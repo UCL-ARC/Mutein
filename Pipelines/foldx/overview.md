@@ -1,4 +1,4 @@
-## Owner=Rachel
+#### Owner:Rachel
 
 ### HPC jobs for myriad
 
@@ -22,6 +22,8 @@ outputs/setname*
 
 To run the pipeline on myriad:
 clone the repo
->> module load python3/recommended
->> python3 scripts/Sh00_Myriad_pipeline.py jobs=1234567 rows=45 setname=6vxx_45 length=6:00:0 (or whatever parameters)
+#### >> module load python3/recommended
+#### >> python3 scripts/Sh00_Myriad_pipeline.py jobs=1234567 rows=45 setname=6vxx_45 length=6:00:0 (or whatever parameters)
+
+#### All python scripts take the same consistent parameters, and can be run via this hpc batch mechanism, or locally:
 
