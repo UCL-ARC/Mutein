@@ -1,6 +1,6 @@
 #### Owner:Rachel
 
-### HPC jobs for myriad
+### HPC FoldX Pipeline for myriad
 
 #### Pipeline inputs
 ##### A pdb file
