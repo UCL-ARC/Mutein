@@ -23,37 +23,45 @@ import helper as hlp
 # The inputs to this function are the pdbfile and the chain id (might optionally consider the positionscan mutation type)
 print('### FoldX repair job ###')
 print(sys.argv)
-params = {}
-params = hlp.inputparams(sys.argv,params)
+iparams = hlp.inputparams(sys.argv)
+cparams = hlp.configparams('')
+params = hlp.mergeparams(cparams,iparams)
 print(params)
-'''
 
-pdb = sys.argv[1]
-jobname = sys.argv[2]
-realOrTest = sys.argv[3]
-environment = sys.argv[4]
+pdb = params['pdb']
+jobname = params['name']
+environment = params['env']
 ############################################
 foldx_exe = 'foldx'
-if environment == 'RSA':
-    foldx_exe = '~/UCL/libs/foldx/foldx' # on my laptop RSA
+if environment == 'python':
+    foldx_exe = '~/UCL/libs/foldx5/foldx' # on my laptop RSA
 
 pdbfile = pdb +'.pdb'
 
 # we want to work in the node directory first, the main pdb input file is a 1-off and lives in github (at the moment)
-dir_path = os.path.dirname(os.path.realpath(__file__)) + '/'
-print('### ... changing directory to',dir_path)
-os.chdir(dir_path)
-results_dir = dir_path + 'results/' + jobname + '/' 
-resultrepair_dir = results_dir + 'repair/'
 
+#\\wsl$\Ubuntu\home\rachel\UCL\github\Mutein\Pipelines\foldx\scripts
+#\\wsl$\Ubuntu\home\rachel\UCL\github\Mutein\Pipelines\foldx\inputs\6vxx
+
+dir_path = os.path.dirname(os.path.realpath(__file__))
+dir_path = dir_path[:-7]
+pdb_path = dir_path + 'inputs/'+pdb + '/'
+results_path = dir_path + 'results/'+jobname + '/'
+resultrepair_dir = results_path + 'repair/'
+print('script path',dir_path)
+print('pdb path',pdb_path)
+print('results path',results_path)
+print('repair path',resultrepair_dir)
+os.chdir(dir_path + 'results/')
+
+# All the files MUST exist already apart from the jobname folders - results_path and resultrepair_path
 # Set up the directory and any files we need (may not be in the path)
-if not os.path.exists(results_dir):
-    os.mkdir(results_dir)
+if not os.path.exists(results_path):
+    os.mkdir(results_path)
 if not os.path.exists(resultrepair_dir):
     os.mkdir(resultrepair_dir)
-
 # Set up files (retain copy of original)
-numRepairs = 5
+numRepairs = 2
 repairinnames = []
 repairoutnames = []
 for r in range(numRepairs+1):
@@ -61,13 +69,11 @@ for r in range(numRepairs+1):
     repairoutnames.append(pdb + '_' + str(r) + '_Repair.pdb')    
 repairinnames[numRepairs] = pdb + '_rep.pdb'
 
-#### there are 2 files we need in the results directory, pdb file rotabase
-print('### ... copying file',pdbfile,results_dir + repairinnames[0],'... ###')
-copyfile(pdbfile, resultrepair_dir + repairinnames[0])
-#print('### ... copying file','rotabase.txt',results_dir + 'rotabase.txt')
-#copyfile('rotabase.txt', resultrepair_dir + 'rotabase.txt')
+#### there are 2 files we need in the results directory, pdb file rotabase, but rotabase is only needed for foldx4 and NOT needed for foldx5
+print('### ... copying file',pdbfile,pdb_path + repairinnames[0],'... ###')
+copyfile(pdb_path + '/' + pdbfile, resultrepair_dir + repairinnames[0])
 # Now change into the results directory for the work
-print('### ... changing directory to',results_dir)
+print('### ... changing directory to',resultrepair_dir)
 os.chdir(resultrepair_dir)
 
 repairBaseA = foldx_exe + ' --command=RepairPDB --pdb='
@@ -79,7 +85,7 @@ for r in range(numRepairs):
     #repaircommand = repairBaseA + repairinnames[r]
     print('### ... repair command #',r,repaircommand)
     os.system(repaircommand)    
-    print('### ... copying file',results_dir + repairoutnames[r],results_dir + repairinnames[r+1])
+    print('### ... copying file',resultrepair_dir + repairoutnames[r],resultrepair_dir + repairinnames[r+1])
     copyfile(repairoutnames[r],repairinnames[r+1])
 
 # copy the final repaired file to our main results directory
@@ -87,4 +93,3 @@ print('### ... copying file',resultrepair_dir + repairoutnames[r], dir_path+repa
 copyfile(resultrepair_dir + repairinnames[numRepairs], results_dir+repairinnames[numRepairs])
 
 print('### COMPLETED FoldX repair job ###')
-'''
