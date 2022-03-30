@@ -65,7 +65,7 @@ if not os.path.exists(results_path):
 if not os.path.exists(resultrepair_dir):
     os.mkdir(resultrepair_dir)
 # Set up files (retain copy of original)
-numRepairs = 1
+numRepairs = 5
 repairinnames = []
 repairoutnames = []
 for r in range(numRepairs+1):
