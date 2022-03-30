@@ -14,6 +14,7 @@ import os
 # For example, when I run locally, I want to use python instead of hpc, and my exe path to foldx and python is different (environment variable incompetence)
 environments = {}
 environments['myriad'] = ['foldx', 'python','hpc']
+environments['myriad_tst'] = ['foldx', 'python','python']
 environments['rachel'] = ['~/UCL/libs/foldx5/foldx', '/bin/python3','python']
 
 def getenvironment(user=''):

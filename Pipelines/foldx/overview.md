@@ -12,7 +12,7 @@
 1. It has my ucl username embedded in the bash scripts for qsub working directory
 2. I force everyone to use the same path to install (well, you can change the install script)
 
-### -- But to get to that state - install or update as follows:
+#### -- But to get to that state - install or update as follows:
 ### 1.Pipeline inputs
 ##### A pdb file
 ##### A list of mutations in a file of the form
