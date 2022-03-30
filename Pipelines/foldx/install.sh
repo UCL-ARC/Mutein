@@ -1,7 +1,8 @@
 
 
 
-mkdir ~/MuteinPipeline/
-mkdir ~/MuteinPipeline/foldx/
-mkdir ~/MuteinPipeline/foldx/scripts/
-cp /scripts ~/MuteinPipeline/foldx/scripts
+mkdir -p ~/MuteinPipeline/
+mkdir -p ~/MuteinPipeline/foldx/
+mkdir -p ~/MuteinPipeline/foldx/scripts/
+cp -R scripts/. ~/MuteinPipeline/foldx/scripts/
+
