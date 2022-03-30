@@ -6,15 +6,13 @@
 ##### A pdb file
 ##### A list of mutations in a file of the form
 ```
-{
-  Mutation,Variant
+Mutation,Variant
 NA501Y,Alpha
 AA570D,Alpha
 TA716I,Alpha
 SA982A,Alpha
 DA1118H,Alpha
 DA614G,Alpha
-}
 ```
 ########################################################################
 ### 2.The data is structured in folders
