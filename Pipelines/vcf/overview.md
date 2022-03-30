@@ -2,7 +2,7 @@
 
 ### List of Papers
 
-This table will list the papers from which our multi-tissue dataset is drawn from:
+This table lists the papers from which our multi-tissue dataset is drawn. UID is intended to be a unique, stable ID within this project only (ie if any paper gets removed from the list do not reuse it's UID for any new papers).
 
 | UID | GH Issue# | DOI | PubMed |First Author | Year | Title | 
 |-----|-----------|-----|--------|-------------|------|-------|
