@@ -26,12 +26,13 @@ outputs/setname/*
 ```
 ########################################################################
 ### 3.To run the pipeline on myriad:
-#### clone the repo
+##### clone the repo
+```
+>> module load python3/recommended
+>> python3 scripts/Sh00_Myriad_pipeline.py jobs=1234567 rows=45 setname=6vxx_45 length=6:00:0 (or whatever parameters)
+```
 ########################################################################
-#### >> module load python3/recommended
-#### >> python3 scripts/Sh00_Myriad_pipeline.py jobs=1234567 rows=45 setname=6vxx_45 length=6:00:0 (or whatever parameters)
-########################################################################
-#### The batch can be run manually and on each individial script too, environment variables 
-#### (you may need to add yoruself) will recognise whether you are running locally or on a server
+##### The batch can be run manually and on each individial script too, environment variables will recognise
+##### whether you are running locally or on a server (you may need to add yourself)
 ########################################################################
 

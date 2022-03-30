@@ -51,10 +51,11 @@ print('script path',dir_path)
 print('pdb path',pdb_path)
 print('results path',results_path)
 print('repair path',resultrepair_dir)
-os.chdir(dir_path + 'results/')
-
 # All the files MUST exist already apart from the jobname folders - results_path and resultrepair_path
 # Set up the directory and any files we need (may not be in the path)
+if not os.path.exists(dir_path + 'results/'):
+    os.mkdir(dir_path + 'results/')
+os.chdir(dir_path + 'results/')
 if not os.path.exists(results_path):
     os.mkdir(results_path)
 if not os.path.exists(resultrepair_dir):

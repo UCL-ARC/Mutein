@@ -11,9 +11,10 @@ import os
 import subprocess
 import helper as hlp
 
+print('#### FOLDX PIPELINE - batch creation ####')
 # Make sure out current directory is where the script lives
 dir_path = os.path.dirname(os.path.realpath(__file__)) + '/'
-print('### ... changing directory to',dir_path)
+print('## ... changing directory to',dir_path)
 os.chdir(dir_path)
 ##### INPUTS #############################################
 # 1= repairing pdb
@@ -88,7 +89,7 @@ if '7' in runparams['jobs']:
 
 for job,exe,script,dependency in runs:
     print(job,exe,script,dependency)
-    if runparams['env'] == 'hpc':
+    if env == 'hpc':
         os.system('chmod +x ' + script)
     args = []
     if env == 'python':
@@ -123,7 +124,7 @@ for job,exe,script,dependency in runs:
 
 
     print(args)
-    if runparams['env'] == 'hpc':
+    if env == 'hpc':
         print('Running on hpc')
         process = subprocess.Popen(args=args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         result = process.communicate()
@@ -134,7 +135,7 @@ for job,exe,script,dependency in runs:
             results = jobid.split('.')
             jobid = results[0]
         dependencies[int(job)] = jobid
-    elif runparams['env'] == 'python':
+    elif env == 'python':
         print('Running in python')
         dependencies[int(job)] = 0
         process = subprocess.Popen(args=args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)    
