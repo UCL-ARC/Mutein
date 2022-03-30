@@ -8,6 +8,10 @@
 >> module load python3/recommended
 >> python3 foldx00_pipeline.py jobs=1234567 split=45 setname=6vxx_45 length=6:00:0 (or whatever parameters)
 ```
+### TODO ###
+1. It has my ucl username embedded in the bash scripts for qsub working directory
+2. I force everyone to use the same path to install (well, you can change the install script)
+
 ### -- But to get to that state - install or update as follows:
 ### 1.Pipeline inputs
 ##### A pdb file
