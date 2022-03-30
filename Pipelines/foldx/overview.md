@@ -2,6 +2,13 @@
 ########################################################################
 ## HPC FoldX Pipeline for myriad
 ########################################################################
+### 0. When everthing is installed and running, you just need to do the following to run the pipeline
+```
+>> cd ~/MuteinPipeline/foldx/scripts/
+>> module load python3/recommended
+>> python3 foldx00_pipeline.py jobs=1234567 split=45 setname=6vxx_45 length=6:00:0 (or whatever parameters)
+```
+### -- But to get to that state - install or update as follows:
 ### 1.Pipeline inputs
 ##### A pdb file
 ##### A list of mutations in a file of the form
