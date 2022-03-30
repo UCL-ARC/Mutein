@@ -16,13 +16,14 @@ DA614G,Alpha
 ```
 ########################################################################
 ### 2.The data is structured in folders
+```
 scripts/*
 inputs/pdb/*
 thruputs/pdb/*
 results/setname/*
 outputs/setname/*
-
 (The thruputs, results and outputs are not are not synced with github)
+```
 ########################################################################
 ### 3.To run the pipeline on myriad:
 #### clone the repo
