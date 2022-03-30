@@ -27,8 +27,9 @@ module load python3/recommended
 module load foldx
 
 # get the script inputs
-pdb=$1
-jobname=$2
+pdb="pdb="$1
+jobname="name="$2
+echo $pdb, $jobname
 
 cd ~/MuteinPipeline/foldx/scripts/
 python foldx01_repair.py $pdb $jobname R MYR
