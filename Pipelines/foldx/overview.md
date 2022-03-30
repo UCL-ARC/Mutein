@@ -29,7 +29,7 @@ outputs/setname/*
 ##### clone the repo
 ```
 >> module load python3/recommended
->> python3 scripts/Sh00_Myriad_pipeline.py jobs=1234567 rows=45 setname=6vxx_45 length=6:00:0 (or whatever parameters)
+>> python3 Pipelines/foldx/scripts/foldx00_pipeline.py jobs=1234567 split=45 setname=6vxx_45 length=6:00:0 (or whatever parameters)
 ```
 ########################################################################
 ##### The batch can be run manually and on each individial script too, environment variables will recognise
