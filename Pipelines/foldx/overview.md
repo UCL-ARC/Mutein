@@ -28,6 +28,8 @@ outputs/setname/*
 ### 3.To run the pipeline on myriad:
 ##### clone the repo
 ```
+>> git checkout .
+>> git pull
 >> module load python3/recommended
 >> python3 Pipelines/foldx/scripts/foldx00_pipeline.py jobs=1234567 split=45 setname=6vxx_45 length=6:00:0 (or whatever parameters)
 ```

@@ -55,13 +55,17 @@ print('repair path',resultrepair_dir)
 # Set up the directory and any files we need (may not be in the path)
 if not os.path.exists(dir_path + 'results/'):
     os.mkdir(dir_path + 'results/')
+if not os.path.exists(dir_path + 'thruputs/'):
+    os.mkdir(dir_path + 'thruputs/')
+if not os.path.exists(dir_path + 'thruputs/' + pdb + '/'):
+    os.mkdir(dir_path + 'thruputs/' + pdb + '/')
 os.chdir(dir_path + 'results/')
 if not os.path.exists(results_path):
     os.mkdir(results_path)
 if not os.path.exists(resultrepair_dir):
     os.mkdir(resultrepair_dir)
 # Set up files (retain copy of original)
-numRepairs = 5
+numRepairs = 1
 repairinnames = []
 repairoutnames = []
 for r in range(numRepairs+1):
@@ -90,6 +94,6 @@ for r in range(numRepairs):
 
 # copy the final repaired file to our main results directory
 print('### ... copying file',resultrepair_dir + repairoutnames[r], dir_path+repairoutnames[r])
-copyfile(resultrepair_dir + repairinnames[numRepairs], results_dir+repairinnames[numRepairs])
+copyfile(resultrepair_dir + repairinnames[numRepairs], dir_path + 'thruputs/' + pdb + '/'+repairinnames[numRepairs])
 
 print('### COMPLETED FoldX repair job ###')

@@ -30,4 +30,5 @@ pdb=$1
 jobname=$2
 
 # cd /home/ucbtlcr/Project549/Project549_02/nodes
+cd $PWD
 python foldx01_repair.py $pdb $jobname R MYR
