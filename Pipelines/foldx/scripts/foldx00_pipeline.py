@@ -15,14 +15,6 @@ import helper as hlp
 dir_path = os.path.dirname(os.path.realpath(__file__)) + '/'
 print('### ... changing directory to',dir_path)
 os.chdir(dir_path)
-env = 'hpc'
-
-# Possibly need to change to rlevant python exe and path for local runs
-if 'wsl$' in dir_path or '/rachel/' in dir_path:
-    env = 'python'
-pythonexe = 'C:/Users/Rache/AppData/Local/Programs/Python/Python310/python.exe' #Rachel windows
-pythonexe = '/bin/python3' #Rachel WSL
-
 ##### INPUTS #############################################
 # 1= repairing pdb
 # 2= making param file for splits
@@ -33,9 +25,11 @@ pythonexe = '/bin/python3' #Rachel WSL
 # 7 = aggregating 6
 jobparams = hlp.inputparams(sys.argv)
 cfgparams = hlp.configparams(jobparams['configfile'])
-cfgparams['env'] = env
 # the job overrides the config
 runparams = hlp.mergeparams(cfgparams, jobparams)
+user = runparams['user']
+user, (foldxe, pythonexe, env) = hlp.getenvironment(user)
+print(user, foldxe, pythonexe,env)
 
 ###### For the purposes of testing override params as required #####
 runparams['jobs'] = '1'
@@ -120,16 +114,17 @@ for job,exe,script,dependency in runs:
             args.append('1-' + str(runparams['combos']))
                     
     args.append(script)
-    args.append(runparams['pdb'])   #1
-    args.append(runparams['name'])            #2
-    args.append(runparams['split'])               #3
-    args.append(runparams['mutation'])           #4   
-    args.append(runparams['variant'])            #5
-    args.append(runparams['variantfile'])        #6
+    args.append(runparams['pdb'])         #1
+    args.append(runparams['name'])        #2
+    args.append(runparams['split'])       #3
+    args.append(runparams['mutation'])    #4   
+    args.append(runparams['variant'])     #5
+    args.append(runparams['variantfile']) #6
 
 
     print(args)
     if runparams['env'] == 'hpc':
+        print('Running on hpc')
         process = subprocess.Popen(args=args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         result = process.communicate()
         print(result) #e.g. Your job 588483 ("foldx-aggregate") has been submitted
@@ -140,11 +135,12 @@ for job,exe,script,dependency in runs:
             jobid = results[0]
         dependencies[int(job)] = jobid
     elif runparams['env'] == 'python':
+        print('Running in python')
         dependencies[int(job)] = 0
         process = subprocess.Popen(args=args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)    
         result = process.communicate()
         print(result) #e.g. Your job 588483 ("foldx-aggregate") has been submitted
     else:
+        print('Not running')
         dependencies[int(job)] = 0
     
-

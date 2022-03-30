@@ -27,14 +27,13 @@ iparams = hlp.inputparams(sys.argv)
 cparams = hlp.configparams('')
 params = hlp.mergeparams(cparams,iparams)
 print(params)
+user = params['user']
+user, (foldxe, pythonexe, environment) = hlp.getenvironment(user)
+print(user, foldxe, pythonexe,environment)
 
 pdb = params['pdb']
 jobname = params['name']
-environment = params['env']
 ############################################
-foldx_exe = 'foldx'
-if environment == 'python':
-    foldx_exe = '~/UCL/libs/foldx5/foldx' # on my laptop RSA
 
 pdbfile = pdb +'.pdb'
 
@@ -61,7 +60,7 @@ if not os.path.exists(results_path):
 if not os.path.exists(resultrepair_dir):
     os.mkdir(resultrepair_dir)
 # Set up files (retain copy of original)
-numRepairs = 2
+numRepairs = 5
 repairinnames = []
 repairoutnames = []
 for r in range(numRepairs+1):
@@ -76,7 +75,7 @@ copyfile(pdb_path + '/' + pdbfile, resultrepair_dir + repairinnames[0])
 print('### ... changing directory to',resultrepair_dir)
 os.chdir(resultrepair_dir)
 
-repairBaseA = foldx_exe + ' --command=RepairPDB --pdb='
+repairBaseA = foldxe + ' --command=RepairPDB --pdb='
 repairBaseB = " --ionStrength=0.05 --pH=7 --vdwDesign=2 --pdbHydrogens=false"
 
 # Run repair number one

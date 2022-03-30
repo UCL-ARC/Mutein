@@ -8,6 +8,31 @@ Helper module for pipeline script for foldx job on Myriad
 
 import os
 
+##################################### Environments exes and paths  ##########################################################
+######################################### !!!!! TODO !!!!! ##################################################################
+## New users, add your environment details here to and check them in to avoid having to mess about locally all the time ##
+# For example, when I run locally, I want to use python instead of hpc, and my exe path to foldx and python is different (environment variable incompetence)
+environments = {}
+environments['myriad'] = ['foldx', 'python','hpc']
+environments['rachel'] = ['~/UCL/libs/foldx5/foldx', '/bin/python3','python']
+
+def getenvironment(user=''):
+    '''Automatically recognise the environment though to can be overridden by exploicitly passing it in
+    Returns: environment, tuple(foldx path, python path, hpc or python)
+    '''
+    if user != '':
+        dir_path = os.path.dirname(os.path.realpath(__file__)) + '/'  
+        if '/rachel/' in dir_path:
+            user = 'rachel'
+        else:
+            user = 'myriad'
+    if user in environments:
+        return user,environments[user]    
+    return None,None
+
+##################################### Environments exes and paths  ##########################################################
+
+### These functions consistently handle the paramater inputs for the script, merging config and overrides
 def addlinetoparams(arg,params):    
     args = []
     if '=' in arg:
@@ -32,6 +57,8 @@ def addlinetoparams(arg,params):
         params['combos'] = args[1]
     elif 'env=' in arg:
         params['env'] = args[1]
+    elif 'user=' in arg:
+        params['user'] = args[1]
     return params
 
 def configparams(filename):    
@@ -55,13 +82,8 @@ def configparams(filename):
         params['variantfile'] = params['pdb'] + '_vars'
 
     #Code to decide if it is test or live environment can be overridden from the command line
-    dir_path = os.path.dirname(os.path.realpath(__file__)) + '/'        
-    if 'wsl$' in dir_path or '/rachel/' in dir_path:# Possibly need to change to rlevant python exe and path for local runs
-        env = 'python'
-    else:
-        env = 'hpc'
-    params['env'] = env
-
+    user, envs = getenvironment()    
+    params['user'] = user
     return params
 
 
