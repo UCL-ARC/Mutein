@@ -29,5 +29,5 @@ module load foldx
 pdb=$1
 jobname=$2
 
-cd /home/ucbtlcr/Project549/Project549_02/nodes
-python /home/ucbtlcr/Project549/Project549_02/nodes/work_foldx01repair.py $pdb $jobname R MYR
+# cd /home/ucbtlcr/Project549/Project549_02/nodes
+python foldx01_repair.py $pdb $jobname R MYR
