@@ -28,10 +28,18 @@ outputs/setname/*
 ### 3.To run the pipeline on myriad:
 ##### clone the repo
 ```
+# 1. Get the code
 >> git checkout .
 >> git pull
+>> cd Mutein
+# 2. Run the install script, let's not run everything within github on the servers(it is ok on your local machine)
+>> chmod +x Pipelines/foldx/install.sh
+>> Pipelines/foldx/install.sh
+# 3. This has created/copied the scripts in ~/MuteinPipeline/foldx/scripts/
+# Now navigate there and run the pipeline
+>> cd ~/MuteinPipeline/foldx/scripts/
 >> module load python3/recommended
->> python3 Pipelines/foldx/scripts/foldx00_pipeline.py jobs=1234567 split=45 setname=6vxx_45 length=6:00:0 (or whatever parameters)
+>> python3 foldx00_pipeline.py jobs=1234567 split=45 setname=6vxx_45 length=6:00:0 (or whatever parameters)
 ```
 ########################################################################
 ##### The batch can be run manually and on each individial script too, environment variables will recognise

@@ -30,6 +30,5 @@ module load foldx
 pdb=$1
 jobname=$2
 
-# cd /home/ucbtlcr/Project549/Project549_02/nodes
-cd $PWD
+cd ~/MuteinPipeline/foldx/scripts/
 python foldx01_repair.py $pdb $jobname R MYR
