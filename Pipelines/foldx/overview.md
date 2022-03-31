@@ -58,5 +58,5 @@ outputs/setname/*
 ########################################################################
 
 ### Continuous integration
-https://medium.com/swlh/automate-python-testing-with-github-actions-7926b5d8a865
+
 
