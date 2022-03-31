@@ -57,3 +57,6 @@ outputs/setname/*
 ##### whether you are running locally or on a server (you may need to add yourself)
 ########################################################################
 
+### Continuous integration
+https://medium.com/swlh/automate-python-testing-with-github-actions-7926b5d8a865
+

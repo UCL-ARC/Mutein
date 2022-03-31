@@ -1,0 +1,233 @@
+   ********************************************
+   ***                                      ***
+   ***             FoldX 5 (c)              ***
+   ***                                      ***
+   ***     code by the FoldX Consortium     ***
+   ***                                      ***
+   ***     Jesper Borg, Frederic Rousseau   ***
+   ***    Joost Schymkowitz, Luis Serrano   ***
+   ***    Peter Vanhee, Erik Verschueren    ***
+   ***     Lies Baeten, Javier Delgado      ***
+   ***       and Francois Stricher          ***
+   *** and any other of the 9! permutations ***
+   ***   based on an original concept by    ***
+   ***   Raphael Guerois and Luis Serrano   ***
+   ********************************************
+
+Start RepairPDB >>>
+
+1 models read: Test_1.pdb
+"Test_1_Repair.fxout"
+Repair will take all residues into account
+wild type
+
+BackHbond       =               -0.31
+SideHbond       =               -0.31
+Energy_VdW      =               -0.08
+Electro         =               -0.03
+Energy_SolvP    =               0.08
+Energy_SolvH    =               -0.11
+Energy_vdwclash =               0.00
+energy_torsion  =               0.23
+backbone_vdwclash=              0.00
+Entropy_sidec   =               0.38
+Entropy_mainc   =               0.75
+water bonds     =               0.00
+helix dipole    =               0.00
+loop_entropy    =               0.00
+cis_bond        =               0.00
+disulfide       =               0.00
+kn electrostatic=               0.00
+partial covalent interactions = 0.00
+Energy_Ionisation =             0.00
+Entropy Complex =               0.00
+-----------------------------------------------------------
+Total          = 				  0.60
+
+Flipping HNQ
+
+BackHbond       =               -0.31
+SideHbond       =               -0.31
+Energy_VdW      =               -0.08
+Electro         =               -0.03
+Energy_SolvP    =               0.08
+Energy_SolvH    =               -0.11
+Energy_vdwclash =               0.00
+energy_torsion  =               0.23
+backbone_vdwclash=              0.00
+Entropy_sidec   =               0.38
+Entropy_mainc   =               0.75
+water bonds     =               0.00
+helix dipole    =               0.00
+loop_entropy    =               0.00
+cis_bond        =               0.00
+disulfide       =               0.00
+kn electrostatic=               0.00
+partial covalent interactions = 0.00
+Energy_Ionisation =             0.00
+Entropy Complex =               0.00
+-----------------------------------------------------------
+Total          = 				  0.60
+
+Now Optimizing Residues
+Now optimizing Residue TYRA28
+Optimize Residue ID= TYRA28
+
+BackHbond       =               -0.31
+SideHbond       =               -0.31
+Energy_VdW      =               -0.09
+Electro         =               -0.03
+Energy_SolvP    =               0.08
+Energy_SolvH    =               -0.11
+Energy_vdwclash =               0.00
+energy_torsion  =               0.23
+backbone_vdwclash=              0.00
+Entropy_sidec   =               0.38
+Entropy_mainc   =               0.75
+water bonds     =               0.00
+helix dipole    =               0.00
+loop_entropy    =               0.00
+cis_bond        =               0.00
+disulfide       =               0.00
+kn electrostatic=               0.00
+partial covalent interactions = 0.00
+Energy_Ionisation =             0.00
+Entropy Complex =               0.00
+-----------------------------------------------------------
+Total          = 				  0.60
+
+Now optimizing Residue THRA29
+Optimize Residue ID= THRA29
+
+BackHbond       =               -0.31
+SideHbond       =               -0.31
+Energy_VdW      =               -0.09
+Electro         =               -0.03
+Energy_SolvP    =               0.08
+Energy_SolvH    =               -0.11
+Energy_vdwclash =               0.00
+energy_torsion  =               0.23
+backbone_vdwclash=              0.00
+Entropy_sidec   =               0.38
+Entropy_mainc   =               0.75
+water bonds     =               0.00
+helix dipole    =               0.00
+loop_entropy    =               0.00
+cis_bond        =               0.00
+disulfide       =               0.00
+kn electrostatic=               0.00
+partial covalent interactions = 0.00
+Energy_Ionisation =             0.00
+Entropy Complex =               0.00
+-----------------------------------------------------------
+Total          = 				  0.60
+
+Optimized
+
+BackHbond       =               -0.31
+SideHbond       =               -0.31
+Energy_VdW      =               -0.09
+Electro         =               -0.03
+Energy_SolvP    =               0.08
+Energy_SolvH    =               -0.11
+Energy_vdwclash =               0.00
+energy_torsion  =               0.23
+backbone_vdwclash=              0.00
+Entropy_sidec   =               0.38
+Entropy_mainc   =               0.75
+water bonds     =               0.00
+helix dipole    =               0.00
+loop_entropy    =               0.00
+cis_bond        =               0.00
+disulfide       =               0.00
+kn electrostatic=               0.00
+partial covalent interactions = 0.00
+Energy_Ionisation =             0.00
+Entropy Complex =               0.00
+-----------------------------------------------------------
+Total          = 				  0.60
+
+Now moving residues with bad energies 
+Residue TYRA28 has high Energy, we mutate it to itself
+Repair Residue ID= TYRA28
+
+BackHbond       =               -0.31
+SideHbond       =               -0.31
+Energy_VdW      =               -0.09
+Electro         =               -0.06
+Energy_SolvP    =               0.09
+Energy_SolvH    =               -0.12
+Energy_vdwclash =               -0.00
+energy_torsion  =               0.23
+backbone_vdwclash=              0.00
+Entropy_sidec   =               0.41
+Entropy_mainc   =               0.75
+water bonds     =               0.00
+helix dipole    =               0.00
+loop_entropy    =               0.00
+cis_bond        =               0.00
+disulfide       =               0.00
+kn electrostatic=               0.00
+partial covalent interactions = 0.00
+Energy_Ionisation =             0.00
+Entropy Complex =               0.00
+-----------------------------------------------------------
+Total          = 				  0.60
+
+Residue THRA29 has high Energy, we mutate it to itself
+Repair Residue ID= THRA29
+
+BackHbond       =               -0.31
+SideHbond       =               -0.31
+Energy_VdW      =               -0.09
+Electro         =               -0.06
+Energy_SolvP    =               0.09
+Energy_SolvH    =               -0.12
+Energy_vdwclash =               -0.00
+energy_torsion  =               0.23
+backbone_vdwclash=              0.00
+Entropy_sidec   =               0.41
+Entropy_mainc   =               0.75
+water bonds     =               0.00
+helix dipole    =               0.00
+loop_entropy    =               0.00
+cis_bond        =               0.00
+disulfide       =               0.00
+kn electrostatic=               0.00
+partial covalent interactions = 0.00
+Energy_Ionisation =             0.00
+Entropy Complex =               0.00
+-----------------------------------------------------------
+Total          = 				  0.60
+
+Repaired
+
+BackHbond       =               -0.31
+SideHbond       =               -0.31
+Energy_VdW      =               -0.09
+Electro         =               -0.06
+Energy_SolvP    =               0.09
+Energy_SolvH    =               -0.12
+Energy_vdwclash =               -0.00
+energy_torsion  =               0.23
+backbone_vdwclash=              0.00
+Entropy_sidec   =               0.41
+Entropy_mainc   =               0.75
+water bonds     =               0.00
+helix dipole    =               0.00
+loop_entropy    =               0.00
+cis_bond        =               0.00
+disulfide       =               0.00
+kn electrostatic=               0.00
+partial covalent interactions = 0.00
+Energy_Ionisation =             0.00
+Entropy Complex =               0.00
+-----------------------------------------------------------
+Total          = 				  0.60
+
+End of Repair
+Output PDB ./Test_1_Repair.pdb
+Your file run OK
+End time of FoldX: Thu Mar 31 10:54:19 2022
+Total time spend: 0.12 seconds.
+Cleaning RepairPDB...DONE

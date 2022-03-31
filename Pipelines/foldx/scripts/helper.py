@@ -13,6 +13,8 @@ import os
 ## New users, add your environment details here to and check them in to avoid having to mess about locally all the time ##
 # For example, when I run locally, I want to use python instead of hpc, and my exe path to foldx and python is different (environment variable incompetence)
 environments = {}
+environments['empty'] = ['foldx', 'python','empty'] #just prints out what it would run
+environments['CI'] = ['~/UCL/libs/foldx5/foldx', '/bin/python3','python'] #continuous integration
 environments['myriad'] = ['foldx', 'python','hpc']
 environments['myriad_tst'] = ['foldx', 'python','python']
 environments['rachel'] = ['~/UCL/libs/foldx5/foldx', '/bin/python3','python']
@@ -20,15 +22,17 @@ environments['rachel'] = ['~/UCL/libs/foldx5/foldx', '/bin/python3','python']
 def getenvironment(user=''):
     '''Automatically recognise the environment though to can be overridden by exploicitly passing it in
     Returns: environment, tuple(foldx path, python path, hpc or python)
-    '''
-    if user != '':
+    '''    
+    if user == '':
         dir_path = os.path.dirname(os.path.realpath(__file__)) + '/'  
         if '/rachel/' in dir_path:
             user = 'rachel'
+        #elif add your user env here to default
         else:
             user = 'myriad'
-    if user in environments:
+    if user in environments:        
         return user,environments[user]    
+
     return None,None
 
 ##################################### Environments exes and paths  ##########################################################
