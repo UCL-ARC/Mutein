@@ -25,7 +25,10 @@ def run_pipeline00(args):
     # 6 = performing variant ddg (parallel)
     # 7 = aggregating 6
     jobparams = hlp.inputparams(args)
-    cfgparams = hlp.configparams(jobparams['configfile'])    
+    pdb = ''
+    if 'pdb' in jobparams:
+        pdb = jobparams['pdb']
+    cfgparams = hlp.configparams(pdb)    
     runparams = hlp.mergeparams(cfgparams, jobparams) # the job overrides the config
     #runparams['jobs'] = '1' ## if needed for testing purposes
     print('final params',runparams)
