@@ -66,22 +66,29 @@ def addlinetoparams(arg,params):
         params['user'] = args[1]
     elif 'chain=' in arg:
         params['chain'] = args[1]
+    elif 'row=' in arg:
+        params['row'] = args[1]
     return params
 
-def configparams(filename):    
-    #set up some defaults for any batch to run without paramaters
+def configparams(pdb):    
+    #set up some defaults for any batch to run without paramaters    
     params = {}
     params['jobs'] = '1234567'
     params['chain'] = 'A'
     params['pdb'] = '6vxx'
     params['name'] = '6vxx_50'
     params['split'] = '50'
+    params['row'] = '1'
     params['mutation'] = '.'
     params['time'] = '.'
     params['combos'] = '63'
-    params['variant'] = 'Alpha'    
-    if filename != '':
-        with open(filename) as fr:
+    params['variant'] = 'Alpha'        
+    if pdb != '':
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        dir_path = dir_path[:-7]
+        input_path = dir_path + 'inputs/'         
+        configfile = input_path + pdb + '/config.cfg'
+        with open(configfile) as fr:
             cfgcontent = fr.readlines()
             for line in cfgcontent:
                 line = line.strip()
@@ -112,8 +119,26 @@ def mergeparams(configparams, jobparams):
         configparams[cfg] = val
     return configparams
 
-
-
+def get_make_paths(pdb,name):
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    dir_path = dir_path[:-7]
+    if not os.path.exists(dir_path + 'interim/'):
+        os.mkdir(dir_path + 'interim/')
+    if not os.path.exists(dir_path + 'thruputs/'):
+        os.mkdir(dir_path + 'thruputs/')
+    if not os.path.exists(dir_path + 'outputs/'):
+        os.mkdir(dir_path + 'outputs/')
+    input_path = dir_path + 'inputs/' + pdb + '/'
+    thruput_path = dir_path + 'thruputs/' + pdb + '/'
+    interim_path =     dir_path + 'interim/' + name + '/'
+    output_path =     dir_path + 'outputs/' + name + '/'
+    if not os.path.exists(thruput_path):
+        os.mkdir(thruput_path)
+    if not os.path.exists(interim_path):
+        os.mkdir(interim_path)
+    if not os.path.exists(output_path):
+        os.mkdir(output_path)
+    return input_path, thruput_path, interim_path, output_path
 
 
 

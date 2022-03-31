@@ -20,35 +20,30 @@ import helper as hlp
 def run_pipeline02(args):
     print('### FoldX make params job ###')
     print(args)    
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    dir_path = dir_path[:-7]
-    input_path = dir_path + 'inputs/'        
-    thruput_path = dir_path + 'thruputs/'            
     # combine config and job input params
-    iparams = hlp.inputparams(args)
-    configfile = ''
+    iparams = hlp.inputparams(args)    
+    pdb = ''
     if 'pdb' in iparams:
-        configfile = input_path + iparams['pdb'] + '/config.cfg'
-    cparams = hlp.configparams(configfile)    
+        pdb = iparams['pdb']
+    cparams = hlp.configparams(pdb)    
     params = hlp.mergeparams(cparams,iparams)
     print(params)
     user = params['user']
     user, (foldxe, pythonexe, environment) = hlp.getenvironment(user)
+    print(user, foldxe, pythonexe,environment)
+    pdb = params['pdb']
+    jobname = params['name']
+    input_path, thruput_path, interim_path, output_path = hlp.get_make_paths(pdb,jobname)
 
     pdb = params['pdb']
     jobname = params['name']
     chainid = params['chain']
     rows = int(params['split'])
 
-    interim_path = dir_path + 'interim/' + jobname + '/'
-    if not os.path.exists(dir_path + 'interim/'):
-        os.mkdir(dir_path + 'interim/')
-    if not os.path.exists(interim_path):
-        os.mkdir(interim_path)
     ##########################################################
 
     ##### Open the pdb file ################################    
-    with open(thruput_path + pdb + '/'+ pdb + '_rep.pdb') as f:
+    with open(thruput_path + pdb + '_rep.pdb') as f:
         pdbcontent = f.readlines()
 
     ##### Amino acid dictionary to convert between 3 and 1 codes
