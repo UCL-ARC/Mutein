@@ -46,9 +46,9 @@ def run_pipeline00(args):
         runs.append([1,'qsub',"./foldx01_repair" + ext,-1])
     if '2' in runparams['jobs']:
         if '1' in runparams['jobs']:
-            runs.append([2,'qsub',"./Sh02_Myriad_makeparams" + ext,1])
+            runs.append([2,'qsub',"./foldx02_makeparams" + ext,1])
         else:
-            runs.append([2,'qsub',"./Sh02_Myriad_makeparams" + ext,-1])
+            runs.append([2,'qsub',"./foldx02_makeparams" + ext,-1])
 
     override_array = False
     if '3' in runparams['jobs']:
