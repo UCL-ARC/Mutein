@@ -129,6 +129,6 @@ dmypy.json
 .pyre/
 
 # Don't include results directories in the github sync
-Pipelines/foldx/results/*
+Pipelines/foldx/interim/*
 Pipelines/foldx/thruputs/*
 Pipelines/foldx/outputs/*
