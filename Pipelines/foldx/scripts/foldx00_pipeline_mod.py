@@ -58,11 +58,11 @@ def run_pipeline00(args):
         dep = -1
         if '2' in runparams['jobs']:
             dep = 2
-        if runparams['mutation'] == '.':
-            override_array = True
-            runs.append([3,'qsub',"./Sh03_Myriad_posscan" + ext,dep])        
-        else:
-            runs.append([3,'qsub',"./Sh03_Myriad_posscan_one" + ext,dep])
+        #if runparams['mutation'] == '.':
+        override_array = True
+        runs.append([3,'qsub',"./foldx03_posscan" + ext,dep])        
+        #else:
+        #    runs.append([3,'qsub',"./Sh03_Myriad_posscan_one" + ext,dep])
 
     if '4' in runparams['jobs']:    
         if '3' in runparams['jobs']:
