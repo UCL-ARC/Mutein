@@ -64,12 +64,15 @@ def addlinetoparams(arg,params):
         params['env'] = args[1]
     elif 'user=' in arg:
         params['user'] = args[1]
+    elif 'chain=' in arg:
+        params['chain'] = args[1]
     return params
 
 def configparams(filename):    
     #set up some defaults for any batch to run without paramaters
     params = {}
     params['jobs'] = '1234567'
+    params['chain'] = 'A'
     params['pdb'] = '6vxx'
     params['name'] = '6vxx_50'
     params['split'] = '50'
@@ -90,8 +93,6 @@ def configparams(filename):
     user, envs = getenvironment()    
     params['user'] = user
     return params
-
-
 
 def inputparams(argvs):        
     params = {}

@@ -17,4 +17,20 @@ def test_foldx_pipeline01_test():
     args = ['','user=CI','pdb=Test','jobs=1']    
     p01.run_pipeline01(args)
     
+def test_foldx_pipeline02_test():
+    addpath()
+    import foldx02_makeparams_mod as p02
+    args = ['','user=CI','pdb=Test','jobs=2']    
+    p02.run_pipeline02(args)
+
+def test_foldx_pipeline02_covid():
+    addpath()
+    import foldx02_makeparams_mod as p02
+    args = ['','user=CI','pdb=6vxx','split=25','name=covid1']    
+    p02.run_pipeline02(args)
+    
+
+#test_foldx_pipeline00_empty()
 #test_foldx_pipeline01_test()
+#test_foldx_pipeline02_test()
+#test_foldx_pipeline02_covid()

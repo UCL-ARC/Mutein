@@ -60,3 +60,9 @@ outputs/setname/*
 ### Continuous integration
 
 
+
+### Useful docs
+1. Virtual env in vscode: https://techinscribed.com/python-virtual-environment-in-vscode/#:~:text=Using%20Python%20Virtual%20Environment%20in%20VSCode%201%20Install,installed%2C%20VSCode%20will%20show%20an%20error%20like%20this.
+
+
+
