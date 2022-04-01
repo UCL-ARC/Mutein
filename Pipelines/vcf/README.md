@@ -85,7 +85,7 @@ This section maps out the references to datasets found in the papers. Where the 
 
 ### List of Dataset Accessions
 
-This table is a duplicate-free list of the dataset accession numbers from the above papers. We could use the accession number as the dataset names in the code and manuscript, but perhaps more informative names would be better referring to tissue type etc, hence the placeholder Sample Name column.
+This table is a duplicate-free list of the dataset accession numbers from the above papers. We could use the accession number as the dataset names in the code and manuscript, but perhaps more informative names would be better referring to tissue type etc, hence the placeholder Sample Name column. Current total data size is 27TB.
 
 | Dataset UID | Orig Acc Numb| Our Sample Name | URL |Paper UID(s) | Data Access Control | Notes | Size (GB) |
 |-------------|--------------------------|-----------------|-----|-------------|---------------------|-------|-----------|
@@ -98,7 +98,7 @@ This table is a duplicate-free list of the dataset accession numbers from the ab
 | 7           | EGAD00001000825          | | [EGA](https://ega-archive.org/datasets/EGAD00001000825) | 3   | datasharing@sanger.ac.uk |700 files, CRAM, Illumina HiSeq 2000|489|
 | 8           | EGAD00001004192          | | [EGA](https://ega-archive.org/datasets/EGAD00001004192) | 4   | datasharing@sanger.ac.uk |2038 files, CRAM, HiSeq X Ten|10681|
 | 9           | EGAD00001004193          | | [EGA](https://ega-archive.org/datasets/EGAD00001004193) | 4   | datasharing@sanger.ac.uk |1632 files, CRAM, Illumina HiSeq 2500|195|
-| 10          | SRP159015                | | [SRA](https://www.ncbi.nlm.nih.gov/sra/?term=SRP159015) | 5   |                          |179 files, SRA, Illumina HiSeq 2500|203|
+| 10          | SRP159015                | | [SRA](https://www.ncbi.nlm.nih.gov/sra/?term=SRP159015) | 5   | open?                    |179 files, SRA, Illumina HiSeq 2500|203|
 | 11          | SRP219003                | | [phs001808.v1.p1](https://www.ncbi.nlm.nih.gov/projects/gap/cgi-bin/study.cgi?study_id=phs001808.v1.p1) [PRJNA531733](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA531733) [SRP219003](https://trace.ncbi.nlm.nih.gov/Traces/sra/?study=SRP219003)|6|JAAMH-DAC@list.nih.gov|152 files, SRA,Illumina HiSeq X Ten, HiSeq 2000|3103|
 | 12          | EGAD00001004464          | | [EGA](https://ega-archive.org/datasets/EGAD00001004464) | 7   | Akira Yokoyama kyototumorpatho-labo@umin.ac.jp|523 files, BAM, Illumina HiSeq 2000|5950|
 | 13          | EGAD00001004462          | | [EGA](https://ega-archive.org/datasets/EGAD00001004462) | 7   | Akira Yokoyama kyototumorpatho-labo@umin.ac.jp|20 files, BAM, Illumina NovaSeq 6000|1209|
