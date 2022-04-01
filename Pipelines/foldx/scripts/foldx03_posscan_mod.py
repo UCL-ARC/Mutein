@@ -43,30 +43,48 @@ def run_pipeline03(args):
     input_path, thruput_path, interim_path, output_path = hlp.get_make_paths(pdb,jobname)
     ############################################
     pdbfile = pdb +'_rep.pdb'
-    print('### ... change directory',thruput_path)
-    os.chdir(thruput_path)                
-    row_path = interim_path + 'row' + str(row) + '/'
-    if not os.path.exists(row_path):
-        os.mkdir(row_path)    
-    print('### ... copying file',pdbfile,row_path + pdbfile)
-    copyfile(pdbfile,row_path + pdbfile)
-    print('### ... change directory',row_path)
-    os.chdir(row_path)
+    print('### ... change directory',thruput_path)                     
+    mutations = []
+    if mutation_string == ".":
+        filename = interim_path + 'params.txt'
+        print('open',filename)
+        with open(filename) as fr:
+            paramscontent = fr.readlines()        
+            for row in paramscontent:
+                row = row.strip()
+                print(row)
+                rowvals = row.split(' ')
+                mutation = rowvals[2]
+                row = rowvals[3]
+                mutations.append([mutation,row])
+    else:
+        mutations.append([mutation_string,'row'+str(row)])
 
-    foldxcommand = foldxe + ' --command=PositionScan'
-    foldxcommand += ' --ionStrength=0.05'
-    foldxcommand += ' --pH=7'
-    foldxcommand += ' --water=CRYSTAL'
-    foldxcommand += ' --vdwDesign=2'
-    foldxcommand += ' --pdbHydrogens=false'
-    #foldxcommand += ' --output-dir=' + results_dir
-    #foldxcommand += ' --pdb-dir=' + results_dir
-    foldxcommand += ' --pdb=' + pdbfile
-    foldxcommand += ' --positions=' + mutation_string
+    for mut,row in mutations:
+        print(mut,row)
+
+        row_path = interim_path + row + '/'
+        if not os.path.exists(row_path):
+            os.mkdir(row_path)    
+        print('### ... copying file',thruput_path + pdbfile,row_path + pdbfile)
+        copyfile(thruput_path + pdbfile,row_path + pdbfile)
+        print('### ... change directory',row_path)
+        os.chdir(row_path)
+
+        foldxcommand = foldxe + ' --command=PositionScan'
+        foldxcommand += ' --ionStrength=0.05'
+        foldxcommand += ' --pH=7'
+        foldxcommand += ' --water=CRYSTAL'
+        foldxcommand += ' --vdwDesign=2'
+        foldxcommand += ' --pdbHydrogens=false'
+        #foldxcommand += ' --output-dir=' + results_dir
+        #foldxcommand += ' --pdb-dir=' + results_dir
+        foldxcommand += ' --pdb=' + pdbfile
+        foldxcommand += ' --positions=' + mut
 
 
-    print(foldxcommand)
-    print("RealOrTest=",environment)
-    if environment != 'empty':    
-        os.system(foldxcommand)
+        print(foldxcommand)
+        print("RealOrTest=",environment)
+        if environment != 'empty':    
+            os.system(foldxcommand)
 
