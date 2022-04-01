@@ -48,7 +48,7 @@ def run_pipeline03(args):
     row_path = interim_path + 'row' + str(row) + '/'
     if not os.path.exists(row_path):
         os.mkdir(row_path)    
-    print('### ... copying file',pdbfile,interim_path + pdbfile)
+    print('### ... copying file',pdbfile,row_path + pdbfile)
     copyfile(pdbfile,row_path + pdbfile)
     print('### ... change directory',row_path)
     os.chdir(row_path)
