@@ -57,7 +57,7 @@ def test_foldx_pipeline05_test():
 #test_foldx_pipeline01_test()
 #test_foldx_pipeline02_test()
 #test_foldx_pipeline02_covid()
-#test_foldx_pipeline03_test()
+test_foldx_pipeline03_test()
 #test_foldx_pipeline03_covid()
 #test_foldx_pipeline04_test()
 #test_foldx_pipeline05_test()
