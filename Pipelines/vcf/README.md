@@ -87,19 +87,19 @@ This section maps out the references to datasets found in the papers. Where the 
 
 This table is a duplicate-free list of the dataset accession numbers from the above papers. We could use the accession number as the dataset names in the code and manuscript, but perhaps more informative names would be better referring to tissue type etc, hence the placeholder Sample Name column.
 
-| Dataset UID | Original Accession Number| Our Sample Name | URL |Paper UID(s) | Data Access Control | Notes | Size (GB) |
+| Dataset UID | Orig Acc Numb| Our Sample Name | URL |Paper UID(s) | Data Access Control | Notes | Size (GB) |
 |-------------|--------------------------|-----------------|-----|-------------|---------------------|-------|-----------|
-| 1           | EGAD00001006969          | | https://ega-archive.org/datasets/EGAD00001006969 | 1   | datasharing@sanger.ac.uk |63 files, CRAM, Illumina HiSeq 2500|14|
-| 2           | EGAD00001004158          | | https://ega-archive.org/datasets/EGAD00001004158 | 1,2 | datasharing@sanger.ac.uk |866 files, CRAM, Illumina HiSeq 2500|597|
-| 3           | EGAD00001006194          | | https://ega-archive.org/datasets/EGAD00001006194 | 1   | datasharing@sanger.ac.uk |1780 files, CRAM, HiSeq X Ten,Illumina HiSeq 2500,Illumina NovaSeq 6000|2653|
-| 4           | EGAD00001004159          | | https://ega-archive.org/datasets/EGAD00001004159 | 1,2 | datasharing@sanger.ac.uk |216 files, CRAM, HiSeq X Ten|1659|
-| 5           | EGAD00001001123          | | https://ega-archive.org/datasets/EGAD00001001123 | 3   | datasharing@sanger.ac.uk |16 files, CRAM, Illumina HiSeq 2000|214|
-| 6           | EGAD00001001090          | | https://ega-archive.org/datasets/EGAD00001001090 | 3   | datasharing@sanger.ac.uk |262 files, BAM, Illumina HiSeq 2000|204|
-| 7           | EGAD00001000825          | | https://ega-archive.org/datasets/EGAD00001000825 | 3   | datasharing@sanger.ac.uk |700 files, CRAM, Illumina HiSeq 2000|489|
-| 8           | EGAD00001004192          | | https://ega-archive.org/datasets/EGAD00001004192 | 4   | datasharing@sanger.ac.uk |2038 files, CRAM, HiSeq X Ten|10681|
-| 9           | EGAD00001004193          | | https://ega-archive.org/datasets/EGAD00001004193 | 4   | datasharing@sanger.ac.uk |1632 files, CRAM, Illumina HiSeq 2500|195|
-| 10          | SRP159015                | | https://www.ncbi.nlm.nih.gov/sra/?term=SRP159015 | 5   |                          |179 files, SRA, Illumina HiSeq 2500|203|
+| 1           | EGAD00001006969          | | [EGA](https://ega-archive.org/datasets/EGAD00001006969) | 1   | datasharing@sanger.ac.uk |63 files, CRAM, Illumina HiSeq 2500|14|
+| 2           | EGAD00001004158          | | [EGA](https://ega-archive.org/datasets/EGAD00001004158) | 1,2 | datasharing@sanger.ac.uk |866 files, CRAM, Illumina HiSeq 2500|597|
+| 3           | EGAD00001006194          | | [EGA](https://ega-archive.org/datasets/EGAD00001006194) | 1   | datasharing@sanger.ac.uk |1780 files, CRAM, HiSeq X Ten,Illumina HiSeq 2500,Illumina NovaSeq 6000|2653|
+| 4           | EGAD00001004159          | | [EGA](https://ega-archive.org/datasets/EGAD00001004159) | 1,2 | datasharing@sanger.ac.uk |216 files, CRAM, HiSeq X Ten|1659|
+| 5           | EGAD00001001123          | | [EGA](https://ega-archive.org/datasets/EGAD00001001123) | 3   | datasharing@sanger.ac.uk |16 files, CRAM, Illumina HiSeq 2000|214|
+| 6           | EGAD00001001090          | | [EGA](https://ega-archive.org/datasets/EGAD00001001090) | 3   | datasharing@sanger.ac.uk |262 files, BAM, Illumina HiSeq 2000|204|
+| 7           | EGAD00001000825          | | [EGA](https://ega-archive.org/datasets/EGAD00001000825) | 3   | datasharing@sanger.ac.uk |700 files, CRAM, Illumina HiSeq 2000|489|
+| 8           | EGAD00001004192          | | [EGA](https://ega-archive.org/datasets/EGAD00001004192) | 4   | datasharing@sanger.ac.uk |2038 files, CRAM, HiSeq X Ten|10681|
+| 9           | EGAD00001004193          | | [EGA](https://ega-archive.org/datasets/EGAD00001004193) | 4   | datasharing@sanger.ac.uk |1632 files, CRAM, Illumina HiSeq 2500|195|
+| 10          | SRP159015                | | [SRA](https://www.ncbi.nlm.nih.gov/sra/?term=SRP159015) | 5   |                          |179 files, SRA, Illumina HiSeq 2500|203|
 | 11          | SRP219003                | | [phs001808.v1.p1](https://www.ncbi.nlm.nih.gov/projects/gap/cgi-bin/study.cgi?study_id=phs001808.v1.p1) [PRJNA531733](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA531733) [SRP219003](https://trace.ncbi.nlm.nih.gov/Traces/sra/?study=SRP219003)|6|JAAMH-DAC@list.nih.gov|152 files, SRA,Illumina HiSeq X Ten, HiSeq 2000|3103|
-| 12          | EGAD00001004464          | | https://ega-archive.org/datasets/EGAD00001004464 | 7   | Akira Yokoyama kyototumorpatho-labo@umin.ac.jp|523 files, BAM, Illumina HiSeq 2000|5950|
-| 13          | EGAD00001004462          | | https://ega-archive.org/datasets/EGAD00001004462 | 7   | Akira Yokoyama kyototumorpatho-labo@umin.ac.jp|20 files, BAM, Illumina NovaSeq 6000|1209|
-| 14          | EGAD00010001631          | | https://ega-archive.org/datasets/EGAD00010001631 | 7   | Akira Yokoyama kyototumorpatho-labo@umin.ac.jp|124 files, "raw" format, GeneChip Human Mapping 250K NspI|5|
+| 12          | EGAD00001004464          | | [EGA](https://ega-archive.org/datasets/EGAD00001004464) | 7   | Akira Yokoyama kyototumorpatho-labo@umin.ac.jp|523 files, BAM, Illumina HiSeq 2000|5950|
+| 13          | EGAD00001004462          | | [EGA](https://ega-archive.org/datasets/EGAD00001004462) | 7   | Akira Yokoyama kyototumorpatho-labo@umin.ac.jp|20 files, BAM, Illumina NovaSeq 6000|1209|
+| 14          | EGAD00010001631          | | [EGA](https://ega-archive.org/datasets/EGAD00010001631) | 7   | Akira Yokoyama kyototumorpatho-labo@umin.ac.jp|124 files, "raw" format, GeneChip Human Mapping 250K NspI|5|
