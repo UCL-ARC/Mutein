@@ -89,20 +89,20 @@ This section maps out the references to datasets found in the papers. Where the 
 
 This table is a duplicate-free list of the dataset accession numbers from the above papers. We could use the accession number as the dataset names in the code and manuscript, but perhaps more informative names would be better referring to tissue type etc, hence the placeholder Sample Name column.
 
-| Dataset UID | Original Accesion Number | Our Sample Name | URL |Paper UID(s) | Notes |
-|-------------|--------------------------|-----------------|-----|-------------|-------|
-| 1           | EGAD00001006969          | | https://ega-archive.org/datasets/EGAD00001006969 | 1   | |
-| 2           | EGAD00001004158          | | https://ega-archive.org/datasets/EGAD00001004158 | 1,2 | |
-| 3           | EGAD00001006194          | | https://ega-archive.org/datasets/EGAD00001006194 | 1   | |
-| 4           | EGAD00001004159          | | https://ega-archive.org/datasets/EGAD00001004159 | 1,2 | |
-| 5           | EGAD00001001123          | | https://ega-archive.org/datasets/EGAD00001001123 | 3   | |
-| 6           | EGAD00001001090          | | https://ega-archive.org/datasets/EGAD00001001090 | 3   | |
-| 7           | EGAD00001000825          | | https://ega-archive.org/datasets/EGAD00001000825 | 3   | |
-| 8           | EGAD00001004192          | | https://ega-archive.org/datasets/EGAD00001004192 | 4   | |
-| 9           | EGAD00001004193          | | https://ega-archive.org/datasets/EGAD00001004193 | 4   | |
-| 10          | SRP159015                | | https://www.ncbi.nlm.nih.gov/sra/?term=SRP159015 | 5   | |
-| 11          | phs001808.v1.p1          | | https://www.ncbi.nlm.nih.gov/projects/gap/cgi-bin/study.cgi?study_id=phs001808.v1.p1 |6||
-| 12          | EGAD00001004464          | | https://ega-archive.org/datasets/EGAD00001004464 | 7   | |
-| 13          | EGAD00001004462          | | https://ega-archive.org/datasets/EGAD00001004462 | 7   | |
-| 14          | EGAD00010001631          | | https://ega-archive.org/datasets/EGAD00010001631 | 7   | |
-| 15          | ???                      | | ???                                              | 8   | |
+| Dataset UID | Original Accesion Number | Our Sample Name | URL |Paper UID(s) | Data Access Control | Notes |
+|-------------|--------------------------|-----------------|-----|-------------|---------------------|-------|
+| 1           | EGAD00001006969          | | https://ega-archive.org/datasets/EGAD00001006969 | 1   | datasharing@sanger.ac.uk ||
+| 2           | EGAD00001004158          | | https://ega-archive.org/datasets/EGAD00001004158 | 1,2 | datasharing@sanger.ac.uk ||
+| 3           | EGAD00001006194          | | https://ega-archive.org/datasets/EGAD00001006194 | 1   | datasharing@sanger.ac.uk ||
+| 4           | EGAD00001004159          | | https://ega-archive.org/datasets/EGAD00001004159 | 1,2 | datasharing@sanger.ac.uk ||
+| 5           | EGAD00001001123          | | https://ega-archive.org/datasets/EGAD00001001123 | 3   | datasharing@sanger.ac.uk ||
+| 6           | EGAD00001001090          | | https://ega-archive.org/datasets/EGAD00001001090 | 3   | datasharing@sanger.ac.uk ||
+| 7           | EGAD00001000825          | | https://ega-archive.org/datasets/EGAD00001000825 | 3   | datasharing@sanger.ac.uk ||
+| 8           | EGAD00001004192          | | https://ega-archive.org/datasets/EGAD00001004192 | 4   | datasharing@sanger.ac.uk ||
+| 9           | EGAD00001004193          | | https://ega-archive.org/datasets/EGAD00001004193 | 4   | datasharing@sanger.ac.uk ||
+| 10          | SRP159015                | | https://www.ncbi.nlm.nih.gov/sra/?term=SRP159015 | 5   | ||
+| 11          | phs001808.v1.p1          | | https://www.ncbi.nlm.nih.gov/projects/gap/cgi-bin/study.cgi?study_id=phs001808.v1.p1 |6|||
+| 12          | EGAD00001004464          | | https://ega-archive.org/datasets/EGAD00001004464 | 7   | Akira Yokoyama kyototumorpatho-labo@umin.ac.jp||
+| 13          | EGAD00001004462          | | https://ega-archive.org/datasets/EGAD00001004462 | 7   | Akira Yokoyama kyototumorpatho-labo@umin.ac.jp||
+| 14          | EGAD00010001631          | | https://ega-archive.org/datasets/EGAD00010001631 | 7   | Akira Yokoyama kyototumorpatho-labo@umin.ac.jp||
+| 15          | ???                      | | ???                                              | 8   | ||
