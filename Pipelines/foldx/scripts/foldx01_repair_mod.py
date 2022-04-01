@@ -41,7 +41,7 @@ def run_pipeline01(args):
     ############################################
     pdbfile = pdb +'.pdb'            
     # Set up files (retain copy of original)
-    numRepairs = 5
+    numRepairs = 10 #this needs to be a a parameter of course and the time needs to change accordingly
     repairinnames = []
     repairoutnames = []
     for r in range(numRepairs+1):

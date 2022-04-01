@@ -66,27 +66,27 @@ def run_pipeline00(args):
 
     if '4' in runparams['jobs']:    
         if '3' in runparams['jobs']:
-            runs.append([4,'qsub',"./Sh04_Myriad_aggregate" + ext,3])
+            runs.append([4,'qsub',"./foldx04_aggddg" + ext,3])
         else:
-            runs.append([4,'qsub',"./Sh04_Myriad_aggregate" + ext,-1])
+            runs.append([4,'qsub',"./foldx04_aggddg" + ext,-1])
 
     if '5' in runparams['jobs']:
         if '1' in runparams['jobs']:
-            runs.append([5,'qsub',"./Sh05_Myriad_makevparams" + ext,1])
+            runs.append([5,'qsub',"./foldx05_vparams" + ext,1])
         else:
-            runs.append([5,'qsub',"./Sh05_Myriad_makevparams" + ext,-1])
+            runs.append([5,'qsub',"./foldx05_vparams" + ext,-1])
 
     if '6' in runparams['jobs']:
         if '5' in runparams['jobs']:
-            runs.append([6,'qsub',"./Sh06_Myriad_build" + ext,5])
+            runs.append([6,'qsub',"./foldx06_build" + ext,5])
         else:
-            runs.append([6,'qsub',"./Sh06_Myriad_build" + ext,-1])
+            runs.append([6,'qsub',"./foldx06_build" + ext,-1])
 
     if '7' in runparams['jobs']:
         if '6' in runparams['jobs']:
-            runs.append([7,'qsub',"./Sh07_Myriad_vaggregate" + ext,6])
+            runs.append([7,'qsub',"./foldx07_vaggddg" + ext,6])
         else:
-            runs.append([7,'qsub',"./Sh07_Myriad_vaggregate" + ext,-1])
+            runs.append([7,'qsub',"./foldx07_vaggddg" + ext,-1])
 
     for job,exe,script,dependency in runs:
         print(job,exe,script,dependency)
