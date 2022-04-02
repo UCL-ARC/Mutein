@@ -59,11 +59,11 @@ def test_foldx_pipeline05_test():
     args = ['','user=CI','pdb=Test']        
     p05.run_pipeline05(args)
 
-#test_foldx_pipeline00_empty()
+test_foldx_pipeline00_empty()
 #test_foldx_pipeline01_test()
 #test_foldx_pipeline02_test()
 #test_foldx_pipeline02_covid()
-test_foldx_pipeline03_test()
+#test_foldx_pipeline03_test()
 #test_foldx_pipeline03_testall()
 #test_foldx_pipeline03_covid()
 #test_foldx_pipeline04_test()

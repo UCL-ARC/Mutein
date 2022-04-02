@@ -1,0 +1,2 @@
+Mutation,Variant
+AA27Y,Alpha

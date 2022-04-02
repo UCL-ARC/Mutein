@@ -37,7 +37,9 @@ def run_pipeline01(args):
     print(user, foldxe, pythonexe,environment)
     pdb = params['pdb']
     jobname = params['name']
-    input_path, thruput_path, interim_path, output_path = hlp.get_make_paths(pdb,jobname)
+    input_path, thruput_path, interim_pathx, output_path = hlp.get_make_paths(pdb,jobname)
+    repair_path = interim_pathx + 'repair/'
+    hlp.goto_job_dir(repair_path,args,'_inputs01')    
     ############################################
     pdbfile = pdb +'.pdb'            
     # Set up files (retain copy of original)
@@ -48,14 +50,10 @@ def run_pipeline01(args):
         repairinnames.append(pdb + '_' + str(r) + '.pdb')    
         repairoutnames.append(pdb + '_' + str(r) + '_Repair.pdb')    
     repairinnames[numRepairs] = pdb + '_rep.pdb'
-
     #### there are 2 files we need in the interim directory, pdb file rotabase, but rotabase is only needed for foldx4 and NOT needed for foldx5
     print('### ... copying file',pdbfile,input_path + repairinnames[0],'... ###')
-    copyfile(input_path + '/' + pdbfile, interim_path + repairinnames[0])
-    # Now change into the interim directory for the work
-    print('### ... changing directory to',interim_path)
-    os.chdir(interim_path)
-
+    copyfile(input_path + '/' + pdbfile, repair_path + repairinnames[0])        
+    
     repairBaseA = foldxe + ' --command=RepairPDB --pdb='
     repairBaseB = " --ionStrength=0.05 --pH=7 --vdwDesign=2 --pdbHydrogens=false"
 
@@ -65,11 +63,16 @@ def run_pipeline01(args):
         #repaircommand = repairBaseA + repairinnames[r]
         print('### ... repair command #',r,repaircommand)
         os.system(repaircommand)    
-        print('### ... copying file',interim_path + repairoutnames[r],interim_path + repairinnames[r+1])
+        print('### ... copying file',repair_path + repairoutnames[r],repair_path + repairinnames[r+1])
         copyfile(repairoutnames[r],repairinnames[r+1])
 
     # copy the final repaired file to our main interim directory
-    print('### ... copying file',interim_path + repairoutnames[r], thruput_path+repairoutnames[r])
-    copyfile(interim_path + repairinnames[numRepairs], thruput_path+repairinnames[numRepairs])
+    print('### ... copying file',repair_path + repairoutnames[r], thruput_path+repairoutnames[r])
+    copyfile(repair_path + repairinnames[numRepairs], thruput_path+repairinnames[numRepairs])
 
     print('### COMPLETED FoldX repair job ###')
+
+    
+if __name__ == '__main__':
+    import sys
+    globals()['run_pipeline01'](sys.arv)

@@ -13,7 +13,7 @@ import pandas as pd
 from shutil import copyfile
 import helper as hlp
 
-def run_pipeline04(args):
+def run_pipeline04(args):    
     print('### Foldx aggregate pos scan ###')
     ##############################################
     iparams = hlp.inputparams(args)    
@@ -29,9 +29,9 @@ def run_pipeline04(args):
     pdb = params['pdb']
     jobname = params['name']        
     input_path, thruput_path, interim_path, output_path = hlp.get_make_paths(pdb,jobname)
+    agg_path = interim_path + 'agg/'
+    hlp.goto_job_dir(agg_path,args,'_inputs04')            
     ############################################    
-    os.chdir(interim_path)
-
     params_file = interim_path + 'params.txt'
     rownum = 1
     with open(params_file) as fr:

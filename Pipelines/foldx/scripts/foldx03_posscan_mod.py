@@ -20,7 +20,7 @@ import helper as hlp
 ##### INPUTS #############################################
 # The inputs to this function are the pdbfile and the chain id (might optionally consider the positionscan mutation type)
 
-def run_pipeline03(args):
+def run_pipeline03(args):    
     print('### FoldX position scan job ###')
     print(args)    
     # combine config and job input params
@@ -64,8 +64,7 @@ def run_pipeline03(args):
         print(mut,row)
 
         row_path = interim_path + row + '/'
-        if not os.path.exists(row_path):
-            os.mkdir(row_path)    
+        hlp.goto_job_dir(row_path,args,'_inputs03')        
         print('### ... copying file',thruput_path + pdbfile,row_path + pdbfile)
         copyfile(thruput_path + pdbfile,row_path + pdbfile)
         print('### ... change directory',row_path)

@@ -17,6 +17,7 @@ import helper as hlp
 ##### INPUTS #############################################
 # The inputs to this function are the pdbfile and the chain id (might optionally consider the positionscan mutation type)
 def run_pipeline05(args):
+    hlp.log_inputs(args)
     print(sys.argv)
     ##############################################
     iparams = hlp.inputparams(args)    
