@@ -8,7 +8,7 @@ def addpath():
 def test_foldx_pipeline00_empty():
     addpath()
     import foldx00_pipeline as p00
-    args = ['','user=empty']    
+    args = ['','user=empty','jobs=1234567']    
     p00.run_pipeline00(args)
 
 def test_foldx_pipeline01_test():

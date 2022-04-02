@@ -1,0 +1,8 @@
+id,script,time,dependency,array
+1,foldx01_repair,3:00:0,-1,0
+2,foldx02_makeparams,0:05:0,1,0
+3,foldx03_posscan,6:00:0,2,50
+4,foldx04_aggddg,0:05:0,3,0
+5,foldx05_vparams,0:05:0,1,0
+6,foldx06_build,1:00:0,5,63
+7,foldx07_vaggddg,0:05:0,6,0

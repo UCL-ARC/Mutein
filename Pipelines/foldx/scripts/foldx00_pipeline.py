@@ -6,8 +6,10 @@ Pipeline script for foldx job on Myriad
 ------------------------
 '''
 import os
+from pdb import run
 import subprocess
 import helper as hlp
+import pandas as pd
 
 def run_pipeline00(args):
 
@@ -17,6 +19,7 @@ def run_pipeline00(args):
     print('## ... changing directory to',dir_path)
     os.chdir(dir_path)
     ##### INPUTS #############################################
+    ## Pipeline jobs sequence
     # 1= repairing pdb
     # 2= making param file for splits
     # 3= performing the position scan ddg mutations (parallel)
@@ -34,59 +37,35 @@ def run_pipeline00(args):
     print('Params=',runparams)
     user = runparams['user']    
     user, (foldxe, pythonexe, env) = hlp.getenvironment(user)
-    print('Environment=',user, foldxe, pythonexe,env)
-
+    print('Environment=',user, foldxe, pythonexe,env)            
     # script extension is either sh or py depending on bash or python environment
     ext = '.sh'
     if env == 'python':
         ext = '.py'
 
+    # The batch is defined in the file batch.csv
+    batch_df = pd.read_csv('batch.csv')
+    batch_dic = {}
+    for i in range(len(batch_df.index)):
+        id = batch_df['id'][i]                
+        script = batch_df['script'][i]                
+        time = batch_df['time'][i]                
+        dependency = batch_df['dependency'][i]                
+        array = batch_df['array'][i]     
+        batch_dic[str(id)] = (script,time,dependency,array)
+    print('batch dic',batch_dic)
     #############################################################
-    dependencies = {1:-1,2:-1,3:-1,4:-1,5:-1,6:-1,7:-1}
-    runs = []
-    if '1' in runparams['jobs']:
-        runs.append([1,'qsub',"./foldx01_repair" + ext,-1])
-    if '2' in runparams['jobs']:
-        if '1' in runparams['jobs']:
-            runs.append([2,'qsub',"./foldx02_makeparams" + ext,1])
-        else:
-            runs.append([2,'qsub',"./foldx02_makeparams" + ext,-1])
-
-    override_array = False
-    if '3' in runparams['jobs']:
-        dep = -1
-        if '2' in runparams['jobs']:
-            dep = 2
-        #if runparams['mutation'] == '.':
-        override_array = True
-        runs.append([3,'qsub',"./foldx03_posscan" + ext,dep])        
-        #else:
-        #    runs.append([3,'qsub',"./Sh03_Myriad_posscan_one" + ext,dep])
-
-    if '4' in runparams['jobs']:    
-        if '3' in runparams['jobs']:
-            runs.append([4,'qsub',"./foldx04_aggddg" + ext,3])
-        else:
-            runs.append([4,'qsub',"./foldx04_aggddg" + ext,-1])
-
-    if '5' in runparams['jobs']:
-        if '1' in runparams['jobs']:
-            runs.append([5,'qsub',"./foldx05_vparams" + ext,1])
-        else:
-            runs.append([5,'qsub',"./foldx05_vparams" + ext,-1])
-
-    if '6' in runparams['jobs']:
-        if '5' in runparams['jobs']:
-            runs.append([6,'qsub',"./foldx06_build" + ext,5])
-        else:
-            runs.append([6,'qsub',"./foldx06_build" + ext,-1])
-
-    if '7' in runparams['jobs']:
-        if '6' in runparams['jobs']:
-            runs.append([7,'qsub',"./foldx07_vaggddg" + ext,6])
-        else:
-            runs.append([7,'qsub',"./foldx07_vaggddg" + ext,-1])
-
+    dependencies = {}
+    runs = []    
+    for j in runparams['jobs']:        
+        if str(j) in batch_dic:
+            script,time,dependency,array = batch_dic[str(j)]
+            dep = "-1"
+            if str(dependency) != "-1" and str(dependency) in runparams['jobs']:
+                dep = dependency
+            runs.append([j,'qsub',script + ext,dep])            
+            dependencies[str(j)] = str(dep)
+        
     for job,exe,script,dependency in runs:
         #print(job,exe,script,dependency)
         if env == 'hpc':
@@ -97,20 +76,20 @@ def run_pipeline00(args):
         else:
             args.append('qsub')
             
-            if dependency > -1:
+            if str(dependency) != "-1":
                 dep = dependencies[int(dependency)]
                 args.append('-hold_jid')
                 args.append(dep)        
             
-            if override_array and job == 3:        
+            if str(job) == "3":        
                 args.append('-t')
                 args.append('1-' + str(runparams['split']))    
             
-            if job == 3 and runparams['time'] != '.':
+            if str(job) == "3" and runparams['time'] != '.':
                 args.append('-l')
                 args.append('h_rt=' + runparams['time'])    
             
-            if job == 6:        
+            if str(job) == "6":        
                 args.append('-t')
                 args.append('1-' + str(runparams['combos']))
                         

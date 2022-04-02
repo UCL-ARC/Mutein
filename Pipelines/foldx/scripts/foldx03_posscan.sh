@@ -54,5 +54,5 @@ newrow = "row="${number}p
 
 
 cd ~/MuteinPipeline/foldx/scripts/
-python foldx03_posscan.py $newrow $pdb $jobnamex $mutation $row
+python foldx03_posscan.py A=10 Z=15 $newrow $pdb $jobnamex $mutation $row
 
