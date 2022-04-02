@@ -24,7 +24,7 @@ def test_foldx_pipeline02_1tst():
 def test_foldx_pipeline03_1tst():
     addpath()
     import foldx03_posscan as p03
-    args = ['','user=CI','pdb=1tst','mutation=.']    
+    args = ['','user=CI','pdb=1tst','row=.']    
     p03.run_pipeline03(args)
 
 def test_foldx_pipeline04_1tst():

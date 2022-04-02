@@ -32,19 +32,19 @@ def test_foldx_pipeline02_covid():
 def test_foldx_pipeline03_test():
     addpath()
     import foldx03_posscan as p03
-    args = ['','user=CI','pdb=Test','mutation=AA27a,YA28a,TA29a','row=0']    
+    args = ['','user=CI','pdb=Test','mutation=AA27a,YA28a,TA29a','row=01']    
     p03.run_pipeline03(args)
 
 def test_foldx_pipeline03_testall():
     addpath()
     import foldx03_posscan as p03
-    args = ['','user=CI','pdb=Test','mutation=.']    
+    args = ['','user=CI','pdb=Test','row=.']    
     p03.run_pipeline03(args)
 
 def test_foldx_pipeline03_covid():
     addpath()
     import foldx03_posscan as p03
-    args = ['','user=CI','pdb=6vxx','mutation=.','name=covid1']        
+    args = ['','user=CI','pdb=6vxx','row=.','name=covid1']        
     p03.run_pipeline03(args)
 
 def test_foldx_pipeline04_test():

@@ -45,7 +45,8 @@ def run_pipeline03(args):
     pdbfile = pdb +'_rep.pdb'
     print('### ... change directory',thruput_path)                     
     mutations = []
-    if mutation_string == ".":
+    # row=. means all, row=1:n means an explicit row, row=0 means the mutation string has been passd in explicitly
+    if row == ".":
         filename = interim_path + 'params.txt'
         print('open',filename)
         with open(filename) as fr:
@@ -57,8 +58,21 @@ def run_pipeline03(args):
                 mutation = rowvals[2]
                 row = rowvals[3]
                 mutations.append([mutation,row])
+    elif row[0]=="0":
+        mutations.append([mutation_string,'row'+ str(row)])    
     else:
-        mutations.append([mutation_string,'row'+str(row)])
+        filename = interim_path + 'params.txt'
+        print('open',filename)
+        with open(filename) as fr:
+            paramscontent = fr.readlines()
+            row = paramscontent[int(row)].strip()
+            print(row)
+            rowvals = row.split(' ')
+            mutation = rowvals[2]
+            row = rowvals[3]
+            mutations.append([mutation,row])  
+
+    
 
     for mut,row in mutations:
         print(mut,row)
