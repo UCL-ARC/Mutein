@@ -51,5 +51,5 @@ mutation="mutation="$imutation
 row = "row="$irow
 
 cd ~/MuteinPipeline/foldx/scripts/
-python foldx06_build.py $pdb $jobname $mutation $row a=R b=MYR 
+python foldx06_build.py $pdb $jobname $mutation $row
 

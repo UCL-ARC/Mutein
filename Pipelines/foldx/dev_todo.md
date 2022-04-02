@@ -9,6 +9,7 @@
 - Anaytics - establish agreement or what the future action is on the number differences as per above
 - Make the batch dependency, script names and times (everything for qsub) configurable from file not hard coded
 - complete the pipeline for the variants in the style adopted (batches 5,6,7)
+- FOR CI - add a final test to add asserts for changed data (waiting to be happy with data#1)
 ---------------------------------------------------------------------------
 #### discuss todo list 
 - Splits and different numbers decision (for now and for later analysis)

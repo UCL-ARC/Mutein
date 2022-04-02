@@ -31,6 +31,6 @@ variant="variant="$5
 variantfile="variantfile="$6
 
 cd ~/MuteinPipeline/foldx/scripts/
-python foldx05_vparams.py $pdb $jobname A $variant $variantfile
+python foldx05_vparams.py $pdb $jobname $variant $variantfile
 
 

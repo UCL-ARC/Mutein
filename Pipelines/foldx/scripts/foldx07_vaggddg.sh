@@ -29,6 +29,6 @@ pdb="pdb="$1
 jobname="name="$2
 
 cd ~/MuteinPipeline/foldx/scripts/
-python foldx07_vaggdgg.py $pdb $jobname a=R b=MYR
+python foldx07_vaggdgg.py $pdb $jobname
 
 

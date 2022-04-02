@@ -46,12 +46,12 @@ ichain="`sed -n ${number}p $paramfile | awk '{print $2}'`"
 imutation="`sed -n ${number}p $paramfile | awk '{print $3}'`"
 irow="`sed -n ${number}p $paramfile | awk '{print $4}'`"
 
-jobname="name="$2
+jobnamex="name="$2
 pdb="pdb="$ipdb
 mutation="mutation="$imutation
 row = "row="$irow
 
 
 cd ~/MuteinPipeline/foldx/scripts/
-python foldx03_posscan.py $pdb $jobname $mutation $row a=R b=MYR 
+python foldx03_posscan.py $pdb $jobnamex $mutation $row
 
