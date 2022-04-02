@@ -44,16 +44,13 @@ number=$SGE_TASK_ID
 ipdb="`sed -n ${number}p $paramfile | awk '{print $1}'`"
 ichain="`sed -n ${number}p $paramfile | awk '{print $2}'`"
 imutation="`sed -n ${number}p $paramfile | awk '{print $3}'`"
-arow="`sed -n ${number}p $paramfile | awk '{print $4}'`"
+irow="`sed -n ${number}p $paramfile | awk '{print $4}'`"
 
 jobnamex="name="$2
 pdb="pdb="$ipdb
+rw="row="$irow
 mutation="mutation="$imutation
-xrow = "row="$arow
-newrowa = "rowa="${number}p
-newrowb = "rowb="$SGE_TASK_ID
-
 
 cd ~/MuteinPipeline/foldx/scripts/
-python foldx03_posscan.py A=10 Z=15 $newrowa $newrowb $pdb $jobnamex $mutation $xrow
+python foldx03_posscan.py $pdb $jobnamex $mutation $rw
 
