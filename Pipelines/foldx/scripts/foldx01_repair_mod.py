@@ -75,4 +75,4 @@ def run_pipeline01(args):
     
 if __name__ == '__main__':
     import sys
-    globals()['run_pipeline01'](sys.arv)
+    globals()['run_pipeline01'](sys.argv)
