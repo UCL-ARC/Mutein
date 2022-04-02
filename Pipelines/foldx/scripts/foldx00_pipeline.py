@@ -11,22 +11,22 @@ import subprocess
 import helper as hlp
 import pandas as pd
 
-def run_pipeline00(args):
+##### INPUTS #############################################
+## Pipeline jobs sequence
+# 1= repairing pdb
+# 2= making param file for splits
+# 3= performing the position scan ddg mutations (parallel)
+# 4= aggregating 3
+# 5= making params file for variants
+# 6 = performing variant ddg (parallel)
+# 7 = aggregating 6
 
+def run_pipeline00(args):
     print('#### FOLDX PIPELINE - batch creation ####')
-    # Make sure out current directory is where the script lives
+    # Make sure our current directory is where the script lives
     dir_path = os.path.dirname(os.path.realpath(__file__)) + '/'
     print('## ... changing directory to',dir_path)
     os.chdir(dir_path)
-    ##### INPUTS #############################################
-    ## Pipeline jobs sequence
-    # 1= repairing pdb
-    # 2= making param file for splits
-    # 3= performing the position scan ddg mutations (parallel)
-    # 4= aggregating 3
-    # 5= making params file for variants
-    # 6 = performing variant ddg (parallel)
-    # 7 = aggregating 6
     jobparams = hlp.inputparams(args)
     pdb = ''
     if 'pdb' in jobparams:
@@ -62,10 +62,10 @@ def run_pipeline00(args):
             dep = "-1"
             if str(dependency) != "-1" and str(dependency) in runparams['jobs']:
                 dep = dependency
-            runs.append([j,'qsub',script + ext,dep])            
+            runs.append([j,'qsub',script + ext,dep,time,array])            
             dependencies[str(j)] = str(dep)
         
-    for job,exe,script,dependency in runs:
+    for job,exe,script,dependency,time,array in runs:
         #print(job,exe,script,dependency)
         if env == 'hpc':
             os.system('chmod +x ' + script)
@@ -73,25 +73,17 @@ def run_pipeline00(args):
         if env == 'python':
             args.append(pythonexe)        
         else:
-            args.append('qsub')
-            
+            args.append('qsub')            
             if str(dependency) != "-1":
                 dep = dependencies[int(dependency)]
                 args.append('-hold_jid')
-                args.append(dep)        
-            
-            if str(job) == "3":        
+                args.append(dep)                                
+            if int(array)>0:
                 args.append('-t')
-                args.append('1-' + str(runparams['split']))    
-            
-            if str(job) == "3" and runparams['time'] != '.':
-                args.append('-l')
-                args.append('h_rt=' + runparams['time'])    
-            
-            if str(job) == "6":        
-                args.append('-t')
-                args.append('1-' + str(runparams['combos']))
-                        
+                args.append('1-' + str(array))                            
+            args.append('-l')
+            args.append('h_rt=' + time)            
+                                    
         args.append(script)
         args.append(runparams['pdb'])         #1
         args.append(runparams['name'])        #2
@@ -99,7 +91,6 @@ def run_pipeline00(args):
         args.append(runparams['mutation'])    #4   
         args.append(runparams['variant'])     #5
         args.append(runparams['variantfile']) #6
-
 
         print(args)
         if env == 'hpc':
