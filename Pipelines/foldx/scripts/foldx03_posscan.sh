@@ -51,7 +51,7 @@ pdb="pdb="$ipdb
 mutation="mutation="$imutation
 xrow = "row="$arow
 newrowa = "rowa="${number}p
-newrowb = "rowb="${number}
+newrowb = "rowb="$SGE_TASK_ID
 
 
 cd ~/MuteinPipeline/foldx/scripts/

@@ -65,7 +65,7 @@ def run_pipeline03(args):
         print('open',filename)
         with open(filename) as fr:
             paramscontent = fr.readlines()
-            row = paramscontent[int(row)].strip()
+            row = paramscontent[int(row-1)].strip()
             print(row)
             rowvals = row.split(' ')
             mutation = rowvals[2]
