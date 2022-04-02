@@ -31,11 +31,10 @@ def run_pipeline00(args):
     cfgparams = hlp.configparams(pdb)    
     runparams = hlp.mergeparams(cfgparams, jobparams) # the job overrides the config
     #runparams['jobs'] = '1' ## if needed for testing purposes
-    print('final params',runparams)
-    user = runparams['user']
-    print('USER',user)
+    print('Params=',runparams)
+    user = runparams['user']    
     user, (foldxe, pythonexe, env) = hlp.getenvironment(user)
-    print('USER ENVIRONMENT',user, foldxe, pythonexe,env)
+    print('Environment=',user, foldxe, pythonexe,env)
 
     # script extension is either sh or py depending on bash or python environment
     ext = '.sh'

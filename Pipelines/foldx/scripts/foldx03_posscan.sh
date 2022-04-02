@@ -50,8 +50,9 @@ jobnamex="name="$2
 pdb="pdb="$ipdb
 mutation="mutation="$imutation
 row = "row="$irow
+newrow = "row="${number}p
 
 
 cd ~/MuteinPipeline/foldx/scripts/
-python foldx03_posscan.py $pdb $jobnamex $mutation $row
+python foldx03_posscan.py $pdb $jobnamex $mutation $row $newrow
 
