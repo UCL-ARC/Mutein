@@ -42,32 +42,8 @@ def addlinetoparams(arg,params):
     args = []
     if '=' in arg:
         args = arg.split('=')
-    if 'jobs=' in arg:
-        params['jobs'] = args[1]
-    elif 'pdb=' in arg:
-        params['pdb'] = args[1]
-    elif 'name=' in arg:
-        params['name'] = args[1]
-    elif 'split=' in arg:
-        params['split'] = args[1]
-    elif 'mutation=' in arg:
-        params['mutation'] = args[1]
-    elif 'time=' in arg:
-        params['time'] = args[1]
-    elif 'variant=' in arg:
-        params['variant'] = args[1]
-    elif 'variantfile=' in arg:
-        params['variantfile'] = args[1]
-    elif 'combos=' in arg:
-        params['combos'] = args[1]
-    elif 'env=' in arg:
-        params['env'] = args[1]
-    elif 'user=' in arg:
-        params['user'] = args[1]
-    elif 'chain=' in arg:
-        params['chain'] = args[1]
-    elif 'row=' in arg:
-        params['row'] = args[1]
+        p,v = args[0],args[1]
+        params[p]=v    
     return params
 
 def configparams(pdb):    
@@ -140,7 +116,7 @@ def get_make_paths(pdb,name):
         os.mkdir(output_path)
     return input_path, thruput_path, interim_path, output_path
 
-def goto_job_dir(dir_path,args,name):
+def goto_job_dir(dir_path,args,params,name):
     if not os.path.exists(dir_path):
         os.mkdir(dir_path)  
     os.chdir(dir_path)
@@ -148,6 +124,9 @@ def goto_job_dir(dir_path,args,name):
     with open(inputs_file, 'w') as fw:
         for arg in args:
             fw.write(str(arg) + ' ')
+        fw.write('\n')
+        for cfg,val in params.items():
+            fw.write(str(cfg) + '=' + str(val) + '\n')
             
 
 

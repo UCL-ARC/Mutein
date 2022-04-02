@@ -11,25 +11,25 @@ def addpath():
 
 def test_foldx_pipeline01_1tst():
     addpath()
-    import foldx01_repair_mod as p01
+    import foldx01_repair as p01
     args = ['','user=CI','pdb=1tst']    
     p01.run_pipeline01(args)
     
 def test_foldx_pipeline02_1tst():
     addpath()
-    import foldx02_makeparams_mod as p02
+    import foldx02_makeparams as p02
     args = ['','user=CI','pdb=1tst']    
     p02.run_pipeline02(args)
 
 def test_foldx_pipeline03_1tst():
     addpath()
-    import foldx03_posscan_mod as p03
+    import foldx03_posscan as p03
     args = ['','user=CI','pdb=1tst','mutation=.']    
     p03.run_pipeline03(args)
 
 def test_foldx_pipeline04_1tst():
     addpath()
-    import foldx04_aggddg_mod as p04
+    import foldx04_aggddg as p04
     args = ['','user=CI','pdb=1tst']        
     p04.run_pipeline04(args)
 
