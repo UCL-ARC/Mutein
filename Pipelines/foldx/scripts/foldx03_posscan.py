@@ -59,8 +59,13 @@ def run_pipeline03(args):
                 row = rowvals[3]
                 mutations.append([mutation,row])
     elif row[0]=="0":
+        # we have specified a mutation and a non-file row num
         mutations.append([mutation_string,'row'+ str(row)])    
+    elif row[:3]=="row":
+        # we have specified a mutation and row from the file
+        mutations.append([mutation_string,row])    
     else:
+        # we have specified a numerical row in the file
         filename = interim_path + 'params.txt'
         print('open',filename)
         with open(filename) as fr:
@@ -78,12 +83,14 @@ def run_pipeline03(args):
         print(mut,row)
 
         row_path = interim_path + row + '/'
+        print('### ... change directory',row_path)
+        params['thisrow'] = row
+        params['thismut'] = mut
         hlp.goto_job_dir(row_path,args,params,'_inputs03')        
         print('### ... copying file',thruput_path + pdbfile,row_path + pdbfile)
         copyfile(thruput_path + pdbfile,row_path + pdbfile)
-        print('### ... change directory',row_path)
-        os.chdir(row_path)
-
+        
+        
         foldxcommand = foldxe + ' --command=PositionScan'
         foldxcommand += ' --ionStrength=0.05'
         foldxcommand += ' --pH=7'
