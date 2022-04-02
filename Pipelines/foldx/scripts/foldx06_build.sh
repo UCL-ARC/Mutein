@@ -44,11 +44,11 @@ number=$SGE_TASK_ID
 ipdb="`sed -n ${number}p $paramfile | awk '{print $1}'`"
 chain="`sed -n ${number}p $paramfile | awk '{print $2}'`"
 imutation="`sed -n ${number}p $paramfile | awk '{print $3}'`"
-irow="`sed -n ${number}p $paramfile | awk '{print $4}'`"
+xrow="`sed -n ${number}p $paramfile | awk '{print $4}'`"
 
 pdb="pdb="$ipdb
 mutation="mutation="$imutation
-row = "row="$irow
+row = "row="$xrow
 
 cd ~/MuteinPipeline/foldx/scripts/
 python foldx06_build.py $pdb $jobname $mutation $row

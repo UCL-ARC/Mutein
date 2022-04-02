@@ -52,8 +52,7 @@ def run_pipeline00(args):
         time = batch_df['time'][i]                
         dependency = batch_df['dependency'][i]                
         array = batch_df['array'][i]     
-        batch_dic[str(id)] = (script,time,dependency,array)
-    print('batch dic',batch_dic)
+        batch_dic[str(id)] = (script,time,dependency,array)    
     #############################################################
     dependencies = {}
     runs = []    

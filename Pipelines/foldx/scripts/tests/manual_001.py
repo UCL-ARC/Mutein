@@ -5,14 +5,11 @@ def addpath():
     above_path = os.path.dirname(os.path.realpath(__file__))[:-5]    
     sys.path.append(above_path)
 
-def test_foldx_pipeline00_empty():
+def test_foldx_pipeline_tst():
     addpath()
-    import foldx00_pipeline_mod as p00
-    args = ['','user=empty']    
-    p00.run_pipeline00(args)
+    import foldx03_posscan as ppl
+    args = ['','pdb=1tst','name=1tst_2','mutation=TA29a']
+    ppl.run_pipeline03(args)
 
-
-
-
-
-#test_foldx_pipeline03_covid()
+#########################################################################
+test_foldx_pipeline_tst()
