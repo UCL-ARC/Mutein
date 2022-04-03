@@ -15,6 +15,7 @@
 ### In progress
 - Make the batch dependency, script names and times (everything for qsub) configurable from file not hard coded
 - complete the pipeline for the variants in the style adopted (batches 5,6,7)
+- the 10x repair is more stable with the ddg, have results to show
 
 ### done
 #### sprint 1 - 7/4/22

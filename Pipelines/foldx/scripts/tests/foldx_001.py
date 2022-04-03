@@ -8,14 +8,14 @@ def addpath():
 def test_foldx_pipeline_HIS1():
     addpath()
     import foldx03_posscan as ppl
-    args = ['','pdb=6vxx','name=6vxx_tst','mutation=VA47a,VA47a,VA47a,VA47a,VA47a','row=01']
+    args = ['','pdb=6vxx','name=6vxx_tst','mutation=VA47a,VA47a','row=005', 'repairs=5']
     ppl.run_pipeline03(args)
 
 def test_foldx_pipeline_HIS2():
     addpath()
     import foldx03_posscan as ppl
-    args = ['','pdb=6vxx','name=6vxx_tst','mutation=VA47a,VA47a','row=02']
+    args = ['','pdb=6vxx','name=6vxx_tst','mutation=VA47a,VA47a','row=010', 'repairs=10']
     ppl.run_pipeline03(args)
 #########################################################################
-#test_foldx_pipeline_HIS1()
+test_foldx_pipeline_HIS1()
 test_foldx_pipeline_HIS2()
