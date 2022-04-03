@@ -30,7 +30,8 @@ def run_pipeline03(args):
     pdb = ''
     if 'pdb' in iparams:
         pdb = iparams['pdb']
-    cparams = hlp.configparams(pdb)    
+    cparams = hlp.configparams(pdb)
+    print('CONFIG PARAMS',cparams)
     params = hlp.mergeparams(cparams,iparams)
     print(params)
     user = params['user']
@@ -42,7 +43,7 @@ def run_pipeline03(args):
     mutation_string = params['mutation']
     input_path, thruput_path, interim_path, output_path = hlp.get_make_paths(pdb,jobname)
     ############################################
-    pdbfile = pdb +'_rep.pdb'
+    pdbfile =pdb + '_rep' + str(params['repairs']) + '.pdb'        
     print('### ... change directory',thruput_path)                     
     mutations = []
     # row=. means all, row=1:n means an explicit row, row=0 means the mutation string has been passd in explicitly

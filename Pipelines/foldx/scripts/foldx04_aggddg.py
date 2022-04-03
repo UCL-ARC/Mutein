@@ -22,7 +22,7 @@ def run_pipeline04(args):
         pdb = iparams['pdb']
     cparams = hlp.configparams(pdb)    
     params = hlp.mergeparams(cparams,iparams)
-    print(params)
+    print('FINAL PARAMS',params)
     user = params['user']
     user, (foldxe, pythonexe, environment) = hlp.getenvironment(user)
     print(user, foldxe, pythonexe,environment)
@@ -37,16 +37,17 @@ def run_pipeline04(args):
     with open(params_file) as fr:
         paramscontent = fr.readlines()        
         rownum = len(paramscontent)
-
-    ddg_file = 'PS_' + pdb + '_rep_scanning_output.txt'
+        
+    ddg_file = 'PS_' + pdb + '_rep' + str(params['repairs']) + '_scanning_output.txt'
     with open(ddg_file,'w') as fw:
         for r in range(rownum):
-            jobresults_file = interim_path + '/row' + str(r+1) + '/' + ddg_file
-            print('row path',jobresults_file)
+            jobresults_file = interim_path + 'row' + str(r+1) + '/' + ddg_file                        
             if os.path.exists(jobresults_file):
-                with open(jobresults_file) as fr:
-                    jobcontent = fr.readlines()        
+                with open(jobresults_file) as fr:                    
+                    jobcontent = fr.readlines()                      
                 fw.writelines(jobcontent)
+            else:
+                print('No file')      
 
     #Make a dataframe
     aa_dict = {'ALA':'A','CYS':'C','ASP':'D','GLU':'E','PHE':'F','GLY':'G','HIS':'H','ILE':'I','LYS':'K','LEU':'L','MET':'M','ASN':'N','PRO':'P','GLN':'Q','ARG':'R','SER':'S','THR':'T','VAL':'V','TRP':'W','TYR':'Y','H1S':'o','H2S':'e'}                 
@@ -56,15 +57,14 @@ def run_pipeline04(args):
         lines = fr.readlines()        
     for line in lines:
         if len(line) > 7:        
-            lns = line.strip().split('\t')    
-            print(lns)
+            lns = line.strip().split('\t')                
             res = lns[0]    
             aa = res[:3]
             chain = res[3:4]
             rid = res[4:-1]
             mut = res[-1:]
             ddg = lns[1]
-            print(aa,chain,rid,mut,ddg)
+            #print(aa,chain,rid,mut,ddg)
             ddg_dic['aa'].append(aa)
             ddg_dic['chain'].append(chain)
             ddg_dic['rid'].append(int(rid))
@@ -73,14 +73,14 @@ def run_pipeline04(args):
             ddg_dic['ddg'].append(float(ddg))
     import pandas as pd
     ddg_df = pd.DataFrame.from_dict(ddg_dic)
-    df_file = output_path + pdb + '_ddg_dataframe.csv'
+    df_file = output_path + pdb + '_' + str(params['repairs'])+'_ddg_dataframe.csv'
     ddg_df.to_csv(df_file,index=False)
 
     #And save something visual as a starting point for some analysis
     import matplotlib.pyplot as plt
     import seaborn as sns
     fig,(ax1,ax2) = plt.subplots(1,2)
-    fig.suptitle(pdb + ' background mutations\nddg <1=stabilising >2.5=destabilising')
+    fig.suptitle(pdb + ' background mutations\nddg <-1=stabilising >2.5=destabilising')
 
 
     xax = 'rid'
@@ -103,7 +103,7 @@ def run_pipeline04(args):
     ax2.set_ylabel('')
     #plt.legend(title=hue,bbox_to_anchor=(1.01, 1), loc=2, borderaxespad=0.,shadow=False,fancybox=False)  # Put the legend out of the figure
 
-    plot_file = output_path + pdb + '_background_plot.png'
+    plot_file = output_path + pdb + '_' +str(params['repairs']) + '_background_plot.png'
     plt.savefig(plot_file)
     print('### COMPLETED FoldX aggregate job ###')
 

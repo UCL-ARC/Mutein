@@ -38,18 +38,19 @@ def run_pipeline01(args):
     pdb = params['pdb']
     jobname = params['name']
     input_path, thruput_path, interim_pathx, output_path = hlp.get_make_paths(pdb,jobname)
-    repair_path = interim_pathx + 'repair/'
+    numRepairs = int(params['repairs'])
+    repair_path = interim_pathx + 'repair' + str(numRepairs) + '/'
     hlp.goto_job_dir(repair_path,args,params,'_inputs01')    
     ############################################
     pdbfile = pdb +'.pdb'            
     # Set up files (retain copy of original)
-    numRepairs = 10 #this needs to be a a parameter of course and the time needs to change accordingly
+    numRepairs = int(params['repairs'])
     repairinnames = []
     repairoutnames = []
     for r in range(numRepairs+1):
         repairinnames.append(pdb + '_' + str(r) + '.pdb')    
         repairoutnames.append(pdb + '_' + str(r) + '_Repair.pdb')    
-    repairinnames[numRepairs] = pdb + '_rep.pdb'
+    repairinnames[numRepairs] = pdb + '_rep' + str(numRepairs) + '.pdb'
     #### there are 2 files we need in the interim directory, pdb file rotabase, but rotabase is only needed for foldx4 and NOT needed for foldx5
     print('### ... copying file',pdbfile,input_path + repairinnames[0],'... ###')
     copyfile(input_path + '/' + pdbfile, repair_path + repairinnames[0])        

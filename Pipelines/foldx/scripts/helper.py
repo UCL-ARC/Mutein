@@ -40,10 +40,24 @@ def getenvironment(user=''):
 ### These functions consistently handle the paramater inputs for the script, merging config and overrides
 def addlinetoparams(arg,params):    
     args = []
-    if '=' in arg:
+    if '=' in arg and "|" not in arg:
         args = arg.split('=')
         p,v = args[0],args[1]
         params[p]=v    
+    return params
+
+def addpipelinetoparams(arg,params):    
+    args = []
+    if '=' in arg and "|" in arg:
+        args = arg.split('|')
+        print(args)
+        id = args[0].split('=')[1]  
+        pv = args[1].split('=')
+        p,v = str(pv[0]),str(pv[1])
+        print(args[0],args[1],id,p,v)
+        if id not in params:
+            params[id] = {}
+        params[id][p]=str(v)    
     return params
 
 def configparams(pdb):    
@@ -88,6 +102,13 @@ def inputparams(argvs):
         params['configfile'] = '../inputs/'+ params['pdb'] + '/config.cfg'    
     return params
             
+def pipelineparams(argvs):        
+    params = {}
+    for i in range(1,len(argvs)):
+        arg = argvs[i]
+        params = addpipelinetoparams(arg,params)                
+    return params
+
 
 def mergeparams(configparams, jobparams):
     #the job params take precendence

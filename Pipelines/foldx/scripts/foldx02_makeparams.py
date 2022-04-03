@@ -44,8 +44,9 @@ def run_pipeline02(args):
 
     ##########################################################
 
-    ##### Open the pdb file ################################    
-    with open(thruput_path + pdb + '_rep.pdb') as f:
+    ##### Open the pdb file ################################            
+    pdb_file =pdb + '_rep' + str(params['repairs']) + '.pdb'
+    with open(thruput_path + pdb_file) as f:
         pdbcontent = f.readlines()
 
     ##### Amino acid dictionary to convert between 3 and 1 codes

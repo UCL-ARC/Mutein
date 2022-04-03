@@ -5,10 +5,10 @@ def addpath():
     above_path = os.path.dirname(os.path.realpath(__file__))[:-5]    
     sys.path.append(above_path)
 
-def test_foldx_pipeline_tsta():
+def test_foldx_pipeline_HIS():
     addpath()
     import foldx03_posscan as ppl
-    args = ['','pdb=1tst','name=1tst_2','mutation=TA29a']
+    args = ['','pdb=6vxx','name=6vxx_tst','mutation=VA47a,VA47a,VA47a,VA47a,VA47a','row=01']
     ppl.run_pipeline03(args)
 
 def test_foldx_pipeline_tstb():
@@ -34,4 +34,4 @@ def test_foldx_pipeline_tstall():
 #test_foldx_pipeline_tsta()
 #test_foldx_pipeline_tstb()
 #test_foldx_pipeline_tstc()
-test_foldx_pipeline_tstall()
+test_foldx_pipeline_HIS()

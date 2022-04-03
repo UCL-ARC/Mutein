@@ -32,6 +32,7 @@ chunk=$3
 pdb="pdb="$1
 jobname="name="$2
 chunk="split="$3
+repairs="repairs="$7
 
 cd ~/MuteinPipeline/foldx/scripts/
-python foldx02_makeparams.py $pdb $jobname A $chunk
+python foldx02_makeparams.py $pdb $jobname $chunk $repairs

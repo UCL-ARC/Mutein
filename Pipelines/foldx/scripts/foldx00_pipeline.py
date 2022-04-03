@@ -28,6 +28,8 @@ def run_pipeline00(args):
     print('## ... changing directory to',dir_path)
     os.chdir(dir_path)
     jobparams = hlp.inputparams(args)
+    pipelineparams = hlp.pipelineparams(args)
+    print('Pipelines=',pipelineparams)
     pdb = ''
     if 'pdb' in jobparams:
         pdb = jobparams['pdb']
@@ -59,6 +61,13 @@ def run_pipeline00(args):
     for j in runparams['jobs']:        
         if str(j) in batch_dic:
             script,time,dependency,array = batch_dic[str(j)]
+            #check there are no overrides from inuts
+            if j in pipelineparams:
+                idparams=pipelineparams[j]
+                if 'time' in idparams:
+                    time = idparams['time']
+                if 'array' in idparams:
+                    array = idparams['array']
             dep = "-1"
             if str(dependency) != "-1" and str(dependency) in runparams['jobs']:
                 dep = dependency
@@ -85,12 +94,23 @@ def run_pipeline00(args):
             args.append('h_rt=' + time)            
                                     
         args.append(script)
-        args.append(runparams['pdb'])         #1
-        args.append(runparams['name'])        #2
-        args.append(runparams['split'])       #3
-        args.append(runparams['mutation'])    #4   
-        args.append(runparams['variant'])     #5
-        args.append(runparams['variantfile']) #6
+        if env == 'hpc':            
+            args.append(runparams['pdb'])         #1
+            args.append(runparams['name'])        #2
+            args.append('unused')       #3
+            args.append(runparams['mutation'])    #4   
+            args.append(runparams['variant'])     #5
+            args.append(runparams['variantfile']) #6
+            args.append(runparams['repairs'])     #7
+        else:
+            args.append(script)
+            args.append('pdb='+runparams['pdb'])         #1
+            args.append('name='+runparams['name'])        #2
+            args.append('unused')       #3
+            args.append('mutation='+runparams['mutation'])    #4   
+            args.append('variant='+runparams['variant'])     #5
+            args.append('variantfile='+runparams['variantfile']) #6
+            args.append('repairs='+runparams['repairs']) #7
 
         print(args)
         if env == 'hpc':
