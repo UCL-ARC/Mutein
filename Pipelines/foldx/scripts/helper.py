@@ -40,7 +40,7 @@ def getenvironment(user=''):
 ### These functions consistently handle the paramater inputs for the script, merging config and overrides
 def addlinetoparams(arg,params):    
     args = []
-    if '=' in arg and "|" not in arg:
+    if '=' in arg and "@" not in arg:
         args = arg.split('=')
         p,v = args[0],args[1]
         params[p]=v    
@@ -48,8 +48,8 @@ def addlinetoparams(arg,params):
 
 def addpipelinetoparams(arg,params):    
     args = []
-    if '=' in arg and "|" in arg:
-        args = arg.split('|')
+    if '=' in arg and "@" in arg:
+        args = arg.split('@')
         print(args)
         id = args[0].split('=')[1]  
         pv = args[1].split('=')

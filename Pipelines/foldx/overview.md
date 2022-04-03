@@ -51,7 +51,10 @@ outputs/setname/*
 >> module load python3/recommended
 >> python3 foldx00_pipeline.py jobs=1234567 split=45 setname=6vxx_45 length=6:00:0 (or whatever parameters)
 
-python3 foldx00_pipeline.py jobs=234 split=50 setname=6vxx50 length=6:00:0 (or whatever parameters)
+Stabdard covid call is
+python3 foldx00_pipeline.py jobs=1234 id=3@array=50 id=3@time=6:00:0 setname=6vxx50 repairs=5
+python3 foldx00_pipeline.py jobs=1234 id=3@array=200 id=3@time=3:00:0 setname=6vxx200 repairs=10
+
 ```
 ########################################################################
 ##### The batch can be run manually and on each individial script too, environment variables will recognise
