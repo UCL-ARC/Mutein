@@ -2,7 +2,20 @@
 ------------------------
 RSA 29/03/22
 ------------------------
-Pipeline script for foldx job on Myriad
+Pipeline overview script for foldx job on Myriad
+
+This script is a parent script that runs the entire foldx pipeline at a top level.
+It manages the dependencies beween the scripts and allows you to run as either HPC, python or empty mode
+
+The scripts dependency is:
+
+                                    SCRIPT 01: FOLDX REPAIR
+                                    |                |
+                        SCRIPT 02: SPLIT     SCRIPT 05: VARIANT SPLIT
+                                |                       |
+        [ARRAY JOBS]    SCRIPT 03: FOLDX POSSCAN     SCRIPT 06: FOLDX BUILD
+                                |                       |
+                        SCRIPT 04: AGGREGATE        SCRIPT 07: VARIANT AGGREGATE
 ------------------------
 '''
 import os
@@ -23,18 +36,21 @@ import pandas as pd
 
 def run_pipeline00(args):
     print('#### FOLDX PIPELINE - batch creation ####')
-    # Make sure our current directory is where the script lives
+    ### Change into script directory
     dir_path = os.path.dirname(os.path.realpath(__file__)) + '/'
     print('## ... changing directory to',dir_path)
     os.chdir(dir_path)
-    jobparams = hlp.inputparams(args)
-    pipelineparams = hlp.pipelineparams(args)
-    print('Pipelines=',pipelineparams)
+    ### Process paramaters in order of preference, job, config, pipeline
+    jobparams = hlp.inputparams(args)    
     pdb = ''
     if 'pdb' in jobparams:
         pdb = jobparams['pdb']
     cfgparams = hlp.configparams(pdb)    
-    runparams = hlp.mergeparams(cfgparams, jobparams) # the job overrides the config
+    cfgplparams = hlp.configpipelineparams(pdb)
+    print(cfgplparams)
+    pipelineparams = hlp.pipelineparams(args,cfgplparams)
+    print('Pipelines=',pipelineparams)
+    runparams = hlp.mergeparams(cfgparams, jobparams) 
     #runparams['jobs'] = '1' ## if needed for testing purposes
     print('Params=',runparams)
     user = runparams['user']    
@@ -79,7 +95,7 @@ def run_pipeline00(args):
         if env == 'hpc':
             os.system('chmod +x ' + script)
         args = []
-        if env == 'python':
+        if 'python' in env:
             args.append(pythonexe)        
         else:
             args.append('qsub')            
@@ -94,7 +110,7 @@ def run_pipeline00(args):
             args.append('h_rt=' + time)            
                                     
         args.append(script)
-        if env == 'hpc':            
+        if env == 'hpc' or env == 'empty_hpc':            
             args.append(runparams['pdb'])         #1
             args.append(runparams['name'])        #2
             args.append('unused')       #3
