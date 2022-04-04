@@ -1,7 +1,7 @@
 ##### Owner:Rachel
-#-----------------------------------------------------------------------
+-----------------------------------------------------------------------
 ## HPC FoldX Pipeline for myriad
-#-----------------------------------------------------------------------
+-----------------------------------------------------------------------
 ### Overview
 This pipeline compares the background protein folding stability of a given pdb structure against known variants.
 
@@ -9,14 +9,14 @@ This pipeline compares the background protein folding stability of a given pdb s
 - The variants are calculating by perumtating the possibilities of the known variants
 
 A comparison of these shows (should show) that the variants are more stable.
-
+-----------------------------------------------------------------------
 ### Inputs
 1. A pdb file
 2. A variants file
-
+-----------------------------------------------------------------------
 ### Pipeline parent script
 - The 00 script is a parent script that runs all the other scripts with the correct dependencies
-
+-----------------------------------------------------------------------
 ### Scripts
 1. This runs foldx repairs on a pdb file, the repairs ensure that the atom positions are relaxed into a favoured position.
 - background mutations
@@ -30,7 +30,7 @@ A comparison of these shows (should show) that the variants are more stable.
 
 - N.B. there is not yet a job that compares the background to the variant data
 - N.B.2 the number of array jobs is arbitrary for script 3 and specific to the number of variants for script 6
-
+-----------------------------------------------------------------------
 ### Structure
 There are pairs of scripts bash/python. The bash submits to qsub, the python runs in python. This enables a test environment to run the python scripts via both CI and user testing from the tests directory.
 
@@ -38,7 +38,7 @@ There are 3 levels of paramaters. In order of least preferred to most:
 - Batch params (eg number of array jobs, time allowed, script dependence)
 - Pdb parameters (eg override of arrays for variants, name of variant, number of repairs)
 - Command line inputs - pdb needed, override anything else if you want (eg change the number of array jobs for testing)
-
+-----------------------------------------------------------------------
 ```
 The scripts dependency is:
 
@@ -50,3 +50,4 @@ The scripts dependency is:
                                         |                |
                             SCRIPT 04: AGGREGATE      SCRIPT 07: VARIANT AGGREGATE
  ```
+-----------------------------------------------------------------------
