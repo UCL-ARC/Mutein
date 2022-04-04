@@ -8,7 +8,7 @@ This pipeline compares the background protein folding stability of a given pdb s
 - The background folding stability is calculated by mutating every single possible residue in a protein structure
 - The variants are calculating by perumtating the possibilities of the known variants
 
-A comparison of these shows (should show) that the variants are more stable.
+- A comparison of these shows (should show) that the variants are more stable.
 -----------------------------------------------------------------------
 ### Inputs
 1. A pdb file
