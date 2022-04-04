@@ -8,7 +8,6 @@ It formats the pdb file into a paramater file suitable for foldx PositionScan
 N.b this file may be run on the myriad clusters or on a local machine
 -----------------------------
 '''
-import sys
 import os
 import pandas as pd
 from shutil import copyfile
@@ -17,8 +16,8 @@ import helper as hlp
 ##### INPUTS #############################################
 # The inputs to this function are the pdbfile and the chain id (might optionally consider the positionscan mutation type)
 def run_pipeline05(args):
-    hlp.log_inputs(args)
-    print(sys.argv)
+    print('### FoldX make variant params job ###')
+    print(args)
     ##############################################
     iparams = hlp.inputparams(args)    
     pdb = ''
@@ -36,13 +35,14 @@ def run_pipeline05(args):
     variant = params['variant']
     chainid = params['chain']
     input_path, thruput_path, interim_path, output_path = hlp.get_make_paths(pdb,jobname)
+    work_path = interim_path + 'vparams/'
+    hlp.goto_job_dir(work_path,args,params,'_inputs05')
     ############################################    
     # we want to work in the node directory first, the main pdb input file is a 1-off and lives in github (at the moment)        
-    in_mutations_file = params['variantfile'] + '.txt'
+    in_mutations_file = input_path + params['variantfile'] + '.txt'
     new_mutations_file = output_path + params['variantfile'] + '.txt'
     print('### ... copying file',in_mutations_file,new_mutations_file)
-    copyfile(in_mutations_file,new_mutations_file)
-    os.chdir(interim_path)
+    copyfile(in_mutations_file,new_mutations_file)    
     ##### Open the variant file ################################
     variant_df = pd.read_csv(new_mutations_file)
     mutations = variant_df.query("Variant == '" + variant + "'")
@@ -80,7 +80,7 @@ def run_pipeline05(args):
         
     ##### Turn the dictionary into a dataframe
     data_params = pd.DataFrame.from_dict(param_dic)
-    filename = 'variant_params.txt'
+    filename = thruput_path + 'variant_params.txt'
     data_params.to_csv(filename,index=False,sep=' ',header=False)
 
 ##########################################################################################   

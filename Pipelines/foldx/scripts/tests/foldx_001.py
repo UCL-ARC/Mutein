@@ -16,6 +16,13 @@ def test_foldx_pipeline_HIS2():
     import foldx03_posscan as ppl
     args = ['','pdb=6vxx','name=6vxx_tst','mutation=VA47a,VA47a','row=010', 'repairs=10']
     ppl.run_pipeline03(args)
+
+def test_foldx_pipeline_HIS3():
+    addpath()
+    import foldx03_posscan as ppl
+    args = ['','pdb=6vxx','name=6vxx_tst','mutation=VA47a,VA47a','row=015', 'repairs=15']
+    ppl.run_pipeline03(args)
 #########################################################################
-test_foldx_pipeline_HIS1()
-test_foldx_pipeline_HIS2()
+#test_foldx_pipeline_HIS1()
+#test_foldx_pipeline_HIS2()
+test_foldx_pipeline_HIS3()

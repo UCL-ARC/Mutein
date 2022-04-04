@@ -43,11 +43,10 @@ def run_pipeline03(args):
     mutation_string = params['mutation']
     input_path, thruput_path, interim_path, output_path = hlp.get_make_paths(pdb,jobname)
     ############################################
-    pdbfile =pdb + '_rep' + str(params['repairs']) + '.pdb'        
-    print('### ... change directory',thruput_path)                     
+    pdbfile =pdb + '_rep' + str(params['repairs']) + '.pdb'            
     mutations = []
     # row=. means all, row=1:n means an explicit row, row=0 means the mutation string has been passd in explicitly
-    if row == ".":
+    if mutation_string == ".":
         filename = interim_path + 'params.txt'
         print('open',filename)
         with open(filename) as fr:

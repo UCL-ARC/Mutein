@@ -17,5 +17,18 @@ def test_foldx_pipeline00_1tstB():
     args = ['','user=CI','jobs=1234','pdb=1tst','repairs=15']    
     p00.run_pipeline00(args)
 
+def test_foldx_pipeline00_1tstC():
+    addpath()
+    import foldx00_pipeline as p00
+    args = ['','user=rachel','jobs=6','pdb=1tst']    
+    p00.run_pipeline00(args)
+
+def test_foldx_pipeline00_1tstD():
+    addpath()
+    import foldx00_pipeline as p00
+    args = ['','user=rachel','jobs=6','pdb=1tst','mutation=.','row=.']    
+    p00.run_pipeline00(args)
 #test_foldx_pipeline00_1tstA()
-test_foldx_pipeline00_1tstB()
+#test_foldx_pipeline00_1tstB()
+#test_foldx_pipeline00_1tstC()
+test_foldx_pipeline00_1tstD()

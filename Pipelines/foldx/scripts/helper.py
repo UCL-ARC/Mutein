@@ -13,7 +13,9 @@ import os
 ## New users, add your environment details here to and check them in to avoid having to mess about locally all the time ##
 # For example, when I run locally, I want to use python instead of hpc, and my exe path to foldx and python is different (environment variable incompetence)
 environments = {}
-environments['empty'] = ['foldx', 'python','empty'] #just prints out what it would run
+environments['empty_hpc'] = ['foldx', 'python','empty_hpc'] #just prints out what it would run
+environments['empty_python'] = ['foldx', 'python','empty_python'] #just prints out what it would run
+environments['python'] = ['foldx', 'python','python'] #just prints out what it would run
 environments['CI'] = ['~/UCL/libs/foldx5/foldx', '/bin/python3','python'] #continuous integration
 environments['myriad'] = ['foldx', 'python','hpc']
 environments['myriad_tst'] = ['foldx', 'python','python']
@@ -66,12 +68,10 @@ def configparams(pdb):
     params['jobs'] = '1234567'
     params['chain'] = 'A'
     params['pdb'] = '6vxx'
-    params['name'] = '6vxx_50'
-    params['split'] = '50'
+    params['name'] = '6vxx_50'    
     params['row'] = '1'
     params['mutation'] = '.'
-    params['time'] = '.'
-    params['combos'] = '63'
+    params['time'] = '.'    
     params['variant'] = 'Alpha'        
     if pdb != '':
         dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -91,6 +91,21 @@ def configparams(pdb):
     params['user'] = user
     return params
 
+def configpipelineparams(pdb):    
+    #set up some defaults for any batch to run without paramaters    
+    params = {}    
+    if pdb != '':
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        dir_path = dir_path[:-7]
+        input_path = dir_path + 'inputs/'         
+        configfile = input_path + pdb + '/config.cfg'
+        with open(configfile) as fr:
+            cfgcontent = fr.readlines()
+            for line in cfgcontent:
+                line = line.strip()
+                params = addpipelinetoparams(line,params)        
+    return params
+
 def inputparams(argvs):        
     params = {}
     for i in range(1,len(argvs)):
@@ -102,13 +117,11 @@ def inputparams(argvs):
         params['configfile'] = '../inputs/'+ params['pdb'] + '/config.cfg'    
     return params
             
-def pipelineparams(argvs):        
-    params = {}
+def pipelineparams(argvs,params):            
     for i in range(1,len(argvs)):
         arg = argvs[i]
         params = addpipelinetoparams(arg,params)                
     return params
-
 
 def mergeparams(configparams, jobparams):
     #the job params take precendence

@@ -42,14 +42,17 @@ paramfile=${a}${jobname}${b}
 number=$SGE_TASK_ID
 
 ipdb="`sed -n ${number}p $paramfile | awk '{print $1}'`"
-chain="`sed -n ${number}p $paramfile | awk '{print $2}'`"
+ichain="`sed -n ${number}p $paramfile | awk '{print $2}'`"
 imutation="`sed -n ${number}p $paramfile | awk '{print $3}'`"
-xrow="`sed -n ${number}p $paramfile | awk '{print $4}'`"
+irow="`sed -n ${number}p $paramfile | awk '{print $4}'`"
 
+jobnamex="name="$2
 pdb="pdb="$ipdb
+rw="row="$irow
 mutation="mutation="$imutation
-row = "row="$xrow
+repairs="repairs="$7
+
 
 cd ~/MuteinPipeline/foldx/scripts/
-python foldx06_build.py $pdb $jobname $mutation $row
+python foldx06_build.py $pdb $jobnamex $mutation $rw $repairs
 

@@ -35,5 +35,5 @@ def test_foldx_pipeline04_1tst():
 
 #test_foldx_pipeline01_1tst()
 #test_foldx_pipeline02_1tst()
-#test_foldx_pipeline03_1tst()
-test_foldx_pipeline04_1tst()
+test_foldx_pipeline03_1tst()
+#test_foldx_pipeline04_1tst()

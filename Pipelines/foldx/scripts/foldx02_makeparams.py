@@ -35,7 +35,7 @@ def run_pipeline02(args):
     jobname = params['name']
     input_path, thruput_path, interim_path, output_path = hlp.get_make_paths(pdb,jobname)
     work_path = interim_path + 'params/'
-    hlp.goto_job_dir(work_path,args,params,'_inputs02')    
+    hlp.goto_job_dir(work_path,args,params,'_inputs02')
 
     pdb = params['pdb']
     jobname = params['name']

@@ -29,8 +29,9 @@ pdb="pdb="$1
 jobname="name="$2
 variant="variant="$5
 variantfile="variantfile="$6
+repairs="repairs="$7
 
 cd ~/MuteinPipeline/foldx/scripts/
-python foldx05_vparams.py $pdb $jobname $variant $variantfile
+python foldx05_vparams.py $pdb $jobname $variant $variantfile $repairs
 
 

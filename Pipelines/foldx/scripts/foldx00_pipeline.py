@@ -19,7 +19,6 @@ The scripts dependency is:
 ------------------------
 '''
 import os
-from pdb import run
 import subprocess
 import helper as hlp
 import pandas as pd
