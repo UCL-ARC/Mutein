@@ -53,5 +53,5 @@ mutation="mutation="$imutation
 repairs="repairs="$7
 
 cd ~/MuteinPipeline/foldx/scripts/
-python foldx03_posscan.py $pdb $jobnamex $mutation $rw $repairs
+python foldx03_posscan.py $pdb $jobnamex $mutation $rw $repairs row=row0
 
