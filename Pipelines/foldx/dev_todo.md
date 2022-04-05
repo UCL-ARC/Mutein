@@ -1,6 +1,7 @@
 ---------------------------------------------------------------------------
 #### dev todo list
 - Add a param for the user's home directory in the main bash scripts
+- I am only being very simple in job splits - can foldx multithread?
 - Make the code and comments and variables up to rsdg standard
 - FOR CI - add a final test to add asserts for changed data (waiting to be happy with data#1)
 - If one of the array jobs fails the dependent batch can still go ahead. Do I just re-run the jobs that failed (they are numbered).
@@ -13,9 +14,7 @@
 ---------------------------------------------------------------------------
 #### sprint 1 - 7/4/22
 DEV
-- Get rid of magic number in get_make_paths
 - Make foldx a "runner" so it is easier to understand what has gone into it.
-- Make args a class to handle args (use argsparse too - later)
 - Get python actions for continuous integration working
 - Get a so called "empty" run that can work in CI (foldx won't work I assume???)
 - Make the CI empty the data completely first
@@ -33,10 +32,14 @@ DEV-ED
 - Make the batch dependency, script names and times (everything for qsub) configurable from file not hard coded
 - Make the number of repairs confugurable and use the repaired file with the specified number from thruputs
 - Make readme.md the main file "information that the next generation of devs"
-- enable override of the pieline params from the batch, eg combos array num changes based on pdb size it is not an arbitrary performance decision)
+- enable override of the pieline params from the batch, eg combos array num changes based on pdb size it is not an arbitrary 
+performance decision)
 - complete the pipeline for the variants in the style adopted (batches 5,6,7)
+- Get rid of magic number in get_make_paths
+- Make args a class to handle args (use argsparse too - later)
 
 DISCUSSED-ED
 - We need to change the analysis for pos scan due to bug
 - the 10x repair is more stable with the ddg for the histidine, have results to show, so yes but there is also a problem
+- Another bug in the copying across of the actual results to results file is why the build script is a bit weird
 ---------------------------------------------------------------------------
