@@ -30,6 +30,6 @@ jobname="name="$2
 repairs="repairs="$7
 
 cd ~/MuteinPipeline/foldx/scripts/
-python foldx07_vaggdgg.py $pdb $jobname $repairs
+python foldx07_vaggddg.py $pdb $jobname $repairs
 
 
