@@ -19,6 +19,7 @@ The scripts dependency is:
 ------------------------
 '''
 import os
+import pwd
 import subprocess
 import helper as hlp
 import pandas as pd
@@ -40,6 +41,8 @@ def run_pipeline00(args):
     dir_path = os.path.dirname(os.path.realpath(__file__)) + '/'
     print('## ... changing directory to',dir_path)
     os.chdir(dir_path)
+    homeuser = pwd.getpwuid(os.getuid())[0]
+    print('HomeUser=',homeuser)  
     ### Process paramaters in order of preference, job, config, pipeline
     argus = Arguments.Arguments(args)                  
     cfgplparams = hlp.configpipelineparams(argus.arg('pdb'))    
@@ -94,8 +97,10 @@ def run_pipeline00(args):
             if int(array)>0:
                 args.append('-t')
                 args.append('1-' + str(array))                            
-            args.append('-l')
-            args.append('h_rt=' + time)            
+            args.append('-l')#$ -l h_rt=5:00:0
+            args.append('h_rt=' + time)
+            args.append('-wd')#$ -wd /home/ucbtlcr/Scratch/workspace
+            args.append('/home/' + homeuser + '/Scratch/workspace')#$ -wd /home/ucbtlcr/Scratch/workspace
                                     
         args.append(script)
         if argus.arg('environment') == 'hpc' or argus.arg('environment') == 'empty_hpc':            
@@ -105,7 +110,7 @@ def run_pipeline00(args):
             args.append(argus.arg('mutation'))    #4   
             args.append(argus.arg('variant'))     #5
             args.append(argus.arg('variantfile')) #6
-            args.append(argus.arg('repairs'))     #7
+            args.append(argus.arg('repairs'))     #7            
         else:
             args.append(script)
             args.append('pdb='+argus.arg('pdb'))         #1

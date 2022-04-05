@@ -8,7 +8,7 @@ def addpath():
 def test_foldx_pipeline00_1tstAll():
     addpath()
     import foldx00_pipeline as p00
-    args = ['','user=CI','jobs=1234567','pdb=1tst']    
+    args = ['','user=CI','jobs=1','pdb=1tst']    
     p00.run_pipeline00(args)
 
 def test_foldx_pipeline00_1tstB():

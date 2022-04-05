@@ -20,7 +20,7 @@
 # Set the working directory to somewhere in your scratch space.  
 #  This is a necessary step as compute nodes cannot write to $HOME.
 # Replace "<your_UCL_id>" with your UCL user ID.
-#$ -wd /home/$USER/Scratch/workspace
+#$ -wd /home/xxx/Scratch/workspace
 
 # Load the necessary python libraries
 module load python3/recommended
