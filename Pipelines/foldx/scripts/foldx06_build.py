@@ -28,7 +28,7 @@ def run_pipeline06(args):
     cparams = hlp.configparams(pdb)
     print('CONFIG PARAMS',cparams,'\n')
     params = hlp.mergeparams(cparams,iparams)
-    print(params,'/n')
+    print(params)
     user = params['user']
     user, (foldxe, pythonexe, environment) = hlp.getenvironment(user)
     print(user, foldxe, pythonexe,environment,'\n')
@@ -86,7 +86,7 @@ def run_pipeline06(args):
         mut_fl = 'individual_list.txt'
         mut_log = 'buildmodel.log'
         with open(mut_fl,'w') as fw:
-            fw.write(mutation_string)        
+            fw.write(mut)        
         #~/UCL/libs/foldx5/foldx --command=BuildModel --ionStrength=0.05 --pH=7
         #  --water=CRYSTAL --vdwDesign=2 --pdbHydrogens=false --numberOfRuns=15 --mutant-file=mutations.txt
         #  --pdb=6vxx_rep.pdb > buildmodel.log

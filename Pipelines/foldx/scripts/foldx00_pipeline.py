@@ -60,7 +60,7 @@ def run_pipeline00(args):
     if env == 'python':
         ext = '.py'
 
-    # The batch is defined in the file batch.csv
+    # The batch is defined in the file batch.csv    
     batch_df = pd.read_csv('batch.csv')
     batch_dic = {}
     for i in range(len(batch_df.index)):
@@ -70,9 +70,9 @@ def run_pipeline00(args):
         dependency = batch_df['dependency'][i]                
         array = batch_df['array'][i]     
         batch_dic[str(id)] = (script,time,dependency,array)    
-    #############################################################
+    #############################################################        
     dependencies = {}
-    runs = []    
+    runs = []        
     for j in runparams['jobs']:        
         if str(j) in batch_dic:
             script,time,dependency,array = batch_dic[str(j)]
@@ -85,10 +85,10 @@ def run_pipeline00(args):
                     array = idparams['array']
             dep = "-1"
             if str(dependency) != "-1" and str(dependency) in runparams['jobs']:
-                dep = dependency
+                dep = dependency            
             runs.append([j,'qsub',script + ext,dep,time,array])            
             dependencies[str(j)] = str(dep)
-        
+                                                
     for job,exe,script,dependency,time,array in runs:
         #print(job,exe,script,dependency)
         if env == 'hpc':
@@ -112,7 +112,7 @@ def run_pipeline00(args):
         if env == 'hpc' or env == 'empty_hpc':            
             args.append(runparams['pdb'])         #1
             args.append(runparams['name'])        #2
-            args.append('unused')       #3
+            args.append(runparams['split'])                #3
             args.append(runparams['mutation'])    #4   
             args.append(runparams['variant'])     #5
             args.append(runparams['variantfile']) #6
@@ -121,7 +121,7 @@ def run_pipeline00(args):
             args.append(script)
             args.append('pdb='+runparams['pdb'])         #1
             args.append('name='+runparams['name'])        #2
-            args.append('unused')       #3
+            args.append('split='+runparams['split'])            #3
             args.append('mutation='+runparams['mutation'])    #4   
             args.append('variant='+runparams['variant'])     #5
             args.append('variantfile='+runparams['variantfile']) #6

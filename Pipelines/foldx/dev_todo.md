@@ -5,6 +5,7 @@
 - FOR CI - add a final test to add asserts for changed data (waiting to be happy with data#1)
 - If one of the array jobs fails the dependent batch can still go ahead. Do I just re-run the jobs that failed (they are numbered).
 - the array number for the variant split is the combination of individual variants, so it should be calculated rather than passed in
+- unsatisfactory use of both split and array jobs needs thinking about
 ---------------------------------------------------------------------------
 #### discuss todo list 
 - Anaytics - establish agreement or what the future action is on the number differences as per above

@@ -27,8 +27,9 @@ module load python3/recommended
 
 pdb="pdb="$1
 jobname="name="$2
+repairs="repairs="$7
 
 cd ~/MuteinPipeline/foldx/scripts/
-python foldx07_vaggdgg.py $pdb $jobname
+python foldx07_vaggdgg.py $pdb $jobname $repairs
 
 
