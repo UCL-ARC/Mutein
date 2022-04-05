@@ -16,6 +16,7 @@ import os
 import pandas as pd
 from shutil import copyfile
 import helper as hlp
+import Arguments
 
 ##### INPUTS #############################################
 # The inputs to this function are the pdbfile and the chain id (might optionally consider the positionscan mutation type)
@@ -23,31 +24,17 @@ import helper as hlp
 def run_pipeline03(args):    
     print('### FoldX position scan job ###')
     print(args)    
-    # combine config and job input params
-    # additional inputs special to this job are row and mutation
-    ##############################################
-    iparams = hlp.inputparams(args)    
-    pdb = ''
-    if 'pdb' in iparams:
-        pdb = iparams['pdb']
-    cparams = hlp.configparams(pdb)
-    print('CONFIG PARAMS',cparams)
-    params = hlp.mergeparams(cparams,iparams)
-    print(params)
-    user = params['user']
-    user, (foldxe, pythonexe, environment) = hlp.getenvironment(user)
-    print(user, foldxe, pythonexe,environment)
-    pdb = params['pdb']
-    jobname = params['name']
-    row = params['row']
-    mutation_string = params['mutation']
-    input_path, thruput_path, interim_path, output_path = hlp.get_make_paths(pdb,jobname)
+    argus = Arguments.Arguments(args)            
+    
+    pdb = argus.arg('pdb')        
+    row = argus.arg('row')
+    mutation_string = argus.arg('mutation')            
     ############################################
-    pdbfile =pdb + '_rep' + str(params['repairs']) + '.pdb'            
+    pdbfile =pdb + '_rep' + str(argus.arg('repairs')) + '.pdb'            
     mutations = []
     # row=. means all, row=1:n means an explicit row, row=0 means the mutation string has been passd in explicitly
     if mutation_string == ".":
-        filename = interim_path + 'params.txt'
+        filename = argus.arg('interim_path') + 'params.txt'
         print('open',filename)
         with open(filename) as fr:
             paramscontent = fr.readlines()        
@@ -66,7 +53,7 @@ def run_pipeline03(args):
         mutations.append([mutation_string,row])    
     else:
         # we have specified a numerical row in the file
-        filename = interim_path + 'params.txt'
+        filename = argus.arg('interim_path') + 'params.txt'
         print('open',filename)
         with open(filename) as fr:
             paramscontent = fr.readlines()
@@ -82,16 +69,16 @@ def run_pipeline03(args):
     for mut,row in mutations:
         print(mut,row)
 
-        row_path = interim_path + row + '/'
+        row_path = argus.arg('interim_path') + row + '/'
         print('### ... change directory',row_path)
-        params['thisrow'] = row
-        params['thismut'] = mut
-        hlp.goto_job_dir(row_path,args,params,'_inputs03')        
-        print('### ... copying file',thruput_path + pdbfile,row_path + pdbfile)
-        copyfile(thruput_path + pdbfile,row_path + pdbfile)
+        argus.params['thisrow'] = row
+        argus.params['thismut'] = mut
+        hlp.goto_job_dir(row_path,args,argus.params,'_inputs03')        
+        print('### ... copying file',argus.arg('thruput_path') + pdbfile,row_path + pdbfile)
+        copyfile(argus.arg('thruput_path') + pdbfile,row_path + pdbfile)
         
         
-        foldxcommand = foldxe + ' --command=PositionScan'
+        foldxcommand = argus.arg('foldxe') + ' --command=PositionScan'
         foldxcommand += ' --ionStrength=0.05'
         foldxcommand += ' --pH=7'
         foldxcommand += ' --water=CRYSTAL'
@@ -104,8 +91,8 @@ def run_pipeline03(args):
 
 
         print(foldxcommand)
-        print("RealOrTest=",environment)
-        if environment != 'empty':    
+        print("RealOrTest=",argus.arg('environment'))
+        if argus.arg('environment') != 'empty':    
             os.system(foldxcommand)
 
 ##########################################################################################   

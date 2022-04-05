@@ -129,26 +129,35 @@ def mergeparams(configparams, jobparams):
         configparams[cfg] = val
     return configparams
 
+def add_remove_path_levels(path,levels=0,dir=''):
+    dirs = path.split('/')
+    if levels > 0:
+        dirs = dirs[:-1*levels]
+    if dir != '':
+        dirs.append(dir)
+    retpath = ''
+    for d in dirs:
+        retpath += d + '/'
+    if not os.path.exists(retpath):
+        os.mkdir(retpath)    
+    return retpath
+    
 def get_make_paths(pdb,name):
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    dir_path = dir_path[:-7]
-    if not os.path.exists(dir_path + 'interim/'):
-        os.mkdir(dir_path + 'interim/')
-    if not os.path.exists(dir_path + 'thruputs/'):
-        os.mkdir(dir_path + 'thruputs/')
-    if not os.path.exists(dir_path + 'outputs/'):
-        os.mkdir(dir_path + 'outputs/')
-    input_path = dir_path + 'inputs/' + pdb + '/'
-    thruput_path = dir_path + 'thruputs/' + pdb + '/'
-    interim_path =     dir_path + 'interim/' + name + '/'
-    output_path =     dir_path + 'outputs/' + name + '/'
-    if not os.path.exists(thruput_path):
-        os.mkdir(thruput_path)
-    if not os.path.exists(interim_path):
-        os.mkdir(interim_path)
-    if not os.path.exists(output_path):
-        os.mkdir(output_path)
-    return input_path, thruput_path, interim_path, output_path
+    paths_dic = {}
+    # The path structure is relative to.....it could be a given path
+    # For now the path structure is relative to the script file
+    # (But it will be easy to change)    
+    dir_script_path = os.path.dirname(os.path.realpath(__file__))
+    dir_path = add_remove_path_levels(dir_script_path,1)
+    inputs_path = add_remove_path_levels(dir_path,0,'inputs')
+    interim_path = add_remove_path_levels(dir_path,0,'interim')
+    thruputs_path = add_remove_path_levels(dir_path,0,'thruputs')
+    outputs_path = add_remove_path_levels(dir_path,0,'outputs')
+    inputs_path = add_remove_path_levels(inputs_path,0,pdb)
+    thruput_path = add_remove_path_levels(thruputs_path,0,pdb)
+    interim_path = add_remove_path_levels(interim_path,0,name)
+    output_path = add_remove_path_levels(outputs_path,0,name)            
+    return inputs_path, thruput_path, interim_path, output_path
 
 def goto_job_dir(dir_path,args,params,name):
     if not os.path.exists(dir_path):

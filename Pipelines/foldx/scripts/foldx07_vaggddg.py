@@ -13,31 +13,18 @@ import statistics
 import pandas as pd
 from shutil import copyfile
 import helper as hlp
+import Arguments
 
 def run_pipeline07(args):
     ##### INPUTS #############################################
     print('### Foldx variant aggregate ###')
     ##############################################
-    iparams = hlp.inputparams(args)    
-    pdb = ''
-    if 'pdb' in iparams:
-        pdb = iparams['pdb']
-    cparams = hlp.configparams(pdb)    
-    params = hlp.mergeparams(cparams,iparams)
-    print('FINAL PARAMS',params)
-    user = params['user']
-    user, (foldxe, pythonexe, environment) = hlp.getenvironment(user)
-    print(user, foldxe, pythonexe,environment)
-    pdb = params['pdb']
-    repairs = params['repairs']
-    reppdb = params['pdb'] + '_rep' + repairs
-    jobname = params['name']        
-    input_path, thruput_path, interim_path, output_path = hlp.get_make_paths(pdb,jobname)
-    vagg_path = interim_path + 'vagg/'
-    hlp.goto_job_dir(vagg_path,args,params,'_inputs07') 
-
-    params_file = thruput_path + 'variant_params.txt'
-
+    argus = Arguments.Arguments(args)        
+    work_path = argus.params['interim_path'] + 'vagg/'
+    argus.params['work_path'] = work_path
+    hlp.goto_job_dir(argus.arg('work_path'),args,argus.params,'_inputs07')    
+    
+    params_file = argus.arg('thruput_path') + 'variant_params.txt'
     variant_dirs = []
     with open(params_file) as fr:
         paramscontent = fr.readlines()
@@ -50,7 +37,7 @@ def run_pipeline07(args):
     ddg_dic = {'mutid':[],'ddg':[],'tag':[]}
     for vd,vn in variant_dirs:
         print(vd,vn)
-        ddg_file = interim_path + vd + '/Dif_' + reppdb + '.fxout' #the pdb repaired files are always pdbcode_rep                
+        ddg_file = argus.arg('interim_path') + vd + '/Dif_' + argus.arg('repairpdb') + '.fxout' #the pdb repaired files are always pdbcode_rep                
         print(ddg_file)
         if os.path.exists(ddg_file):
             with open(ddg_file) as fr:
@@ -69,15 +56,15 @@ def run_pipeline07(args):
     #Make a dataframe
     import pandas as pd
     ddg_df = pd.DataFrame.from_dict(ddg_dic)
-    df_file = reppdb + '_variants_ddg_dataframe.csv'
-    ddg_df.to_csv(output_path+df_file,index=False)
-    print('saved dataframe to',output_path + df_file)
+    df_file = argus.arg('repairpdb') + '_variants_ddg_dataframe.csv'
+    ddg_df.to_csv(argus.arg('output_path')+df_file,index=False)
+    print('saved dataframe to',argus.arg('output_path') + df_file)
 
     #And save something visual as a starting point for some analysis
     import matplotlib.pyplot as plt
     import seaborn as sns    
     fig,(ax1,ax2) = plt.subplots(1,2,figsize=(8,9))
-    fig.suptitle(pdb + ' variant mutations\nddg <-1=stabilising >2.5=destabilising')    
+    fig.suptitle(argus.arg('pdb') + ' variant mutations\nddg <-1=stabilising >2.5=destabilising')    
     sns.set_color_codes("pastel")
     # first plt
     sns.barplot(x="ddg", y="tag", data=ddg_df,color="g",ax=ax1)
@@ -87,9 +74,9 @@ def run_pipeline07(args):
     ax2.set_ylabel('')
     sns.despine(left=True, bottom=True)
     plt.rcParams["axes.labelsize"] = 25
-    plot_file = reppdb + '_variant_plot.png'
-    plt.savefig(output_path+plot_file)
-    print('saved plot to',output_path+plot_file)
+    plot_file = argus.arg('repairpdb') + '_variant_plot.png'
+    plt.savefig(argus.arg('output_path')+plot_file)
+    print('saved plot to',argus.arg('output_path')+plot_file)
     
     print('### COMPLETED FoldX aggregate job ###')
 #####################################################################################################

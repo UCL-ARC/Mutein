@@ -15,38 +15,27 @@ import os
 import pandas as pd
 from shutil import copyfile
 import helper as hlp
+import Arguments
 ##### INPUTS #############################################
 # The inputs to this function are the pdbfile and the chain id (might optionally consider the positionscan mutation type)
 def run_pipeline02(args):
     print('### FoldX make params job ###')
     print(args)    
-    # combine config and job input params
-    iparams = hlp.inputparams(args)    
-    pdb = ''
-    if 'pdb' in iparams:
-        pdb = iparams['pdb']
-    cparams = hlp.configparams(pdb)    
-    params = hlp.mergeparams(cparams,iparams)
-    print(params)
-    user = params['user']
-    user, (foldxe, pythonexe, environment) = hlp.getenvironment(user)
-    print(user, foldxe, pythonexe,environment)
-    pdb = params['pdb']
-    jobname = params['name']
-    input_path, thruput_path, interim_path, output_path = hlp.get_make_paths(pdb,jobname)
-    work_path = interim_path + 'params/'
-    hlp.goto_job_dir(work_path,args,params,'_inputs02')
-
-    pdb = params['pdb']
-    jobname = params['name']
-    chainid = params['chain']
-    rows = int(params['split'])
+    argus = Arguments.Arguments(args)        
+    work_path = argus.params['interim_path'] + 'params/'
+    argus.params['work_path'] = work_path
+    hlp.goto_job_dir(argus.arg('work_path'),args,argus.params,'_inputs02')    
+        
+    pdb = argus.arg('pdb')
+    jobname = argus.arg('name')
+    chainid = argus.arg('chain')
+    rows = int(argus.arg('split'))
 
     ##########################################################
 
     ##### Open the pdb file ################################            
-    pdb_file =pdb + '_rep' + str(params['repairs']) + '.pdb'
-    with open(thruput_path + pdb_file) as f:
+    pdb_file =pdb + '_rep' + str(argus.arg('repairs')) + '.pdb'
+    with open(argus.arg('thruput_path') + pdb_file) as f:
         pdbcontent = f.readlines()
 
     ##### Amino acid dictionary to convert between 3 and 1 codes
@@ -105,7 +94,7 @@ def run_pipeline02(args):
     print(total_muts,rows,chunk,row)
     ##### Turn the dictionary into a dataframe
     data_params = pd.DataFrame.from_dict(param_dic)
-    filename = interim_path + 'params.txt'
+    filename = argus.arg('interim_path') + 'params.txt'
     data_params.to_csv(filename,index=False,sep=' ',header=False)
 
 ##########################################################################################   

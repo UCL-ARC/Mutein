@@ -13,34 +13,26 @@ import pandas as pd
 from shutil import copyfile
 import itertools
 import helper as hlp
+import Arguments
 ##### INPUTS #############################################
 # The inputs to this function are the pdbfile and the chain id (might optionally consider the positionscan mutation type)
 def run_pipeline05(args):
     print('### FoldX make variant params job ###')
     print(args)
     ##############################################
-    iparams = hlp.inputparams(args)    
-    pdb = ''
-    if 'pdb' in iparams:
-        pdb = iparams['pdb']
-    cparams = hlp.configparams(pdb)    
-    params = hlp.mergeparams(cparams,iparams)
-    print(params)
-    user = params['user']
-    user, (foldxe, pythonexe, environment) = hlp.getenvironment(user)
-    print(user, foldxe, pythonexe,environment)
-    pdb = params['pdb']
-    jobname = params['name']
-    row = params['row']
-    variant = params['variant']
-    chainid = params['chain']
-    input_path, thruput_path, interim_path, output_path = hlp.get_make_paths(pdb,jobname)
-    work_path = interim_path + 'vparams/'
-    hlp.goto_job_dir(work_path,args,params,'_inputs05')
+    argus = Arguments.Arguments(args)        
+    work_path = argus.params['interim_path'] + 'vparams/'
+    argus.params['work_path'] = work_path
+    hlp.goto_job_dir(argus.arg('work_path'),args,argus.params,'_inputs05')    
     ############################################    
+    pdb = argus.arg('pdb')
+    jobname = argus.arg('name')
+    row = argus.arg('row')
+    variant = argus.arg('variant')
+    chainid = argus.arg('chain')
     # we want to work in the node directory first, the main pdb input file is a 1-off and lives in github (at the moment)        
-    in_mutations_file = input_path + params['variantfile'] + '.txt'
-    new_mutations_file = output_path + params['variantfile'] + '.txt'
+    in_mutations_file = argus.arg('input_path') + argus.arg('variantfile') + '.txt'
+    new_mutations_file = argus.arg('output_path') + argus.arg('variantfile') + '.txt'
     print('### ... copying file',in_mutations_file,new_mutations_file)
     copyfile(in_mutations_file,new_mutations_file)    
     ##### Open the variant file ################################
@@ -80,7 +72,7 @@ def run_pipeline05(args):
         
     ##### Turn the dictionary into a dataframe
     data_params = pd.DataFrame.from_dict(param_dic)
-    filename = thruput_path + 'variant_params.txt'
+    filename = argus.arg('thruput_path') + 'variant_params.txt'
     data_params.to_csv(filename,index=False,sep=' ',header=False)
 
 ##########################################################################################   

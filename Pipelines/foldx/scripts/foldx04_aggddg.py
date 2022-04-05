@@ -12,36 +12,27 @@ import os
 import pandas as pd
 from shutil import copyfile
 import helper as hlp
+import Arguments
 
 def run_pipeline04(args):    
     print('### Foldx aggregate pos scan ###')
-    ##############################################
-    iparams = hlp.inputparams(args)    
-    pdb = ''
-    if 'pdb' in iparams:
-        pdb = iparams['pdb']
-    cparams = hlp.configparams(pdb)    
-    params = hlp.mergeparams(cparams,iparams)
-    print('FINAL PARAMS',params)
-    user = params['user']
-    user, (foldxe, pythonexe, environment) = hlp.getenvironment(user)
-    print(user, foldxe, pythonexe,environment)
-    pdb = params['pdb']
-    jobname = params['name']        
-    input_path, thruput_path, interim_path, output_path = hlp.get_make_paths(pdb,jobname)
-    agg_path = interim_path + 'agg/'
-    hlp.goto_job_dir(agg_path,args,params,'_inputs04')            
+    print(args)
+    ##############################################    
+    argus = Arguments.Arguments(args)        
+    work_path = argus.params['interim_path'] + 'agg/'
+    argus.params['work_path'] = work_path
+    hlp.goto_job_dir(argus.arg('work_path'),args,argus.params,'_inputs04')    
     ############################################    
-    params_file = interim_path + 'params.txt'
+    params_file = argus.arg('interim_path') + 'params.txt'
     rownum = 1
     with open(params_file) as fr:
         paramscontent = fr.readlines()        
         rownum = len(paramscontent)
         
-    ddg_file = 'PS_' + pdb + '_rep' + str(params['repairs']) + '_scanning_output.txt'
+    ddg_file = 'PS_' + argus.arg('pdb') + '_rep' + str(argus.arg('repairs')) + '_scanning_output.txt'
     with open(ddg_file,'w') as fw:
         for r in range(rownum):
-            jobresults_file = interim_path + 'row' + str(r+1) + '/' + ddg_file                        
+            jobresults_file = argus.arg('interim_path') + 'row' + str(r+1) + '/' + ddg_file                        
             if os.path.exists(jobresults_file):
                 with open(jobresults_file) as fr:                    
                     jobcontent = fr.readlines()                      
@@ -73,14 +64,14 @@ def run_pipeline04(args):
             ddg_dic['ddg'].append(float(ddg))
     import pandas as pd
     ddg_df = pd.DataFrame.from_dict(ddg_dic)
-    df_file = output_path + pdb + '_' + str(params['repairs'])+'_ddg_dataframe.csv'
+    df_file = argus.arg('output_path') + argus.arg('pdb') + '_' + str(argus.arg('repairs'))+'_ddg_dataframe.csv'
     ddg_df.to_csv(df_file,index=False)
 
     #And save something visual as a starting point for some analysis
     import matplotlib.pyplot as plt
     import seaborn as sns
     fig,(ax1,ax2) = plt.subplots(1,2)
-    fig.suptitle(pdb + ' background mutations\nddg <-1=stabilising >2.5=destabilising')
+    fig.suptitle(argus.arg('pdb') + ' background mutations\nddg <-1=stabilising >2.5=destabilising')
 
 
     xax = 'rid'
@@ -103,7 +94,7 @@ def run_pipeline04(args):
     ax2.set_ylabel('')
     #plt.legend(title=hue,bbox_to_anchor=(1.01, 1), loc=2, borderaxespad=0.,shadow=False,fancybox=False)  # Put the legend out of the figure
 
-    plot_file = output_path + pdb + '_' +str(params['repairs']) + '_background_plot.png'
+    plot_file = argus.arg('output_path') + argus.arg('pdb') + '_' +str(argus.arg('repairs')) + '_background_plot.png'
     plt.savefig(plot_file)
     print('### COMPLETED FoldX aggregate job ###')
 

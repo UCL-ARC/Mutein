@@ -5,7 +5,6 @@ RSA 15/03/22
 Adapted from:
 https://github.com/shorthouse-mrc/COVID_structure/blob/main/Alpha_variant/Foldx_variantcombinations_calculation.py
 -----------------------------
-
 This performs a mutation on a given list of amino acid positions on the structure
 -----------------------------
 N.b this file may be run on the myriad clusters or on a local machine
@@ -15,36 +14,22 @@ import os
 import pandas as pd
 from shutil import copyfile
 import helper as hlp
+import Arguments
 
-##### INPUTS #############################################
-# The inputs to this function are the pdbfile and the chain id (might optionally consider the positionscan mutation type)
 def run_pipeline06(args):
     print('### FoldX build job ###')
     print(args)
-    iparams = hlp.inputparams(args)    
-    pdb = ''
-    if 'pdb' in iparams:
-        pdb = iparams['pdb']
-    cparams = hlp.configparams(pdb)
-    print('CONFIG PARAMS',cparams,'\n')
-    params = hlp.mergeparams(cparams,iparams)
-    print(params)
-    user = params['user']
-    user, (foldxe, pythonexe, environment) = hlp.getenvironment(user)
-    print(user, foldxe, pythonexe,environment,'\n')
-    #####################################################     
-    pdb = params['pdb']
-    jobname = params['name']
-    row = params['row']
-    mutation_string = params['mutation']
-    input_path, thruput_path, interim_path, output_path = hlp.get_make_paths(pdb,jobname)
+    argus = Arguments.Arguments(args)                
+    pdb = argus.arg('pdb')        
+    row = argus.arg('row')
+    mutation_string = argus.arg('mutation')                    
     ############################################    
     # set up the files and directories
-    pdbfile =pdb + '_rep' + str(params['repairs']) + '.pdb'
+    pdbfile =pdb + '_rep' + str(argus.arg('repairs')) + '.pdb'
     mutations = []
 
     if mutation_string == ".":
-        filename = thruput_path + 'variant_params.txt'
+        filename = argus.arg('thruput_path') + 'variant_params.txt'
         print('open',filename)
         with open(filename) as fr:
             paramscontent = fr.readlines()        
@@ -63,7 +48,7 @@ def run_pipeline06(args):
         mutations.append([mutation_string,row])    
     else:
         # we have specified a numerical row in the file
-        filename = interim_path + 'params.txt'
+        filename = argus.arg('interim_path') + 'params.txt'
         print('open',filename)
         with open(filename) as fr:
             paramscontent = fr.readlines()
@@ -76,13 +61,13 @@ def run_pipeline06(args):
 
     for mut,row in mutations:
         # put mutation into a file
-        row_path = interim_path + row + '/'
+        row_path = argus.arg('interim_path') + row + '/'
         print('### ... change directory',row_path)
-        params['thisrow'] = row
-        params['thismut'] = mut
-        hlp.goto_job_dir(row_path,args,params,'_inputs06')        
-        print('### ... copying file',thruput_path + pdbfile,row_path + pdbfile)
-        copyfile(thruput_path + pdbfile,row_path + pdbfile)
+        argus.params['thisrow'] = row
+        argus.params['thismut'] = mut
+        hlp.goto_job_dir(row_path,args,argus.params,'_inputs06')        
+        print('### ... copying file',argus.arg('thruput_path') + pdbfile,row_path + pdbfile)
+        copyfile(argus.arg('thruput_path') + pdbfile,row_path + pdbfile)
         mut_fl = 'individual_list.txt'
         mut_log = 'buildmodel.log'
         with open(mut_fl,'w') as fw:
@@ -90,7 +75,7 @@ def run_pipeline06(args):
         #~/UCL/libs/foldx5/foldx --command=BuildModel --ionStrength=0.05 --pH=7
         #  --water=CRYSTAL --vdwDesign=2 --pdbHydrogens=false --numberOfRuns=15 --mutant-file=mutations.txt
         #  --pdb=6vxx_rep.pdb > buildmodel.log
-        foldxcommand = foldxe + ' --command=BuildModel'
+        foldxcommand = argus.arg('foldxe') + ' --command=BuildModel'
         foldxcommand += ' --ionStrength=0.05'
         foldxcommand += ' --pH=7'
         foldxcommand += ' --water=CRYSTAL'
@@ -103,7 +88,7 @@ def run_pipeline06(args):
         print()
         print(foldxcommand)        
         print()
-        if 'empty' not in environment:    
+        if 'empty' not in argus.arg('environment'):    
             os.system(foldxcommand)
 
 if __name__ == '__main__':
