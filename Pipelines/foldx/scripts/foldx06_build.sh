@@ -32,12 +32,13 @@ module load python3/recommended
 module load foldx
 
 # Parse parameter file to get variables.
+pdb=$1
 jobname=$2
 rows=$3
-a='/home/ucbtlcr/MuteinPipeline/foldx/interim/'
+a='/home/ucbtlcr/MuteinPipeline/foldx/thruputs/'
 b='/variant_params.txt'
 d=$1
-paramfile=${a}${jobname}${b}
+paramfile=${a}${pdb}${b}
 
 number=$SGE_TASK_ID
 

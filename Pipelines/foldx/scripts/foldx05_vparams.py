@@ -76,7 +76,7 @@ def run_pipeline05(args):
         param_dic['pdb'].append(pdb)
         param_dic['chain'].append(chainid)
         param_dic['mutation'].append(mut_str + ';')
-        param_dic['row'].append(str(len(mut)) + '_var' + str(row))                
+        param_dic['row'].append('row' + str(len(mut)) + '_var' + str(row))                
         
     ##### Turn the dictionary into a dataframe
     data_params = pd.DataFrame.from_dict(param_dic)
