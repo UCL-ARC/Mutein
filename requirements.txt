@@ -13,7 +13,6 @@ cycler==0.11.0
 dbus-python==1.2.16
 distlib==0.3.4
 distro==1.4.0
-distro-info===0.23ubuntu1
 entrypoints==0.3
 filelock==3.6.0
 fonttools==4.31.2
