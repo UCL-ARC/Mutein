@@ -64,11 +64,17 @@ python3 foldx00_pipeline.py jobs=1234567 pdb=1tst
 ########################################################################
 
 ### Continuous integration
-
+https://www.techiediaries.com/python-unit-tests-github-actions/
 
 
 ### Useful docs
-1. Virtual env in vscode: https://techinscribed.com/python-virtual-environment-in-vscode/#:~:text=Using%20Python%20Virtual%20Environment%20in%20VSCode%201%20Install,installed%2C%20VSCode%20will%20show%20an%20error%20like%20this.
+##### Using VSCode and WSL
+- necessarily easy (access and security problems, but the beginning of this works)Not
+-- Virtual env in vscode: https://techinscribed.com/python-virtual-environment-in-vscode/#:~:text=Using%20Python%20Virtual%20Environment%20in%20VSCode%201%20Install,installed%2C%20VSCode%20will%20show%20an%20error%20like%20this.
+- In vscode once created, the venv can be selected in the bottom-right next to "Python3"
+- Install things into the venv from the command line within VSCode 
+
+
 
 
 
