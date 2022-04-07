@@ -1,4 +1,4 @@
-'''
+"""
 ------------------------
 RSA 29/03/22
 ------------------------
@@ -17,7 +17,7 @@ The scripts dependency is:
                                 |                       |
                         SCRIPT 04: AGGREGATE        SCRIPT 07: VARIANT AGGREGATE
 ------------------------
-'''
+"""
 import os
 import pwd
 import subprocess
@@ -36,120 +36,132 @@ import yaml
 # 6 = performing variant ddg (parallel)
 # 7 = aggregating 6
 
+
 def run_pipeline00(args):
     ret_array = []
-    print('#### FOLDX PIPELINE - batch creation ####')
+    print("#### FOLDX PIPELINE - batch creation ####")
     ### Change into script directory
-    dir_path = os.path.dirname(os.path.realpath(__file__)) + '/'
-    print('## ... changing directory to',dir_path)
+    dir_path = os.path.dirname(os.path.realpath(__file__)) + "/"
+    print("## ... changing directory to", dir_path)
     os.chdir(dir_path)
     homeuser = pwd.getpwuid(os.getuid())[0]
-    print('HomeUser=',homeuser)  
+    print("HomeUser=", homeuser)
     ### Process paramaters in order of preference, job, config, pipeline
-    argus = Arguments.Arguments(args)                  
-    cfgplparams = hlp.configpipelineparams(argus.arg('pdb'))    
-    pipelineparams = hlp.pipelineparams(args,cfgplparams)    
-    print('Pipelines=',pipelineparams)                    
+    argus = Arguments.Arguments(args)
+    cfgplparams = hlp.configpipelineparams(argus.arg("pdb"))
+    pipelineparams = hlp.pipelineparams(args, cfgplparams)
+    print("Pipelines=", pipelineparams)
     # script extension is either sh or py depending on bash or python environment
-    ext = '.sh'
-    if argus.arg('environment') == 'python':
-        ext = '.py'
+    ext = ".sh"
+    if argus.arg("environment") == "python":
+        ext = ".py"
     # The batch is defined in the file batch.yml
     batch_dic = {}
-    with open('batch.yml','r') as fr:
+    with open("batch.yml", "r") as fr:
         pipes = yaml.safe_load_all(fr)
         for pipe in pipes:
-            #print('pipe|',pipe)             
-            id = pipe['id']
-            script = pipe['script']            
-            time = pipe['time']               
-            dependency = pipe['dependency']
-            array = pipe['array']
-            batch_dic[str(id)] = (script,time,dependency,array)    
-    #############################################################        
+            # print('pipe|',pipe)
+            id = pipe["id"]
+            script = pipe["script"]
+            time = pipe["time"]
+            dependency = pipe["dependency"]
+            array = pipe["array"]
+            batch_dic[str(id)] = (script, time, dependency, array)
+    #############################################################
     dependencies = {}
-    runs = []        
-    for j in argus.arg('jobs'):
+    runs = []
+    for j in argus.arg("jobs"):
         if str(j) in batch_dic:
-            script,time,dependency,array = batch_dic[str(j)]
-            #check there are no overrides from inuts
+            script, time, dependency, array = batch_dic[str(j)]
+            # check there are no overrides from inuts
             if j in pipelineparams:
-                idparams=pipelineparams[j]
-                if 'time' in idparams:
-                    time = idparams['time']
-                if 'array' in idparams:
-                    array = idparams['array']
+                idparams = pipelineparams[j]
+                if "time" in idparams:
+                    time = idparams["time"]
+                if "array" in idparams:
+                    array = idparams["array"]
             dep = "-1"
-            if str(dependency) != "-1" and str(dependency) in argus.arg('jobs'):
-                dep = dependency            
-            runs.append([j,'qsub',script + ext,dep,time,array])            
+            if str(dependency) != "-1" and str(dependency) in argus.arg("jobs"):
+                dep = dependency
+            runs.append([j, "qsub", script + ext, dep, time, array])
             dependencies[str(j)] = str(dep)
-                                                
-    for job,exe,script,dependency,time,array in runs:
-        #print(job,exe,script,dependency)
-        if argus.arg('environment') == 'hpc':
-            os.system('chmod +x ' + script)
+
+    for job, exe, script, dependency, time, array in runs:
+        # print(job,exe,script,dependency)
+        if argus.arg("environment") == "hpc":
+            os.system("chmod +x " + script)
         args = []
-        if 'python' in argus.arg('environment'):
-            args.append(argus.arg('pythonexe'))        
+        if "python" in argus.arg("environment"):
+            args.append(argus.arg("pythonexe"))
         else:
-            args.append('qsub')            
-            if str(dependency) != '-1':                
-                args.append('-hold_jid')
-                args.append(dependency)                                
-            if int(array)>0:
-                args.append('-t')
-                args.append('1-' + str(array))                            
-            args.append('-l')#$ -l h_rt=5:00:0
-            args.append('h_rt=' + time)
-            args.append('-wd')#$ -wd /home/ucbtlcr/Scratch/workspace
-            args.append('/home/' + homeuser + '/Scratch/workspace')#$ -wd /home/ucbtlcr/Scratch/workspace
-                                    
+            args.append("qsub")
+            if str(dependency) != "-1":
+                args.append("-hold_jid")
+                args.append(dependency)
+            if int(array) > 0:
+                args.append("-t")
+                args.append("1-" + str(array))
+            args.append("-l")  # $ -l h_rt=5:00:0
+            args.append("h_rt=" + time)
+            args.append("-wd")  # $ -wd /home/ucbtlcr/Scratch/workspace
+            args.append(
+                "/home/" + homeuser + "/Scratch/workspace"
+            )  # $ -wd /home/ucbtlcr/Scratch/workspace
+
         args.append(script)
-        if argus.arg('environment') == 'hpc' or argus.arg('environment') == 'inputs_hpc':            
-            args.append(argus.arg('pdb'))         #1
-            args.append(argus.arg('name'))        #2
-            args.append(argus.arg('split'))      #3
-            args.append(argus.arg('mutation'))    #4   
-            args.append(argus.arg('variant'))     #5
-            args.append(argus.arg('variantfile')) #6
-            args.append(argus.arg('repairs'))     #7            
+        if (
+            argus.arg("environment") == "hpc"
+            or argus.arg("environment") == "inputs_hpc"
+        ):
+            args.append(argus.arg("pdb"))  # 1
+            args.append(argus.arg("name"))  # 2
+            args.append(argus.arg("split"))  # 3
+            args.append(argus.arg("mutation"))  # 4
+            args.append(argus.arg("variant"))  # 5
+            args.append(argus.arg("variantfile"))  # 6
+            args.append(argus.arg("repairs"))  # 7
         else:
             args.append(script)
-            args.append('pdb='+argus.arg('pdb'))         #1
-            args.append('name='+argus.arg('name'))        #2
-            args.append('split='+argus.arg('split'))            #3
-            args.append('mutation='+argus.arg('mutation'))    #4   
-            args.append('variant='+argus.arg('variant'))     #5
-            args.append('variantfile='+argus.arg('variantfile')) #6
-            args.append('repairs='+argus.arg('repairs')) #7
+            args.append("pdb=" + argus.arg("pdb"))  # 1
+            args.append("name=" + argus.arg("name"))  # 2
+            args.append("split=" + argus.arg("split"))  # 3
+            args.append("mutation=" + argus.arg("mutation"))  # 4
+            args.append("variant=" + argus.arg("variant"))  # 5
+            args.append("variantfile=" + argus.arg("variantfile"))  # 6
+            args.append("repairs=" + argus.arg("repairs"))  # 7
 
         print(args)
         ret_array.append(args)
-        if argus.arg('environment') == 'hpc':
-            #print('Running on hpc')
-            process = subprocess.Popen(args=args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        if argus.arg("environment") == "hpc":
+            # print('Running on hpc')
+            process = subprocess.Popen(
+                args=args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+            )
             result = process.communicate()
-            print(result) #e.g. Your job 588483 ("foldx-aggregate") has been submitted
-            results = result[0].split(' ')    
-            jobid = results[2]    
-            if '.' in jobid:
-                results = jobid.split('.')
+            print(result)  # e.g. Your job 588483 ("foldx-aggregate") has been submitted
+            results = result[0].split(" ")
+            jobid = results[2]
+            if "." in jobid:
+                results = jobid.split(".")
                 jobid = results[0]
             dependencies[int(job)] = jobid
-        elif argus.arg('environment') == 'python':
-            #print('Running in python')
+        elif argus.arg("environment") == "python":
+            # print('Running in python')
             dependencies[int(job)] = 0
-            process = subprocess.Popen(args=args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)    
+            process = subprocess.Popen(
+                args=args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+            )
             result = process.communicate()
-            print(result) #e.g. Your job 588483 ("foldx-aggregate") has been submitted
+            print(result)  # e.g. Your job 588483 ("foldx-aggregate") has been submitted
         else:
-            #print('Not running')
+            # print('Not running')
             dependencies[int(job)] = 0
 
     return ret_array
 
+
 ####################################################################################################
-if __name__ == '__main__':
+if __name__ == "__main__":
     import sys
-    globals()['run_pipeline00'](sys.argv)
+
+    globals()["run_pipeline00"](sys.argv)
