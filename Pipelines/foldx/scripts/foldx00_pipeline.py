@@ -24,6 +24,7 @@ import subprocess
 import helper as hlp
 import pandas as pd
 import Arguments
+import yaml
 
 ##### INPUTS #############################################
 ## Pipeline jobs sequence
@@ -36,6 +37,7 @@ import Arguments
 # 7 = aggregating 6
 
 def run_pipeline00(args):
+    ret_array = []
     print('#### FOLDX PIPELINE - batch creation ####')
     ### Change into script directory
     dir_path = os.path.dirname(os.path.realpath(__file__)) + '/'
@@ -52,16 +54,18 @@ def run_pipeline00(args):
     ext = '.sh'
     if argus.arg('environment') == 'python':
         ext = '.py'
-    # The batch is defined in the file batch.csv    
-    batch_df = pd.read_csv('batch.csv')
+    # The batch is defined in the file batch.yml
     batch_dic = {}
-    for i in range(len(batch_df.index)):
-        id = batch_df['id'][i]                
-        script = batch_df['script'][i]                
-        time = batch_df['time'][i]                
-        dependency = batch_df['dependency'][i]                
-        array = batch_df['array'][i]     
-        batch_dic[str(id)] = (script,time,dependency,array)    
+    with open('batch.yml','r') as fr:
+        pipes = yaml.safe_load_all(fr)
+        for pipe in pipes:
+            #print('pipe|',pipe)             
+            id = pipe['id']
+            script = pipe['script']            
+            time = pipe['time']               
+            dependency = pipe['dependency']
+            array = pipe['array']
+            batch_dic[str(id)] = (script,time,dependency,array)    
     #############################################################        
     dependencies = {}
     runs = []        
@@ -90,10 +94,9 @@ def run_pipeline00(args):
             args.append(argus.arg('pythonexe'))        
         else:
             args.append('qsub')            
-            if str(dependency) != "-1":
-                dep = dependencies[int(dependency)]
+            if str(dependency) != '-1':                
                 args.append('-hold_jid')
-                args.append(dep)                                
+                args.append(dependency)                                
             if int(array)>0:
                 args.append('-t')
                 args.append('1-' + str(array))                            
@@ -122,6 +125,7 @@ def run_pipeline00(args):
             args.append('repairs='+argus.arg('repairs')) #7
 
         print(args)
+        ret_array.append(args)
         if argus.arg('environment') == 'hpc':
             #print('Running on hpc')
             process = subprocess.Popen(args=args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
@@ -142,6 +146,8 @@ def run_pipeline00(args):
         else:
             #print('Not running')
             dependencies[int(job)] = 0
+
+    return ret_array
 
 ####################################################################################################
 if __name__ == '__main__':

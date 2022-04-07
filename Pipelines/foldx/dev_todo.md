@@ -2,22 +2,21 @@
 #### dev todo list
 - I am only being very simple in job splits - can foldx multithread?
 - Make the code and comments and variables up to rsdg standard
-- FOR CI - add a final test to add asserts for changed data (waiting to be happy with data#1)
 - Make the CI empty the data completely first
 - If one of the array jobs fails the dependent batch can still go ahead. Do I just re-run the jobs that failed (they are numbered).
 - the array number for the variant split is the combination of individual variants, so it should be calculated rather than passed in
 - unsatisfactory use of both split and array jobs needs thinking about
 - use argparse (https://docs.python.org/3/library/argparse.html#)
 - Make foldx a "runner" so it is easier to understand what has gone into it.
-- Make thebatch.csv file a yaml file (code review TY 7.4.22)
-- Run black pep8 formatter on my code (code review TY 7.4.22)
 - Make a foldx runner class (code reveiew TY 7.4.22)
+- Need to make the pdb input cfg file yaml too
 ---------------------------------------------------------------------------
 #### discuss todo list 
 - Anaytics - establish agreement or what the future action is on the number differences as per above
 ---------------------------------------------------------------------------
 #### sprint 1 - 7/4/22
 DEV
+- Run black pep8 formatter on my code (code review TY 7.4.22)
 
 
 DISCUSS
@@ -43,6 +42,8 @@ performance decision)
 - Get a so called "empty" run that can work in CI (foldx won't work I assume???)
 - Make the sh file clearer as to what is overridden (code review TY 7.4.22)
 - Change 'empty' to inputs only (code review TY 7.4.22)
+- FOR CI - add a final test to add asserts for changed data (waiting to be happy with data#1)
+- Make thebatch.csv file a yaml file (code review TY 7.4.22)
 
 DISCUSSED-ED
 - We may need to change the analysis for pos scan due to bug
