@@ -139,6 +139,8 @@ def test_foldx_pipeline00_inputsA():
 
     args = ["", "user=inputs_hpc", "pdb=6vxx"]
     ret_arr = p00.run_pipeline00(args)
+    print('returned=')
+    print(ret_arr)
     if ret_arr != ci_array_01:
         raise Exception("Fails CI 01")
 
@@ -193,9 +195,11 @@ def test_foldx_pipeline00_inputsB():
         "id=3@array=200",
     ]
     ret_arr = p00.run_pipeline00(args)
+    print('returned=')
+    print(ret_arr)
     if ret_arr != ci_array_02:
         raise Exception("Fails CI 02")
 
 
-# test_foldx_pipeline00_inputsA()
+#test_foldx_pipeline00_inputsA()
 test_foldx_pipeline00_inputsB()
