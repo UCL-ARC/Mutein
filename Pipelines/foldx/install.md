@@ -2,7 +2,7 @@
 --------------------------------------------------------------------------
 ## HPC FoldX Pipeline for myriad
 --------------------------------------------------------------------------
-### When everthing is installed and running, you just need to do the following to run the pipeline
+### When everything is installed and running, you just need to do the following to run the pipeline
 ```
 >> cd ~/MuteinPipeline/foldx/scripts/
 >> module load python3/recommended
@@ -18,7 +18,7 @@ inputs/pdb/*
 thruputs/pdb/*
 results/setname/*
 outputs/setname/*
-(The thruputs, results and outputs are not are not synced with github)
+(The thruputs, results and outputs are not synced with github)
 ```
 ### 2.Pipeline inputs
 ##### A pdb file
@@ -64,7 +64,7 @@ The scripts dependency is:
                             SCRIPT 04: AGGREGATE      SCRIPT 07: VARIANT AGGREGATE
  ```
 -----------------------------------------------------------------------
-##### The batch can be run manually and on each individial script too, environment variables will recognise
+##### The batch can be run manually and on each individual script too, environment variables will recognise
 ##### whether you are running locally or on a server (you may need to add yourself)
 -------------------------------------------------------------------------------------------------
 ### Useful docs

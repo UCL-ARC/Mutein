@@ -3,5 +3,17 @@
         "Pipelines"
     ],
     "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true
+    "python.testing.pytestEnabled": true,
+    "cSpell.words": [
+        "foldx",
+        "Mutein",
+        "positionscan",
+        "setname"
+    ],
+    "cSpell.ignoreWords": [
+        "POSSCAN"
+    ],
+    "cSpell.enableFiletypes": [
+        "!python"
+    ]
 }

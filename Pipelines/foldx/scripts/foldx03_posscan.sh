@@ -21,7 +21,7 @@ module load foldx
 # Parse parameter file to get variables.
 jobname=$2
 rows=$3
-a='/home/'$USER'/MuteinPipeline/foldx/interim/'
+a="/home/$USER/MuteinPipeline/foldx/interim/"
 b='/params.txt'
 d=$1
 paramfile=${a}${jobname}${b}
