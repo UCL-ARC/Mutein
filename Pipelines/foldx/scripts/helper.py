@@ -13,8 +13,8 @@ import os
 ## New users, add your environment details here to and check them in to avoid having to mess about locally all the time ##
 # For example, when I run locally, I want to use python instead of hpc, and my exe path to foldx and python is different (environment variable incompetence)
 environments = {}
-environments['empty_hpc'] = ['foldx', 'python','empty_hpc'] #just prints out what it would run
-environments['empty_python'] = ['foldx', 'python','empty_python'] #just prints out what it would run
+environments['inputs_hpc'] = ['foldx', 'python','inputs_hpc'] #just prints out what it would run
+environments['inputs_python'] = ['foldx', 'python','inputs_python'] #just prints out what it would run
 environments['python'] = ['foldx', 'python','python'] #just prints out what it would run
 environments['CI'] = ['~/UCL/libs/foldx5/foldx', '/bin/python3','python'] #continuous integration
 environments['myriad'] = ['foldx', 'python','hpc']

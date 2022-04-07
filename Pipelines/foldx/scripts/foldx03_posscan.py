@@ -92,7 +92,7 @@ def run_pipeline03(args):
 
         print(foldxcommand)
         print("RealOrTest=",argus.arg('environment'))
-        if argus.arg('environment') != 'empty':    
+        if argus.arg('environment') != 'inputs':    
             os.system(foldxcommand)
 
 ##########################################################################################   

@@ -9,11 +9,9 @@
 - unsatisfactory use of both split and array jobs needs thinking about
 - use argparse (https://docs.python.org/3/library/argparse.html#)
 - Make foldx a "runner" so it is easier to understand what has gone into it.
-- Make thebatch.csv file a yaml file (code review TY)
-- Run black pep8 formatter on my code (code review TY)
-- Change 'empty' to inputs only (code review TY)
-- Make the sh file clearer as to what is overridden (code review TY)
-- Make a foldx runner class (code reveiew TY)
+- Make thebatch.csv file a yaml file (code review TY 7.4.22)
+- Run black pep8 formatter on my code (code review TY 7.4.22)
+- Make a foldx runner class (code reveiew TY 7.4.22)
 ---------------------------------------------------------------------------
 #### discuss todo list 
 - Anaytics - establish agreement or what the future action is on the number differences as per above
@@ -43,9 +41,11 @@ performance decision)
 - Add a param for the user's home directory in the main bash scripts
 - Get python actions for continuous integration working
 - Get a so called "empty" run that can work in CI (foldx won't work I assume???)
+- Make the sh file clearer as to what is overridden (code review TY 7.4.22)
+- Change 'empty' to inputs only (code review TY 7.4.22)
 
 DISCUSSED-ED
-- We need to change the analysis for pos scan due to bug
+- We may need to change the analysis for pos scan due to bug
 - the 10x repair is more stable with the ddg for the histidine, have results to show, so yes but there is also a problem
 - Another bug in the copying across of the actual results to results file is why the build script is a bit weird
 ---------------------------------------------------------------------------

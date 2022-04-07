@@ -50,7 +50,7 @@ There are 3 levels of paramaters. In order of least preferred to most:
 - Command line inputs - pdb needed, override anything else if you want (eg change the number of array jobs for testing)
 -----------------------------------------------------------------------
 ### Environment
-The scripts can be run in 3 modes - python, hpc and empty. You can override this with user= in the batch.
+The scripts can be run in 3 modes - python, hpc and inputs (inputs only records the inputs to external libraries). You can override this with user= in the batch.
 You can add your dev invironment to the top of helper.py
 An example of a batch command with parameters overridden:
 

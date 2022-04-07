@@ -89,7 +89,7 @@ def run_pipeline06(args):
         print()
         print(foldxcommand)        
         print()
-        if 'empty' not in argus.arg('environment'):    
+        if 'inputs' not in argus.arg('environment'):    
             os.system(foldxcommand)
 
 if __name__ == '__main__':

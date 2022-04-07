@@ -5,7 +5,7 @@ RSA 29/03/22
 Pipeline overview script for foldx job on Myriad
 
 This script is a parent script that runs the entire foldx pipeline at a top level.
-It manages the dependencies beween the scripts and allows you to run as either HPC, python or empty mode
+It manages the dependencies beween the scripts and allows you to run as either HPC, python or inputs mode
 
 The scripts dependency is:
 
@@ -103,7 +103,7 @@ def run_pipeline00(args):
             args.append('/home/' + homeuser + '/Scratch/workspace')#$ -wd /home/ucbtlcr/Scratch/workspace
                                     
         args.append(script)
-        if argus.arg('environment') == 'hpc' or argus.arg('environment') == 'empty_hpc':            
+        if argus.arg('environment') == 'hpc' or argus.arg('environment') == 'inputs_hpc':            
             args.append(argus.arg('pdb'))         #1
             args.append(argus.arg('name'))        #2
             args.append(argus.arg('split'))      #3
