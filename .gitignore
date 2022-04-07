@@ -132,3 +132,4 @@ dmypy.json
 Pipelines/foldx/interim/*
 Pipelines/foldx/thruputs/*
 Pipelines/foldx/outputs/*
+.vscode/settings.json
