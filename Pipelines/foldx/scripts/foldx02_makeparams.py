@@ -1,11 +1,139 @@
-'''
+"""
 -----------------------------
-RSA 31/03/2022
+RSA 15/03/2022
 -----------------------------
-A light wrapper to the module file
-Turns the pdb file into a config file containing a list of parallelisable mutations
+This file takes a pdb code (file must be located in the same directory in the format 1xyz.pdb)
+It formats the pdb file into a parameter file suitable for foldx PositionScan
+The output is in the same directory with the name
+scanparams_1xyz.txt
 -----------------------------
-'''
-import sys
-import foldx02_makeparams_mod as p02
-p02.run_pipeline02(sys.argv)
+N.b this file may be run on the myriad clusters or on a local machine
+-----------------------------
+"""
+# import sys
+import os
+import pandas as pd
+from shutil import copyfile
+import helper as hlp
+import Arguments
+
+##### INPUTS #############################################
+# The inputs to this function are the pdbfile and the chain id (might optionally consider the positionscan mutation type)
+def run_pipeline02(args):
+    print("### FoldX make params job ###")
+    print(args)
+    argus = Arguments.Arguments(args)
+    work_path = argus.params["interim_path"] + "params/"
+    argus.params["work_path"] = work_path
+    hlp.goto_job_dir(argus.arg("work_path"), args, argus.params, "_inputs02")
+
+    pdb = argus.arg("pdb")
+    jobname = argus.arg("name")
+    chainid = argus.arg("chain")
+    rows = int(argus.arg("split"))
+
+    ##########################################################
+
+    ##### Open the pdb file ################################
+    pdb_file = pdb + "_rep" + str(argus.arg("repairs")) + ".pdb"
+    with open(argus.arg("thruput_path") + pdb_file) as f:
+        pdbcontent = f.readlines()
+
+    ##### Amino acid dictionary to convert between 3 and 1 codes
+    aa_dict = {
+        "ALA": "A",
+        "CYS": "C",
+        "ASP": "D",
+        "GLU": "E",
+        "PHE": "F",
+        "GLY": "G",
+        "HIS": "H",
+        "ILE": "I",
+        "LYS": "K",
+        "LEU": "L",
+        "MET": "M",
+        "ASN": "N",
+        "PRO": "P",
+        "GLN": "Q",
+        "ARG": "R",
+        "SER": "S",
+        "THR": "T",
+        "VAL": "V",
+        "TRP": "W",
+        "TYR": "Y",
+    }
+
+    ##### Go through each line and get the WT residue, then construct the foldx string to mutate it to everything, add to a list
+    params_lst = []
+    for line in pdbcontent:
+        line = line.strip()
+        if line.startswith("ATOM"):
+            linecontents = [
+                line[:6],
+                line[6:11],
+                line[12:16],
+                line[17:20],
+                line[21],
+                line[22:26],
+                line[30:38],
+                line[38:46],
+                line[46:54],
+            ]
+            # this is e.g.   ATOM        4481         CB            THR         A         716
+            #                          atom no        atom name     amino acid   chain   residue number
+            atomtype = linecontents[2].strip()
+            if atomtype == "CA":
+                if linecontents[4].strip() == chainid:
+                    aaa = linecontents[3].strip()
+                    if aaa in aa_dict:
+                        aa = aa_dict[aaa]
+                        mut = (
+                            aa + linecontents[4].strip() + linecontents[5].strip() + "a"
+                        )  # aa chain rid mutation = mutation string
+                        params_lst.append(mut)
+                    else:
+                        print("!Error maybe?", aaa)  # TODO think about this
+
+    ##### Create a dataframe for the paramterfile in the number of chunks specified
+    rows = int(rows)
+    param_dic = {}
+    param_dic["pdb"] = []
+    param_dic["chain"] = []
+    param_dic["mutation"] = []
+    param_dic["row"] = []
+    mut_str = ""
+
+    total_muts = len(params_lst)
+    chunk = int(total_muts / rows)
+    remainder = int(total_muts % rows)
+    # so until we get to the remainer we need chunk +1 on each row
+    row_size = 0
+    row = 0
+    for i in range(len(params_lst)):
+        mut = params_lst[i]
+        if row_size == 0:
+            param_dic["pdb"].append(pdb)
+            param_dic["chain"].append(chainid)
+            param_dic["mutation"].append(mut)
+            row += 1
+            param_dic["row"].append("row" + str(row))
+        else:
+            param_dic["mutation"][row - 1] = param_dic["mutation"][row - 1] + "," + mut
+        row_size += 1
+
+        if row_size == chunk and row > remainder:
+            row_size = 0
+        elif row_size == chunk + 1:
+            row_size = 0
+    print(total_muts, rows, chunk, row)
+    ##### Turn the dictionary into a dataframe
+    data_params = pd.DataFrame.from_dict(param_dic)
+    filename = argus.arg("interim_path") + "params.txt"
+    data_params.to_csv(filename, index=False, sep=" ", header=False)
+
+
+##########################################################################################
+if __name__ == "__main__":
+    import sys
+
+    globals()["run_pipeline02"](sys.argv)

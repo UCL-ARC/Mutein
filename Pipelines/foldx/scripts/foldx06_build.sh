@@ -1,55 +1,46 @@
 #!/bin/bash -l
 
+# Batch script to run an array of variant processes for ddg
 
-
-# Batch script to run an array job under.
-
-# Request ten minutes of wallclock time (format hours:minutes:seconds).
+# inputs that are overridden from pipeline script
 #$ -l h_rt=3:00:0
-
-# Request 1 gigabyte of RAM (must be an integer followed by M, G, or T)
-#$ -l mem=4G
-
-# Request 15 gigabyte of TMPDIR space (default is 10 GB - remove if cluster is diskless)
-#$ -l tmpfs=15G
-
-# Set up the job array.   #$ -t 1-$rows
 #$ -t 1-2
+#$ -wd /home/ucbtlcr/Scratch/workspace
 
-# Set the name of the job.
+# inputs that are in the script only
+#$ -l mem=4G
+#$ -l tmpfs=15G
 #$ -N foldx-build
-
 # Email myself the job status
 #$ -m be
-
-# Set the working directory to somewhere in your scratch space.  
-#  This is a necessary step as compute nodes cannot write to $HOME.
-# Replace "<your_UCL_id>" with your UCL user ID.
-#$ -wd /home/ucbtlcr/Scratch/workspace
 
 # Load the necessary python libraries
 module load python3/recommended
 module load foldx
 
 # Parse parameter file to get variables.
+pdb=$1
 jobname=$2
 rows=$3
-a='~/MuteinPipeline/foldx/interim/'
+a='/home/'$USER'/MuteinPipeline/foldx/thruputs/'
 b='/variant_params.txt'
 d=$1
-paramfile=${a}${jobname}${b}
+paramfile=${a}${pdb}${b}
 
 number=$SGE_TASK_ID
 
 ipdb="`sed -n ${number}p $paramfile | awk '{print $1}'`"
-chain="`sed -n ${number}p $paramfile | awk '{print $2}'`"
+ichain="`sed -n ${number}p $paramfile | awk '{print $2}'`"
 imutation="`sed -n ${number}p $paramfile | awk '{print $3}'`"
 irow="`sed -n ${number}p $paramfile | awk '{print $4}'`"
 
+jobnamex="name="$2
 pdb="pdb="$ipdb
+rw="row="$irow
 mutation="mutation="$imutation
-row = "row="$irow
+repairs="repairs="$7
+
 
 cd ~/MuteinPipeline/foldx/scripts/
-python foldx06_build.py $pdb $jobname $mutation $row a=R b=MYR 
+python foldx06_build.py $pdb $jobnamex $mutation $rw $repairs
 
