@@ -1,15 +1,16 @@
 ##### Owner:Rachel
-########################################################################
+--------------------------------------------------------------------------
 ## HPC FoldX Pipeline for myriad
-########################################################################
-### 0. When everthing is installed and running, you just need to do the following to run the pipeline
+--------------------------------------------------------------------------
+### When everthing is installed and running, you just need to do the following to run the pipeline
 ```
 >> cd ~/MuteinPipeline/foldx/scripts/
 >> module load python3/recommended
 >> python3 foldx00_pipeline.py jobs=1234567 pdb=6vxx
 ```
-
+--------------------------------------------------------------------------
 #### -- But to get to that state - 
+--------------------------------------------------------------------------
 ### 1.The data is structured in folders
 ```
 scripts/*
@@ -31,7 +32,7 @@ SA982A,Alpha
 DA1118H,Alpha
 DA614G,Alpha
 ```
-########################################################################
+--------------------------------------------------------------------------
 ### 3.To run the pipeline on myriad:
 ##### clone the repo
 ```
@@ -63,11 +64,8 @@ The scripts dependency is:
                             SCRIPT 04: AGGREGATE      SCRIPT 07: VARIANT AGGREGATE
  ```
 -----------------------------------------------------------------------
-########################################################################
 ##### The batch can be run manually and on each individial script too, environment variables will recognise
 ##### whether you are running locally or on a server (you may need to add yourself)
-########################################################################
-
 -------------------------------------------------------------------------------------------------
 ### Useful docs
 ### Continuous integration
