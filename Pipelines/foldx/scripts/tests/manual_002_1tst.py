@@ -1,7 +1,8 @@
 
 '''
 RSA: 2/4/22
-This CI test script runs the entire pipeline with a very small dataset
+This CI test script runs each script in the pipleline with a very small dataset
+
 '''
 import sys,os
 

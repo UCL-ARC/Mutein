@@ -1,23 +1,21 @@
 ---------------------------------------------------------------------------
 #### dev todo list
-- Add a param for the user's home directory in the main bash scripts
 - I am only being very simple in job splits - can foldx multithread?
 - Make the code and comments and variables up to rsdg standard
 - FOR CI - add a final test to add asserts for changed data (waiting to be happy with data#1)
+- Make the CI empty the data completely first
 - If one of the array jobs fails the dependent batch can still go ahead. Do I just re-run the jobs that failed (they are numbered).
 - the array number for the variant split is the combination of individual variants, so it should be calculated rather than passed in
 - unsatisfactory use of both split and array jobs needs thinking about
 - use argparse (https://docs.python.org/3/library/argparse.html#)
+- Make foldx a "runner" so it is easier to understand what has gone into it.
 ---------------------------------------------------------------------------
 #### discuss todo list 
 - Anaytics - establish agreement or what the future action is on the number differences as per above
 ---------------------------------------------------------------------------
 #### sprint 1 - 7/4/22
 DEV
-- Make foldx a "runner" so it is easier to understand what has gone into it.
-- Get python actions for continuous integration working
-- Get a so called "empty" run that can work in CI (foldx won't work I assume???)
-- Make the CI empty the data completely first
+
 
 DISCUSS
 - 
@@ -37,6 +35,9 @@ performance decision)
 - complete the pipeline for the variants in the style adopted (batches 5,6,7)
 - Get rid of magic number in get_make_paths
 - Make args a class to handle args (use argsparse too - later)
+- Add a param for the user's home directory in the main bash scripts
+- Get python actions for continuous integration working
+- Get a so called "empty" run that can work in CI (foldx won't work I assume???)
 
 DISCUSSED-ED
 - We need to change the analysis for pos scan due to bug

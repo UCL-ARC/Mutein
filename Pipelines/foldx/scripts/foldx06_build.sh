@@ -24,7 +24,7 @@
 
 # Set the working directory to somewhere in your scratch space.  
 #  This is a necessary step as compute nodes cannot write to $HOME.
-# Replace "<your_UCL_id>" with your UCL user ID.
+# The username is overridden from the sumbission script
 #$ -wd /home/ucbtlcr/Scratch/workspace
 
 # Load the necessary python libraries
@@ -35,7 +35,7 @@ module load foldx
 pdb=$1
 jobname=$2
 rows=$3
-a='/home/ucbtlcr/MuteinPipeline/foldx/thruputs/'
+a='/home/'$USER'/MuteinPipeline/foldx/thruputs/'
 b='/variant_params.txt'
 d=$1
 paramfile=${a}${pdb}${b}

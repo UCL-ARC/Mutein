@@ -3,7 +3,7 @@
 RSA 15/03/2022
 -----------------------------
 This file takes a pdb code (file must be located in the same directory in the format 1xyz.pdb)
-It formats the pdb file into a paramater file suitable for foldx PositionScan
+It formats the pdb file into a parameter file suitable for foldx PositionScan
 The output is in the same directory with the name
 scanparams_1xyz.txt
 -----------------------------

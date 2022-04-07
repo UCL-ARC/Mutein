@@ -2,8 +2,8 @@
 -----------------------------
 RSA 23/03/2022
 -----------------------------
-This file takes a pdb code (file must be located in the same directory in the format 1xyz.pdb)
-It formats the pdb file into a paramater file suitable for foldx PositionScan
+This file takes a pdb code (the data must be in inputs)
+It formats the pdb file into a parameter file suitable for foldx PositionScan
 -----------------------------
 N.b this file may be run on the myriad clusters or on a local machine
 -----------------------------

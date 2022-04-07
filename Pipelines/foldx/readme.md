@@ -2,13 +2,23 @@
 -----------------------------------------------------------------------
 ## HPC FoldX Pipeline for myriad
 -----------------------------------------------------------------------
+```
+The scripts structure is:
+
+                                    SCRIPT 01:FOLDX REPAIR
+                                        |                |
+                            SCRIPT 02:SPLIT          SCRIPT 05:VARIANT SPLIT
+                                        |                |
+            [ARRAY JOBS]    SCRIPT 03:FOLDX POSSCAN  SCRIPT 06:FOLDX BUILD
+                                        |                |
+                            SCRIPT 04:AGGREGATE      SCRIPT 07:VARIANT AGGREGATE
+ ```
+-----------------------------------------------------------------------
 ### Overview
 This pipeline compares the background protein folding stability of a given pdb structure against known variants.
 
 - The background folding stability is calculated by mutating every single possible residue in a protein structure
 - The variants are calculating by perumtating the possibilities of the known variants
-
-- A comparison of these shows (should show) that the variants are more stable.
 -----------------------------------------------------------------------
 ### Inputs
 1. A pdb file
@@ -39,15 +49,9 @@ There are 3 levels of paramaters. In order of least preferred to most:
 - Pdb parameters (eg override of arrays for variants, name of variant, number of repairs)
 - Command line inputs - pdb needed, override anything else if you want (eg change the number of array jobs for testing)
 -----------------------------------------------------------------------
-```
-The scripts dependency is:
+### Environment
+The scripts can be run in 3 modes - python, hpc and empty. You can override this with user= in the batch.
+You can add your dev invironment to the top of helper.py
+An example of a batch command with parameters overridden:
 
-                                    SCRIPT 01: FOLDX REPAIR
-                                        |                |
-                            SCRIPT 02: SPLIT          SCRIPT 05: VARIANT SPLIT
-                                        |                |
-            [ARRAY JOBS]    SCRIPT 03: FOLDX POSSCAN  SCRIPT 06: FOLDX BUILD
-                                        |                |
-                            SCRIPT 04: AGGREGATE      SCRIPT 07: VARIANT AGGREGATE
- ```
------------------------------------------------------------------------
+

@@ -5,6 +5,7 @@ RSA 15/03/22
 Adapted from:
 https://github.com/shorthouse-mrc/COVID_structure/blob/main/Alpha_variant/Foldx_variantcombinations_calculation.py
 -----------------------------
+
 This performs a mutation on a given list of amino acid positions on the structure
 -----------------------------
 N.b this file may be run on the myriad clusters or on a local machine

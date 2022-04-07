@@ -1,4 +1,7 @@
-
+'''
+RSA 7/4/22
+This replicates a problem in foldx where the order in which you pass in a mutation list changes the vlaues you get out
+'''
 import sys,os
 
 def addpath():
