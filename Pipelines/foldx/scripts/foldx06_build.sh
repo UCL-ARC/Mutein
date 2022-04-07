@@ -22,7 +22,7 @@ module load foldx
 pdb=$1
 jobname=$2
 rows=$3
-a='/home/'$USER'/MuteinPipeline/foldx/thruputs/'
+a="/home/$USER/MuteinPipeline/foldx/thruputs/"
 b='/variant_params.txt'
 d=$1
 paramfile=${a}${pdb}${b}

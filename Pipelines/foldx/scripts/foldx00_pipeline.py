@@ -5,7 +5,7 @@ RSA 29/03/22
 Pipeline overview script for foldx job on Myriad
 
 This script is a parent script that runs the entire foldx pipeline at a top level.
-It manages the dependencies beween the scripts and allows you to run as either HPC, python or inputs mode
+It manages the dependencies between the scripts and allows you to run as either HPC, python or inputs mode
 
 The scripts dependency is:
 

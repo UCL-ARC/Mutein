@@ -18,7 +18,7 @@ The scripts structure is:
 This pipeline compares the background protein folding stability of a given pdb structure against known variants.
 
 - The background folding stability is calculated by mutating every single possible residue in a protein structure
-- The variants are calculating by perumtating the possibilities of the known variants
+- The variants are calculating by permuting the possibilities of the known variants
 -----------------------------------------------------------------------
 ### Inputs
 1. A pdb file
@@ -30,9 +30,9 @@ This pipeline compares the background protein folding stability of a given pdb s
 ### Scripts
 1. This runs foldx repairs on a pdb file, the repairs ensure that the atom positions are relaxed into a favoured position.
 - background mutations
-2. This splits the possible mutations up into a config file ready for parallising
+2. This splits the possible mutations up into a config file ready for parallelizing
 3. An array job: This calls foldx positionscan function with 1 of the rows from the config file, 1 set of mutations
-4. This aggregates and perfoms some analysis on all the individual muations
+4. This aggregates and performs some analysis on all the individual mutations
 - variant mutations
 5. This permutes the possible mutations and makes a config file
 6. An array job: This calls build for each mutation
@@ -44,14 +44,14 @@ This pipeline compares the background protein folding stability of a given pdb s
 ### Structure
 There are pairs of scripts bash/python. The bash submits to qsub, the python runs in python. This enables a test environment to run the python scripts via both CI and user testing from the tests directory.
 
-There are 3 levels of paramaters. In order of least preferred to most:
+There are 3 levels of parameters. In order of least preferred to most:
 - Batch params (eg number of array jobs, time allowed, script dependence)
 - Pdb parameters (eg override of arrays for variants, name of variant, number of repairs)
 - Command line inputs - pdb needed, override anything else if you want (eg change the number of array jobs for testing)
 -----------------------------------------------------------------------
 ### Environment
 The scripts can be run in 3 modes - python, hpc and inputs (inputs only records the inputs to external libraries). You can override this with user= in the batch.
-You can add your dev invironment to the top of helper.py
+You can add your dev environment to the top of helper.py
 An example of a batch command with parameters overridden:
 
 

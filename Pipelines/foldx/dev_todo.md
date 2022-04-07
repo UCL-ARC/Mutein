@@ -8,24 +8,24 @@
 - unsatisfactory use of both split and array jobs needs thinking about
 - use argparse (https://docs.python.org/3/library/argparse.html#)
 - Make foldx a "runner" so it is easier to understand what has gone into it.
-- Make a foldx runner class (code reveiew TY 7.4.22)
+- Make a foldx runner class (code review TY 7.4.22)
 - Need to make the pdb input cfg file yaml too
 ---------------------------------------------------------------------------
 #### discuss todo list 
-- Anaytics - establish agreement or what the future action is on the number differences as per above
+- Analytics - establish agreement or what the future action is on the number differences as per above
 ---------------------------------------------------------------------------
 #### sprint 1 - 7/4/22
 DEV-ED
 - Put the repairs in another folder
-- Log the input paramaters to the current directory
+- Log the input parameters to the current directory
 - Implement a full dummy test data set to mimic an HPC batch
 - Change the files so there is only 1 python file per bash script (__main__)
 - make the test set 1tst for potential multiple ones
 - Make a fully demonstrable show of the orders-of-mutations problem in its own test file
 - Make the batch dependency, script names and times (everything for qsub) configurable from file not hard coded
-- Make the number of repairs confugurable and use the repaired file with the specified number from thruputs
+- Make the number of repairs configurable and use the repaired file with the specified number from thruputs
 - Make readme.md the main file "information that the next generation of devs"
-- enable override of the pieline params from the batch, eg combos array num changes based on pdb size it is not an arbitrary 
+- enable override of the pipeline params from the batch, eg combos array num changes based on pdb size it is not an arbitrary 
 performance decision)
 - complete the pipeline for the variants in the style adopted (batches 5,6,7)
 - Get rid of magic number in get_make_paths
@@ -36,7 +36,7 @@ performance decision)
 - Make the sh file clearer as to what is overridden (code review TY 7.4.22)
 - Change 'empty' to inputs only (code review TY 7.4.22)
 - FOR CI - add a final test to add asserts for changed data (waiting to be happy with data#1)
-- Make thebatch.csv file a yaml file (code review TY 7.4.22)
+- Make the batch.csv file a yaml file (code review TY 7.4.22)
 - Run black pep8 formatter on my code (code review TY 7.4.22)
 
 DISCUSSED-ED
