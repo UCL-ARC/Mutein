@@ -15,13 +15,6 @@
 - Anaytics - establish agreement or what the future action is on the number differences as per above
 ---------------------------------------------------------------------------
 #### sprint 1 - 7/4/22
-DEV
-- Run black pep8 formatter on my code (code review TY 7.4.22)
-
-
-DISCUSS
-- 
-
 DEV-ED
 - Put the repairs in another folder
 - Log the input paramaters to the current directory
@@ -44,6 +37,7 @@ performance decision)
 - Change 'empty' to inputs only (code review TY 7.4.22)
 - FOR CI - add a final test to add asserts for changed data (waiting to be happy with data#1)
 - Make thebatch.csv file a yaml file (code review TY 7.4.22)
+- Run black pep8 formatter on my code (code review TY 7.4.22)
 
 DISCUSSED-ED
 - We may need to change the analysis for pos scan due to bug
