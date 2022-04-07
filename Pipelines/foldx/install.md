@@ -6,7 +6,7 @@
 ```
 >> cd ~/MuteinPipeline/foldx/scripts/
 >> module load python3/recommended
->> python3 foldx00_pipeline.py jobs=1234567 pdb=6vxx
+>> python3 foldx00_pipeline.py jobs=1234567 pdb=6vxx  
 ```
 --------------------------------------------------------------------------
 #### -- But to get to that state - 

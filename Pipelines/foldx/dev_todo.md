@@ -9,6 +9,11 @@
 - unsatisfactory use of both split and array jobs needs thinking about
 - use argparse (https://docs.python.org/3/library/argparse.html#)
 - Make foldx a "runner" so it is easier to understand what has gone into it.
+- Make thebatch.csv file a yaml file (code review TY)
+- Run black pep8 formatter on my code (code review TY)
+- Change 'empty' to inputs only (code review TY)
+- Make the sh file clearer as to what is overridden (code review TY)
+- Make a foldx runner class (code reveiew TY)
 ---------------------------------------------------------------------------
 #### discuss todo list 
 - Anaytics - establish agreement or what the future action is on the number differences as per above
