@@ -10,6 +10,8 @@
 - Make foldx a "runner" so it is easier to understand what has gone into it.
 - Make a foldx runner class (code review TY 7.4.22)
 - Need to make the pdb input cfg file yaml too
+- The CI has hardcoded the user name "runner" which is the CI name, but I should pass the user in as a variable.
+- I followed instrctions for the CI requirements.txt file but there seems too much I must be able t cut it down.
 ---------------------------------------------------------------------------
 #### discuss todo list 
 - Analytics - establish agreement or what the future action is on the number differences as per above
