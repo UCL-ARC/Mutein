@@ -14,8 +14,6 @@ import genestovariants
 import yaml
 import pandas as pd
 import Gene
-import Pdb
-import Variant
 
 #import from the shared library in Mutein/Pipelines/shared/lib
 dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
@@ -32,11 +30,14 @@ def run_pipeline(args):
     "gene_name"	"n_syn"	"n_mis"	"n_non"	"n_spl"	"n_ind"	"wmis_cv"	"wnon_cv"	"wspl_cv"	"wind_cv"	"pmis_cv"	"ptrunc_cv"	"pallsubs_cv"	"pind_cv"	"qmis_cv"	"qtrunc_cv"	"qallsubs_cv"	"pglobal_cv"	"qglobal_cv"
     "NOTCH1"	404	2700	772	360	1208	3.98846230912502	21.7266421919647	21.7266421919647	17.6547328391658	0	0	0	8.07429581976078e-68	0	0	0	0	0
     """
-    # 1.) First prepare the variants file
+    genes_file = dataset_path.dataset_outputs + '/genes.txt'
     genes_variant_file = dataset_path.dataset_outputs + '/genes_variants.txt'
-    gene_variant_dic = genestovariants.extractVariantsFromFile(genes_variant_file)                    
-    # 2.) Now go and find all the pdbs, also look at the variants per gene
-    genes_file = dataset_path.dataset_outputs + '/genes.txt'        
+    gene_variant_dic = genestovariants.extractVariantsFromFile(genes_variant_file)
+    genes_paths_yaml = dataset_path.dataset_outputs + '/genes_pdbs.yml' # We want a yaml file for the whole dataset
+    genes_variants_csv = dataset_path.dataset_outputs + '/genes_variants.csv' # 
+    dic_genes_paths = {}    
+    segments_list = []
+    print(genes_file)
     with open(genes_file, 'r') as fr:                
         lines = fr.readlines()
         lines = ["notch1"]
@@ -51,26 +52,25 @@ def run_pipeline(args):
                 wholeseq = ''
                 for s in range(1,len(seq_lines)):
                     sl =  str(seq_lines[s].strip())
-                    wholeseq += sl                                    
-                gn = Gene.Gene(gene,wholeseq)
-                genes.append(gn) # main repository for data we are creating in function
-                # CREATE the variants for the gene
-                vrs = gene_variant_dic[gene.upper()]                
-                for i in range(len(vrs["bases"])):
-                    bs = vrs['bases'][i]
-                    p1 = vrs['prev_aa'][i]
-                    rs = vrs['residue'][i]
-                    na = vrs['new_aa'][i]
-                    vr = vrs['variant'][i]
-                    print(bs,p1,rs,na,vr)
-                    vrnt = Variant.Variant(gene,vr,bs)
-                    gn.addVariant(vrnt)
-                # CREATE the pdbs for the gene
-                pdbs_paths = genetoprotein.pdbs_from_accession_bioservices(accession)                                
-                print("gene=",gene, "accession=",accession)#,"pdbs=",pdbs_paths)                                                                        
+                    wholeseq += sl                    
+                print(len(wholeseq),wholeseq)
+                pdbs_paths = genetoprotein.pdbs_from_accession_bioservices(accession)
+                dic_genes_paths[gene] = pdbs_paths
+                pdb_paths_csv = gene_path.gene_outputs + '/pdbs_segments.csv' #we want an input yaml per gene
+                print("gene=",gene, "accession=",accession)#,"pdbs=",pdbs_paths)                                                    
+                pdbs_good = {}                              
+                pdbs_good['gene'] = []
+                pdbs_good['chain'] = []
+                pdbs_good['segment'] = []                
+                pdbs_good['pdb'] = []  
+                pdbs_good['method'] = []  
+                pdbs_good['resolution'] = []  
+                #pdbs_good['url'] = []
+
                 for pdb_path in pdbs_paths:
                     pdb = pdb_path['pdb']
-                    url = pdb_path['path']                
+                    url = pdb_path['path']
+                    print(pdb,url)
                     biopdb = genetoprotein.retrievePdbStructure(url,pdb,gene_path.gene_outpdbs + "/" + pdb + ".pdb")
                     method,res = biopdb.header["structure_method"],biopdb.header["resolution"]
                     import Bio.PDB as bio
@@ -87,25 +87,25 @@ def run_pipeline(args):
                             except:                                
                                 print("!!!",resis,gene,pdb)
                             print(start,seq_one)
-                            has_match = True                                                                                    
-                            pb = Pdb.Pdb(gene,pdb,chain,start+1,start+len(seq_one),method, res)                                                        
-                            gn.addPdb(pb)
+                            has_match = True                            
+                            segments_list.append([start,start+len(seq_one),pdb])
+                            pdbs_good['gene'].append(gene)                            
+                            pdbs_good['pdb'].append(pdb)                            
+                            pdbs_good['segment'].append(str(start+1) + ":" + str(start+len(seq_one)))
+                            pdbs_good['chain'].append(chain)
+                            pdbs_good['method'].append(method)
+                            pdbs_good['resolution'].append(res)
+                            #pdbs_good['url'].append(url)
                     if not has_match:                                            
-                        genetoprotein.removePdbStructure(url,pdb,gene_path.gene_outpdbs + "/" + pdb + ".pdb")                                                
-                            
-    for gene in genes:
-        gene_path = Paths.Paths('geneprot',dataset=dataset,gene=gene.gene)        
-        df = gene.getVariantCandidatesDataFrame()
-        df.to_csv(gene_path.gene_outputs + '/pdb_candidates.csv',index=False)            
-        
-        
-        for pdbcod,pdb in gene.pdbs.items():
-            print(pdb.pdb)        
-        # I want the possible pdb structures for every variant
-        # AND the variants that are included for each pdb structure
-        # .... which I'll make a new set of files ready for the HPC run
-        
-    '''
+                        genetoprotein.removePdbStructure(url,pdb,gene_path.gene_outpdbs + "/" + pdb + ".pdb")
+                
+                pdbs_df = pd.DataFrame.from_dict(pdbs_good)
+                pdbs_df.to_csv(pdb_paths_csv,index=False)                                
+            else:
+                print("gene=",gene, "accession=",accession)
+    with open(genes_paths_yaml, 'w') as wf:
+        outputs = yaml.dump(dic_genes_paths, wf)
+    # now we know what the coverage is, we could go through the list of variants and tag which pdb files could be appropriate
     gene_variant_dic['candidates'] = []
     for rid in gene_variant_dic['residue']:
         candidate = []
@@ -126,7 +126,16 @@ def run_pipeline(args):
         gene_path = Paths.Paths('geneprot',dataset=dataset,gene=gene)        
         gene_one_df.to_csv(gene_path.gene_outputs + '/gene_variants.csv',index=False)
 
-    '''
+    # And now make a new protein folder ready for HPC and analysis
+                # ....for the chosen pdb structures
+                # ... ... which is currently only alphafold for the first pass
+                for i in range(len(pdbs_df.index)):
+                    pdb = pdbs_df['pdb'][i]
+                    segment = pdbs_df['segment'][i]
+                    start = int(segment.split(":")[0])
+                    end = int(segment.split(":")[1])
+                    chain = pdbs_df['chain'][i]
+
     
 
 
