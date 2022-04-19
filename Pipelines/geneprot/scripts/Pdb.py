@@ -10,12 +10,12 @@ import Bio.PDB as bio
 
 class Pdb:
     def __init__(self,gene,pdb,chain,segment_start,segment_end,method, resolution):
-        self.gene = gene
+        self.gene = gene.upper()
         self.pdbcode = pdb
-        self.chain = chain
+        self.chain = chain.upper()
         self.segment_starts = [int(segment_start)]
         self.segment_ends = [int(segment_end)]
-        self.method = method
+        self.method = method.lower()
         self.resolution = resolution
 
     def matchesResidue(self,residue):
@@ -64,7 +64,7 @@ class Pdb:
         else:
             web_path = self.getPDBLink()
         
-        return self.retrievePdbStructure(web_path,file_path + "/" + self.pdbcode + ".pdb")
+        return self.retrievePdbStructure(web_path,file_path + "/" + self.pdbcode.lower() + ".pdb")
         
     def retrievePdbStructure(self,url,path_name):
         if self.retrieveFile(url,path_name):

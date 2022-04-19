@@ -190,6 +190,7 @@ def goto_job_dir(dir_path, args, params, name):
     if not os.path.exists(dir_path):
         os.mkdir(dir_path)
     os.chdir(dir_path)
+    print('Change directory to',dir_path)
     inputs_file = name + ".log"
     with open(inputs_file, "w") as fw:
         for arg in args:
