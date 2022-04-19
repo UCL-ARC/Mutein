@@ -1,0 +1,13 @@
+gene,pdb,residue,mutation,variant
+notch1,5fma,143,P143S,ANY
+notch1,5fma,146,S146F,ANY
+notch1,5fma,148,P148S,ANY
+notch1,5fma,148,P148L,ANY
+notch1,5fma,148,P148F,ANY
+notch1,5fma,149,C149W,ANY
+notch1,5fma,151,N151S,ANY
+notch1,5fma,151,N151I,ANY
+notch1,5fma,153,G153N,ANY
+notch1,5fma,153,G153C,ANY
+notch1,5fma,153,G153S,ANY
+notch1,5fma,153,G153D,ANY

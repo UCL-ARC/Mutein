@@ -93,40 +93,26 @@ def run_pipeline(args):
                     if not has_match:                                            
                         genetoprotein.removePdbStructure(url,pdb,gene_path.gene_outpdbs + "/" + pdb + ".pdb")                                                
                             
+    # having found our collection of genes with assopciated pdbs and variants we can now create the pdb datasets
     for gene in genes:
-        gene_path = Paths.Paths('geneprot',dataset=dataset,gene=gene.gene)        
-        df = gene.getVariantCandidatesDataFrame()
-        df.to_csv(gene_path.gene_outputs + '/pdb_candidates.csv',index=False)            
-        
-        
+        gene_path = Paths.Paths("geneprot",dataset=dataset,gene=gene.gene)        
+        dfv = gene.getVariantCandidatesDataFrame()
+        dfv.to_csv(gene_path.gene_outputs + '/pdb_candidates.csv',index=False)            
+        dfp = gene.getPdbCoverageDataFrame()
+        dfp.to_csv(gene_path.gene_outputs + '/pdb_coverage.csv',index=False)            
+                
         for pdbcod,pdb in gene.pdbs.items():
-            print(pdb.pdb)        
-        # I want the possible pdb structures for every variant
-        # AND the variants that are included for each pdb structure
-        # .... which I'll make a new set of files ready for the HPC run
+            print(pdb.pdbcode) 
+            # only use x-ray and alphafold:
+            if pdb.getMethod() == "x-ray" or pdb.getMethod() == "alphafold":
+                pdb_path = Paths.Paths("pdb",dataset=dataset,gene=gene.gene,pdb=pdb.pdbcode)
+                dfp = gene.getPdbVariantCoverageDataFrame(pdb)                
+                dfp.to_csv(pdb_path.pdb_inputs + '/variants.csv',index=False)            
+                pdb.downloadPdb(pdb_path.pdb_inputs)
+                gene.createPdbConfigYaml(pdb,pdb_path.pdb_inputs + '/config.yml')
         
-    '''
-    gene_variant_dic['candidates'] = []
-    for rid in gene_variant_dic['residue']:
-        candidate = []
-        for start,end,pdb in segments_list:
-            if int(start) <= int(rid) and int(end) >= int(rid):
-                if pdb not in candidate:
-                    candidate.append(pdb)
-        gene_variant_dic['candidates'].append(" ".join(candidate))
-    
-    gene_variant_df = pd.DataFrame.from_dict(gene_variant_dic)
-    gene_variant_df.to_csv(genes_variants_csv,index=False)
-    
-    #also save this in each gene folder
-    genes = gene_variant_df["gene"].unique()
-    for gene in genes:
-        gene_one_df = gene_variant_df[gene_variant_df["gene"]==gene]
-        gene_one_df = gene_one_df.sort_values(by='residue', ascending=True)
-        gene_path = Paths.Paths('geneprot',dataset=dataset,gene=gene)        
-        gene_one_df.to_csv(gene_path.gene_outputs + '/gene_variants.csv',index=False)
-
-    '''
+        
+  
     
 
 

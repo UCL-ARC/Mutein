@@ -18,8 +18,10 @@ class Variant:
         self.variant = variant
         self.bases = bases
 
-    def includedInRange(self,start,end):
-        if self.residue >= int(start) and self.residue <= int(end):
-            return True
-        else:
-            return False
+    def includedInRange(self,starts,ends):
+        for s in range(len(starts)):
+            start = int(starts[s])
+            end = int(ends[s])
+            if self.residue >= int(start) and self.residue <= int(end):
+                return True        
+        return False
