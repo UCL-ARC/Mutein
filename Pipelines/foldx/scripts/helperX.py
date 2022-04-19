@@ -175,15 +175,13 @@ def get_make_paths(pdb, name):
     # (But it will be easy to change)
     dir_script_path = os.path.dirname(os.path.realpath(__file__))
     dir_path = add_remove_path_levels(dir_script_path, 1)
-    inputs_path = add_remove_path_levels(dir_path, 0, "inputs")
-    interim_path = add_remove_path_levels(dir_path, 0, "interim")
+    inputs_path = add_remove_path_levels(dir_path, 0, "inputs")    
     thruputs_path = add_remove_path_levels(dir_path, 0, "thruputs")
     outputs_path = add_remove_path_levels(dir_path, 0, "outputs")
     inputs_path = add_remove_path_levels(inputs_path, 0, pdb)
-    thruput_path = add_remove_path_levels(thruputs_path, 0, pdb)
-    interim_path = add_remove_path_levels(interim_path, 0, name)
+    thruput_path = add_remove_path_levels(thruputs_path, 0, pdb)    
     output_path = add_remove_path_levels(outputs_path, 0, name)
-    return inputs_path, thruput_path, interim_path, output_path
+    return inputs_path, thruput_path, output_path
 
 
 def goto_job_dir(dir_path, args, params, name):

@@ -11,8 +11,16 @@ N.b this file may be run on the myriad clusters or on a local machine
 import os
 import pandas as pd
 from shutil import copyfile
-import helper as hlp
+
+#import from the shared library in Mutein/Pipelines/shared/lib
+import sys
+dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
+retpath = "/".join(dirs) + '/shared/lib'
+sys.path.append(retpath)
+import Paths
 import Arguments
+import Config
+
 
 
 def run_pipeline04(args):
@@ -20,11 +28,16 @@ def run_pipeline04(args):
     print(args)
     ##############################################
     argus = Arguments.Arguments(args)
-    work_path = argus.params["interim_path"] + "agg/"
+    pdbcode = argus.arg("pdb")
+    pdb_path = Paths.Paths("pdb",dataset="",gene="",pdb=pdbcode)
+    pdb_config = Config.Config(pdb_path.pdb_inputs + "/config.yml")
+    argus.addConfig(pdb_config.params) 
+
+    work_path = pdb_path.pdb_thruputs + "agg/"
     argus.params["work_path"] = work_path
-    hlp.goto_job_dir(argus.arg("work_path"), args, argus.params, "_inputs04")
+    pdb_path.goto_job_dir(argus.arg("work_path"), args, argus.params, "_inputs04")
     ############################################
-    params_file = argus.arg("interim_path") + "params.txt"
+    params_file = pdb_path.pdb_thruputs + "params_" + str(argus.arg("split"))+ ".txt"
     rownum = 1
     with open(params_file) as fr:
         paramscontent = fr.readlines()
@@ -40,7 +53,7 @@ def run_pipeline04(args):
     with open(ddg_file, "w") as fw:
         for r in range(rownum):
             jobresults_file = (
-                argus.arg("interim_path") + "row" + str(r + 1) + "/" + ddg_file
+                pdb_path.pdb_thruputs + str(argus.arg("split")) + "_row" + str(r + 1) + "/" + ddg_file
             )
             if os.path.exists(jobresults_file):
                 with open(jobresults_file) as fr:
@@ -121,7 +134,7 @@ def run_pipeline04(args):
 
     ddg_df = pd.DataFrame.from_dict(ddg_dic)
     df_file = (
-        argus.arg("output_path")
+        pdb_path.pdb_outputs
         + argus.arg("pdb")
         + "_"
         + str(argus.arg("repairs"))
@@ -170,7 +183,7 @@ def run_pipeline04(args):
     # plt.legend(title=hue,bbox_to_anchor=(1.01, 1), loc=2, borderaxespad=0.,shadow=False,fancybox=False)  # Put the legend out of the figure
 
     plot_file = (
-        argus.arg("output_path")
+        pdb_path.pdb_outputs
         + argus.arg("pdb")
         + "_"
         + str(argus.arg("repairs"))

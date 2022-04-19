@@ -12,15 +12,33 @@ import os
 import statistics
 import pandas as pd
 from shutil import copyfile
-import helper as hlp
+
+#import from the shared library in Mutein/Pipelines/shared/lib
+import sys
+dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
+retpath = "/".join(dirs) + '/shared/lib'
+sys.path.append(retpath)
+import Paths
 import Arguments
+import Config
+
 
 
 def run_pipeline07(args):
     ##### INPUTS #############################################
     print("### Foldx variant aggregate ###")
     ##############################################
+    argus = ArgumentsX.Arguments(args)
+
     argus = Arguments.Arguments(args)
+    pdbcode = argus.arg("pdb")
+    pdb_path = Paths.Paths("pdb",dataset="",gene="",pdb=pdbcode)
+    pdb_config = Config.Config(pdb_path.pdb_inputs + "/config.yml")
+    argus.addConfig(pdb_config.params)
+
+
+
+
     work_path = argus.params["interim_path"] + "vagg/"
     argus.params["work_path"] = work_path
     hlp.goto_job_dir(argus.arg("work_path"), args, argus.params, "_inputs07")

@@ -134,7 +134,6 @@ dmypy.json
 Pipelines/foldx/interim/*
 Pipelines/foldx/thruputs/*
 Pipelines/foldx/outputs/*
-Pipelines/shared/data/gene_NOTCH1/pdbs/5fma.pdb
 # New structure for all pipelines, we only want to sync the inputs
 Pipelines/shared/data/outputs*
 Pipelines/shared/data/thruputs*

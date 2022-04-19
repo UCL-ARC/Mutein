@@ -9,7 +9,7 @@ The batch params ar ethe first level of configutation (script order, dependecies
 import helper as hlp
 
 
-class Arguments:
+class ArgumentsX:
     def __init__(self, inputs):
         print("Arguments")
         # combine config and job input params
@@ -22,12 +22,12 @@ class Arguments:
         user = self.params["user"]
         user, (foldxe, pythonexe, environment) = hlp.getenvironment(user)
         jobname = self.params["name"]
-        input_path, thruput_path, interim_path, output_path = hlp.get_make_paths(
+        input_path, thruput_path, output_path = hlp.get_make_paths(
             pdb, jobname
         )
         self.params["input_path"] = input_path
         self.params["thruput_path"] = thruput_path
-        self.params["interim_path"] = interim_path
+        #self.params["interim_path"] = interim_path
         self.params["output_path"] = output_path
         self.params["user"] = user
         self.params["foldxe"] = foldxe

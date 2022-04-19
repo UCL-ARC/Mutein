@@ -12,8 +12,16 @@ import os
 import pandas as pd
 from shutil import copyfile
 import itertools
-import helper as hlp
+
+#import from the shared library in Mutein/Pipelines/shared/lib
+import sys
+dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
+retpath = "/".join(dirs) + '/shared/lib'
+sys.path.append(retpath)
+import Paths
 import Arguments
+import Config
+
 
 ##### INPUTS #############################################
 # The inputs to this function are the pdbfile and the chain id (might optionally consider the positionscan mutation type)
@@ -21,7 +29,7 @@ def run_pipeline05(args):
     print("### FoldX make variant params job ###")
     print(args)
     ##############################################
-    argus = Arguments.Arguments(args)
+    argus = ArgumentsX.Arguments(args)
     work_path = argus.params["interim_path"] + "vparams/"
     argus.params["work_path"] = work_path
     hlp.goto_job_dir(argus.arg("work_path"), args, argus.params, "_inputs05")

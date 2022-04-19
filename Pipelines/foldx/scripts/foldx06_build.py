@@ -14,14 +14,22 @@ N.b this file may be run on the myriad clusters or on a local machine
 import os
 import pandas as pd
 from shutil import copyfile
-import helper as hlp
+
+#import from the shared library in Mutein/Pipelines/shared/lib
+import sys
+dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
+retpath = "/".join(dirs) + '/shared/lib'
+sys.path.append(retpath)
+import Paths
 import Arguments
+import Config
+
 
 
 def run_pipeline06(args):
     print("### FoldX build job ###")
     print(args)
-    argus = Arguments.Arguments(args)
+    argus = ArgumentsX.Arguments(args)
     pdb = argus.arg("pdb")
     row = argus.arg("row")
     mutation_string = argus.arg("mutation")
