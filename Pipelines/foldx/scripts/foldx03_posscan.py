@@ -38,7 +38,7 @@ def run_pipeline03(args):
     pdb_path = Paths.Paths("pdb",dataset="",gene="",pdb=pdbcode)
     pdb_config = Config.Config(pdb_path.pdb_inputs + "/config.yml")
     argus.addConfig(pdb_config.params)    
-    row = argus.arg("row")
+    row = argus.arg("row","row0")
     mutation_string = argus.arg("mutation")
     ############################################
     pdbfile = pdbcode + "_rep" + str(argus.arg("repairs")) + ".pdb"

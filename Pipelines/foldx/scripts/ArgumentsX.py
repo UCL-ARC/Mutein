@@ -21,7 +21,7 @@ class ArgumentsX:
         self.params = hlp.mergeparams(cparams, iparams)
         user = self.params["user"]
         user, (foldxe, pythonexe, environment) = hlp.getenvironment(user)
-        jobname = self.params["name"]
+        #jobname = self.params["name"]
         input_path, thruput_path, output_path = hlp.get_make_paths(
             pdb, jobname
         )

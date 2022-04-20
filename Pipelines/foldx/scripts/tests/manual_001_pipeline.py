@@ -16,7 +16,7 @@ def test_foldx_pipeline00_1tstAll():
     addpath()
     import foldx00_pipeline as p00
 
-    args = ["", "user=CI", "jobs=1234567", "pdb=1tst", "repairs=3"]
+    args = ["", "user=CI", "jobs=1234567", "pdb=1tst", "repairs=2","split=3"]
     p00.run_pipeline00(args)
 
 
