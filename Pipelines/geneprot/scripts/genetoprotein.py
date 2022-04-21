@@ -14,17 +14,21 @@ from bioservices import UniProt
 from urllib.request import urlretrieve
 import Bio.PDB as bio
 
-#----------------- -------------------------------------------
+# ----------------- -------------------------------------------
 ###       bioservices, uniprot                            ###
-#------------------------------------------------------------
-def accession_from_bioservices(genename):    
-    u = UniProt()    
-    result = u.search("organism:9606+and+reviewed:yes+and+gene:" + genename, columns="id,genes", limit=5)
-    rows = result.split("\n")    
-    if len(rows)>1:        
+# ------------------------------------------------------------
+def accession_from_bioservices(genename):
+    u = UniProt()
+    result = u.search(
+        "organism:9606+and+reviewed:yes+and+gene:" + genename,
+        columns="id,genes",
+        limit=5,
+    )
+    rows = result.split("\n")
+    if len(rows) > 1:
         for row in rows:
-            print("Row:",row)
-            acc_gene = row.split("\t")     
+            print("Row:", row)
+            acc_gene = row.split("\t")
             if len(acc_gene) > 1:
                 acc = acc_gene[0]
                 gn = acc_gene[1].upper()
@@ -34,68 +38,84 @@ def accession_from_bioservices(genename):
                     return acc
         return ""
     else:
-        print("(!)" +result)
+        print("(!)" + result)
         return ""
 
-def sequence_from_bioservices(accession):    
-    u = UniProt()    
-    seq = u.retrieve(accession, "fasta")    
+
+def sequence_from_bioservices(accession):
+    u = UniProt()
+    seq = u.retrieve(accession, "fasta")
     return seq
+
 
 def pdbs_from_accession_bioservices(accession):
     u = UniProt()
     af_model, af_version = "F1", "v2"
-    pdb_paths = [] #a tuple of pdb code and path for download
+    pdb_paths = []  # a tuple of pdb code and path for download
     res = u.mapping("ACC", "PDB_ID", accession)
-    af_name, af_path = getAlphaFoldLink(accession,af_model,af_version)
-    pdb_paths.append({'pdb':af_name, 'path':af_path})
+    af_name, af_path = getAlphaFoldLink(accession, af_model, af_version)
+    pdb_paths.append({"pdb": af_name, "path": af_path})
     if accession in res:
         for pdb in res[accession]:
             pdb_path = getPDBLink(pdb)
-            pdb_paths.append({'pdb':pdb.lower(), 'path':pdb_path})        
+            pdb_paths.append({"pdb": pdb.lower(), "path": pdb_path})
     return pdb_paths
-#----------------- -------------------------------------------
+
+
+# ----------------- -------------------------------------------
 ###       PDB Links                                       ###
-#------------------------------------------------------------
+# ------------------------------------------------------------
 def getPDBeLink(pdb):
-    return "https://www.ebi.ac.uk/pdbe/entry-files/download/pdb"+pdb.lower()+".ent"
+    return "https://www.ebi.ac.uk/pdbe/entry-files/download/pdb" + pdb.lower() + ".ent"
+
 
 def getPDBLink(pdb):
-    return "https://files.rcsb.org/download/" +pdb.upper()+ ".pdb"
+    return "https://files.rcsb.org/download/" + pdb.upper() + ".pdb"
 
-def getAlphaFoldLink(accession,model,version):
-    af_path = "https://alphafold.ebi.ac.uk/files/AF-" +accession.upper() + "-" + model.upper() + "-model_" + version.lower() + ".pdb"
-    af_name ="AF-" +accession.upper() + "-" + model.upper() + "-model_" + version.lower()
+
+def getAlphaFoldLink(accession, model, version):
+    af_path = (
+        "https://alphafold.ebi.ac.uk/files/AF-"
+        + accession.upper()
+        + "-"
+        + model.upper()
+        + "-model_"
+        + version.lower()
+        + ".pdb"
+    )
+    af_name = (
+        "AF-" + accession.upper() + "-" + model.upper() + "-model_" + version.lower()
+    )
     return af_name, af_path
 
-def retrievePdbStructure(url,pdb,path_name):
-    if retrieveFile(url,path_name):
+
+def retrievePdbStructure(url, pdb, path_name):
+    if retrieveFile(url, path_name):
         try:
             parser = bio.PDBParser()
-            print("PDB:",path_name)
-            struc = parser.get_structure(pdb,path_name)
+            print("PDB:", path_name)
+            struc = parser.get_structure(pdb, path_name)
             return struc
         except:
-            if retrieveFile(url,path_name,overwrite=True):        
+            if retrieveFile(url, path_name, overwrite=True):
                 parser = bio.PDBParser()
-                print("PDB:",path_name)
-                struc = parser.get_structure(pdb,path_name)
-                return struc        
+                print("PDB:", path_name)
+                struc = parser.get_structure(pdb, path_name)
+                return struc
     return None
-def removePdbStructure(url,pdb,path_name):
+
+
+def removePdbStructure(url, pdb, path_name):
     if os.path.exists(path_name):
         os.remove(path_name)
-        
-def retrieveFile(url,path_name, overwrite=False):
+
+
+def retrieveFile(url, path_name, overwrite=False):
     if not os.path.exists(path_name) or overwrite:
         try:
-            urlretrieve(url,path_name)
+            urlretrieve(url, path_name)
             return True
         except:
             print("...!!! No data for", url)
             return False
     return True
-    
-
-
-    

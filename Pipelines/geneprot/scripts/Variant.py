@@ -6,8 +6,9 @@ Class to manage the data associated with a gene's variant
 """
 import os
 
+
 class Variant:
-    def __init__(self, gene,variant,bases):
+    def __init__(self, gene, variant, bases):
         self.gene = gene
         from_aa = variant[:1]
         to_aa = variant[-1:]
@@ -18,10 +19,10 @@ class Variant:
         self.variant = variant
         self.bases = bases
 
-    def includedInRange(self,starts,ends):
+    def includedInRange(self, starts, ends):
         for s in range(len(starts)):
             start = int(starts[s])
             end = int(ends[s])
             if self.residue >= int(start) and self.residue <= int(end):
-                return True        
+                return True
         return False
