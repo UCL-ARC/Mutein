@@ -34,7 +34,9 @@ def extractVariantsFromFile(file):
             bases = d["mut"][i]
             if variant_type == "missense":
                 if (
-                    "?" not in variant and "*" not in variant and "delins" not in variant
+                    "?" not in variant
+                    and "*" not in variant
+                    and "delins" not in variant
                 ):  # ? not in exons, * is a stop codon, delins is 2 residues
                     if variant not in dic_new_df[gene]["variant"]:
                         dic_new_df[gene]["bases"].append(len(bases))

@@ -25,8 +25,8 @@ import Paths
 import Arguments
 
 
-def run_pipeline(args):    
-    argus = Arguments.Arguments(args)    
+def run_pipeline(args):
+    argus = Arguments.Arguments(args)
     dataset = argus.arg("dataset")
     dataset_path = Paths.Paths("vcf", dataset=dataset)
     genes = []
