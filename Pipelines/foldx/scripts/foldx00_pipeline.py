@@ -133,7 +133,7 @@ def run_pipeline00(args):
             args.append(argus.arg("split"))  # 3
             args.append(argus.arg("mutation"))  # 4
             args.append(argus.arg("variant"))  # 5
-            args.append(argus.arg("variants.csv"))  # 6
+            args.append("variants.csv")  # 6
             args.append(argus.arg("repairs"))  # 7
         else:
             args.append(script)
