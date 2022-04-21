@@ -16,7 +16,8 @@ def extractVariantsFromFile(file):
     dic_new_df = {}     
     for i in range(len(d.index)):
     #for i in range(20):
-        gene = d["gene"][i]
+        gene = d["gene"][i].upper()
+        
         if gene not in dic_new_df:
             dic_new_df[gene] = {}            
             dic_new_df[gene]['bases'] = []

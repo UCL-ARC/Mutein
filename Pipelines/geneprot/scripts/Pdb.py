@@ -7,6 +7,8 @@ Class to manage the data associated with a pdb file specifically for a gene
 import os
 from urllib.request import urlretrieve
 import Bio.PDB as bio
+import warnings
+warnings.filterwarnings("ignore") #sadly because of the annoying bioython warnings
 
 class Pdb:
     def __init__(self,gene,pdb,chain,segment_start,segment_end,method, resolution):
@@ -50,6 +52,8 @@ class Pdb:
             return "nmr"
         elif "x-ray" in self.method:
             return "x-ray"
+        elif "electron microscopy" in self.method:
+            return "e-m"
         elif "unknown" in self.method and "AF" in self.pdbcode:
             return "alphafold"
         else:

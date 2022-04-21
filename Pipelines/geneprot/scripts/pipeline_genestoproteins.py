@@ -33,16 +33,22 @@ def run_pipeline(args):
     "NOTCH1"	404	2700	772	360	1208	3.98846230912502	21.7266421919647	21.7266421919647	17.6547328391658	0	0	0	8.07429581976078e-68	0	0	0	0	0
     """
     # 1.) First prepare the variants file
-    genes_variant_file = dataset_path.dataset_outputs + '/genes_variants.txt'
+    genes_variant_file = dataset_path.dataset_outputs + 'genes_variants.txt'
     gene_variant_dic = genestovariants.extractVariantsFromFile(genes_variant_file)                    
     # 2.) Now go and find all the pdbs, also look at the variants per gene
     genes_file = dataset_path.dataset_outputs + '/genes.txt'        
     with open(genes_file, 'r') as fr:                
         lines = fr.readlines()
-        lines = ["notch1"]
-        for line in lines:
+        #lines = ["","FAT1"]
+        for l in range(1,len(lines)):
+        #for l in range(1,2):
+            line = lines[l]
             cols = line.split('\t')
-            gene=cols[0]
+            gene=cols[0].upper()
+            if gene[0] == '"':
+                gene = gene[1:]
+            if gene[-1] == '"':
+                gene = gene[:-1]
             gene_path = Paths.Paths('geneprot',dataset=dataset,gene=gene)
             accession = genetoprotein.accession_from_bioservices(gene)            
             if len(accession)>1:
@@ -52,7 +58,7 @@ def run_pipeline(args):
                 for s in range(1,len(seq_lines)):
                     sl =  str(seq_lines[s].strip())
                     wholeseq += sl                                    
-                gn = Gene.Gene(gene,wholeseq)
+                gn = Gene.Gene(gene,accession,wholeseq)
                 genes.append(gn) # main repository for data we are creating in function
                 # CREATE the variants for the gene
                 vrs = gene_variant_dic[gene.upper()]                
@@ -62,7 +68,7 @@ def run_pipeline(args):
                     rs = vrs['residue'][i]
                     na = vrs['new_aa'][i]
                     vr = vrs['variant'][i]
-                    print(bs,p1,rs,na,vr)
+                    #print(bs,p1,rs,na,vr)
                     vrnt = Variant.Variant(gene,vr,bs)
                     gn.addVariant(vrnt)
                 # CREATE the pdbs for the gene
@@ -71,49 +77,55 @@ def run_pipeline(args):
                 for pdb_path in pdbs_paths:
                     pdb = pdb_path['pdb']
                     url = pdb_path['path']                
-                    biopdb = genetoprotein.retrievePdbStructure(url,pdb,gene_path.gene_outpdbs + "/" + pdb + ".pdb")
-                    method,res = biopdb.header["structure_method"],biopdb.header["resolution"]
-                    import Bio.PDB as bio
-                    ppb = bio.CaPPBuilder() #PPBuilder is C-N and CAPPBuilder is CA-CA
-                    has_match = False                    
-                    for pp in ppb.build_peptides(biopdb):
-                        seq_one = str(pp.get_sequence())                        
-                        start = wholeseq.find(seq_one)
-                        chain = ""
-                        if start > -1:
-                            try:
-                                resis = pp.get_ca_list()[0]
-                                chain = resis.parent.get_parent().id
-                            except:                                
-                                print("!!!",resis,gene,pdb)
-                            print(start,seq_one)
-                            has_match = True                                                                                    
-                            pb = Pdb.Pdb(gene,pdb,chain,start+1,start+len(seq_one),method, res)                                                        
-                            gn.addPdb(pb)
-                    if not has_match:                                            
-                        genetoprotein.removePdbStructure(url,pdb,gene_path.gene_outpdbs + "/" + pdb + ".pdb")                                                
-                            
+                    biopdb = genetoprotein.retrievePdbStructure(url,pdb,gene_path.gene_outpdbs + pdb + ".pdb")
+                    if biopdb != None:
+                        method,res = biopdb.header["structure_method"],biopdb.header["resolution"]
+                        import Bio.PDB as bio
+                        ppb = bio.CaPPBuilder() #PPBuilder is C-N and CAPPBuilder is CA-CA
+                        has_match = False                    
+                        for pp in ppb.build_peptides(biopdb):
+                            seq_one = str(pp.get_sequence())                        
+                            start = wholeseq.find(seq_one)
+                            chain = ""
+                            if start > -1:
+                                try:
+                                    resis = pp.get_ca_list()[0]
+                                    chain = resis.parent.get_parent().id
+                                except:                                
+                                    print("!!!",resis,gene,pdb)
+                                #print(start,seq_one)
+                                has_match = True                                                                                    
+                                pb = Pdb.Pdb(gene,pdb,chain,start+1,start+len(seq_one),method, res)                                                        
+                                gn.addPdb(pb)
+                        if not has_match:                                            
+                            genetoprotein.removePdbStructure(url,pdb,gene_path.gene_outpdbs + pdb + ".pdb")                                                
+                                
     # having found our collection of genes with assopciated pdbs and variants we can now create the pdb datasets
-    for gene in genes:
-        gene_path = Paths.Paths("geneprot",dataset=dataset,gene=gene.gene)        
-        dfv = gene.getVariantCandidatesDataFrame()
-        dfv.to_csv(gene_path.gene_outputs + '/pdb_candidates.csv',index=False)            
-        dfp = gene.getPdbCoverageDataFrame()
-        dfp.to_csv(gene_path.gene_outputs + '/pdb_coverage.csv',index=False)            
-                
-        for pdbcod,pdb in gene.pdbs.items():
-            print(pdb.pdbcode) 
-            # only use x-ray and alphafold:
-            if pdb.getMethod() == "x-ray" or pdb.getMethod() == "alphafold":
-                pdb_path = Paths.Paths("pdb",dataset=dataset,gene=gene.gene,pdb=pdb.pdbcode)
-                dfp = gene.getPdbVariantCoverageDataFrame(pdb)                
-                dfp.to_csv(pdb_path.pdb_inputs + '/variants.csv',index=False)            
-                pdb.downloadPdb(pdb_path.pdb_inputs)
-                gene.createPdbConfigYaml(pdb,pdb_path.pdb_inputs + '/config.yml')
-        
-        
-  
+    #for gn in genes:
+        #gene_path = Paths.Paths("geneprot",dataset=dataset,gene=gn.gene)        
+            dfv = gn.getVariantCandidatesDataFrame()
+            dfv.to_csv(gene_path.gene_outputs + '/pdb_candidates.csv',index=False)            
+            dfp = gn.getPdbCoverageDataFrame()
+            dfp.to_csv(gene_path.gene_outputs + '/pdb_coverage.csv',index=False)            
+                    
+            for pdbcod,pdb in gn.pdbs.items():
+                #print(pdb.pdbcode) 
+                # only use x-ray and alphafold:
+                if True:#pdb.getMethod() == "x-ray" or pdb.getMethod() == "alphafold" or pdb.getMethod() == "e-m":
+                    pdb_path = Paths.Paths("pdb",dataset=dataset,gene=gn.gene,pdb=pdb.pdbcode)
+                    dfp = gn.getPdbVariantCoverageDataFrame(pdb)                
+                    dfp.to_csv(pdb_path.pdb_inputs + '/variants.csv',index=False)            
+                    pdb.downloadPdb(pdb_path.pdb_inputs)
+                    gn.createPdbConfigYaml(pdb,pdb_path.pdb_inputs + '/config.yml')
     
+            # And save it all in the dataset output    
+            # we do this each time so that if it gets abandoned we knw where we were
+            dfp = genes[0].getDatasetGenesPdbsDataFrame(dataset,genes)
+            dfp.to_csv(dataset_path.dataset_outputs + '/pdb_coverage.csv',index=False)            
+            
+        
+
+
 
 
 

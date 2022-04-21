@@ -19,10 +19,20 @@ import Bio.PDB as bio
 #------------------------------------------------------------
 def accession_from_bioservices(genename):    
     u = UniProt()    
-    result = u.search("organism:9606+and+reviewed:yes+and+gene:" + genename, columns="id", limit=1)
+    result = u.search("organism:9606+and+reviewed:yes+and+gene:" + genename, columns="id,genes", limit=5)
     rows = result.split("\n")    
-    if len(rows)>1:
-        return rows[1] #don't return the header
+    if len(rows)>1:        
+        for row in rows:
+            print("Row:",row)
+            acc_gene = row.split("\t")     
+            if len(acc_gene) > 1:
+                acc = acc_gene[0]
+                gn = acc_gene[1].upper()
+                gns = gn.split(" ")
+                gn = gns[0]
+                if gn == genename:
+                    return acc
+        return ""
     else:
         print("(!)" +result)
         return ""
@@ -60,16 +70,24 @@ def getAlphaFoldLink(accession,model,version):
 
 def retrievePdbStructure(url,pdb,path_name):
     if retrieveFile(url,path_name):
-        parser = bio.PDBParser()
-        struc = parser.get_structure(pdb,path_name)
-        return struc
+        try:
+            parser = bio.PDBParser()
+            print("PDB:",path_name)
+            struc = parser.get_structure(pdb,path_name)
+            return struc
+        except:
+            if retrieveFile(url,path_name,overwrite=True):        
+                parser = bio.PDBParser()
+                print("PDB:",path_name)
+                struc = parser.get_structure(pdb,path_name)
+                return struc        
     return None
 def removePdbStructure(url,pdb,path_name):
     if os.path.exists(path_name):
         os.remove(path_name)
         
-def retrieveFile(url,path_name):
-    if not os.path.exists(path_name):
+def retrieveFile(url,path_name, overwrite=False):
+    if not os.path.exists(path_name) or overwrite:
         try:
             urlretrieve(url,path_name)
             return True

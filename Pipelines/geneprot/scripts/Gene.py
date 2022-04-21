@@ -8,8 +8,9 @@ import os
 import pandas as pd
 
 class Gene:
-    def __init__(self, gene,seq):
+    def __init__(self, gene,accession,seq):
         self.gene = gene
+        self.accession = accession
         self.sequence = seq
         self.variants = {}
         self.pdbs = {}
@@ -36,6 +37,7 @@ class Gene:
     def getVariantCandidatesDataFrame(self):
         dic_variants = {}
         dic_variants["gene"] = []
+        dic_variants["accession"] = []
         dic_variants["variant"] = []
         dic_variants["residue"] = []
         dic_variants["bases"] = []
@@ -43,12 +45,13 @@ class Gene:
         
         for vrcod,vr in self.variants.items():
             candidate = ""
-            print(vr.variant)
+            #print(vr.variant)
             for pdbcod,pdb in self.pdbs.items():
                 if pdb.matchesResidue(vr.residue):
                     candidate += pdbcod + " "
-            dic_variants["residue"].append(vr.residue)
+            dic_variants["residue"].append(vr.residue)            
             dic_variants["gene"].append(self.gene)
+            dic_variants["accession"].append(self.accession)
             dic_variants["candidates"].append(candidate)
             dic_variants["variant"].append(vr.variant)
             dic_variants["bases"].append(vr.bases)
@@ -60,6 +63,7 @@ class Gene:
     def getPdbCoverageDataFrame(self):
         dic_coverage = {}
         dic_coverage["gene"] = []
+        dic_coverage["accession"] = []
         dic_coverage["pdb"] = []
         dic_coverage["method"] = []
         dic_coverage["resolution"] = []
@@ -67,6 +71,7 @@ class Gene:
                 
         for pdbcod,pdb in self.pdbs.items():                                    
             dic_coverage["gene"].append(self.gene)
+            dic_coverage["accession"].append(self.accession)
             dic_coverage["pdb"].append(pdbcod)
             dic_coverage["method"].append(pdb.getMethod())
             dic_coverage["resolution"].append(pdb.resolution)
@@ -77,6 +82,7 @@ class Gene:
     def getPdbVariantCoverageDataFrame(self,pdb):
         dic_coverage = {}
         dic_coverage["gene"] = []
+        dic_coverage["accession"] = []
         dic_coverage["pdb"] = []     
         dic_coverage["residue"] = []           
         dic_coverage["mutation"] = []
@@ -85,12 +91,36 @@ class Gene:
         for vrcod,vr in self.variants.items():
             if vr.includedInRange(pdb.segment_starts,pdb.segment_ends):
                 dic_coverage["gene"].append(self.gene)
+                dic_coverage["accession"].append(self.accession)
                 dic_coverage["pdb"].append(pdb.pdbcode)            
                 dic_coverage["residue"].append(vr.residue)
                 dic_coverage["mutation"].append(vrcod)
                 dic_coverage["variant"].append("ANY")
         pdbs_df = pd.DataFrame.from_dict(dic_coverage)        
         pdbs_df = pdbs_df.sort_values(by='residue', ascending=True)
+        return pdbs_df
+    
+    def getDatasetGenesPdbsDataFrame(self,dataset,genes):
+        dic_coverage = {}
+        dic_coverage["dataset"] = []
+        dic_coverage["gene"] = []        
+        dic_coverage["accession"] = []       
+        dic_coverage["variants"] = []
+        dic_coverage["length"] = []
+        dic_coverage["pdbs"] = []             
+                        
+        for gene in genes:            
+            dic_coverage["dataset"].append(dataset)
+            dic_coverage["gene"].append(gene.gene)                        
+            dic_coverage["accession"].append(gene.accession)                        
+            dic_coverage["variants"].append(len(gene.variants.items()))
+            dic_coverage["length"].append(len(gene.sequence))
+            pdbs = ""
+            for pdbcod,pdb in gene.pdbs.items():                                    
+                pdbs += pdbcod + " "
+            
+            dic_coverage["pdbs"].append(pdbs)            
+        pdbs_df = pd.DataFrame.from_dict(dic_coverage)                
         return pdbs_df
 
     def createPdbConfigYaml(self,pdb,file_path):
