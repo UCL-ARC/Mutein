@@ -22,10 +22,12 @@ dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
 retpath = "/".join(dirs) + "/shared/lib"
 sys.path.append(retpath)
 import Paths
+import Arguments
 
 
-def run_pipeline(args):
-    dataset = "shearwater"
+def run_pipeline(args):    
+    argus = Arguments.Arguments(args)    
+    dataset = argus.arg("dataset")
     dataset_path = Paths.Paths("vcf", dataset=dataset)
     genes = []
     """
