@@ -12,6 +12,7 @@ class SubRunner:
     def __init__(self, exe, script, inputs):
         self.args = []
         if exe != "":  # it is a script if it is ""
+            os.system("chmod +x " + script)
             self.args.append(exe)
         self.args.append(script)
         inputss = inputs.split(" ")
