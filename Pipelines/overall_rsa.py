@@ -85,7 +85,7 @@ def overall_rsa(args):
         print("# overall pipeline script:",id,script, time, dependency, array, inputs)        
         if py_or_sh == "qsub":
             if dependency != -1:
-                if dependencies in dependencies:                
+                if dependency in dependencies:                
                     dependency = dependencies[id]
                 else:
                     dependency = -1
