@@ -99,7 +99,7 @@ def overall_rsa(args):
             dirs = (script_path + "/" + script).split("/")[:-1]
             newpath = "/".join(dirs)
             print(dirs,newpath)            
-            print("## ... changing directory to", newpath)
+            print("# overall pipeline: changing directory to", newpath)
             os.chdir(newpath)
             runner = sub.SubRunner("", script_path + "/" + script + ".sh", inputs)
             dep = runner.run()

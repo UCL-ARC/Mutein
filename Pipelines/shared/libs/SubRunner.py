@@ -11,9 +11,11 @@ import subprocess
 class SubRunner:
     def __init__(self, exe, script, inputs):
         self.args = []
-        if exe != "":  # it is a script if it is ""
-            os.system("chmod +x " + script)
+        if exe != "":  # it is a script if it is ""            
             self.args.append(exe)
+        else:
+            print("chmod:",script)
+            os.system("## SubRunner: chmod +x " + script)
         self.args.append(script)
         inputss = inputs.split(" ")
         for input in inputss:
