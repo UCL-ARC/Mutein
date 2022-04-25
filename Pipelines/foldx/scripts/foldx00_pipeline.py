@@ -57,7 +57,7 @@ def run_pipeline00(args):
 
     ### Change into script directory
     dir_path = os.path.dirname(os.path.realpath(__file__)) + "/"
-    print("## ... changing directory to", dir_path)
+    print("## ... foldx00: changing directory to", dir_path)
     os.chdir(dir_path)
     homeuser = pwd.getpwuid(os.getuid())[0]
     print("HomeUser=", homeuser)

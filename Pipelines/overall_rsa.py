@@ -58,7 +58,7 @@ def overall_rsa(args):
     # We want to be in the script directory    
     script_path = os.path.dirname(os.path.realpath(__file__))
     dir_path =  script_path + "/"
-    print("## ... changing directory to", dir_path)
+    print("# overall pipeline: changing directory to", dir_path)
     os.chdir(dir_path)
 
     # Load in the batch yaml file, which contains ONLY batch related parameters

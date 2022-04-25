@@ -46,7 +46,7 @@ def run_pipeline05(args):
     # we want to work in the node directory first, the main pdb input file is a 1-off and lives in github (at the moment)
     in_mutations_file = pdb_path.pdb_inputs + argus.arg("variantfile")
     new_mutations_file = pdb_path.pdb_outputs + argus.arg("variantfile")
-    print("### ... copying file", in_mutations_file, new_mutations_file)
+    print("### foldx05: ... copying file", in_mutations_file, new_mutations_file)
     copyfile(in_mutations_file, new_mutations_file)
     ##### Open the variant file ################################
     variant_df = pd.read_csv(new_mutations_file)

@@ -53,7 +53,7 @@ def run_pipeline01(args):
     repairinnames[numRepairs] = argus.arg("pdb") + "_rep" + str(numRepairs) + ".pdb"
     #### there are 2 files we need in the interim directory, pdb file rotabase, but rotabase is only needed for foldx4 and NOT needed for foldx5
     print(
-        "### ... copying file",
+        "### foldx03: ... copying file",
         pdbfile,
         pdb_path.pdb_inputs + "/" + repairinnames[0],
         "... ###",
@@ -80,7 +80,7 @@ def run_pipeline01(args):
         print("### ... repair command #", r, repaircommand)
         os.system(repaircommand)
         print(
-            "### ... copying file",
+            "### foldx03:  ... copying file",
             argus.arg("repair_path") + repairoutnames[r],
             argus.arg("repair_path") + repairinnames[r + 1],
         )
