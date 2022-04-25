@@ -13,15 +13,23 @@
 # Email myself the job status
 #$ -m be
 
+# First we want to make sure we know what params have been passed to the script
+echo "~~~~~~~~~~~~~~~~~~ Parameters passed to the script ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+for var in "$@"
+do
+    echo "$var"
+done
+
 # Load the necessary python libraries
 module load python3/recommended
 # pip install bioservices
 
 # get the script inputs
+echo $0
 work_dir=$1
-echo $work_dir
+echo "work directory = $work_dir"
 inputs=$2
-echo $inputs
+echo "inputs = $inputs"
 # cd ~/MuteinPipeline/geneprot/scripts/
 cd $work_dir
 python pipeline02_genestoproteins.py $inputs

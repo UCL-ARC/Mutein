@@ -30,8 +30,10 @@ class QSubRunner:
 
     def run(self):
         if self.print_only:
-            print("### QSub.Run print only",self.args)
+            print("### QSub.Run() print only",self.args)
         else:
+            print("### QSub.Run(): working dir", os.getcwd())                
+            print("### QSub.Run()",self.args)
             process = subprocess.Popen(
                 args=self.args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
             )

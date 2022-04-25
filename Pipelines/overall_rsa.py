@@ -47,7 +47,7 @@ def overall_rsa(args):
     # The environment is loaded by arguments by default
     argus = Arguments.Arguments([])
     ret_array = []
-    print("#### FOLDX PIPELINE - batch creation ####")
+    print("#### MUTEIN PIPELINE ####")
     # There are only 2 arguments
     yaml_file = args[1] #1) a yaml file path with the batch definition    
     py_or_sh = args[2] #2) qsub or py or sh for python or hpc batch or just sh
@@ -71,36 +71,37 @@ def overall_rsa(args):
             if pipe != None:
                 print('### yaml load|',pipe)
                 id = pipe["id"]
+                work_dir = pipe["work_dir"]
                 script = pipe["script"]
                 time = pipe["time"]
                 dependency = pipe["dependency"]
                 array = pipe["array"]
                 inputs = pipe["inputs"]
-                batch_dic[str(id)] = (script, time, dependency, array, inputs)
+                batch_dic[str(id)] = (work_dir,script, time, dependency, array, inputs)
                 batch_list.append(str(id))
 
     dependencies = {}
     for id in batch_list:        
-        script, time, dependency, array, inputs = batch_dic[id]
-        print("# overall pipeline script:",id,script, time, dependency, array, inputs)        
+        work_dir,script, time, dependency, array, inputs = batch_dic[id]
+        print("# overall pipeline script:",id,work_dir,script, time, dependency, array, inputs)        
         if "qsub" in py_or_sh:
             if dependency != -1:
                 if dependency in dependencies:                
                     dependency = dependencies[id]
                 else:
                     dependency = -1
-            runner = qsub.QSubRunner(script + ".sh", dir_path, dependency, time, array,homeuser,inputs,py_or_sh!="qsub")
+            runner = qsub.QSubRunner(script + ".sh", dir_path+work_dir,dependency,time,array,homeuser,inputs,py_or_sh!="qsub")
             dep = runner.run()
             dependencies[id] = dep
         elif py_or_sh == "py":
-            runner = sub.SubRunner(argus.arg("pythonexe"), script + ".py", inputs)
+            runner = sub.SubRunner(argus.arg("pythonexe"),dir_path+work_dir,script+".py",inputs)
             dep = runner.run()
         elif py_or_sh == "sh":                                    
             dirs = (script_path + "/" + script).split("/")[:-1]
-            newpath = "/".join(dirs)                     
-            print("# overall pipeline: changing directory to", newpath)
-            os.chdir(newpath)
-            runner = sub.SubRunner("", script_path + "/" + script + ".sh", inputs)
+            #newpath = "/".join(dirs)                     
+            #print("# overall pipeline: changing directory to", newpath)
+            #os.chdir(newpath)
+            runner = sub.SubRunner("",dir_path+work_dir,script+".sh",inputs)
             dep = runner.run()
 
 
