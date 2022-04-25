@@ -69,7 +69,7 @@ def overall_rsa(args):
         pipes = yaml.safe_load_all(fr)
         for pipe in pipes:
             if pipe != None:
-                print('pipe|',pipe)
+                print('### yaml load|',pipe)
                 id = pipe["id"]
                 script = pipe["script"]
                 time = pipe["time"]
@@ -83,13 +83,13 @@ def overall_rsa(args):
     for id in batch_list:        
         script, time, dependency, array, inputs = batch_dic[id]
         print("# overall pipeline script:",id,script, time, dependency, array, inputs)        
-        if py_or_sh == "qsub":
+        if "qsub" in py_or_sh:
             if dependency != -1:
                 if dependency in dependencies:                
                     dependency = dependencies[id]
                 else:
                     dependency = -1
-            runner = qsub.QSubRunner(script + ".sh", dir_path, dependency, time, array,homeuser,inputs)
+            runner = qsub.QSubRunner(script + ".sh", dir_path, dependency, time, array,homeuser,inputs,py_or_sh!="qsub")
             dep = runner.run()
             dependencies[id] = dep
         elif py_or_sh == "py":

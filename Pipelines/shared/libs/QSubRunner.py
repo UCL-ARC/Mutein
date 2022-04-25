@@ -9,8 +9,9 @@ import subprocess
 
 
 class QSubRunner:
-    def __init__(self, work_dir, script, dependency, time, array, homeuser, inputs):
+    def __init__(self, work_dir, script, dependency, time, array, homeuser, inputs, print_only):
         os.system("chmod +x " + script)
+        self.print_only = print_only
         self.args = []
         self.args.append("qsub")
         if str(dependency) != "-1":
@@ -28,15 +29,18 @@ class QSubRunner:
         self.args.append(inputs)
 
     def run(self):
-        process = subprocess.Popen(
-            args=self.args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
-        )
-        result = process.communicate()
-        print(result)  # e.g. Your job 588483 ("foldx-aggregate") has been submitted
-        results = result[0].split(" ")
-        jobid = results[2]
-        if "." in jobid:
-            results = jobid.split(".")
-            jobid = results[0]
-            return jobid
-        return -1
+        if self.print_only:
+            print("### QSub.Run print only",self.args)
+        else:
+            process = subprocess.Popen(
+                args=self.args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+            )
+            result = process.communicate()
+            print(result)  # e.g. Your job 588483 ("foldx-aggregate") has been submitted
+            results = result[0].split(" ")
+            jobid = results[2]
+            if "." in jobid:
+                results = jobid.split(".")
+                jobid = results[0]
+                return jobid
+            return -1

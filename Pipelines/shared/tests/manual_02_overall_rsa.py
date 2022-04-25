@@ -30,6 +30,6 @@ def test_pipeline(method):
 
 
 ######################################
-test_pipeline("qsub")
+test_pipeline("qsub_tst")
 #test_pipeline("py")
 #test_pipeline("sh")
