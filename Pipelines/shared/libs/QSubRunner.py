@@ -24,7 +24,7 @@ class QSubRunner:
         self.args.append("h_rt=" + time)
         self.args.append("-wd")  # $ -wd /home/ucbtlcr/Scratch/workspace
         self.args.append("/home/" + homeuser + "/Scratch/workspace")
-        self.args.append(script)
+        self.args.append(work_dir+script)
         self.args.append(work_dir)
         self.args.append(inputs)
 
