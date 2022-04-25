@@ -135,6 +135,7 @@ Pipelines/foldx/interim/*
 Pipelines/foldx/thruputs/*
 Pipelines/foldx/outputs/*
 # New structure for all pipelines, we only want to sync the inputs
-Pipelines/shared/data/outputs*
+Pipelines/shared/data/outputs/genes/shearwater*
+Pipelines/shared/data/outputs/pdbs/*
 Pipelines/shared/data/thruputs*
 Pipelines/shared/data/inputs/pdbs/shearwater*
