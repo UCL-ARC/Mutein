@@ -22,4 +22,5 @@ inputs=$1
 echo $inputs
 
 # cd ~/MuteinPipeline/geneprot/scripts/
+cd "$(dirname "$0")"
 python pipeline02_genestoproteins.py $inputs
