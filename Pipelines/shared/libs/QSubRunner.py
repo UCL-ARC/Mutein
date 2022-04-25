@@ -10,7 +10,7 @@ import subprocess
 
 class QSubRunner:
     def __init__(self, script,work_dir, dependency, time, array, homeuser, inputs, print_only):
-        os.system("chmod +x " + script)
+        os.system("chmod +x " + work_dir+script)
         self.print_only = print_only
         self.args = []
         self.args.append("qsub")
