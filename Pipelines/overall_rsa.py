@@ -31,7 +31,7 @@ import yaml
 #import from the shared library in Mutein/Pipelines/shared/lib
 import sys
 dirs = os.path.dirname(os.path.realpath(__file__)).split("/")
-retpath = "/".join(dirs) + '/shared/lib'
+retpath = "/".join(dirs) + '/shared/libs'
 sys.path.append(retpath)
 import Config
 import Paths

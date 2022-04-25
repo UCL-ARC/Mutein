@@ -16,7 +16,7 @@ from shutil import copyfile
 #import from the shared library in Mutein/Pipelines/shared/lib
 import sys
 dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
-retpath = "/".join(dirs) + '/shared/lib'
+retpath = "/".join(dirs) + '/shared/libs'
 sys.path.append(retpath)
 import Paths
 import Arguments
