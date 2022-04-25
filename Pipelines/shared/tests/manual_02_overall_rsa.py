@@ -18,19 +18,19 @@ def addpath():
     
 
 
-def test_pipeline(method):
+def test_pipeline(method, batch_file):
     addpath()
     import overall_rsa as pipe
     args = [
         "",
-        "batch_tst01.yml",                        
+        batch_file,                        
         method
     ]
     pipe.overall_rsa(args)
 
 
 ######################################
-test_pipeline("qsub")
+#test_pipeline("qsub")
 #test_pipeline("qsub_tst")
-#test_pipeline("py")
+test_pipeline("py","batch_tst02.yml")
 #test_pipeline("sh")
