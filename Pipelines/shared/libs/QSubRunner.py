@@ -9,7 +9,7 @@ import subprocess
 
 
 class QSubRunner:
-    def __init__(self, script, dependency, time, array, homeuser, inputs):
+    def __init__(self, work_dir, script, dependency, time, array, homeuser, inputs):
         os.system("chmod +x " + script)
         self.args = []
         self.args.append("qsub")
@@ -24,6 +24,7 @@ class QSubRunner:
         self.args.append("-wd")  # $ -wd /home/ucbtlcr/Scratch/workspace
         self.args.append("/home/" + homeuser + "/Scratch/workspace")
         self.args.append(script)
+        self.args.append(work_dir)
         self.args.append(inputs)
 
     def run(self):

@@ -15,12 +15,13 @@
 
 # Load the necessary python libraries
 module load python3/recommended
-pip install bioservices
+# pip install bioservices
 
 # get the script inputs
-inputs=$1
+work_dir=$1
+echo $work_dir
+inputs=$2
 echo $inputs
-
 # cd ~/MuteinPipeline/geneprot/scripts/
-cd "$(dirname "$0")"
+cd $work_dir
 python pipeline02_genestoproteins.py $inputs

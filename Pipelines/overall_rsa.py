@@ -89,7 +89,7 @@ def overall_rsa(args):
                     dependency = dependencies[id]
                 else:
                     dependency = -1
-            runner = qsub.QSubRunner(script + ".sh", dependency, time, array,homeuser,inputs)
+            runner = qsub.QSubRunner(script + ".sh", dir_path, dependency, time, array,homeuser,inputs)
             dep = runner.run()
             dependencies[id] = dep
         elif py_or_sh == "py":
