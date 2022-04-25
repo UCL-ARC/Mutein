@@ -14,7 +14,7 @@ class SubRunner:
         if exe != "":  # it is a script if it is ""            
             self.args.append(exe)
         else:
-            print("chmod:",script)
+            print("chmod +x",script)
             os.system("## SubRunner: chmod +x " + script)
         self.args.append(script)
         inputss = inputs.split(" ")
