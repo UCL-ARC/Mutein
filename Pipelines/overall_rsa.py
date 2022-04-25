@@ -80,9 +80,9 @@ def overall_rsa(args):
                 batch_list.append(str(id))
 
     dependencies = {}
-    for id in batch_list:
+    for id in batch_list:        
         script, time, dependency, array, inputs = batch_dic[id]
-        print(id,script, time, dependency, array, inputs)
+        print("# overall pipeline script:",id,script, time, dependency, array, inputs)        
         if py_or_sh == "qsub":
             if dependency != -1:
                 if dependencies in dependencies:                
