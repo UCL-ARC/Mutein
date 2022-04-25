@@ -16,9 +16,16 @@ N.b this file may be run on the myriad clusters or on a local machine
 """
 import os
 from shutil import copyfile
-import helper as hlp
-import Arguments
 
+
+#import from the shared library in Mutein/Pipelines/shared/lib
+import sys
+dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
+retpath = "/".join(dirs) + '/shared/libs'
+sys.path.append(retpath)
+import Paths
+import Arguments
+import Config
 
 def run_pipeline01(args):
 
@@ -26,9 +33,14 @@ def run_pipeline01(args):
     # The inputs to this function are the pdbfile and the chain id (might optionally consider the positionscan mutation type)
     print("### FoldX repair job ###")
     argus = Arguments.Arguments(args)
-    repair_path = argus.arg("interim_path") + "repair" + argus.arg("repairs") + "/"
-    argus.params["repair_path"] = repair_path
-    hlp.goto_job_dir(argus.arg("repair_path"), args, argus.params, "_inputs01")
+    pdbcode = argus.arg("pdb")
+    pdb_path = Paths.Paths("pdb",dataset="",gene="",pdb=pdbcode)
+    pdb_config = Config.Config(pdb_path.pdb_inputs + "/config.yml")
+    argus.addConfig(pdb_config.params)
+    
+    repair_path = pdb_path.pdb_thruputs + "repair" + str(argus.arg("repairs")) + "/"    
+    argus.addConfig({"repair_path":repair_path})
+    pdb_path.goto_job_dir(repair_path, args, argus.params, "_inputs01")
     ############################################
     pdbfile = argus.arg("pdb") + ".pdb"
     # Set up files (retain copy of original)
@@ -41,14 +53,14 @@ def run_pipeline01(args):
     repairinnames[numRepairs] = argus.arg("pdb") + "_rep" + str(numRepairs) + ".pdb"
     #### there are 2 files we need in the interim directory, pdb file rotabase, but rotabase is only needed for foldx4 and NOT needed for foldx5
     print(
-        "### ... copying file",
+        "### foldx03: ... copying file",
         pdbfile,
-        argus.arg("input_path") + repairinnames[0],
+        pdb_path.pdb_inputs + "/" + repairinnames[0],
         "... ###",
     )
     copyfile(
-        argus.arg("input_path") + "/" + pdbfile,
-        argus.arg("repair_path") + repairinnames[0],
+        pdb_path.pdb_inputs + "/" + pdbfile,
+        repair_path + repairinnames[0],
     )
 
     repairBaseA = argus.arg("foldxe") + " --command=RepairPDB --pdb="
@@ -68,7 +80,7 @@ def run_pipeline01(args):
         print("### ... repair command #", r, repaircommand)
         os.system(repaircommand)
         print(
-            "### ... copying file",
+            "### foldx03:  ... copying file",
             argus.arg("repair_path") + repairoutnames[r],
             argus.arg("repair_path") + repairinnames[r + 1],
         )
@@ -77,12 +89,12 @@ def run_pipeline01(args):
     # copy the final repaired file to our main interim directory
     print(
         "### ... copying file",
-        argus.arg("repair_path") + repairoutnames[r],
-        argus.arg("thruput_path") + repairoutnames[r],
+        argus.arg("repair_path") + repairinnames[numRepairs],
+        pdb_path.pdb_thruputs + "/" + repairinnames[numRepairs],        
     )
     copyfile(
         argus.arg("repair_path") + repairinnames[numRepairs],
-        argus.arg("thruput_path") + repairinnames[numRepairs],
+        pdb_path.pdb_thruputs + "/" + repairinnames[numRepairs], 
     )
 
     print("### COMPLETED FoldX repair job ###")

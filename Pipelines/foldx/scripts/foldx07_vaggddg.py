@@ -12,20 +12,32 @@ import os
 import statistics
 import pandas as pd
 from shutil import copyfile
-import helper as hlp
+
+#import from the shared library in Mutein/Pipelines/shared/lib
+import sys
+dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
+retpath = "/".join(dirs) + '/shared/libs'
+sys.path.append(retpath)
+import Paths
 import Arguments
+import Config
+
 
 
 def run_pipeline07(args):
     ##### INPUTS #############################################
     print("### Foldx variant aggregate ###")
-    ##############################################
+    ##############################################    
     argus = Arguments.Arguments(args)
-    work_path = argus.params["interim_path"] + "vagg/"
-    argus.params["work_path"] = work_path
-    hlp.goto_job_dir(argus.arg("work_path"), args, argus.params, "_inputs07")
+    pdbcode = argus.arg("pdb")
+    pdb_path = Paths.Paths("pdb",dataset="",gene="",pdb=pdbcode)
+    pdb_config = Config.Config(pdb_path.pdb_inputs + "/config.yml")
+    argus.addConfig(pdb_config.params)
+    work_path = pdb_path.pdb_thruputs + "vagg/"
+    argus.addConfig({"work_path": work_path})
+    pdb_path.goto_job_dir(argus.arg("work_path"), args, argus.params, "_inputs07")
 
-    params_file = argus.arg("thruput_path") + "variant_params.txt"
+    params_file = pdb_path.pdb_thruputs + "variant_params.txt"
     variant_dirs = []
     with open(params_file) as fr:
         paramscontent = fr.readlines()
@@ -39,7 +51,7 @@ def run_pipeline07(args):
     for vd, vn in variant_dirs:
         print(vd, vn)
         ddg_file = (
-            argus.arg("interim_path") + vd + "/Dif_" + argus.arg("repairpdb") + ".fxout"
+            pdb_path.pdb_thruputs + vd + "/Dif_" + argus.arg("repairpdb") + ".fxout"
         )  # the pdb repaired files are always pdbcode_rep
         print(ddg_file)
         if os.path.exists(ddg_file):
@@ -61,8 +73,8 @@ def run_pipeline07(args):
 
     ddg_df = pd.DataFrame.from_dict(ddg_dic)
     df_file = argus.arg("repairpdb") + "_variants_ddg_dataframe.csv"
-    ddg_df.to_csv(argus.arg("output_path") + df_file, index=False)
-    print("saved dataframe to", argus.arg("output_path") + df_file)
+    ddg_df.to_csv(pdb_path.pdb_outputs + df_file, index=False)
+    print("saved dataframe to", pdb_path.pdb_outputs + df_file)
 
     # And save something visual as a starting point for some analysis
     import matplotlib.pyplot as plt
@@ -82,8 +94,8 @@ def run_pipeline07(args):
     sns.despine(left=True, bottom=True)
     plt.rcParams["axes.labelsize"] = 25
     plot_file = argus.arg("repairpdb") + "_variant_plot.png"
-    plt.savefig(argus.arg("output_path") + plot_file)
-    print("saved plot to", argus.arg("output_path") + plot_file)
+    plt.savefig(pdb_path.pdb_outputs + plot_file)
+    print("saved plot to", pdb_path.pdb_outputs + plot_file)
 
     print("### COMPLETED FoldX aggregate job ###")
 

@@ -13,9 +13,15 @@ N.b this file may be run on the myriad clusters or on a local machine
 # import sys
 import os
 import pandas as pd
-from shutil import copyfile
-import helper as hlp
+
+#import from the shared library in Mutein/Pipelines/shared/lib
+import sys
+dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
+retpath = "/".join(dirs) + '/shared/libs'
+sys.path.append(retpath)
+import Paths
 import Arguments
+import Config
 
 ##### INPUTS #############################################
 # The inputs to this function are the pdbfile and the chain id (might optionally consider the positionscan mutation type)
@@ -23,12 +29,16 @@ def run_pipeline02(args):
     print("### FoldX make params job ###")
     print(args)
     argus = Arguments.Arguments(args)
-    work_path = argus.params["interim_path"] + "params/"
-    argus.params["work_path"] = work_path
-    hlp.goto_job_dir(argus.arg("work_path"), args, argus.params, "_inputs02")
+    pdbcode = argus.arg("pdb")
+    pdb_path = Paths.Paths("pdb",dataset="",gene="",pdb=pdbcode)
+    pdb_config = Config.Config(pdb_path.pdb_inputs + "/config.yml")
+    argus.addConfig(pdb_config.params)
+        
+    work_path = pdb_path.pdb_thruputs + "params" + str(argus.arg("split")) + "/"
+    argus.addConfig({"work_path": work_path})
+    pdb_path.goto_job_dir(argus.arg("work_path"), args, argus.params, "_inputs02")
 
-    pdb = argus.arg("pdb")
-    jobname = argus.arg("name")
+    pdb = argus.arg("pdb")    
     chainid = argus.arg("chain")
     rows = int(argus.arg("split"))
 
@@ -36,7 +46,7 @@ def run_pipeline02(args):
 
     ##### Open the pdb file ################################
     pdb_file = pdb + "_rep" + str(argus.arg("repairs")) + ".pdb"
-    with open(argus.arg("thruput_path") + pdb_file) as f:
+    with open(pdb_path.pdb_thruputs + pdb_file) as f:
         pdbcontent = f.readlines()
 
     ##### Amino acid dictionary to convert between 3 and 1 codes
@@ -128,7 +138,7 @@ def run_pipeline02(args):
     print(total_muts, rows, chunk, row)
     ##### Turn the dictionary into a dataframe
     data_params = pd.DataFrame.from_dict(param_dic)
-    filename = argus.arg("interim_path") + "params.txt"
+    filename = pdb_path.pdb_thruputs + "params_" + str(argus.arg("split")) + ".txt"
     data_params.to_csv(filename, index=False, sep=" ", header=False)
 
 

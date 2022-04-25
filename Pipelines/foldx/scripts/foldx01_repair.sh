@@ -24,4 +24,4 @@ echo $pdb, $jobname
 repairs="repairs="$7
 
 cd ~/MuteinPipeline/foldx/scripts/
-python foldx01_repair.py $pdb $jobname $repairs
+python foldx01_repair.py $pdb xxx $repairs

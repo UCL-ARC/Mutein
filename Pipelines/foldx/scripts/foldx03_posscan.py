@@ -15,8 +15,16 @@ N.b this file may be run on the myriad clusters or on a local machine
 import os
 import pandas as pd
 from shutil import copyfile
-import helper as hlp
+
+#import from the shared library in Mutein/Pipelines/shared/lib
+import sys
+dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
+retpath = "/".join(dirs) + '/shared/libs'
+sys.path.append(retpath)
+import Paths
 import Arguments
+import Config
+
 
 ##### INPUTS #############################################
 # The inputs to this function are the pdbfile and the chain id (might optionally consider the positionscan mutation type)
@@ -26,16 +34,18 @@ def run_pipeline03(args):
     print("### FoldX position scan job ###")
     print(args)
     argus = Arguments.Arguments(args)
-
-    pdb = argus.arg("pdb")
-    row = argus.arg("row")
+    pdbcode = argus.arg("pdb")
+    pdb_path = Paths.Paths("pdb",dataset="",gene="",pdb=pdbcode)
+    pdb_config = Config.Config(pdb_path.pdb_inputs + "/config.yml")
+    argus.addConfig(pdb_config.params)    
+    row = argus.arg("row","row0")
     mutation_string = argus.arg("mutation")
     ############################################
-    pdbfile = pdb + "_rep" + str(argus.arg("repairs")) + ".pdb"
+    pdbfile = pdbcode + "_rep" + str(argus.arg("repairs")) + ".pdb"
     mutations = []
     # row=. means all, row=1:n means an explicit row, row=0 means the mutation string has been passd in explicitly
     if mutation_string == ".":
-        filename = argus.arg("interim_path") + "params.txt"
+        filename = pdb_path.pdb_thruputs + "params_" + str(argus.arg("split")) + ".txt"
         print("open", filename)
         with open(filename) as fr:
             paramscontent = fr.readlines()
@@ -68,17 +78,17 @@ def run_pipeline03(args):
     for mut, row in mutations:
         print(mut, row)
 
-        row_path = argus.arg("interim_path") + row + "/"
+        row_path = pdb_path.pdb_thruputs + str(argus.arg("split")) + "_" + row + "/"
         print("### ... change directory", row_path)
         argus.params["thisrow"] = row
         argus.params["thismut"] = mut
-        hlp.goto_job_dir(row_path, args, argus.params, "_inputs03")
+        pdb_path.goto_job_dir(row_path, args, argus.params, "_inputs03")
         print(
-            "### ... copying file",
-            argus.arg("thruput_path") + pdbfile,
+            "### foldx03: ... copying file",
+            pdb_path.pdb_thruputs + pdbfile,
             row_path + pdbfile,
         )
-        copyfile(argus.arg("thruput_path") + pdbfile, row_path + pdbfile)
+        copyfile(pdb_path.pdb_thruputs + pdbfile, row_path + pdbfile)
 
         foldxcommand = argus.arg("foldxe") + " --command=PositionScan"
         foldxcommand += " --ionStrength=0.05"
@@ -92,8 +102,8 @@ def run_pipeline03(args):
         foldxcommand += " --positions=" + mut
 
         print(foldxcommand)
-        print("RealOrTest=", argus.arg("environment"))
-        if argus.arg("environment") != "inputs":
+        print("RealOrTest=", argus.arg("env"))
+        if argus.arg("env") != "inputs":
             os.system(foldxcommand)
 
 

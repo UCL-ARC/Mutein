@@ -1,0 +1,41 @@
+id: '1'
+script: 'foldx01_repair'
+time: '3:00:0'
+dependency: '-1'
+array: 0
+---
+id: '2'
+script: 'foldx02_makeparams'
+time: '0:05:0'
+dependency: '1'
+array: 0
+---
+id: '3'
+script: 'foldx03_posscan'
+time: '6:00:0'
+dependency: '2'
+array: 50
+---
+id: '4'
+script: 'foldx04_aggddg'
+time: '0:05:0'
+dependency: '3'
+array: 0
+---
+id: '5'
+script: 'foldx05_vparams'
+time: '0:05:0'
+dependency: '1'
+array: 0
+---
+id: '6'
+script: 'foldx06_build'
+time: '1:00:0'
+dependency: '5'
+array: 63
+---
+id: '7'
+script: 'foldx07_vaggddg'
+time: '0:05:0'
+dependency: '6'
+array: 0

@@ -14,16 +14,28 @@ N.b this file may be run on the myriad clusters or on a local machine
 import os
 import pandas as pd
 from shutil import copyfile
-import helper as hlp
+
+#import from the shared library in Mutein/Pipelines/shared/lib
+import sys
+dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
+retpath = "/".join(dirs) + '/shared/libs'
+sys.path.append(retpath)
+import Paths
 import Arguments
+import Config
+
 
 
 def run_pipeline06(args):
     print("### FoldX build job ###")
     print(args)
-    argus = Arguments.Arguments(args)
+    argus = Arguments.Arguments(args)    
+    pdbcode = argus.arg("pdb")
+    pdb_path = Paths.Paths("pdb",dataset="",gene="",pdb=pdbcode)
+    pdb_config = Config.Config(pdb_path.pdb_inputs + "/config.yml")
+    argus.addConfig(pdb_config.params)          
     pdb = argus.arg("pdb")
-    row = argus.arg("row")
+    row = argus.arg("row","row0")
     mutation_string = argus.arg("mutation")
     ############################################
     # set up the files and directories
@@ -31,7 +43,7 @@ def run_pipeline06(args):
     mutations = []
 
     if mutation_string == ".":
-        filename = argus.arg("thruput_path") + "variant_params.txt"
+        filename = pdb_path.pdb_thruputs + "variant_params.txt"
         print("open", filename)
         with open(filename) as fr:
             paramscontent = fr.readlines()
@@ -63,17 +75,17 @@ def run_pipeline06(args):
 
     for mut, row in mutations:
         # put mutation into a file
-        row_path = argus.arg("interim_path") + row + "/"
-        print("### ... change directory", row_path)
+        row_path = pdb_path.pdb_thruputs + row + "/"
+        print("### foldx06: ... change directory", row_path)
         argus.params["thisrow"] = row
         argus.params["thismut"] = mut
-        hlp.goto_job_dir(row_path, args, argus.params, "_inputs06")
+        pdb_path.goto_job_dir(row_path, args, argus.params, "_inputs06")
         print(
-            "### ... copying file",
-            argus.arg("thruput_path") + pdbfile,
+            "### foldx06: ... copying file",
+            pdb_path.pdb_thruputs + pdbfile,
             row_path + pdbfile,
         )
-        copyfile(argus.arg("thruput_path") + pdbfile, row_path + pdbfile)
+        copyfile(pdb_path.pdb_thruputs + pdbfile, row_path + pdbfile)
         mut_fl = "individual_list.txt"
         mut_log = "buildmodel.log"
         with open(mut_fl, "w") as fw:
@@ -94,7 +106,7 @@ def run_pipeline06(args):
         print()
         print(foldxcommand)
         print()
-        if "inputs" not in argus.arg("environment"):
+        if "inputs" not in argus.arg("env"):
             os.system(foldxcommand)
 
 

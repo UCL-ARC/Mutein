@@ -12,8 +12,16 @@ import os
 import pandas as pd
 from shutil import copyfile
 import itertools
-import helper as hlp
+
+#import from the shared library in Mutein/Pipelines/shared/lib
+import sys
+dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
+retpath = "/".join(dirs) + '/shared/libs'
+sys.path.append(retpath)
+import Paths
 import Arguments
+import Config
+
 
 ##### INPUTS #############################################
 # The inputs to this function are the pdbfile and the chain id (might optionally consider the positionscan mutation type)
@@ -21,20 +29,24 @@ def run_pipeline05(args):
     print("### FoldX make variant params job ###")
     print(args)
     ##############################################
-    argus = Arguments.Arguments(args)
-    work_path = argus.params["interim_path"] + "vparams/"
-    argus.params["work_path"] = work_path
-    hlp.goto_job_dir(argus.arg("work_path"), args, argus.params, "_inputs05")
+    argus = Arguments.Arguments(args)        
+    pdbcode = argus.arg("pdb")
+    pdb_path = Paths.Paths("pdb",dataset="",gene="",pdb=pdbcode)
+    pdb_config = Config.Config(pdb_path.pdb_inputs + "/config.yml")
+    argus.addConfig(pdb_config.params)  
+    work_path = pdb_path.pdb_thruputs + "vparams/"
+    argus.addConfig({"work_path":work_path})
+    pdb_path.goto_job_dir(argus.arg("work_path"), args, argus.params, "_inputs05")
     ############################################
     pdb = argus.arg("pdb")
-    jobname = argus.arg("name")
-    row = argus.arg("row")
+    #jobname = argus.arg("name")
+    row = argus.arg("row","row0")
     variant = argus.arg("variant")
     chainid = argus.arg("chain")
     # we want to work in the node directory first, the main pdb input file is a 1-off and lives in github (at the moment)
-    in_mutations_file = argus.arg("input_path") + argus.arg("variantfile") + ".txt"
-    new_mutations_file = argus.arg("output_path") + argus.arg("variantfile") + ".txt"
-    print("### ... copying file", in_mutations_file, new_mutations_file)
+    in_mutations_file = pdb_path.pdb_inputs + argus.arg("variantfile")
+    new_mutations_file = pdb_path.pdb_outputs + argus.arg("variantfile")
+    print("### foldx05: ... copying file", in_mutations_file, new_mutations_file)
     copyfile(in_mutations_file, new_mutations_file)
     ##### Open the variant file ################################
     variant_df = pd.read_csv(new_mutations_file)
@@ -73,7 +85,7 @@ def run_pipeline05(args):
 
     ##### Turn the dictionary into a dataframe
     data_params = pd.DataFrame.from_dict(param_dic)
-    filename = argus.arg("thruput_path") + "variant_params.txt"
+    filename = pdb_path.pdb_thruputs + "variant_params.txt"
     data_params.to_csv(filename, index=False, sep=" ", header=False)
 
 

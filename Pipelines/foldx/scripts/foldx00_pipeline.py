@@ -21,10 +21,18 @@ The scripts dependency is:
 import os
 import pwd
 import subprocess
-import helper as hlp
 import pandas as pd
-import Arguments
 import yaml
+
+#import from the shared library in Mutein/Pipelines/shared/lib
+import sys
+dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
+retpath = "/".join(dirs) + '/shared/libs'
+sys.path.append(retpath)
+import Config
+import Paths
+import Arguments
+
 
 ##### INPUTS #############################################
 ## Pipeline jobs sequence
@@ -40,20 +48,27 @@ import yaml
 def run_pipeline00(args):
     ret_array = []
     print("#### FOLDX PIPELINE - batch creation ####")
+    #The arguments HAVE to include a pdb name
+    argus = Arguments.Arguments(args)    
+    pdbcode = argus.arg("pdb")
+    pdb_path = Paths.Paths("pdb",dataset="",gene="",pdb=pdbcode)    
+    pdb_config = Config.Config(pdb_path.pdb_inputs + "/config.yml")
+    argus.addConfig(pdb_config.params)
+
     ### Change into script directory
     dir_path = os.path.dirname(os.path.realpath(__file__)) + "/"
-    print("## ... changing directory to", dir_path)
+    print("## ... foldx00: changing directory to", dir_path)
     os.chdir(dir_path)
     homeuser = pwd.getpwuid(os.getuid())[0]
     print("HomeUser=", homeuser)
     ### Process paramaters in order of preference, job, config, pipeline
-    argus = Arguments.Arguments(args)
-    cfgplparams = hlp.configpipelineparams(argus.arg("pdb"))
-    pipelineparams = hlp.pipelineparams(args, cfgplparams)
-    print("Pipelines=", pipelineparams)
+    
+    #cfgplparams = hlp.configpipelineparams(argus.arg("pdb"))
+    pipelineparams = argus.pipelineparams
+    #print("Pipelines=", pipelineparams)
     # script extension is either sh or py depending on bash or python environment
     ext = ".sh"
-    if argus.arg("environment") == "python":
+    if argus.arg("env") == "python":
         ext = ".py"
     # The batch is defined in the file batch.yml
     batch_dic = {}
@@ -88,10 +103,10 @@ def run_pipeline00(args):
 
     for job, exe, script, dependency, time, array in runs:
         # print(job,exe,script,dependency)
-        if argus.arg("environment") == "hpc":
+        if argus.arg("env") == "hpc":
             os.system("chmod +x " + script)
         args = []
-        if "python" in argus.arg("environment"):
+        if "python" in argus.arg("env"):
             args.append(argus.arg("pythonexe"))
         else:
             args.append("qsub")
@@ -110,29 +125,29 @@ def run_pipeline00(args):
 
         args.append(script)
         if (
-            argus.arg("environment") == "hpc"
-            or argus.arg("environment") == "inputs_hpc"
+            argus.arg("env") == "hpc"
+            or argus.arg("env") == "inputs_hpc"
         ):
             args.append(argus.arg("pdb"))  # 1
-            args.append(argus.arg("name"))  # 2
+            args.append("xxx")  # 2
             args.append(argus.arg("split"))  # 3
             args.append(argus.arg("mutation"))  # 4
             args.append(argus.arg("variant"))  # 5
-            args.append(argus.arg("variantfile"))  # 6
+            args.append("variants.csv")  # 6
             args.append(argus.arg("repairs"))  # 7
         else:
             args.append(script)
-            args.append("pdb=" + argus.arg("pdb"))  # 1
-            args.append("name=" + argus.arg("name"))  # 2
-            args.append("split=" + argus.arg("split"))  # 3
+            args.append("pdb=" + argus.arg("pdb"))  # 1            
+            args.append("name=xxx")  # 2
+            args.append("split=" + str(argus.arg("split")))  # 3
             args.append("mutation=" + argus.arg("mutation"))  # 4
             args.append("variant=" + argus.arg("variant"))  # 5
-            args.append("variantfile=" + argus.arg("variantfile"))  # 6
-            args.append("repairs=" + argus.arg("repairs"))  # 7
+            args.append("variantfile=variants.csv")  # 6
+            args.append("repairs=" + str(argus.arg("repairs")))  # 7
 
         print(args)
         ret_array.append(args)
-        if argus.arg("environment") == "hpc":
+        if argus.arg("env") == "hpc":
             # print('Running on hpc')
             process = subprocess.Popen(
                 args=args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
@@ -145,7 +160,7 @@ def run_pipeline00(args):
                 results = jobid.split(".")
                 jobid = results[0]
             dependencies[int(job)] = jobid
-        elif argus.arg("environment") == "python":
+        elif argus.arg("env") == "python":
             # print('Running in python')
             dependencies[int(job)] = 0
             process = subprocess.Popen(

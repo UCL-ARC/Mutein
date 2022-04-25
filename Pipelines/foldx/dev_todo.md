@@ -3,6 +3,7 @@
 - I am only being very simple in job splits - can foldx multithread?
 - Make the code and comments and variables up to rsdg standard
 - Make the CI empty the data completely first
+- Improve CI, add foldx calls and unit tests (problem is outputs are big text files....) Each testable function should have an output that is meaningful, a signature, like its external library call.
 - If one of the array jobs fails the dependent batch can still go ahead. Do I just re-run the jobs that failed (they are numbered).
 - the array number for the variant split is the combination of individual variants, so it should be calculated rather than passed in
 - unsatisfactory use of both split and array jobs needs thinking about
@@ -11,7 +12,8 @@
 - Make a foldx runner class (code review TY 7.4.22)
 - Need to make the pdb input cfg file yaml too
 - The CI has hardcoded the user name "runner" which is the CI name, but I should pass the user in as a variable.
-- I followed instrctions for the CI requirements.txt file but there seems too much I must be able t cut it down.
+- I followed instructions for the CI requirements.txt file but there seems too much, I must be able to cut it down.
+- Migrate the helper functions to the shared/lib folder 1 level up, the arguments are more generic
 ---------------------------------------------------------------------------
 #### discuss todo list 
 - Analytics - establish agreement or what the future action is on the number differences as per above

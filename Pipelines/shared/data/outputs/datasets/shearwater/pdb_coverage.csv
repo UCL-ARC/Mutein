@@ -1,0 +1,73 @@
+dataset,gene,accession,variants,length,pdbs
+shearwater,NOTCH1,P46531,1146,2555,AF-P46531-F1-model_v2 1pb5 1toz 1yyh 2f8x 2f8y 3i08 3l95 3nbn 3v79 5fm9 5fma 5kzo 5l0r 6py8 
+shearwater,TP53,P04637,368,393,AF-P04637-F1-model_v2 1aie 1c26 1dt7 1gzh 1h26 1jsp 1kzy 1ma3 1olg 1olh 1pes 1pet 1sae 1saf 1sak 1sal 1tsr 1tup 1xqh 1yc5 1ycq 1ycr 1ycs 2ac0 2ady 2ahi 2ata 2b3g 2bin 2bio 2bip 2biq 2fej 2foo 2gs0 2h2d 2h2f 2h4f 2h4h 2h4j 2h59 2j0z 2j21 2k8f 2l14 2ly4 2mej 2mwo 2mwp 2mwy 2mzd 2ocj 2ruk 2xwr 2ybg 2ydr 2z5s 2z5t 3d05 3d06 3d07 3d08 3d09 3dab 3dac 3igl 3kmd 3kz8 3lw1 3pdh 3sak 3tg5 4buz 4bv2 4hfz 4hje 4ibv 4ibw 4ibz 4qo1 4rp6 4rp7 4x34 4xr8 4zzj 5bua 5ecg 5lgy 5mct 5mcu 5mcv 5mcw 5mf7 5mg7 5mhc 5moc 5ol0 5un8 5xzc 6fj5 6lhd 6r5l 6rjz 6rk8 6rki 6rkk 6rkm 6rl3 6rl4 6rl6 6rm5 6rm7 6rwh 6rwi 6rws 6rwu 6rx2 6rz3 6s39 6s3c 6s40 6s9q 6sin 6sio 6sip 6siq 6slv 6t58 6v4f 6v4h 6vr1 6vrm 6xre 7dhz 7dvd 
+shearwater,NOTCH2,Q04721,753,2471,AF-Q04721-F1-model_v2 5mwb 
+shearwater,FAT1,Q14517,964,4588,
+shearwater,NOTCH3,Q9UM47,496,2321,AF-Q9UM47-F1-model_v2 4zlp 5czv 5czx 6wqu 6xsw 
+shearwater,ARID2,Q68CP9,269,1835,AF-Q68CP9-F1-model_v2 
+shearwater,AJUBA,Q96IF1,83,538,AF-Q96IF1-F1-model_v2 
+shearwater,KMT2D,O14686,939,5537,3uvk 4erq 6o7g 
+shearwater,CUL3,Q13618,72,768,AF-Q13618-F1-model_v2 2myl 2mym 4ap2 4apf 4eoz 5nlb 6i2m 
+shearwater,TP63,Q9H3D4,121,680,AF-Q9H3D4-F1-model_v2 1rg6 2y9u 3qym 3qyn 3us0 3us1 3us2 3zy0 3zy1 4a9z 6ru6 6ru7 6ru8 
+shearwater,RB1,P06400,102,928,AF-P06400-F1-model_v2 1ad6 1gux 1h25 1o9k 2aze 2qdj 2r7g 3n5u 3pom 4cri 4elj 4ell 
+shearwater,PIK3CA,P42336,130,1068,AF-P42336-F1-model_v2 2rd0 3hhm 3hiz 3zim 4jps 4l1b 4l23 4l2y 4ovu 4ovv 4tuu 4tv3 4waf 4ykn 4zop 5dxh 5dxt 5fi4 5itd 5sw8 5swg 5swo 5swp 5swr 5swt 5sx8 5sx9 5sxa 5sxb 5sxc 5sxd 5sxe 5sxf 5sxi 5sxj 5sxk 5ubr 5uk8 5ukj 5ul1 5xgh 5xgi 5xgj 6gvf 6gvg 6gvh 6gvi 6nct 6oac 6pys 6vo7 7jiu 7k6m 7k6n 7k6o 7k71 
+shearwater,DICER1,Q9UPY3,237,1922,AF-Q9UPY3-F1-model_v2 2eb1 4ngb 4ngc 4ngd 4ngf 4ngg 4nh3 4nh5 4nh6 4nha 4wyq 5zak 5zal 5zam 
+shearwater,MUC17,Q685J3,1295,4493,
+shearwater,NSD1,Q96L73,392,2696,AF-Q96L73-F1-model_v2 6kqp 6kqq 
+shearwater,NOTCH4,Q99466,342,2003,AF-Q99466-F1-model_v2 
+shearwater,NF1,P21359,354,2839,1nf1 2d4q 2e2x 3peg 6ob2 6v65 6v6f 
+shearwater,RBM10,P98175,137,930,AF-P98175-F1-model_v2 2lxi 
+shearwater,SPHKAP,Q2M3C7,647,1700,AF-Q2M3C7-F1-model_v2 
+shearwater,FBXW7,Q969H0,100,707,AF-Q969H0-F1-model_v2 2ovp 2ovq 2ovr 5ibk 5v4b 
+shearwater,FAT4,Q6V0I7,1236,4981,
+shearwater,ADAM29,Q9UKF5,303,820,AF-Q9UKF5-F1-model_v2 
+shearwater,EZH2,Q15910,70,746,AF-Q15910-F1-model_v2 4mi0 4mi5 5gsa 5h14 5h15 5h17 5h19 5h24 5h25 5hyn 5ij7 5ij8 5ls6 5u5t 5u62 5wg6 5wuk 6c23 6c24 6lo2 6p5l 6u4y 6wkr 7at8 
+shearwater,HRAS,P01112,34,189,AF-P01112-F1-model_v2 121p 1aa9 1bkd 1clu 1crp 1crq 1crr 1ctq 1gnp 1gnq 1gnr 1iaq 1ioz 1k8r 1nvv 1nvw 1p2s 1p2t 1p2u 1p2v 1plj 1plk 1pll 1q21 1qra 1rvd 1wq1 1xcm 1xd2 1xj0 1zw6 2cld 2rge 2rgg 2x1v 3k8y 3k9l 3k9n 3kkm 3kud 3l8y 3l8z 3lbh 3lbi 3lbn 3lo5 3oiv 3rry 3rrz 3rs0 3rs2 3rs3 3rs4 3rs5 3rs7 3rsl 3rso 3tgp 4dls 4dlt 4dlu 4dlw 4efl 4g0n 4l9s 4nyj 4nym 4q21 4rsg 4xvq 4xvr 5b2z 5b30 5p21 5vbe 5vbz 5wdo 5wfo 5wfp 5wfq 5wfr 5x9s 6axg 6bvi 6bvj 6bvk 6bvl 6bvm 6cuo 6cup 6cur 6d55 6d56 6d59 6d5e 6d5g 6d5h 6d5j 6d5l 6dzh 6e6c 6e6p 6q21 6v94 6v9f 6v9j 6v9l 6v9m 6v9n 6v9o 6zj0 6zl3 7dph 7l0f 
+shearwater,SALL1,Q9NSC2,442,1324,AF-Q9NSC2-F1-model_v2 
+shearwater,CCND1,P24385,35,295,AF-P24385-F1-model_v2 2w96 2w99 2w9f 2w9z 5vzu 6p8e 6p8f 6p8g 6p8h 
+shearwater,SCN1A,P35498,445,2009,AF-P35498-F1-model_v2 7dtd 
+shearwater,SMO,Q99835,93,787,AF-Q99835-F1-model_v2 4jkv 4n4w 4o9r 4qim 4qin 5l7d 5l7i 6ot0 6xbj 6xbk 6xbl 6xbm 
+shearwater,EPHA2,P29317,163,976,AF-P29317-F1-model_v2 1mqb 2k9y 2kso 2x10 2x11 3c8x 3czu 3fl7 3hei 3hpn 3kka 3mbw 3mx0 3skj 4p2k 4pdo 4trl 5ek7 5i9u 5i9v 5i9w 5i9x 5i9y 5i9z 5ia0 5ia1 5ia2 5ia3 5ia4 5ia5 5njz 5nk0 5nk1 5nk2 5nk3 5nk4 5nk5 5nk6 5nk7 5nk8 5nk9 5nka 5nkb 5nkc 5nkd 5nke 5nkf 5nkg 5nkh 5nki 5nz9 6b9l 6f7m 6f7n 6fnf 6fng 6fnh 6hes 6het 6heu 6hev 6hew 6hex 6hey 6q7b 6q7c 6q7d 6q7e 6q7f 6q7g 6rw2 7b7n 7cze 7czf 7kja 7kjb 7kjc 
+shearwater,KEAP1,Q14145,95,624,AF-Q14145-F1-model_v2 1u6d 1zgk 2flu 3vng 3vnh 4ifj 4ifl 4ifn 4in4 4xmb 5dad 5daf 5nlb 5x54 6fmp 6fmq 6hws 6rog 6tym 6typ 7k2d 7k2f 7k2h 7k2i 7k2n 7k2o 7k2p 
+shearwater,TRIOBP,Q9H2D6,515,2365,AF-Q9H2D6-F1-model_v2 
+shearwater,FLG2,Q5D862,667,2391,AF-Q5D862-F1-model_v2 
+shearwater,GRIN2A,Q12879,415,1464,AF-Q12879-F1-model_v2 3nfl 5h8f 5h8h 5h8q 5i2k 5i2n 5kdt 5tp9 5tpa 6ira 6irf 6irg 6irh 7eoq 7eor 7eos 7eot 7eou 7eu7 
+shearwater,KMT2A,Q03164,615,3969,2jyi 2kkf 2msr 2mtn 2w5y 2w5z 3eg6 3emh 3lqh 3lqi 3lqj 4esg 4nw3 5f5e 5f6l 6kiu 6kiv 6kix 6kiz 6pwv 6pww 6u9k 6u9m 6u9n 6u9r 6w5i 6w5m 6w5n 
+shearwater,APOB,P04114,1075,4563,
+shearwater,AKT1,P31749,60,480,AF-P31749-F1-model_v2 1h10 1unp 1unr 2uvm 2uzr 3cqu 3cqw 3mv5 3mvh 3o96 3ocb 3ow4 3qkk 3qkl 3qkm 4ejn 4ekk 4ekl 4gv1 5kcv 6buu 6hhf 6hhg 6hhh 6hhi 6hhj 6npz 6s9w 6s9x 7apj 7nh4 7nh5 
+shearwater,PLCB1,Q9NQ66,341,1216,AF-Q9NQ66-F1-model_v2 
+shearwater,PTPRT,O14522,310,1441,AF-O14522-F1-model_v2 2ooq 
+shearwater,PTEN,P60484,15,403,AF-P60484-F1-model_v2 1d5r 2kyl 4o1v 7juk 7jul 7jvx 
+shearwater,FGFR3,P22607,127,806,AF-P22607-F1-model_v2 1ry7 2lzl 6lvm 7dhl 
+shearwater,GRM3,Q14832,290,879,AF-Q14832-F1-model_v2 3sm9 4xar 5cnk 5cnm 6b7h 
+shearwater,ERBB4,Q15303,340,1308,AF-Q15303-F1-model_v2 2ahx 2l2t 2lcx 2r4b 3bbt 3bbw 3bce 3u2p 3u7u 3u9u 
+shearwater,PREX2,Q70Z35,378,1606,AF-Q70Z35-F1-model_v2 6bnm 
+shearwater,SCN11A,Q9UI33,364,1791,AF-Q9UI33-F1-model_v2 
+shearwater,PCED1B,Q96HM7,88,432,AF-Q96HM7-F1-model_v2 
+shearwater,PTCH1,Q13635,220,1447,AF-Q13635-F1-model_v2 6dmb 6dmo 6dmy 6e1h 6n7g 6n7h 6n7k 6oeu 6oev 6rmg 6rtx 6rvc 6rvd 
+shearwater,SOX2,P48431,29,317,AF-P48431-F1-model_v2 1o4x 6t7b 6t90 6wx7 6wx8 6wx9 6yov 
+shearwater,ERBB3,P21860,167,1342,AF-P21860-F1-model_v2 1m6b 3kex 3lmg 3p11 4leo 4p59 4riw 4rix 4riy 5cus 5o4o 5o7p 6kbi 6op9 7mn5 7mn6 
+shearwater,ADAMTS18,Q8TE60,348,1221,AF-Q8TE60-F1-model_v2 
+shearwater,ERBB2,P04626,146,1255,AF-P04626-F1-model_v2 1mfg 1mfl 1mw4 1n8z 1qr1 1s78 2a91 2jwa 2ks1 2l4k 3be1 3h3b 3mzw 3n85 3pp0 3rcd 3wlw 3wsq 4gfu 4hrl 4hrm 5k33 5kwg 5my6 5o4g 5ob4 5tqs 6att 6bgt 6j71 6oge 7jxh 7mn5 7mn6 
+shearwater,CDH1,P12830,141,882,AF-P12830-F1-model_v2 3ff7 3l6x 3l6y 4zt1 4zte 6cxy 6vel 
+shearwater,EGFR,P00533,186,1210,AF-P00533-F1-model_v2 1ivo 1m14 1m17 1mox 1xkk 1z9i 2eb2 2eb3 2gs2 2gs6 2gs7 2itn 2ito 2itp 2itq 2itt 2itu 2itv 2itw 2itx 2ity 2itz 2j5e 2j5f 2j6m 2jit 2jiu 2jiv 2ks1 2m0b 2rf9 2rfd 2rfe 2rgp 3b2v 3bel 3buo 3g5v 3g5y 3gop 3gt8 3ika 3lzb 3ob2 3op0 3p0y 3pfv 3poz 3qwq 3ug1 3ug2 3vjn 3vjo 3vrp 3vrr 3w2o 3w2p 3w2q 3w2r 3w2s 3w32 3w33 4g5j 4g5p 4hjo 4i21 4i22 4i23 4i24 4jq7 4jq8 4jr3 4jrv 4kro 4krp 4li5 4ll0 4lqm 4r3p 4r3r 4r5s 4riw 4rix 4riy 4rj4 4rj5 4rj6 4rj7 4rj8 4tks 4uip 4uv7 4wd5 4wkq 4wrg 4zau 4zjv 4zse 5c8k 5c8m 5c8n 5cal 5can 5cao 5cap 5caq 5cas 5cau 5cav 5cnn 5cno 5czh 5czi 5edp 5edq 5edr 5em5 5em6 5em7 5em8 5fed 5fee 5feq 5gmp 5gnk 5gty 5gtz 5hcx 5hcy 5hcz 5hg7 5hg9 5hib 5hic 5j9y 5j9z 5jeb 5lv6 5ug8 5ug9 5ugb 5ugc 5wb7 5wb8 5x26 5x27 5x28 5x2a 5x2f 5x2k 5xdk 5xdl 5xgm 5xgn 5xwd 5y25 5y9t 5yu9 5zto 6d8e 6jrj 6jrk 6jrx 6jwl 6jx4 6jxt 6jz0 6lub 6lud 6p1l 6s89 6s8a 6s9b 6s9c 6s9d 6tfu 6tfv 6tfw 6tfy 6tfz 6tg0 6v6k 6v6o 6vh4 6vhn 6vhp 6wa2 6wak 6wxn 6xl4 6z4b 6z4d 7a2a 7aei 7aem 7jxi 7jxk 7jxl 7jxm 7jxp 7jxw 7k1i 7lgs 7oxb 
+shearwater,AKT2,P31751,54,481,AF-P31751-F1-model_v2 1gzk 1gzn 1gzo 1mrv 1mry 1o6k 1o6l 1p6s 2jdo 2jdr 2uw9 2x39 2xh5 3d0e 3e87 3e88 3e8d 
+shearwater,FGFR2,P21802,107,821,AF-P21802-F1-model_v2 1djs 1e0o 1ev2 1gjo 1ii4 1iil 1nun 1oec 1wvz 2fdb 2psq 2pvf 2pvy 2pwl 2py3 2pz5 2pzp 2pzr 2q0b 3b2t 3caf 3cly 3cu1 3dar 3euu 3ri1 4j23 4j95 4j97 4j99 4wv1 5eg3 5ugl 5ugx 5uhn 6agx 6lvk 6lvl 7kia 7kie 
+shearwater,SMAD4,Q13485,46,552,AF-Q13485-F1-model_v2 1dd1 1g88 1mr1 1u7f 1u7v 1ygs 5c4v 5mey 5mez 5mf0 5uwu 6yic 
+shearwater,KRAS,P01116,20,189,AF-P01116-F1-model_v2 3gft 4lpk 5kyk 5oct 5tb5 5ufq 5uk9 5vpi 5vpy 5vpz 5vq2 5vq6 5vq8 5wha 5wpm 6cu6 6e6f 6fa2 6gom 6gqt 6gqw 6gqx 6mqn 6ms9 6mta 6vc8 6xhb 7lc2 
+shearwater,NFE2L2,Q16236,75,605,AF-Q16236-F1-model_v2 2flu 4ifl 5wfv 7k2k 
+shearwater,CREBBP,Q92793,288,2442,AF-Q92793-F1-model_v2 1liq 1rdt 1zoq 2kje 2kwf 2lxs 2lxt 2n1a 3dwy 3p1c 3p1d 3p1e 3p1f 3svh 4a9k 4n3w 4n4f 4nr4 4nr5 4nr6 4nr7 4nyv 4nyw 4nyx 4ouf 4tqn 4ts8 4yk0 5cgp 5dbm 5eic 5eng 5gh9 5i83 5i86 5i89 5i8b 5i8g 5j0d 5jem 5ktu 5lpj 5mmg 5mpk 5mpz 5mqe 5mqg 5mqk 5nlk 5nrw 5owk 5svh 5w0e 5w0f 5w0l 5w0q 5xxh 6alb 6axq 6ay3 6ay5 6dmk 6fqo 6fqt 6fqu 6fr0 6frf 6qst 6sqe 6sqf 6sqm 6sxx 6yij 6yik 6yil 6yim 7co1 7jfl 7jfm 7juo 
+shearwater,NRAS,P01111,23,189,AF-P01111-F1-model_v2 3con 5uhv 6e6h 6wgh 6zir 
+shearwater,PPP1R3A,Q16821,458,1122,AF-Q16821-F1-model_v2 5zqv 
+shearwater,KMT2C,Q8NEZ4,552,4911,4ery 5f59 5f6k 6kiw 
+shearwater,ARID1A,O14497,307,2285,AF-O14497-F1-model_v2 1ryu 6lth 6ltj 
+shearwater,BRAF,P15056,99,766,AF-P15056-F1-model_v2 1uwh 1uwj 2fb8 3d4q 3idp 3ii5 3ny5 3og7 3ppj 3ppk 3prf 3pri 3psb 3psd 3q4c 3q96 3skc 3tv4 3tv6 4cqe 4dbn 4e26 4e4x 4ehe 4ehg 4fc0 4fk3 4g9c 4g9r 4h58 4ksp 4ksq 4mbj 4mne 4mnf 4pp7 4r5y 4rzw 4xv1 4xv2 4xv3 4yht 5c9c 5csw 5csx 5ct7 5fd2 5hi2 5hie 5ita 5j17 5j18 5j2r 5jrq 5jsm 5jt2 5val 5vam 5vyk 6b8u 6cad 6n0p 6n0q 6nsq 6nyb 6p7g 6pp9 6q0j 6q0k 6q0t 6u2g 6u2h 6uan 6uuo 6v2u 6v2w 6xag 6xlo 7m0t 7m0u 7m0v 7m0w 7m0x 7m0y 7m0z 
+shearwater,KCNH5,Q8NCM2,224,988,AF-Q8NCM2-F1-model_v2 
+shearwater,CR2,P20023,272,1033,AF-P20023-F1-model_v2 2gsx 3oed 
+shearwater,CASP8,Q14790,88,479,AF-Q14790-F1-model_v2 1f9e 1i4e 1qdu 1qtn 2c2z 2fun 2k7z 2y1l 3h11 3kjn 3kjq 4jj7 4prz 4ps1 5l08 6agw 6px9 
+shearwater,SUFU,Q9UMX1,58,484,AF-Q9UMX1-F1-model_v2 1m1l 4bl8 4bl9 4bla 4blb 4bld 4km8 4km9 4kmd 4kmh 
+shearwater,IRF6,O14896,66,467,AF-O14896-F1-model_v2 
+shearwater,SETD2,Q9BYW2,383,2564,AF-Q9BYW2-F1-model_v2 2a7o 4fmu 4h12 5jjy 5jlb 5jle 5lss 5lsx 5lsy 5lsz 5lt6 5lt7 5lt8 5v21 5v22 6j9j 6vdb 7ea8 7evr 7evs 7lzb 7lzd 7lzf 
+shearwater,FGFR1,P11362,137,822,AF-P11362-F1-model_v2 1agw 1cvs 1evt 1fgi 1fgk 1fq9 1xr0 2fgi 3c4f 3gqi 3gql 3js2 3kxx 3ky2 3rhx 3tt0 4f63 4f64 4f65 4nk9 4nka 4nks 4rwi 4rwj 4rwk 4rwl 4uwb 4uwc 4uwy 4v01 4v04 4v05 4wun 4zsa 5a46 5a4c 5am6 5am7 5b7v 5ew8 5flf 5o49 5o4a 5uq0 5ur1 5vnd 5w59 5z0s 5zv2 6c18 6c19 6c1b 6c1c 6c1o 6itj 6mzq 6mzw 6nvl 6p68 6p69 
+shearwater,AURKA,O14965,27,403,1mq4 1muo 1ol5 1ol6 1ol7 2bmc 2c6d 2c6e 2dwb 2j4z 2j50 2np8 2w1c 2w1d 2w1e 2w1f 2w1g 2wqe 2wtv 2wtw 2x6d 2x6e 2x81 2xne 2xng 2xru 3e5a 3efw 3fdn 3h0y 3h0z 3h10 3ha6 3k5u 3lau 3m11 3myg 3o50 3o51 3p9j 3qbn 3r21 3r22 3vap 3w16 3w18 3w2c 4b0g 4bn1 4byi 4byj 4c3p 4c3r 4ceg 4dhf 4j8m 4jai 4jaj 4jbp 4jbq 4o0s 4o0u 4o0w 4prj 4uyn 4uzd 4uzh 4zs0 4ztq 4ztr 4zts 5aad 5aae 5aaf 5aag 5dn3 5dnr 5dos 5dpv 5dr6 5dr9 5drd 5dt0 5dt3 5dt4 5ew9 5g15 5g1x 5l8j 5l8k 5l8l 5lxm 5obj 5obr 5one 5orl 5orn 5oro 5orp 5orr 5ors 5ort 5orv 5orw 5orx 5ory 5orz 5os0 5os1 5os2 5os3 5os4 5os5 5os6 5osd 5ose 5osf 5zan 6c2r 6c2t 6c83 6cpe 6cpf 6cpg 6gra 6i2u 6r49 6r4a 6r4b 6r4c 6r4d 6vpg 6vph 6vpl 6vpm 6xka 6z4y 7ayh 7ayi 7o2v 
+shearwater,MET,P08581,162,1390,AF-P08581-F1-model_v2 1fyr 1r0p 1r1w 1shy 2g15 2rfn 2rfs 2uzx 2uzy 2wd1 2wgj 2wkm 3a4p 3bux 3c1x 3ccn 3cd8 3ce3 3cth 3ctj 3dkf 3dkg 3efj 3efk 3f66 3f82 3i5n 3l8v 3lq8 3q6u 3q6w 3qti 3r7o 3rhk 3u6h 3u6i 3vw8 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4eev 4gg5 4gg7 4iwd 4k3j 4knb 4mxc 4o3t 4o3u 4r1v 4r1y 4xmo 4xyf 5dg5 5eob 5eyc 5eyd 5hlw 5hni 5ho6 5hoa 5hor 5hti 5lsp 5t3q 5uab 5uad 5ya5 6gcu 6i04 6sd9 6sdc 6sdd 6sde 6ubw 6wvz 7b3q 7b3t 7b3v 7b3w 7b3z 7b40 7b41 7b42 7b43 7b44 7mo7 7mo8 7mo9 7moa 7mob 
