@@ -50,9 +50,11 @@ class QSubRunner:
             result = process.communicate()
             print(result)  # e.g. Your job 588483 ("foldx-aggregate") has been submitted
             results = result[0].split(" ")
-            jobid = results[2]
-            if "." in jobid:
-                results = jobid.split(".")
-                jobid = results[0]
+            if len(results)>1:
+                jobid = results[2]
+                if "." in jobid:
+                    results = jobid.split(".")
+                    jobid = results[0]
+                    return jobid
                 return jobid
             return -1
