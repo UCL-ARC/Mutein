@@ -9,24 +9,32 @@ import subprocess
 
 
 class SubRunner:
-    def __init__(self, exe, work_dir,script, inputs):
+    def __init__(self, exe, curr_dir,work_dir,script,ext,inputs,isarray):
+        # need to add the array btach option here
         self.work_dir = work_dir
         self.args = []
-        if exe == "bash":  # it is a script if it is ""            
-            print("### SubRunner: chmod +x",script)
-            os.system("chmod +x " + work_dir+script)
+        self.args.append(exe) #0 arg=executable        
+        if not isarray:
+            sh_script_name = "pipeline_array.sh"        
+        else:
+            sh_script_name = "pipeline_single.sh"                  
+        py_script = curr_dir + work_dir + script + ".py"
         
-        self.args.append(exe)        
-        self.args.append(script)
-        self.args.append(work_dir)
-        inputss = inputs.split(" ")
-        for input in inputss:
-            self.args.append(input)
+        if exe == "bash":
+            exe_script = curr_dir + sh_script_name
+            print("### SubRunner: chmod +x",exe_script)
+            os.system("chmod +x " + exe_script)
+            self.args.append(exe_script) #1 arg=executable script     
+        else:
+            exe_script = curr_dir + work_dir + sh_script_name        
+            self.args.append(py_script) #1 arg=executable script          
+        
+        self.args.append(inputs) #2 arg=inputs
+        self.args.append(py_script) #3 arg=python script
+                        
 
     def run(self):
-        print("### SubRunner.Run():",self.args)
-        print("### SubRunner.Run(): changing directory to", self.work_dir)
-        os.chdir(self.work_dir)
+        print("### SubRunner.Run():",self.args)        
         print("### SubRunner.Run(): working dir", os.getcwd())        
         print("### SubRunner.Run() arguments",self.args)
         process = subprocess.Popen(

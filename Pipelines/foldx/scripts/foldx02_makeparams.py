@@ -29,10 +29,12 @@ def run_pipeline02(args):
     print("### FoldX make params job ###")
     print(args)
     argus = Arguments.Arguments(args)
+    dataset = argus.arg("dataset")
+    gene = argus.arg("gene")
     pdbcode = argus.arg("pdb")
-    pdb_path = Paths.Paths("pdb",dataset="",gene="",pdb=pdbcode)
-    pdb_config = Config.Config(pdb_path.pdb_inputs + "/config.yml")
-    argus.addConfig(pdb_config.params)
+    pdb_path = Paths.Paths("pdb",dataset=dataset,gene=gene,pdb=pdbcode)
+    #pdb_config = Config.Config(pdb_path.pdb_inputs + "/config.yml")
+    #argus.addConfig(pdb_config.params)
         
     work_path = pdb_path.pdb_thruputs + "params" + str(argus.arg("split")) + "/"
     argus.addConfig({"work_path": work_path})

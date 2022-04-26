@@ -45,7 +45,7 @@ import SubRunner as sub
 
 def overall_rsa(args):
     # The environment is loaded by arguments by default
-    argus = Arguments.Arguments([])
+    argus = Arguments.Arguments([],spaced=False)
     ret_array = []
     print("#### MUTEIN PIPELINE ####")
     # There are only 2 arguments
@@ -71,37 +71,37 @@ def overall_rsa(args):
             if pipe != None:
                 print('### yaml load|',pipe)
                 id = pipe["id"]
-                work_dir = pipe["work_dir"]
-                script = pipe["script"]
-                time = pipe["time"]
-                dependency = pipe["dependency"]
+                qsubid = pipe["qsub_id"]
+                work_dir = pipe["work_dir"].strip()
+                script = pipe["script"].strip()
+                time = pipe["time"].strip()
+                dependency = pipe["dependency"].strip()
                 array = pipe["array"]
-                inputs = pipe["inputs"]
-                batch_dic[str(id)] = (work_dir,script, time, dependency, array, inputs)
-                batch_list.append(str(id))
+                inputs = pipe["inputs"].strip()
+                active = pipe["active"].strip()=="Y"
+                if active:
+                    batch_dic[str(id)] = (qsubid,work_dir,script, time, dependency, array, inputs)
+                    batch_list.append(str(id))
 
     dependencies = {}
-    for id in batch_list:        
-        work_dir,script, time, dependency, array, inputs = batch_dic[id]
-        print("# overall pipeline script:",id,work_dir,script, time, dependency, array, inputs)        
+    for id in batch_list:
+        isarray =  int(array)>0
+        qsubid,work_dir,script, time, dependency, array, inputs = batch_dic[id]
+        print("# overall pipeline script:",id,qsubid,work_dir,script, time, dependency, array, inputs)        
         if "qsub" in py_or_sh:
             if dependency != -1:
                 if dependency in dependencies:                
-                    dependency = dependencies[id]
+                    dependency = dependencies[dependency]
                 else:
                     dependency = -1
-            runner = qsub.QSubRunner(script + ".sh", dir_path+work_dir,dependency,time,array,homeuser,inputs,py_or_sh!="qsub")
+            runner = qsub.QSubRunner(qsubid,script, dir_path,work_dir,dependency,time,array,homeuser,inputs,py_or_sh!="qsub")
             dep = runner.run()
             dependencies[id] = dep
         elif py_or_sh == "py":
-            runner = sub.SubRunner(argus.arg("pythonexe"),dir_path+work_dir,script+".py",inputs)
+            runner = sub.SubRunner(argus.arg("pythonexe"),dir_path,work_dir,script,".py",inputs,isarray)
             dep = runner.run()
-        elif py_or_sh == "sh":                                    
-            dirs = (script_path + "/" + script).split("/")[:-1]
-            #newpath = "/".join(dirs)                     
-            #print("# overall pipeline: changing directory to", newpath)
-            #os.chdir(newpath)
-            runner = sub.SubRunner("bash",dir_path+work_dir,script+".sh",inputs)
+        elif py_or_sh == "sh":                                                
+            runner = sub.SubRunner("bash",dir_path,work_dir,script,".sh",inputs,isarray)
             dep = runner.run()
 
 

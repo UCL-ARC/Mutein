@@ -25,6 +25,7 @@ import Paths
 import Arguments
 
 
+
 def run_pipeline(args):
     argus = Arguments.Arguments(args)
     dataset = argus.arg("dataset")
@@ -140,7 +141,8 @@ def run_pipeline(args):
                     dfp = gn.getPdbVariantCoverageDataFrame(pdb)
                     dfp.to_csv(pdb_path.pdb_inputs + "/variants.csv", index=False)
                     pdb.downloadPdb(pdb_path.pdb_inputs)
-                    gn.createPdbConfigYaml(pdb, pdb_path.pdb_inputs + "/config.yml")
+                    # I don't think I need the config yaml anymore with the new batch system
+                    #gn.createPdbConfigYaml(pdb, pdb_path.pdb_inputs + "/config.yml")
 
             # And save it all in the dataset output
             # we do this each time so that if it gets abandoned we knw where we were

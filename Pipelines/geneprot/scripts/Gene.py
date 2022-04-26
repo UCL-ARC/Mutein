@@ -66,6 +66,7 @@ class Gene:
         dic_coverage["gene"] = []
         dic_coverage["accession"] = []
         dic_coverage["pdb"] = []
+        dic_coverage["chain"] = []
         dic_coverage["method"] = []
         dic_coverage["resolution"] = []
         dic_coverage["coverage"] = []
@@ -74,6 +75,7 @@ class Gene:
             dic_coverage["gene"].append(self.gene)
             dic_coverage["accession"].append(self.accession)
             dic_coverage["pdb"].append(pdbcod)
+            dic_coverage["chain"].append(pdb.chain)
             dic_coverage["method"].append(pdb.getMethod())
             dic_coverage["resolution"].append(pdb.resolution)
             dic_coverage["coverage"].append(pdb.getSegments())
@@ -85,6 +87,7 @@ class Gene:
         dic_coverage["gene"] = []
         dic_coverage["accession"] = []
         dic_coverage["pdb"] = []
+        dic_coverage["chain"] = []
         dic_coverage["residue"] = []
         dic_coverage["mutation"] = []
         dic_coverage["variant"] = []
@@ -94,6 +97,7 @@ class Gene:
                 dic_coverage["gene"].append(self.gene)
                 dic_coverage["accession"].append(self.accession)
                 dic_coverage["pdb"].append(pdb.pdbcode)
+                dic_coverage["chain"].append(pdb.chain)
                 dic_coverage["residue"].append(vr.residue)
                 dic_coverage["mutation"].append(vrcod)
                 dic_coverage["variant"].append("ANY")

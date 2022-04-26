@@ -33,10 +33,12 @@ def run_pipeline01(args):
     # The inputs to this function are the pdbfile and the chain id (might optionally consider the positionscan mutation type)
     print("### FoldX repair job ###")
     argus = Arguments.Arguments(args)
+    dataset = argus.arg("dataset")
+    gene = argus.arg("gene")
     pdbcode = argus.arg("pdb")
-    pdb_path = Paths.Paths("pdb",dataset="",gene="",pdb=pdbcode)
-    pdb_config = Config.Config(pdb_path.pdb_inputs + "/config.yml")
-    argus.addConfig(pdb_config.params)
+    pdb_path = Paths.Paths("pdb",dataset=dataset,gene=gene,pdb=pdbcode)
+    #pdb_config = Config.Config(pdb_path.pdb_inputs + "/config.yml")
+    #argus.addConfig(pdb_config.params)
     
     repair_path = pdb_path.pdb_thruputs + "repair" + str(argus.arg("repairs")) + "/"    
     argus.addConfig({"repair_path":repair_path})

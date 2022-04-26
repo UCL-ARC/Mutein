@@ -9,7 +9,12 @@ import subprocess
 
 
 class QSubRunner:
-    def __init__(self, script,work_dir, dependency, time, array, homeuser, inputs, print_only):
+    def __init__(self, qsubid,script,dir_path,work_dir, dependency, time, array, homeuser, inputs, print_only):
+        isarray = int(array)>0
+        if isarray:
+            sh_script_name = "pipeline_array.sh"        
+        else:
+            sh_script_name = "pipeline_single.sh"                  
         os.system("chmod +x " + work_dir+script)
         self.print_only = print_only
         self.args = []
@@ -20,12 +25,18 @@ class QSubRunner:
         if int(array) > 0:
             self.args.append("-t")
             self.args.append("1-" + str(array))
+        self.args.append("-N")  # $ -N foldx-posscan
+        self.args.append(qsubid)#$ 
         self.args.append("-l")  # $ -l h_rt=5:00:0
         self.args.append("h_rt=" + time)
         self.args.append("-wd")  # $ -wd /home/ucbtlcr/Scratch/workspace
         self.args.append("/home/" + homeuser + "/Scratch/workspace")
-        self.args.append(work_dir+script)
+        if isarray:
+            self.args.append(dir_path+work_dir+script+".sh")
+        else:
+            self.args.append(dir_path+sh_script_name)
         self.args.append(work_dir)
+        self.args.append(dir_path+work_dir+script+".py")
         self.args.append(inputs)
 
     def run(self):

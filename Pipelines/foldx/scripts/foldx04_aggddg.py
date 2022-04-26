@@ -28,10 +28,12 @@ def run_pipeline04(args):
     print(args)
     ##############################################
     argus = Arguments.Arguments(args)
+    dataset = argus.arg("dataset")
+    gene = argus.arg("gene")
     pdbcode = argus.arg("pdb")
-    pdb_path = Paths.Paths("pdb",dataset="",gene="",pdb=pdbcode)
-    pdb_config = Config.Config(pdb_path.pdb_inputs + "/config.yml")
-    argus.addConfig(pdb_config.params) 
+    pdb_path = Paths.Paths("pdb",dataset=dataset,gene=gene,pdb=pdbcode)
+    #pdb_config = Config.Config(pdb_path.pdb_inputs + "/config.yml")
+    #argus.addConfig(pdb_config.params) 
 
     work_path = pdb_path.pdb_thruputs + "agg/"
     argus.params["work_path"] = work_path
@@ -53,14 +55,15 @@ def run_pipeline04(args):
     with open(ddg_file, "w") as fw:
         for r in range(rownum):
             jobresults_file = (
-                pdb_path.pdb_thruputs + str(argus.arg("split")) + "_row" + str(r + 1) + "/" + ddg_file
+                pdb_path.pdb_thruputs + str(argus.arg("split")) + "_" + str(r + 1) + "/" + ddg_file
             )
             if os.path.exists(jobresults_file):
+                print("### foldx.aggregate",jobresults_file)
                 with open(jobresults_file) as fr:
                     jobcontent = fr.readlines()
                 fw.writelines(jobcontent)
             else:
-                print("No file")
+                print("No file",jobresults_file)
 
     # Make a dataframe
     aa_dict = {

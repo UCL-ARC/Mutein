@@ -15,9 +15,9 @@ import environments
 
 
 class Arguments:
-    def __init__(self, inputs, spaced=False):
-        print("Arguments")
+    def __init__(self, inputs, spaced=True):        
         # combine config and job input params
+        print("### Arguments",inputs)
         if spaced:
             self.params = self.spacedparams(inputs)
         else:
@@ -64,7 +64,7 @@ class Arguments:
 
     def spacedparams(self, argvs):
         params = {}
-        argvss = argvs[1].split(" ")
+        argvss = argvs[1].split("@")
         for i in range(0, len(argvss)):
             arg = argvss[i]
             params = self.addlinetoparams(arg, params)

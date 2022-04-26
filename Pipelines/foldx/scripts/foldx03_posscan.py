@@ -34,51 +34,45 @@ def run_pipeline03(args):
     print("### FoldX position scan job ###")
     print(args)
     argus = Arguments.Arguments(args)
+    dataset = argus.arg("dataset")
+    gene = argus.arg("gene")
     pdbcode = argus.arg("pdb")
-    pdb_path = Paths.Paths("pdb",dataset="",gene="",pdb=pdbcode)
-    pdb_config = Config.Config(pdb_path.pdb_inputs + "/config.yml")
-    argus.addConfig(pdb_config.params)    
-    row = argus.arg("row","row0")
-    mutation_string = argus.arg("mutation")
+    pdb_path = Paths.Paths("pdb",dataset=dataset,gene=gene,pdb=pdbcode)
+    #pdb_config = Config.Config(pdb_path.pdb_inputs + "/config.yml")
+    #argus.addConfig(pdb_config.params)    
+    task = argus.arg("task","none")
+    mutation_string = argus.arg("mutation","none")
     ############################################
     pdbfile = pdbcode + "_rep" + str(argus.arg("repairs")) + ".pdb"
     mutations = []
-    # row=. means all, row=1:n means an explicit row, row=0 means the mutation string has been passd in explicitly
-    if mutation_string == ".":
+    # task=all means all, task=1:n means an explicit row, row=-1 means the mutation string has been passd in explicitly
+    if mutation_string == "none":
         filename = pdb_path.pdb_thruputs + "params_" + str(argus.arg("split")) + ".txt"
         print("open", filename)
         with open(filename) as fr:
             paramscontent = fr.readlines()
-            for row in paramscontent:
-                row = row.strip()
-                print(row)
+            if task == "all":
+                for row in paramscontent:
+                    row = row.strip()
+                    print(row)
+                    rowvals = row.split(" ")
+                    mutation = rowvals[2]
+                    row = rowvals[3]
+                    mutations.append([mutation, row])
+            else:
+                row = paramscontent[int(task) - 1].strip()                
                 rowvals = row.split(" ")
                 mutation = rowvals[2]
                 row = rowvals[3]
-                mutations.append([mutation, row])
-    elif row[0] == "0":
-        # we have specified a mutation and a non-file row num
-        mutations.append([mutation_string, "row" + str(row)])
-    elif row[:3] == "row":
-        # we have specified a mutation and row from the file
-        mutations.append([mutation_string, row])
+                mutations.append([mutation, row])    
     else:
-        # we have specified a numerical row in the file
-        filename = argus.arg("interim_path") + "params.txt"
-        print("open", filename)
-        with open(filename) as fr:
-            paramscontent = fr.readlines()
-            row = paramscontent[int(row) - 1].strip()
-            print(row)
-            rowvals = row.split(" ")
-            mutation = rowvals[2]
-            row = rowvals[3]
-            mutations.append([mutation, row])
-
+        # we have specified a mutation and row from the file
+        mutations.append([mutation_string, 0])
+    
     for mut, row in mutations:
         print(mut, row)
 
-        row_path = pdb_path.pdb_thruputs + str(argus.arg("split")) + "_" + row + "/"
+        row_path = pdb_path.pdb_thruputs + str(argus.arg("split")) + "_" + str(row) + "/"
         print("### ... change directory", row_path)
         argus.params["thisrow"] = row
         argus.params["thismut"] = mut

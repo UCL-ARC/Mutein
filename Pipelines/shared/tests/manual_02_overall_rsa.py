@@ -23,14 +23,15 @@ def test_pipeline(method, batch_file):
     import overall_rsa as pipe
     args = [
         "",
-        batch_file,                        
+        batch_file,                           
         method
     ]
     pipe.overall_rsa(args)
 
 
 ######################################
-#test_pipeline("qsub")
-#test_pipeline("qsub_tst")
-test_pipeline("py","batch_tst02.yml")
-#test_pipeline("sh")
+#test_pipeline("qsub","batch_tst02.yml")
+#test_pipeline("qsub_tst","batch_tst02.yml")
+#test_pipeline("py","batch_tst02.yml")
+test_pipeline("sh","batch_tst02.yml")
+
