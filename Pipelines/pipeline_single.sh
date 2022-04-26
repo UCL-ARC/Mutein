@@ -25,7 +25,7 @@ workspace=$3
 echo "SCRIPT=$script"
 echo "PYSCRIPT=$pyscript"
 echo "INPUTS=$inputs"
-
+echo "INPUTS=$workspace"
 cd $workspace
 echo "CURRENT=$PWD"
 # Load the necessary python libraries
