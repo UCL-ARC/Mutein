@@ -9,13 +9,14 @@ import subprocess
 
 
 class QSubRunner:
-    def __init__(self, qsubid,script,dir_path,work_dir, dependency, time, array, homeuser, inputs, print_only):
+    def __init__(self, runid,qsubid,script,dir_path,work_dir, dependency, time, array, homeuser, inputs, print_only):
         isarray = int(array)>0
         if isarray:
             sh_script_name = "pipeline_array.sh"        
         else:
             sh_script_name = "pipeline_single.sh"                  
         os.system("chmod +x " + sh_script_name)
+        self.runid=runid
         self.print_only = print_only
         self.args = []
         self.args.append("qsub")
@@ -39,6 +40,7 @@ class QSubRunner:
     def run(self):
         if self.print_only:
             print("### QSub.Run() print only",self.args)
+            return self.runid
         else:
             #print("### QSub.Run(): working dir", os.getcwd())                
             print("### QSub.Run()",self.args)

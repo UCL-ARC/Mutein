@@ -1,5 +1,5 @@
 ---
-id: 'F1'
+id: 'Foldx1'
 qsub_id: 'foldx_repair'
 work_dir: 'foldx/scripts/'
 script: 'foldx01_repair'
@@ -9,32 +9,32 @@ array: 0
 inputs: "dataset=notch@gene=NOTCH1@pdb=6py8@repairs=2"
 active: 'Y'
 ---
-id: 'F2'
+id: 'Foldx2'
 qsub_id: 'foldx_params'
 work_dir: 'foldx/scripts/'
 script: 'foldx02_makeparams'
 time: '3:00:0'
-dependency: 'F1'
+dependency: 'Foldx1'
 array: 0
 inputs: "dataset=notch@gene=NOTCH1@pdb=6py8@repairs=2@split=10@chain=F"
 active: 'Y'
 ---
-id: 'F3'
+id: 'Foldx3'
 qsub_id: 'foldx_posscan'
 work_dir: 'foldx/scripts/'
 script: 'foldx03_posscan'
 time: '3:00:0'
-dependency: 'F2'
+dependency: 'Foldx2'
 array: 25
 inputs: "dataset=notch@gene=NOTCH1@pdb=6py8@repairs=2@split=10@chain=F"
 active: 'Y'
 ---
-id: 'F4'
+id: 'Foldx4'
 qsub_id: 'foldx_agg'
 work_dir: 'foldx/scripts/'
 script: 'foldx04_aggddg'
 time: '3:00:0'
-dependency: 'F3'
+dependency: 'Foldx3'
 array: 0
 inputs: "dataset=notch@gene=NOTCH1@pdb=6py8@repairs=2@split=10@chain=F"
 active: 'Y'

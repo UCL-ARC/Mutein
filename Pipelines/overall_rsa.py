@@ -87,17 +87,15 @@ def overall_rsa(args):
     for id in batch_list:
         isarray =  int(array)>0
         qsubid,work_dir,script, time, dependency, array, inputs = batch_dic[id]
-        print("# overall pipeline script:",id,qsubid,work_dir,script, time, dependency, array, inputs)        
+        #print("# overall pipeline script:",id,qsubid,work_dir,script, time, dependency, array, inputs)        
         if "qsub" in py_or_sh:
             dep = -1
             if str(dependency) != "-1":
                 if dependency in dependencies:                
                     dep = dependencies[dependency]
                 else:
-                    dep = -1
-            print(dependency,dep)
-            
-            runner = qsub.QSubRunner(qsubid,script, dir_path,work_dir,dep,time,array,homeuser,inputs,py_or_sh!="qsub")
+                    dep = -1            
+            runner = qsub.QSubRunner(id,qsubid,script, dir_path,work_dir,dep,time,array,homeuser,inputs,py_or_sh!="qsub")
             dep = runner.run()
             dependencies[id] = dep
         elif py_or_sh == "py":
