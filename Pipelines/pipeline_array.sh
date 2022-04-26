@@ -25,6 +25,7 @@ workspace=$3
 echo "SCRIPT=$script"
 echo "PYSCRIPT=$pyscript"
 echo "INPUTS=$inputs"
+echo "TASKNUM=$SGE_TASK_ID"
 
 cd $workspace
 echo "CURRENT=$PWD"
