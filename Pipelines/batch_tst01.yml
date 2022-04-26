@@ -1,5 +1,6 @@
 ---
 id: '1'
+qsub_id: 'geneprot02'
 work_dir: 'geneprot/scripts/'
 script: 'pipeline02_genestoproteins'
 time: '3:00:0'
