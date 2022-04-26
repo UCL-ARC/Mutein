@@ -31,6 +31,7 @@ class SubRunner:
         
         self.args.append(inputs) #2 arg=inputs
         self.args.append(py_script) #3 arg=python script
+        self.args.append(curr_dir+work_dir) #4 workspace
                         
 
     def run(self):

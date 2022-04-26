@@ -35,6 +35,7 @@ class QSubRunner:
         self.args.append(sh_script_name) #1 executable script               
         self.args.append(inputs) #2 inputs
         self.args.append(script+".py") #3 pyscript
+        self.args.append(dir_path+work_dir) #4 workspace
         
 
     def run(self):

@@ -20,10 +20,13 @@ echo "~~~~~~~~~~~~~~~~~~ Parameters passed to the script ~~~~~~~~~~~~~~~~~~~~~~~
 script=$0
 inputs=$1
 pyscript=$2
+workspace=$3
 
 echo "SCRIPT=$script"
 echo "PYSCRIPT=$pyscript"
 echo "INPUTS=$inputs"
+
+cd $workspace
 echo "CURRENT=$PWD"
 # Load the necessary python libraries
 module load python3/recommended
