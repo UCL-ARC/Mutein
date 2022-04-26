@@ -30,11 +30,8 @@ class QSubRunner:
         self.args.append("-l")  # $ -l h_rt=5:00:0
         self.args.append("h_rt=" + time)
         self.args.append("-wd")  # $ -wd /home/ucbtlcr/Scratch/workspace
-        self.args.append("/home/" + homeuser + "/Scratch/workspace")
-        if isarray:
-            self.args.append(dir_path+work_dir+script+".sh")
-        else:
-            self.args.append(dir_path+sh_script_name)
+        self.args.append("/home/" + homeuser + "/Scratch/workspace")        
+        self.args.append(sh_script_name)        
         self.args.append(work_dir)
         self.args.append(dir_path+work_dir+script+".py")
         self.args.append(inputs)
