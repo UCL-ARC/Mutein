@@ -19,7 +19,7 @@ class QSubRunner:
         self.runid=runid
         self.print_only = print_only
         self.args = []
-        self.args.append("qsub")
+        self.args.append("qsub") #0 executable
         if str(dependency) != "-1":
             self.args.append("-hold_jid")
             self.args.append(dependency)
@@ -32,10 +32,10 @@ class QSubRunner:
         self.args.append("h_rt=" + time)
         self.args.append("-wd")  # $ -wd /home/ucbtlcr/Scratch/workspace
         self.args.append("/home/" + homeuser + "/Scratch/workspace")        
-        self.args.append(sh_script_name)        
-        self.args.append(work_dir)
-        self.args.append(dir_path+work_dir+script+".py")
-        self.args.append(inputs)
+        self.args.append(sh_script_name) #1 executable script               
+        self.args.append(inputs) #2 inputs
+        self.args.append(script+".py") #3 pyscript
+        
 
     def run(self):
         if self.print_only:
