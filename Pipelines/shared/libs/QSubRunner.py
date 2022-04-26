@@ -15,7 +15,7 @@ class QSubRunner:
             sh_script_name = "pipeline_array.sh"        
         else:
             sh_script_name = "pipeline_single.sh"                  
-        os.system("chmod +x " + work_dir+script)
+        os.system("chmod +x " + sh_script_name)
         self.print_only = print_only
         self.args = []
         self.args.append("qsub")
@@ -43,7 +43,7 @@ class QSubRunner:
         if self.print_only:
             print("### QSub.Run() print only",self.args)
         else:
-            print("### QSub.Run(): working dir", os.getcwd())                
+            #print("### QSub.Run(): working dir", os.getcwd())                
             print("### QSub.Run()",self.args)
             process = subprocess.Popen(
                 args=self.args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
