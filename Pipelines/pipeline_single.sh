@@ -30,6 +30,7 @@ cd $workspace
 echo "CURRENT=$PWD"
 # Load the necessary python libraries
 module load python3/recommended
+module load foldx
 echo "~~~~~~~~~~~~~~~~~~ Call python script ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 python "$pyscript" $inputs
 
