@@ -51,7 +51,7 @@ def run_pipeline03(args):
         print("open", filename)
         with open(filename) as fr:
             paramscontent = fr.readlines()
-            if task == "all":
+            if task == "all":                
                 for row in paramscontent:
                     row = row.strip()
                     print(row)

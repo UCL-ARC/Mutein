@@ -128,7 +128,7 @@ def run_pipeline02(args):
             param_dic["chain"].append(chainid)
             param_dic["mutation"].append(mut)
             row += 1
-            param_dic["row"].append("row" + str(row))
+            param_dic["row"].append("" + str(row))
         else:
             param_dic["mutation"][row - 1] = param_dic["mutation"][row - 1] + "," + mut
         row_size += 1
