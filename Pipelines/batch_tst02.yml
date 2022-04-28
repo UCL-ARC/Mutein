@@ -57,7 +57,7 @@ time: '3:00:0'
 dependency: 'Foldx5'
 array: 10
 inputs: "dataset=notch@gene=NOTCH1@pdb=6py8@repairs=2@split=10@chain=F@variant=*@task=1"
-active: 'N'
+active: 'Y'
 ---
 id: 'Foldx7'
 qsub_id: 'foldx_varagg'
