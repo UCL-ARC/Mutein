@@ -69,4 +69,3 @@ dependency: 'Foldx6'
 array: 0
 inputs: inputs: "dataset=notch@gene=NOTCH1@pdb=af-p46531-f1-model_v2@repairs=5@split=20@chain=A@variant=*"
 active: 'Y'
----

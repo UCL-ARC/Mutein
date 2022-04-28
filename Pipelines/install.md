@@ -14,7 +14,7 @@ git checkout rachel/foldxv1
 ####### 3) "py" to run as a serial python script, "qsub" to submit qsub batches for parallel
 ```
 module load python3/recommended
-python3 overall_rsa.py batch_tst01.yml py
+python3 overall_rsa.py batch_notch_alpha.yml qsub
 ```
 #### 3) GeneProt: This starts with I think a vcf file and ends with the protein structures
 #### 4) FoldX: This pipeline takes a pdb file and a list of mutations and creates xxxx
