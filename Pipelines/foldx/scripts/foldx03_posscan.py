@@ -95,10 +95,8 @@ def run_pipeline03(args):
         foldxcommand += " --pdb=" + pdbfile
         foldxcommand += " --positions=" + mut
 
-        print(foldxcommand)
-        print("RealOrTest=", argus.arg("env"))
-        if argus.arg("env") != "inputs":
-            os.system(foldxcommand)
+        print("### foldx cmd=", foldxcommand)        
+        os.system(foldxcommand)
 
 
 ##########################################################################################

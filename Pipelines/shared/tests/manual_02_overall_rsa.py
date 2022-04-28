@@ -31,7 +31,7 @@ def test_pipeline(method, batch_file):
 
 ######################################
 #test_pipeline("qsub","batch_tst02.yml")
-test_pipeline("qsub_tst","batch_tst02.yml")
-#test_pipeline("py","batch_tst02.yml")
+#test_pipeline("qsub_tst","batch_tst02.yml")
+test_pipeline("py","batch_tst02.yml")
 #test_pipeline("sh","batch_tst02.yml")
 

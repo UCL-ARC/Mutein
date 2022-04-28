@@ -141,6 +141,7 @@ def run_pipeline02(args):
     ##### Turn the dictionary into a dataframe
     data_params = pd.DataFrame.from_dict(param_dic)
     filename = pdb_path.pdb_thruputs + "params_" + str(argus.arg("split")) + ".txt"
+    print("### foldx02: ... savig df",filename)
     data_params.to_csv(filename, index=False, sep=" ", header=False)
 
 
