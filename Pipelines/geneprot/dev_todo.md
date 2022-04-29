@@ -8,10 +8,9 @@ python -m black Pipelines/shared/lib/*.py
 - Run the manual regression tests
 
 #### dev todo list
-- The override of the time or array for a batch needs to make sense
-- need to make sure the covid batch still works on hpc
 - need to scope out how long things could take
-- I might need to change the scripts now to be HPC-splittable on a per-gene basis?
+- how do I run and aggregate multiple structures for a gene?
+- need a yaml that takes papramaters and lists
 
 
 -------------------------------------------------------------------
@@ -23,6 +22,9 @@ TODO
 - Do a full test on notch1, human and mouse
 - The tests no longer work 
 DONE
+- Batches are now defined in the pieline directory in yaml without the overrides
+- need to make sure the covid batch still works on hpc
+
 
 -------------------------------------------------------------------
 Sprint #2
