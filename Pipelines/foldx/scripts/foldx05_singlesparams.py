@@ -76,14 +76,15 @@ def run_pipeline05(args):
     row = 0
     for i in range(len(mut_list)):
         mut = mut_list[i]
+        mutscan = mut[0]+chainid+mut[1:]#format for posscan
         if row_size == 0:
             param_dic["pdb"].append(pdb)
             param_dic["chain"].append(chainid)
-            param_dic["mutation"].append(mut[0]+chainid+mut[1:])
+            param_dic["mutation"].append(mutscan)
             row += 1
             param_dic["row"].append("" + str(row))
         else:
-            param_dic["mutation"][row - 1] = param_dic["mutation"][row - 1] + "," + mut
+            param_dic["mutation"][row - 1] = param_dic["mutation"][row - 1] + "," + mutscan
         row_size += 1
 
         if row_size == chunk and row > remainder:
