@@ -149,7 +149,7 @@ def run_pipeline04(args):
     import matplotlib.pyplot as plt
     import seaborn as sns
 
-    fig, (ax1, ax2) = plt.subplots(1, 2)
+    fig, (ax1, ax2,ax3) = plt.subplots(1, 2,3)
     fig.suptitle(
         argus.arg("pdb")
         + " background mutations\nddg <-1=stabilising >2.5=destabilising"
@@ -159,15 +159,22 @@ def run_pipeline04(args):
     yax = "mut"
     hue = "ddg"
 
-    # first plt
+    ### first plt ######
     sns.histplot(data=ddg_df, x="ddg", palette="tab20", ax=ax1, bins=50)
     ax1.set_ylabel("")
-    # ax1.set_title('ddg >2.5 destabilising')
+    
+    ###  second plt ######
+    # if ddg > 10 just make it 20 so we can better see the histogram
+    ddg_df_clipped = ddg_df
+    ddg_df_clipped.ddg.clip(upper=10)
+    sns.histplot(data=ddg_df_clipped, x="ddg max=20", palette="tab20", ax=ax2, bins=50)
+    ax2.set_ylabel("")
 
+    ###  third plt ######
     vmin = -2.5  # ddg_df[hue].min() #they have defined >2.5 as destabilising
     vmax = -1 * vmin
     ddg_df = ddg_df.sort_values(by=yax, ascending=False)
-    g = ax2.scatter(
+    g = ax3.scatter(
         ddg_df[xax],
         ddg_df[yax],
         c=ddg_df[hue],
@@ -181,8 +188,8 @@ def run_pipeline04(args):
     )
     cb = plt.colorbar(g, extend="both")
     cb.set_label(hue)
-    ax2.set_xlabel("residue no")
-    ax2.set_ylabel("")
+    ax3.set_xlabel("residue no")
+    ax3.set_ylabel("")
     # plt.legend(title=hue,bbox_to_anchor=(1.01, 1), loc=2, borderaxespad=0.,shadow=False,fancybox=False)  # Put the legend out of the figure
 
     plot_file = (

@@ -35,9 +35,10 @@ def test_pipeline(method, batch_file,dataset,gene,pdb,chain):
 
 ######################################
 ## Tests for the geneprot
-test_pipeline("py","batch_tst01.yml","notch","NOTCH1","","")
+#test_pipeline("py","batch_tst01.yml","notch","NOTCH1","","")
 
 ## Tests for the pdb
+test_pipeline("py","batch_pdb.yml","notch","NOTCH1","1toz","A")
 #test_pipeline("qsub","batch_tst02.yml")
 #test_pipeline("qsub_tst","batch_tst02.yml")
 #test_pipeline("py","batch_tst02.yml")
