@@ -60,11 +60,12 @@ def run_pipeline03(args):
                     row = rowvals[3]
                     mutations.append([mutation, row])
             else:
-                row = paramscontent[int(task) - 1].strip()                
-                rowvals = row.split(" ")
-                mutation = rowvals[2]
-                row = rowvals[3]
-                mutations.append([mutation, row])    
+                if int(task) >= len(paramscontent)
+                    row = paramscontent[int(task) - 1].strip()                
+                    rowvals = row.split(" ")
+                    mutation = rowvals[2]
+                    row = rowvals[3]
+                    mutations.append([mutation, row])    
     else:
         # we have specified a mutation and row from the file
         mutations.append([mutation_string, 0])

@@ -128,8 +128,8 @@ def run_pipeline(args):
                             if chain != "":
                                 bm.addBatch(script_file,yaml_file,dataset,gene,pdb,chain)
                 
-                bm.printBatchScript(gene_path.gene_outputs + "/pipeline_gene_" + gene + ".sh")
-                bm.printBatchScript(gene_path.pipeline_path + "/pipeline_gene_" + gene + ".sh")
+                bm.printBatchScript(gene_path.gene_outputs + "/pipeline_"+dataset+"_"+ gene + ".sh")
+                bm.printBatchScript(gene_path.pipeline_path + "/pipeline_"+dataset+"_"+ gene + ".sh")
                             
             # having found our collection of genes with assopciated pdbs and variants we can now create the pdb datasets
             # for gn in genes:
