@@ -155,7 +155,7 @@ def run_pipeline04(args):
     )
 
     ana = Analysis.Analysis(ddg_df,argus.arg("pdb"))
-    ana.createDdgResidue(plot_file)
+    ana.createDdgResidue(plot_file,"background")
     
     print("### COMPLETED FoldX aggregate job ###")
 

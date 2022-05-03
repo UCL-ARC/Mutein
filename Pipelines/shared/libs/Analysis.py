@@ -10,14 +10,15 @@ class Analysis:
     def __init__(self,df,pdb):        
         self.df = df
         self.pdb = pdb
+        self.count=len(self.df.index)
     
-    def createDdgResidue(self,file_path):
+    def createDdgResidue(self,file_path,title_type):
         # And save something visual as a starting point for some analysis        
         import matplotlib.pyplot as plt
         import seaborn as sns
 
         fig, (ax1,ax2,ax3) = plt.subplots(1, 3)
-        fig.suptitle(self.pdb + " variant mutations\nddg <-1=stabilising >2.5=destabilising")
+        fig.suptitle(self.pdb + " " + title_type + " mutations ("+str(self.count)+")\nddg <-1=stabilising >2.5=destabilising")
 
         xax = "rid"
         yax = "mut"

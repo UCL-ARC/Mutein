@@ -8,13 +8,14 @@ git pull
 git checkout rachel/foldxv1
 ```
 #### 2) Navigate to the Pipelines directory and run the script, first installing python mods
-##### There are 3 choices:
-####### 1) The script itself
-####### 2) The config
-####### 3) "py" to run as a serial python script, "qsub" to submit qsub batches for parallel
 ```
 module load python3/recommended
-python3 overall_rsa.py batch_notch_alpha.yml qsub
+```
+##### There are a few choices:
+```
+sh pipeline_covid.sh
+sh pipeline_notch.sh
+sh pipeline_notch_NOTCH1.sh
 ```
 #### 3) GeneProt: This starts with I think a vcf file and ends with the protein structures
 #### 4) FoldX: This pipeline takes a pdb file and a list of mutations and creates xxxx
