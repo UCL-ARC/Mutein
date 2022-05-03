@@ -34,10 +34,10 @@ class Arguments:
             )
         self.addConfig(envs)
 
-    def arg(self, param, override=""):
+    def arg(self, param, override=None):
         if param in self.params:
             return self.params[param]
-        elif override != "":
+        elif override != None:
             self.params[param] = override
             return override
         else:

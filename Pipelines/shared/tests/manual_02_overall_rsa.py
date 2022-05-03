@@ -18,21 +18,28 @@ def addpath():
     
 
 
-def test_pipeline(method, batch_file):
+def test_pipeline(method, batch_file,dataset,gene,pdb):
     addpath()
     import overall_rsa as pipe
     args = [
         "",
         batch_file,                           
-        method
+        method,
+        dataset,
+        gene,
+        pdb
     ]
     pipe.overall_rsa(args)
 
 
 ######################################
+## Tests for the geneprot
+test_pipeline("qsub_tst","batch_tst01.yml","notch","NOTCH1","")
+
+## Tests for the pdb
 #test_pipeline("qsub","batch_tst02.yml")
 #test_pipeline("qsub_tst","batch_tst02.yml")
 #test_pipeline("py","batch_tst02.yml")
-test_pipeline("qsub_tst","batch_notch_alpha.yml")
+#test_pipeline("qsub_tst","batch_notch_alpha.yml")
 #test_pipeline("sh","batch_tst02.yml")
 

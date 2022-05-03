@@ -45,12 +45,23 @@ import SubRunner as sub
 
 def overall_rsa(args):
     # The environment is loaded by arguments by default
-    argus = Arguments.Arguments([],spaced=False)
-    ret_array = []
-    print("#### MUTEIN PIPELINE ####")
-    # There are only 2 arguments
+    print("ARGS=",args)
+    argus = Arguments.Arguments(args,spaced=False)
+    
+
+    # There are 5 arguments
     yaml_file = args[1] #1) a yaml file path with the batch definition    
     py_or_sh = args[2] #2) qsub or py or sh for python or hpc batch or just sh
+    # everything is defined in the yaml APART from dataset, gene, pdb        
+    dataset,gene,pdb = "","",""
+    if len(args) > 2:
+        dataset = args[3] #3) dataset
+    if len(args) > 3:
+        gene = args[4] #4) gene
+    if len(args) > 4:
+        pdb = args[5] #5) pdb
+    print("#### MUTEIN PIPELINE ####", yaml_file,py_or_sh, dataset, gene, pdb)
+
     # We want the user
     homeuser = pwd.getpwuid(os.getuid())[0]
     print("HomeUser=", homeuser)
@@ -79,6 +90,12 @@ def overall_rsa(args):
                 array = pipe["array"]
                 inputs = pipe["inputs"].strip()
                 active = pipe["active"].strip()=="Y"
+                # add the dataset, gene and pdb onto inputs
+                if len(inputs) > 0:
+                    inputs += "@"
+                inputs += "dataset=" + dataset
+                inputs += "@gene=" + gene
+                inputs += "@pdb=" + pdb
                 if active:
                     batch_dic[str(id)] = (qsubid,work_dir,script, time, dependency, array, inputs)
                     batch_list.append(str(id))

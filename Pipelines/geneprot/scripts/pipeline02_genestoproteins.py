@@ -130,7 +130,7 @@ def run_pipeline(args):
             dfp.to_csv(gene_path.gene_outputs + "/pdb_coverage.csv", index=False)
 
             for pdbcod, pdb in gn.pdbs.items():
-                # print(pdb.pdbcode)
+                print("Gene contains:",pdb.pdbcode)
                 # only use x-ray and alphafold:
                 if (
                     True
