@@ -11,8 +11,7 @@
 #$ -l mem=4G
 #$ -l tmpfs=15G
 #
-# Email myself the job status
-#$ -m be
+# DONT Email myself the job status - too many, outlook told me off
 #
 # First we want to make sure we know what params have been passed to the script
 echo "~~~~~~~~~~~~~~~~~~ Parameters passed to the script ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"

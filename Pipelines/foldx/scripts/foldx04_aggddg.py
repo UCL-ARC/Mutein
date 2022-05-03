@@ -149,7 +149,7 @@ def run_pipeline04(args):
     import matplotlib.pyplot as plt
     import seaborn as sns
 
-    fig, (ax1, ax2,ax3) = plt.subplots(1, 2,3)
+    fig, (ax1, ax2,ax3) = plt.subplots(1,3)
     fig.suptitle(
         argus.arg("pdb")
         + " background mutations\nddg <-1=stabilising >2.5=destabilising"
@@ -164,11 +164,11 @@ def run_pipeline04(args):
     ax1.set_ylabel("")
     
     ###  second plt ######
-    # if ddg > 10 just make it 20 so we can better see the histogram
-    ddg_df_clipped = ddg_df
-    ddg_df_clipped.ddg.clip(upper=10)
-    sns.histplot(data=ddg_df_clipped, x="ddg max=20", palette="tab20", ax=ax2, bins=50)
+    ddg_df_clipped = ddg_df[['ddg']]
+    ddg_df_clipped['ddg'][ddg_df_clipped['ddg'] >= 10] = 10        
+    sns.histplot(data=ddg_df_clipped, x="ddg", palette="tab20", ax=ax2, bins=50)
     ax2.set_ylabel("")
+    ax2.set_xlabel("ddg max=10")
 
     ###  third plt ######
     vmin = -2.5  # ddg_df[hue].min() #they have defined >2.5 as destabilising
