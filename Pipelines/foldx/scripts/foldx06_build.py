@@ -24,60 +24,55 @@ sys.path.append(retpath)
 import Paths
 import Arguments
 import Config
-
+import Foldx
 
 
 def run_pipeline06(args):
     print("### FoldX build job ###")
-    print(args)
-    argus = Arguments.Arguments(args)    
+    print(args)    
+    argus = Arguments.Arguments(args)
+    dataset = argus.arg("dataset")
+    gene = argus.arg("gene")
     pdbcode = argus.arg("pdb")
-    pdb_path = Paths.Paths("pdb",dataset="",gene="",pdb=pdbcode)
-    pdb_config = Config.Config(pdb_path.pdb_inputs + "/config.yml")
-    argus.addConfig(pdb_config.params)          
-    pdb = argus.arg("pdb")
-    row = argus.arg("row","row0")
-    mutation_string = argus.arg("mutation")
+    pdb_path = Paths.Paths("pdb",dataset=dataset,gene=gene,pdb=pdbcode)
+    #pdb_config = Config.Config(pdb_path.pdb_inputs + "/config.yml")
+    #argus.addConfig(pdb_config.params)    
+    task = argus.arg("task","none")
+    mutation_string = argus.arg("mutation","none")
+
     ############################################
     # set up the files and directories
-    pdbfile = pdb + "_rep" + str(argus.arg("repairs")) + ".pdb"
+    pdbfile = pdbcode + "_rep" + str(argus.arg("repairs")) + ".pdb"
     mutations = []
 
-    if mutation_string == ".":
-        filename = pdb_path.pdb_thruputs + "variant_params.txt"
+    if mutation_string == "none":
+        filename = pdb_path.pdb_thruputs + "singles_" + str(argus.arg("split")) + ".txt"
         print("open", filename)
         with open(filename) as fr:
             paramscontent = fr.readlines()
-            for row in paramscontent:
-                row = row.strip()
-                print(row)
+            if task == "all":                
+                for row in paramscontent:
+                    row = row.strip()
+                    print(row)
+                    rowvals = row.split(" ")
+                    mutation = rowvals[2]
+                    row = rowvals[3]
+                    mutations.append([mutation, row])
+            else:
+                row = paramscontent[int(task) - 1].strip()                
                 rowvals = row.split(" ")
                 mutation = rowvals[2]
                 row = rowvals[3]
-                mutations.append([mutation, row])
-    elif row[0] == "0":
-        # we have specified a mutation and a non-file row num
-        mutations.append([mutation_string, "row" + str(row)])
-    elif row[:3] == "row":
-        # we have specified a mutation and row from the file
-        mutations.append([mutation_string, row])
+                mutations.append([mutation, row])    
     else:
-        # we have specified a numerical row in the file
-        filename = argus.arg("interim_path") + "params.txt"
-        print("open", filename)
-        with open(filename) as fr:
-            paramscontent = fr.readlines()
-            row = paramscontent[int(row) - 1].strip()
-            print(row)
-            rowvals = row.split(" ")
-            mutation = rowvals[2]
-            row = rowvals[3]
-            mutations.append([mutation, row])
+        # we have specified a mutation and row from the file
+        mutations.append([mutation_string, 0])
 
     for mut, row in mutations:
-        # put mutation into a file
-        row_path = pdb_path.pdb_thruputs + row + "/"
-        print("### foldx06: ... change directory", row_path)
+        print(mut, row)
+
+        row_path = pdb_path.pdb_thruputs + str(argus.arg("split")) + "_" + str(row) + "_build" + "/"
+        print("### ... change directory", row_path)
         argus.params["thisrow"] = row
         argus.params["thismut"] = mut
         pdb_path.goto_job_dir(row_path, args, argus.params, "_inputs06")
@@ -87,29 +82,12 @@ def run_pipeline06(args):
             row_path + pdbfile,
         )
         copyfile(pdb_path.pdb_thruputs + pdbfile, row_path + pdbfile)
-        mut_fl = "individual_list.txt"
-        mut_log = "buildmodel.log"
-        with open(mut_fl, "w") as fw:
-            fw.write(mut)
-        # ~/UCL/libs/foldx5/foldx --command=BuildModel --ionStrength=0.05 --pH=7
-        #  --water=CRYSTAL --vdwDesign=2 --pdbHydrogens=false --numberOfRuns=15 --mutant-file=mutations.txt
-        #  --pdb=6vxx_rep.pdb > buildmodel.log
-        foldxcommand = argus.arg("foldxe") + " --command=BuildModel"
-        foldxcommand += " --ionStrength=0.05"
-        foldxcommand += " --pH=7"
-        foldxcommand += " --water=CRYSTAL"
-        foldxcommand += " --vdwDesign=2"
-        foldxcommand += " --pdbHydrogens=false"
-        foldxcommand += " --numberOfRuns=15"
-        foldxcommand += " --mutant-file=" + mut_fl
-        foldxcommand += " --pdb=" + pdbfile
-        foldxcommand += " > " + mut_log
-        print()
-        print(foldxcommand)
-        print()
-        if "inputs" not in argus.arg("env"):
-            os.system(foldxcommand)
-
+    
+        fx_runner = Foldx.Foldx(argus.arg("foldxe"))    
+        fx_runner.runBuild(pdbfile,mut,15)    
+        ddg_file = row_path+"/Dif_" + pdbfile + ".fxout"
+        df_file = row_path+"/pdbfile_build_DDG.csv"        
+        fx_runner.createBuildCsv(pdbcode,mut,ddg_file,df_file,task)
 
 if __name__ == "__main__":
     import sys

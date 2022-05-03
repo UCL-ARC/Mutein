@@ -24,6 +24,7 @@ sys.path.append(retpath)
 import Paths
 import Arguments
 import Config
+import Foldx
 
 
 ##### INPUTS #############################################
@@ -85,19 +86,10 @@ def run_pipeline03(args):
         )
         copyfile(pdb_path.pdb_thruputs + pdbfile, row_path + pdbfile)
 
-        foldxcommand = argus.arg("foldxe") + " --command=PositionScan"
-        foldxcommand += " --ionStrength=0.05"
-        foldxcommand += " --pH=7"
-        foldxcommand += " --water=CRYSTAL"
-        foldxcommand += " --vdwDesign=2"
-        foldxcommand += " --pdbHydrogens=false"
-        # foldxcommand += ' --output-dir=' + results_dir
-        # foldxcommand += ' --pdb-dir=' + results_dir
-        foldxcommand += " --pdb=" + pdbfile
-        foldxcommand += " --positions=" + mut
+        fx_runner = Foldx.Foldx(argus.arg("foldxe"))    
+        fx_runner.runPosscan(pdbfile,mut)
 
-        print("### foldx cmd=", foldxcommand)        
-        os.system(foldxcommand)
+        
 
 
 ##########################################################################################

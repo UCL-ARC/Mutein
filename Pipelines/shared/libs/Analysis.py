@@ -12,7 +12,7 @@ class Analysis:
         self.pdb = pdb
     
     def createDdgResidue(self,file_path):
-        # And save something visual as a starting point for some analysis
+        # And save something visual as a starting point for some analysis        
         import matplotlib.pyplot as plt
         import seaborn as sns
 
@@ -56,8 +56,8 @@ class Analysis:
         cb.set_label(hue)
         ax3.set_xlabel("residue no")
         ax3.set_ylabel("")
-        # plt.legend(title=hue,bbox_to_anchor=(1.01, 1), loc=2, borderaxespad=0.,shadow=False,fancybox=False)  # Put the legend out of the figure
-        
+        # plt.legend(title=hue,bbox_to_anchor=(1.01, 1), loc=2, borderaxespad=0.,shadow=False,fancybox=False)  # Put the legend out of the figure        
         plt.savefig(file_path)
+        print("### Analysis:OutputDdgResidue to",file_path)
 
             

@@ -26,6 +26,7 @@ sys.path.append(retpath)
 import Paths
 import Arguments
 import Config
+import Foldx
 
 def run_pipeline01(args):
 
@@ -36,10 +37,7 @@ def run_pipeline01(args):
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
     pdbcode = argus.arg("pdb")
-    pdb_path = Paths.Paths("pdb",dataset=dataset,gene=gene,pdb=pdbcode)
-    #pdb_config = Config.Config(pdb_path.pdb_inputs + "/config.yml")
-    #argus.addConfig(pdb_config.params)
-    
+    pdb_path = Paths.Paths("pdb",dataset=dataset,gene=gene,pdb=pdbcode)        
     repair_path = pdb_path.pdb_thruputs + "repair" + str(argus.arg("repairs")) + "/"    
     argus.addConfig({"repair_path":repair_path})
     pdb_path.goto_job_dir(repair_path, args, argus.params, "_inputs01")
@@ -65,22 +63,14 @@ def run_pipeline01(args):
         repair_path + repairinnames[0],
     )
 
-    repairBaseA = argus.arg("foldxe") + " --command=RepairPDB --pdb="
-    repairBaseB = " --ionStrength=0.05 --pH=7 --vdwDesign=2 --pdbHydrogens=false"
-
-    # Run repair number one
+    # Create Foldx class
+    fx_runner = Foldx.Foldx(argus.arg("foldxe"))    
+    # Run desired number of repairs
     for r in range(numRepairs):
-        repaircommand = (
-            repairBaseA
-            + repairinnames[r]
-            + repairBaseB
-            + " > repair_"
-            + str(r)
-            + ".txt"
-        )
-        # repaircommand = repairBaseA + repairinnames[r]
-        print("### ... repair command #", r, repaircommand)
-        os.system(repaircommand)
+        pdb = repairinnames[r]
+        output_file = "repair_" + str(r) + ".txt"
+        fx_runner.runRepair(pdb,output_file)
+              
         print(
             "### foldx03:  ... copying file",
             argus.arg("repair_path") + repairoutnames[r],
