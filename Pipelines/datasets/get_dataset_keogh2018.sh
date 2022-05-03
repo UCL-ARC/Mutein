@@ -4,7 +4,7 @@
 # downloads the Keogh et al 2018 dataset
 # you must first manually download the metadata and accession list file as described below
 # save these two files under datasets/keogh2018 before running this script
-# currently requires: bash, sratools
+# currently requires: bash, enaBrowserTools
 #
 
 # in a browser visit: https://www.ncbi.nlm.nih.gov/sra/?term=SRP159015
@@ -22,15 +22,25 @@
 
 set -eu
 
-SRATOOLS_DIR=~/software/sratoolkit.3.0.0-centos_linux64/bin
+#SRATOOLS_DIR=~/software/sratoolkit.3.0.0-centos_linux64/bin
+ENATOOLS_DIR=~/software/enaBrowserTools/python3
 DATA_DIR=datasets/keogh2018
 ACC_FILE=SRR_Acc_List.txt
 
-export PATH=${SRATOOLS_DIR}:${PATH}
+#export PATH=${SRATOOLS_DIR}:${PATH}
+export PATH=${ENATOOLS_DIR}:${PATH}
+
+module load python3/recommended
 
 cd "${DATA_DIR}"
 
+for x in $(cat "${ACC_FILE}")
+do
+    enaDataGet -f fastq ${x}
+done
+
 #download compressed sra files using prefetch command
+#also download come metadata files which maybe we don't need
 #for x in $(cat "${ACC_FILE}")
 #do
 #    #prefetch --progress --resume yes --verify yes --max-size u --output-directory "${x}" "${x}"
@@ -47,9 +57,9 @@ cd "${DATA_DIR}"
 
 #might be original to EBI rather than NCBI?
 #https://www.ebi.ac.uk/ena/browser/text-search?query=SRP159015
-for x in $(cat "${ACC_FILE}")
-do
-    wget -c ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR776/005/${x}/${x}_1.fastq.gz
-    wget -c ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR776/005/${x}/${x}_2.fastq.gz
-    break
-done
+#for x in $(cat "${ACC_FILE}")
+#do
+#    wget -c ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR776/005/${x}/${x}_1.fastq.gz
+#    wget -c ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR776/005/${x}/${x}_2.fastq.gz
+#    break
+#done

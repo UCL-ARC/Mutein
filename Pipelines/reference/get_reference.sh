@@ -26,7 +26,7 @@ wget ${SRC_URL}/${MD5_FILE}
 wget ${SRC_URL}/${DOC_FILE}
 wget ${SRC_URL}/${REF_FILE}
 
-#extract just the relevant checksums
+#extract just the relevant checksum
 cat ${MD5_FILE} | grep -e "${REF_FILE}" > ${CHK_FILE}
 
 #perform the check
