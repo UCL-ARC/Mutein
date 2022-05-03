@@ -23,6 +23,7 @@ retpath = "/".join(dirs) + "/shared/libs"
 sys.path.append(retpath)
 import Paths
 import Arguments
+import BatchMaker
 
 
 
@@ -63,6 +64,7 @@ def run_pipeline(args):
                     wholeseq += sl
                 gn = Gene.Gene(gene, accession, wholeseq)
                 genes.append(gn)  # main repository for data we are creating in function
+                bm = BatchMaker.BatchMaker()
                 # CREATE the variants for the gene
                 vrs = gene_variant_dic[gene.upper()]
                 for i in range(len(vrs["bases"])):
@@ -120,7 +122,15 @@ def run_pipeline(args):
                             genetoprotein.removePdbStructure(
                                 url, pdb, gene_path.gene_outpdbs + pdb + ".pdb"
                             )
-
+                        else:
+                            script_file = "overall_rsa.py"
+                            yaml_file = "batch_pdb.yml"
+                            if chain != "":
+                                bm.addBatch(script_file,yaml_file,dataset,gene,pdb,chain)
+                
+                bm.printBatchScript(gene_path.gene_outputs + "/pipeline_gene_" + gene + ".sh")
+                bm.printBatchScript(gene_path.pipeline_path + "/pipeline_gene_" + gene + ".sh")
+                            
             # having found our collection of genes with assopciated pdbs and variants we can now create the pdb datasets
             # for gn in genes:
             # gene_path = Paths.Paths("geneprot",dataset=dataset,gene=gn.gene)

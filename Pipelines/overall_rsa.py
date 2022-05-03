@@ -49,18 +49,20 @@ def overall_rsa(args):
     argus = Arguments.Arguments(args,spaced=False)
     
 
-    # There are 5 arguments
+    # There are 6 arguments
     yaml_file = args[1] #1) a yaml file path with the batch definition    
     py_or_sh = args[2] #2) qsub or py or sh for python or hpc batch or just sh
     # everything is defined in the yaml APART from dataset, gene, pdb        
-    dataset,gene,pdb = "","",""
+    dataset,gene,pdb,chain = "","","",""
     if len(args) > 2:
         dataset = args[3] #3) dataset
     if len(args) > 3:
         gene = args[4] #4) gene
     if len(args) > 4:
         pdb = args[5] #5) pdb
-    print("#### MUTEIN PIPELINE ####", yaml_file,py_or_sh, dataset, gene, pdb)
+    if len(args) > 5:
+        chain = args[6] #6) chain
+    print("#### MUTEIN PIPELINE ####", yaml_file,py_or_sh, dataset, gene, pdb,chain)
 
     # We want the user
     homeuser = pwd.getpwuid(os.getuid())[0]
@@ -96,6 +98,7 @@ def overall_rsa(args):
                 inputs += "dataset=" + dataset
                 inputs += "@gene=" + gene
                 inputs += "@pdb=" + pdb
+                inputs += "@chain=" + chain
                 if active:
                     batch_dic[str(id)] = (qsubid,work_dir,script, time, dependency, array, inputs)
                     batch_list.append(str(id))

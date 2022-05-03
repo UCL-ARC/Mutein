@@ -18,7 +18,7 @@ class Paths:
 
         # there are levels of ids as many to 1 is slowly whittled down by dataset, gene, pdb and perhaps method (eg ddg or other)
         # [dataset] 1--* [gene] 1--* [pdb] 1--* [method]
-
+                
         # Create the dataset paths
         if "vcf" == level:
             # clean up first?
@@ -38,6 +38,7 @@ class Paths:
         # The path structure is relative to the script file (it will be easy to change to a given one)
         dir_script_path = os.path.dirname(os.path.realpath(__file__))
         dir_path = self.add_remove_path_levels(dir_script_path, 2)
+        self.pipeline_path = dir_path
 
         in_root_path = "/shared/data/inputs"
         self.add_remove_path_levels(dir_path, 0, dir=in_root_path)
@@ -66,6 +67,7 @@ class Paths:
         # The path structure is relative to the script file (it will be easy to change to a given one)
         dir_script_path = os.path.dirname(os.path.realpath(__file__))
         dir_path = self.add_remove_path_levels(dir_script_path, 2)
+        self.pipeline_path = dir_path
 
         in_root_path = "/shared/data/inputs"
         self.add_remove_path_levels(dir_path, 0, dir=in_root_path)
@@ -108,6 +110,7 @@ class Paths:
         # The path structure is relative to the script file (it will be easy to change to a given one)
         dir_script_path = os.path.dirname(os.path.realpath(__file__))
         dir_path = self.add_remove_path_levels(dir_script_path, 2)
+        self.pipeline_path = dir_path
 
         in_root_path = "/shared/data/inputs"
         self.add_remove_path_levels(dir_path, 0, dir=in_root_path)
