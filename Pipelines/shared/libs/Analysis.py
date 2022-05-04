@@ -4,7 +4,7 @@ This performs required analysis for the ddg
 
 """
 
-
+import numpy as np
 
 class Analysis:
     def __init__(self,df,pdb):        
@@ -30,10 +30,11 @@ class Analysis:
 
         ###  second plt ######
         # Clip it to show stabilising and destabilising mutations
-        ddg_df_clipped = self.df[['ddg']]
-        ddg_df_clipped['ddg'][ddg_df_clipped['ddg'] >= 5] = 5        
-        ddg_df_clipped['ddg'][ddg_df_clipped['ddg'] <= -5] = -5            
-        sns.histplot(data=ddg_df_clipped, x="ddg", palette="tab20", ax=ax2, bins=[-5,-2.5,-1,0,1,2.5,5])
+        max_value = 5                
+        #df['a'][df['a'] >= maxVal] = maxVal this returns the annoying copy error
+        np_clipped = np.clip(self.df['ddg'], a_max=max_value, a_min=None)
+        #sns.histplot(data=np_clipped, x="ddg", palette="tab20", ax=ax2, bins=[-5,-2.5,-1,0,1,2.5,5])
+        sns.histplot(data=np_clipped, palette="tab20", ax=ax2, bins=[-5,-2.5,-1,0,1,2.5,5])
         ax2.set_ylabel("")
         ax2.set_xlabel("ddg max=10")
             
