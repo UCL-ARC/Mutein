@@ -3,7 +3,7 @@ id: '1'
 qsub_id: 'geneprot02'
 work_dir: 'geneprot/scripts/'
 script: 'pipeline02_genestoproteins'
-time: '3:00:0'
+time: '1:00:0'
 dependency: '-1'
 array: 0
 inputs: ""
