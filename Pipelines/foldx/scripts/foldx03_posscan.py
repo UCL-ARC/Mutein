@@ -82,7 +82,7 @@ def run_pipeline03(args):
         copyfile(pdb_path.pdb_thruputs + pdbfile, row_path + pdbfile)
 
         fx_runner = Foldx.Foldx(argus.arg("foldxe"))    
-        #fx_runner.runPosscan(pdbfile,mut)
+        fx_runner.runPosscan(pdbfile,mut)
         pdb = pdbcode + "_rep" + str(argus.arg("repairs"))
         fx_runner.createPosscanCsv(row_path,pdb,mut,"",row_path + "posscan_df.csv")
 
