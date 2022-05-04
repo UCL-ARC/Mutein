@@ -42,7 +42,7 @@ def run_pipeline01(args):
     argus.addConfig({"repair_path":repair_path})
     pdb_path.goto_job_dir(repair_path, args, argus.params, "_inputs01")
     ############################################
-    pdbfile = argus.arg("pdb") + ".pdb"
+    pdbfile = pdbcode + ".pdb"
     # Set up files (retain copy of original)
     numRepairs = int(argus.arg("repairs"))
     repairinnames = []
