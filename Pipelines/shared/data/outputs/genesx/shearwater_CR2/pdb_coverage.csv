@@ -1,4 +1,0 @@
-gene,accession,pdb,method,resolution,coverage
-CR2,P20023,AF-P20023-F1-model_v2,alphafold,,1:1033 
-CR2,P20023,2gsx,solution scattering,,21:971 
-CR2,P20023,3oed,x-ray,3.16,20:149 

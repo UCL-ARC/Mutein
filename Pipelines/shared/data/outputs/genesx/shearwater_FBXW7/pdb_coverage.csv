@@ -1,7 +1,0 @@
-gene,accession,pdb,method,resolution,coverage
-FBXW7,Q969H0,AF-Q969H0-F1-model_v2,alphafold,,1:707 
-FBXW7,Q969H0,2ovp,x-ray,2.9,263:337 341:706 
-FBXW7,Q969H0,2ovq,x-ray,2.6,263:706 
-FBXW7,Q969H0,2ovr,x-ray,2.5,263:338 341:706 
-FBXW7,Q969H0,5ibk,x-ray,2.5,277:322 275:322 
-FBXW7,Q969H0,5v4b,x-ray,2.6,263:706 

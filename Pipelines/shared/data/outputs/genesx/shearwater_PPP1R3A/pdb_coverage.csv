@@ -1,3 +1,0 @@
-gene,accession,pdb,method,resolution,coverage
-PPP1R3A,Q16821,AF-Q16821-F1-model_v2,alphafold,,1:1122 
-PPP1R3A,Q16821,5zqv,x-ray,2.95,61:81 62:81 

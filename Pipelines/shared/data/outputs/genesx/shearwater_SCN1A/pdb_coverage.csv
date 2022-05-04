@@ -1,3 +1,0 @@
-gene,accession,pdb,method,resolution,coverage
-SCN1A,P35498,AF-P35498-F1-model_v2,alphafold,,1:2009 
-SCN1A,P35498,7dtd,e-m,3.3,116:282 312:439 749:996 1201:1795 

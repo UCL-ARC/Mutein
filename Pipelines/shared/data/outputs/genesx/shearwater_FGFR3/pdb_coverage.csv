@@ -1,6 +1,0 @@
-gene,accession,pdb,method,resolution,coverage
-FGFR3,P22607,AF-P22607-F1-model_v2,alphafold,,1:806 
-FGFR3,P22607,1ry7,x-ray,3.2,150:362 
-FGFR3,P22607,2lzl,nmr,,357:399 
-FGFR3,P22607,6lvm,x-ray,2.53,587:646 649:755 
-FGFR3,P22607,7dhl,x-ray,2.57,578:579 587:646 649:755 
