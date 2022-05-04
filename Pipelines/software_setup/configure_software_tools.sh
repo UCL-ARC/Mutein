@@ -4,20 +4,19 @@
 # setup conda environments for the pipeline
 #
 
-#source mutein settings
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-source ${SCRIPT_DIR}/../software_setup/mutein_settings.sh
+set -eu
+source ~/.mutein_settings
 
-#load miniconda as a module or setup miniconda manually if no module exists
-module load python/miniconda3/${MUTEIN_CONDA_VER}
+#make conda commands available
+module load ${MUT_CONDA_MODULE}
+echo ". ${MUT_CONDA_SETUP}" >> ~/.bashrc
 
-#one off conda config to set it up fully for your user account
-echo ". /shared/ucl/apps/miniconda/${MUTEIN_CONDA_VER}/etc/profile.d/conda.sh" >> ~/.bashrc
+#add channels contains bioinformatics tools available
 conda config --add channels defaults
 conda config --add channels bioconda
 conda config --add channels conda-forge
 
-#required for enaDataGet
+#required for enaDataGet command
 conda create --name enabrowsertools
 conda activate enabrowsertools
 conda install enabrowsertools

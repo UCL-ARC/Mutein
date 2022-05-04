@@ -21,19 +21,22 @@
 # ttt: A,B,C,D,E,BLD = Cerebellum, Entorhinal cortex, Frontal Cortex, Medulla, Cingulate, Blood (see Cell_type column)
 
 set -eu
-
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-source ${SCRIPT_DIR}/../software_setup/mutein_settings.sh
+source ~/.mutein_settings
 
 #may become command line arguments in future
 DATA_DIR=datasets/keogh2018
 ACC_FILE=SRR_Acc_List.txt
 
-module load python/miniconda3/${MUTEIN_CONDA_VER}
+module load ${MUT_CONDA_MODULE}
 
 cd "${DATA_DIR}"
 
 for x in $(cat "${ACC_FILE}")
 do
     enaDataGet -f fastq ${x}
-done
+done \
+> download-${TIMESTAMP}.stdout \
+2> download-${TIMESTAMP}.stderr
+
+#set all samples as active (manually edit active_acc_list to work selectly)
+cp ${ACC_FILE} active_acc_list
