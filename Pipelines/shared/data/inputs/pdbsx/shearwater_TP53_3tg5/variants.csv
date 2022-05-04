@@ -1,0 +1,3 @@
+gene,accession,pdb,residue,mutation,variant
+TP53,P04637,3tg5,374,G374S,ANY
+TP53,P04637,3tg5,375,Q375K,ANY

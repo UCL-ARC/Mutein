@@ -9,6 +9,7 @@ N.b this file may be run on the myriad clusters or on a local machine
 -----------------------------
 """
 import os
+from os.path import exists
 import pandas as pd
 from shutil import copyfile
 
@@ -21,6 +22,7 @@ import Paths
 import Arguments
 import Config
 import Analysis
+import FileDf
 
 
 
@@ -41,108 +43,19 @@ def run_pipeline04(args):
     pdb_path.goto_job_dir(argus.arg("work_path"), args, argus.params, "_inputs04")
     ############################################
     params_file = pdb_path.pdb_thruputs + "params_" + str(argus.arg("split"))+ ".txt"
-    rownum = 1
-    with open(params_file) as fr:
-        paramscontent = fr.readlines()
-        rownum = len(paramscontent)
-
-    ddg_file = (
-        "PS_"
-        + argus.arg("pdb")
-        + "_rep"
-        + str(argus.arg("repairs"))
-        + "_scanning_output.txt"
-    )
-    with open(ddg_file, "w") as fw:
-        for r in range(rownum):
-            jobresults_file = (
-                pdb_path.pdb_thruputs + str(argus.arg("split")) + "_" + str(r + 1) + "/" + ddg_file
-            )
-            if os.path.exists(jobresults_file):
-                print("### foldx.aggregate",jobresults_file)
-                with open(jobresults_file) as fr:
-                    jobcontent = fr.readlines()
-                fw.writelines(jobcontent)
-            else:
-                print("No file",jobresults_file)
-
-    # Make a dataframe
-    aa_dict = {
-        "ALA": "A",
-        "CYS": "C",
-        "ASP": "D",
-        "GLU": "E",
-        "PHE": "F",
-        "GLY": "G",
-        "HIS": "H",
-        "ILE": "I",
-        "LYS": "K",
-        "LEU": "L",
-        "MET": "M",
-        "ASN": "N",
-        "PRO": "P",
-        "GLN": "Q",
-        "ARG": "R",
-        "SER": "S",
-        "THR": "T",
-        "VAL": "V",
-        "TRP": "W",
-        "TYR": "Y",
-        "H1S": "o",
-        "H2S": "e",
-    }
-    a_dict = {
-        "A": "ALA",
-        "C": "CYS",
-        "D": "ASP",
-        "E": "GLU",
-        "F": "PHE",
-        "G": "GLY",
-        "H": "HIS",
-        "I": "ILE",
-        "K": "LYS",
-        "L": "LEU",
-        "M": "MET",
-        "N": "ASN",
-        "P": "PRO",
-        "Q": "GLN",
-        "R": "ARG",
-        "S": "SER",
-        "T": "THR",
-        "V": "VAL",
-        "W": "TRP",
-        "Y": "TYR",
-        "o": "H1S",
-        "e": "H2S",
-    }
-    ddg_dic = {"aa": [], "chain": [], "rid": [], "mut": [], "mutid": [], "ddg": []}
-    with open(ddg_file, "r") as fr:
-        lines = fr.readlines()
-    for line in lines:
-        if len(line) > 7:
-            lns = line.strip().split("\t")
-            res = lns[0]
-            aa = res[:3]
-            chain = res[3:4]
-            rid = res[4:-1]
-            mut = res[-1:]
-            ddg = lns[1]
-            # print(aa,chain,rid,mut,ddg)
-            ddg_dic["aa"].append(aa)
-            ddg_dic["chain"].append(chain)
-            ddg_dic["rid"].append(int(rid))
-            ddg_dic["mut"].append(mut)
-            ddg_dic["mutid"].append(aa_dict[aa] + chain + rid + mut)
-            ddg_dic["ddg"].append(float(ddg))
-    import pandas as pd
-
-    ddg_df = pd.DataFrame.from_dict(ddg_dic)
+    fdfp = FileDf.FileDf(params_file,sep=" ",cols=["pdb","mut","task"],header=False)
+    pm_df = fdfp.openDataFrame()
+    all_df = []
+    for i in range(len(pm_df.index)):
+        r = pm_df["task"][i]
+        # the file has already been turned into a dataframe called posscan_df.csv
+        file_path = pdb_path.pdb_thruputs + str(argus.arg("split")) + "_" + str(r) + "/posscan_df.csv" 
+        if exists(file_path):
+            fdf = FileDf.FileDf(file_path)
+            all_df.append(fdf.openDataFrame())        
+    ddg_df = pd.concat(all_df,ignore_index=True)
     df_file = (
-        pdb_path.pdb_outputs
-        + argus.arg("pdb")
-        + "_"
-        + str(argus.arg("repairs"))
-        + "_ddg_dataframe.csv"
+        pdb_path.pdb_outputs + "ddg_background.csv"
     )
     ddg_df.to_csv(df_file, index=False)
  

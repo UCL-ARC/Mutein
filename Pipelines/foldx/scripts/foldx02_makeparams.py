@@ -95,13 +95,14 @@ def run_pipeline02(args):
             #                          atom no        atom name     amino acid   chain   residue number
             atomtype = linecontents[2].strip()
             if atomtype == "CA":
-                if linecontents[4].strip() == chainid:
+                chain = linecontents[4].strip()
+                if chain in chainid:#list of chains
                     aaa = linecontents[3].strip()
                     if aaa in aa_dict:
                         aa = aa_dict[aaa]
                         mut = (
                             aa + linecontents[4].strip() + linecontents[5].strip() + "a"
-                        )  # aa chain rid mutation = mutation string
+                        )  # aa chain rid mutation = mutation string                        
                         params_lst.append(mut)
                     else:
                         print("!Error maybe?", aaa)  # TODO think about this
@@ -109,9 +110,8 @@ def run_pipeline02(args):
     ##### Create a dataframe for the paramterfile in the number of chunks specified
     rows = int(rows)
     param_dic = {}
-    param_dic["pdb"] = []
-    param_dic["chain"] = []
-    param_dic["mutation"] = []
+    param_dic["pdb"] = []    
+    param_dic["mutation"] = []    
     param_dic["row"] = []
     mut_str = ""
 
@@ -124,13 +124,12 @@ def run_pipeline02(args):
     for i in range(len(params_lst)):
         mut = params_lst[i]
         if row_size == 0:
-            param_dic["pdb"].append(pdb)
-            param_dic["chain"].append(chainid)
-            param_dic["mutation"].append(mut)
+            param_dic["pdb"].append(pdb)            
+            param_dic["mutation"].append(mut)            
             row += 1
             param_dic["row"].append("" + str(row))
         else:
-            param_dic["mutation"][row - 1] = param_dic["mutation"][row - 1] + "," + mut
+            param_dic["mutation"][row - 1] = param_dic["mutation"][row - 1] + "," + mut            
         row_size += 1
 
         if row_size == chunk and row > remainder:

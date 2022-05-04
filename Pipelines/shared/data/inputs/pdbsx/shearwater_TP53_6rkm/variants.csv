@@ -1,0 +1,4 @@
+gene,accession,pdb,residue,mutation,variant
+TP53,P04637,6rkm,388,E388K,ANY
+TP53,P04637,6rkm,391,D391N,ANY
+TP53,P04637,6rkm,393,D393V,ANY

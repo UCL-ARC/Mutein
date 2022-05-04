@@ -13,9 +13,6 @@ import genetoprotein
 import genestovariants
 import yaml
 import pandas as pd
-import Gene
-import Pdb
-import Variant
 
 # import from the shared library in Mutein/Pipelines/shared/lib
 dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
@@ -24,6 +21,9 @@ sys.path.append(retpath)
 import Paths
 import Arguments
 import BatchMaker
+import Gene
+import Pdb
+import Variant
 
 
 
@@ -86,38 +86,48 @@ def run_pipeline(args):
                         url, pdb, gene_path.gene_outpdbs + pdb + ".pdb"
                     )
                     if biopdb != None:
-                        method, res = (
+                        method, reso = (
                             biopdb.header["structure_method"],
                             biopdb.header["resolution"],
                         )
+                        res = 0
+                        try:
+                            res =  float(reso)
+                        except:
+                            pass
+
                         import Bio.PDB as bio
 
                         ppb = (
                             bio.CaPPBuilder()
                         )  # PPBuilder is C-N and CAPPBuilder is CA-CA
                         has_match = False
-                        for pp in ppb.build_peptides(biopdb):
-                            seq_one = str(pp.get_sequence())
-                            start = wholeseq.find(seq_one)
+                        peptides = []
+                        try:
+                            peptides= ppb.build_peptides(biopdb)
+                        except:
+                            print("Build peptides error", pdb)
+
+                        for pp in peptides:
+                            seq_one = str(pp.get_sequence())                            
+                            start = wholeseq.find(seq_one)                            
+                            start += 1
                             chain = ""
-                            if start > -1:
+                            if start > 0:
                                 try:
                                     resis = pp.get_ca_list()[0]
                                     chain = resis.parent.get_parent().id
+                                    #https://biopython.org/docs/1.75/api/Bio.PDB.Atom.html                                                        
+                                    #get_full_id(self): Return the full id of the atom.
+                                    #The full id of an atom is the tuple (structure id, model id, chain id, residue id, atom name, altloc).                                    
+                                    residue_num = resis.get_full_id()[3][1]
+                                    offset = start - residue_num
+                                    print(pdb,"gene=",start,"pdb=",residue_num,"offset=",offset,seq_one)
+                                    has_match = True
+                                    pb = Pdb.Pdb(gene,pdb,chain,start,start+len(seq_one),method,res,offset)
+                                    gn.addPdb(pb)
                                 except:
-                                    print("!!!", resis, gene, pdb)
-                                # print(start,seq_one)
-                                has_match = True
-                                pb = Pdb.Pdb(
-                                    gene,
-                                    pdb,
-                                    chain,
-                                    start + 1,
-                                    start + len(seq_one),
-                                    method,
-                                    res,
-                                )
-                                gn.addPdb(pb)
+                                    print("!!!", resis, gene, pdb)                                                                
                         if not has_match:
                             genetoprotein.removePdbStructure(
                                 url, pdb, gene_path.gene_outpdbs + pdb + ".pdb"
@@ -130,6 +140,14 @@ def run_pipeline(args):
                 
                 bm.printBatchScript(gene_path.gene_outputs + "/pipeline_"+dataset+"_"+ gene + ".sh")
                 bm.printBatchScript(gene_path.pipeline_path + "/pipeline_"+dataset+"_"+ gene + ".sh")
+
+                # and we want only 1 batch for the stitching
+                bm2 = BatchMaker.BatchMaker()
+                script_file = "overall_rsa.py"
+                yaml_file = "batch_genestitch.yml"                
+                bm2.addBatch(script_file,yaml_file,dataset,gene,"x","x")
+                bm2.printBatchScript(gene_path.gene_outputs + "/pipeline_"+dataset+"_"+ gene + "_stitch.sh")
+                bm2.printBatchScript(gene_path.pipeline_path + "/pipeline_"+dataset+"_"+ gene + "_stitch.sh")
                             
             # having found our collection of genes with assopciated pdbs and variants we can now create the pdb datasets
             # for gn in genes:

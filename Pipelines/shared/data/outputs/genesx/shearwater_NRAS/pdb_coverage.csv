@@ -1,0 +1,7 @@
+gene,accession,pdb,method,resolution,coverage
+NRAS,P01111,AF-P01111-F1-model_v2,alphafold,,1:189 
+NRAS,P01111,3con,x-ray,1.65,1:60 72:167 
+NRAS,P01111,5uhv,x-ray,1.67,1:166 
+NRAS,P01111,6e6h,x-ray,1.99,71:166 
+NRAS,P01111,6wgh,x-ray,1.65,65:169 68:168 
+NRAS,P01111,6zir,x-ray,1.9,1:60 

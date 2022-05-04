@@ -1,0 +1,163 @@
+gene,accession,variant,residue,bases,candidates
+MET,P08581,P4H,4,2,AF-P08581-F1-model_v2 
+MET,P08581,F16L,16,1,AF-P08581-F1-model_v2 
+MET,P08581,T67I,67,1,AF-P08581-F1-model_v2 1shy 2uzx 2uzy 4k3j 4o3t 4o3u 6gcu 6i04 6wvz 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,L78I,78,1,AF-P08581-F1-model_v2 1shy 2uzx 2uzy 4k3j 4o3t 4o3u 6gcu 6i04 6wvz 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,M118L,118,1,AF-P08581-F1-model_v2 1shy 2uzx 2uzy 4k3j 4o3t 4o3u 6gcu 6i04 6wvz 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,D127E,127,1,AF-P08581-F1-model_v2 1shy 2uzx 2uzy 4k3j 4o3t 4o3u 6gcu 6i04 6wvz 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,G139E,139,1,AF-P08581-F1-model_v2 1shy 2uzx 2uzy 4k3j 4o3t 4o3u 6gcu 6i04 6wvz 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,D153H,153,1,AF-P08581-F1-model_v2 1shy 4k3j 4o3t 4o3u 6gcu 6i04 6wvz 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,C160S,160,1,AF-P08581-F1-model_v2 1shy 2uzx 2uzy 4k3j 4o3t 4o3u 6gcu 6i04 6wvz 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,P164L,164,1,AF-P08581-F1-model_v2 1shy 2uzy 4k3j 4o3t 4o3u 6gcu 6i04 6wvz 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,E168K,168,1,AF-P08581-F1-model_v2 1shy 2uzx 2uzy 4k3j 4o3t 4o3u 6gcu 6i04 6wvz 7mo7 7mo8 7mo9 7moa 
+MET,P08581,C172F,172,1,AF-P08581-F1-model_v2 1shy 2uzx 2uzy 4k3j 4o3t 4o3u 6gcu 6i04 6wvz 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,D174H,174,1,AF-P08581-F1-model_v2 1shy 2uzx 2uzy 4k3j 4o3t 4o3u 6gcu 6i04 6wvz 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,L185F,185,1,AF-P08581-F1-model_v2 1shy 2uzx 2uzy 4k3j 4o3t 4o3u 6gcu 6i04 6wvz 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,P207S,207,1,AF-P08581-F1-model_v2 1shy 4k3j 4o3t 4o3u 6gcu 6wvz 7mo7 7mo8 7mo9 7moa 
+MET,P08581,D208N,208,1,AF-P08581-F1-model_v2 1shy 4k3j 4o3t 4o3u 6gcu 6wvz 7mo7 7mo8 7mo9 7moa 
+MET,P08581,R218K,218,1,AF-P08581-F1-model_v2 1shy 2uzx 2uzy 4k3j 4o3t 4o3u 6gcu 6i04 6wvz 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,K223R,223,1,AF-P08581-F1-model_v2 1shy 2uzx 2uzy 4k3j 4o3t 4o3u 6gcu 6i04 6wvz 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,S233F,233,1,AF-P08581-F1-model_v2 1shy 2uzx 2uzy 4k3j 4o3t 4o3u 6gcu 6i04 6wvz 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,S233A,233,1,AF-P08581-F1-model_v2 1shy 2uzx 2uzy 4k3j 4o3t 4o3u 6gcu 6i04 6wvz 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,D270Y,270,1,AF-P08581-F1-model_v2 1shy 2uzx 2uzy 4k3j 4o3t 4o3u 6gcu 6i04 6wvz 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,R280K,280,1,AF-P08581-F1-model_v2 1shy 2uzx 2uzy 4k3j 4o3t 4o3u 6gcu 6i04 6wvz 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,I284K,284,1,AF-P08581-F1-model_v2 1shy 2uzx 2uzy 4k3j 4o3t 4o3u 6gcu 6i04 6wvz 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,S290T,290,1,AF-P08581-F1-model_v2 1shy 2uzx 2uzy 4k3j 4o3t 4o3u 6gcu 6i04 6wvz 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,E293K,293,1,AF-P08581-F1-model_v2 1shy 2uzx 2uzy 4k3j 4o3t 4o3u 6gcu 6i04 6wvz 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,K306R,306,1,AF-P08581-F1-model_v2 
+MET,P08581,E312K,312,1,AF-P08581-F1-model_v2 1shy 4k3j 4o3t 4o3u 6gcu 6i04 6wvz 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,F314L,314,1,AF-P08581-F1-model_v2 1shy 4k3j 4o3t 4o3u 6gcu 6i04 6wvz 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,L317V,317,1,AF-P08581-F1-model_v2 1shy 4k3j 4o3t 4o3u 6gcu 6i04 6wvz 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,A319V,319,1,AF-P08581-F1-model_v2 1shy 4k3j 4o3t 4o3u 6gcu 6i04 6wvz 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,A327V,327,2,AF-P08581-F1-model_v2 1shy 4k3j 4o3t 4o3u 6gcu 6i04 6wvz 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,R331K,331,1,AF-P08581-F1-model_v2 1shy 4k3j 4o3t 4o3u 6gcu 6i04 6wvz 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,L342F,342,1,AF-P08581-F1-model_v2 1shy 4k3j 4o3t 4o3u 6gcu 6i04 6wvz 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,F343I,343,1,AF-P08581-F1-model_v2 1shy 4k3j 4o3t 4o3u 6gcu 6i04 6wvz 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,G344K,344,2,AF-P08581-F1-model_v2 1shy 4k3j 4o3t 4o3u 6gcu 6i04 6wvz 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,G344E,344,1,AF-P08581-F1-model_v2 1shy 4k3j 4o3t 4o3u 6gcu 6i04 6wvz 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,S353F,353,1,AF-P08581-F1-model_v2 1shy 4k3j 4o3t 4o3u 6gcu 6i04 6wvz 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,P366S,366,1,AF-P08581-F1-model_v2 1shy 4k3j 4o3t 4o3u 6gcu 6i04 6wvz 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,G391E,391,1,AF-P08581-F1-model_v2 1shy 2uzx 2uzy 4k3j 4o3t 4o3u 6gcu 6i04 6wvz 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,G391R,391,1,AF-P08581-F1-model_v2 1shy 2uzx 2uzy 4k3j 4o3t 4o3u 6gcu 6i04 6wvz 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,P392L,392,2,AF-P08581-F1-model_v2 1shy 2uzx 2uzy 4k3j 4o3t 4o3u 6gcu 6i04 6wvz 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,F398C,398,1,AF-P08581-F1-model_v2 1shy 4o3t 4o3u 6gcu 6wvz 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,R413H,413,1,AF-P08581-F1-model_v2 7mo7 7mo8 7mo9 7moa 
+MET,P08581,E415D,415,1,AF-P08581-F1-model_v2 1shy 2uzx 2uzy 4o3t 4o3u 6gcu 6i04 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,V427I,427,1,AF-P08581-F1-model_v2 1shy 2uzx 2uzy 4o3t 4o3u 6gcu 6i04 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,G432S,432,1,AF-P08581-F1-model_v2 1shy 2uzx 2uzy 4o3t 4o3u 6gcu 6i04 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,S441F,441,1,AF-P08581-F1-model_v2 1shy 2uzx 2uzy 4o3t 4o3u 6gcu 6i04 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,P472L,472,2,AF-P08581-F1-model_v2 1shy 2uzx 2uzy 4o3t 4o3u 6gcu 6i04 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,L480F,480,1,AF-P08581-F1-model_v2 1shy 2uzx 2uzy 4o3t 4o3u 6gcu 6i04 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,D482N,482,2,AF-P08581-F1-model_v2 1shy 2uzx 2uzy 4o3t 4o3u 6gcu 6i04 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,S483F,483,1,AF-P08581-F1-model_v2 1shy 2uzx 2uzy 4o3t 4o3u 6gcu 6i04 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,P485L,485,2,AF-P08581-F1-model_v2 1shy 2uzx 2uzy 4o3t 4o3u 6gcu 6i04 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,E489D,489,1,AF-P08581-F1-model_v2 1shy 2uzx 2uzy 4o3t 4o3u 6gcu 6i04 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,E489K,489,1,AF-P08581-F1-model_v2 1shy 2uzx 2uzy 4o3t 4o3u 6gcu 6i04 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,P514L,514,1,AF-P08581-F1-model_v2 1shy 2uzx 2uzy 4o3t 4o3u 6gcu 6i04 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,C520Y,520,1,AF-P08581-F1-model_v2 1shy 2uzx 2uzy 4o3t 4o3u 5lsp 6gcu 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,S531F,531,1,AF-P08581-F1-model_v2 1shy 2uzx 2uzy 4o3t 4o3u 5lsp 6gcu 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,S548L,548,1,AF-P08581-F1-model_v2 1shy 2uzx 2uzy 4o3t 4o3u 5lsp 6gcu 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,E550K,550,1,AF-P08581-F1-model_v2 1shy 2uzx 2uzy 4o3t 4o3u 5lsp 6gcu 7mo7 7mo8 7mo9 7moa 7mob 
+MET,P08581,G578E,578,1,AF-P08581-F1-model_v2 2uzx 2uzy 5lsp 6gcu 7mo7 7mo8 7mo9 7moa 
+MET,P08581,R591W,591,1,AF-P08581-F1-model_v2 2uzx 2uzy 5lsp 6gcu 7mo7 7mo8 7mo9 7moa 
+MET,P08581,K600N,600,1,AF-P08581-F1-model_v2 2uzx 2uzy 5lsp 6gcu 7mo7 7mo8 7mo9 7moa 
+MET,P08581,L605F,605,1,AF-P08581-F1-model_v2 2uzx 2uzy 5lsp 6gcu 7mo7 7mo8 7mo9 7moa 
+MET,P08581,T611I,611,1,AF-P08581-F1-model_v2 2uzx 2uzy 5lsp 6gcu 7mo7 7mo8 7mo9 7moa 
+MET,P08581,S617N,617,1,AF-P08581-F1-model_v2 2uzx 2uzy 5lsp 6gcu 7mo7 7mo8 7mo9 7moa 
+MET,P08581,G645E,645,1,AF-P08581-F1-model_v2 2uzx 2uzy 5lsp 6gcu 7mo7 7mo8 7mo9 7moa 
+MET,P08581,S653F,653,2,AF-P08581-F1-model_v2 2uzx 2uzy 5lsp 6gcu 7mo7 7mo8 7mo9 7moa 
+MET,P08581,D656N,656,1,AF-P08581-F1-model_v2 2uzx 2uzy 5lsp 6gcu 7mo7 7mo9 7moa 
+MET,P08581,P657S,657,1,AF-P08581-F1-model_v2 2uzx 2uzy 5lsp 6gcu 7mo7 7mo9 7moa 
+MET,P08581,G679R,679,1,AF-P08581-F1-model_v2 2uzy 5lsp 6gcu 7mo7 7mo9 7moa 
+MET,P08581,G679E,679,1,AF-P08581-F1-model_v2 2uzy 5lsp 6gcu 7mo7 7mo9 7moa 
+MET,P08581,G685E,685,1,AF-P08581-F1-model_v2 5lsp 6gcu 7mo7 
+MET,P08581,R688S,688,1,AF-P08581-F1-model_v2 5lsp 6gcu 7mo7 7mo9 7moa 
+MET,P08581,I690S,690,1,AF-P08581-F1-model_v2 2uzy 5lsp 6gcu 7mo7 7mo9 7moa 
+MET,P08581,T698A,698,1,AF-P08581-F1-model_v2 2uzy 5lsp 6gcu 7mo7 7mo9 7moa 
+MET,P08581,P712S,712,1,AF-P08581-F1-model_v2 2uzy 5lsp 6gcu 7mo7 7mo9 7moa 
+MET,P08581,D727N,727,1,AF-P08581-F1-model_v2 2uzy 5lsp 6gcu 7mo7 7mo9 7moa 
+MET,P08581,R739C,739,1,AF-P08581-F1-model_v2 2uzy 5lsp 6gcu 7mo7 
+MET,P08581,D741G,741,1,AF-P08581-F1-model_v2 2uzy 
+MET,P08581,I743V,743,1,AF-P08581-F1-model_v2 
+MET,P08581,Y745F,745,1,AF-P08581-F1-model_v2 
+MET,P08581,P749S,749,1,AF-P08581-F1-model_v2 
+MET,P08581,P761L,761,1,AF-P08581-F1-model_v2 
+MET,P08581,S773N,773,1,AF-P08581-F1-model_v2 
+MET,P08581,G774D,774,1,AF-P08581-F1-model_v2 
+MET,P08581,S787L,787,1,AF-P08581-F1-model_v2 
+MET,P08581,V788I,788,1,AF-P08581-F1-model_v2 
+MET,P08581,P791L,791,2,AF-P08581-F1-model_v2 
+MET,P08581,I795K,795,1,AF-P08581-F1-model_v2 
+MET,P08581,P822L,822,1,AF-P08581-F1-model_v2 
+MET,P08581,L827V,827,1,AF-P08581-F1-model_v2 
+MET,P08581,P832L,832,1,AF-P08581-F1-model_v2 
+MET,P08581,P857S,857,1,AF-P08581-F1-model_v2 
+MET,P08581,G871D,871,1,AF-P08581-F1-model_v2 
+MET,P08581,V895A,895,1,AF-P08581-F1-model_v2 
+MET,P08581,I903M,903,1,AF-P08581-F1-model_v2 
+MET,P08581,D917N,917,1,AF-P08581-F1-model_v2 
+MET,P08581,L921S,921,1,AF-P08581-F1-model_v2 
+MET,P08581,E928K,928,1,AF-P08581-F1-model_v2 
+MET,P08581,S934F,934,1,AF-P08581-F1-model_v2 
+MET,P08581,T936I,936,1,AF-P08581-F1-model_v2 
+MET,P08581,I942L,942,1,AF-P08581-F1-model_v2 
+MET,P08581,T961I,961,1,AF-P08581-F1-model_v2 
+MET,P08581,A991V,991,1,AF-P08581-F1-model_v2 
+MET,P08581,L998S,998,1,AF-P08581-F1-model_v2 3bux 
+MET,P08581,D999N,999,1,AF-P08581-F1-model_v2 3bux 
+MET,P08581,R1000K,1000,1,AF-P08581-F1-model_v2 3bux 
+MET,P08581,S1008N,1008,1,AF-P08581-F1-model_v2 
+MET,P08581,M1013I,1013,1,AF-P08581-F1-model_v2 
+MET,P08581,Y1021C,1021,1,AF-P08581-F1-model_v2 
+MET,P08581,P1026S,1026,1,AF-P08581-F1-model_v2 3vw8 
+MET,P08581,Q1041K,1041,1,AF-P08581-F1-model_v2 
+MET,P08581,S1050Y,1050,1,AF-P08581-F1-model_v2 1r0p 1r1w 2g15 3dkf 3dkg 3q6u 3q6w 3r7o 3rhk 4eev 4iwd 5dg5 5t3q 
+MET,P08581,S1061F,1061,1,AF-P08581-F1-model_v2 1r0p 1r1w 2g15 2rfn 2wd1 2wgj 2wkm 3ccn 3cd8 3dkf 3dkg 3efj 3efk 3f66 3f82 3i5n 3lq8 3q6u 3q6w 3qti 3r7o 3rhk 3u6h 3u6i 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4eev 4iwd 4knb 4mxc 4r1v 4xmo 4xyf 5dg5 5eob 5eyc 5eyd 5hlw 5hti 5t3q 5uab 5uad 5ya5 6sdc 6ubw 7b3q 7b3v 7b3z 7b40 7b41 7b42 7b43 7b44 
+MET,P08581,P1063L,1063,2,AF-P08581-F1-model_v2 1r0p 1r1w 2g15 2rfn 2wd1 2wgj 2wkm 3a4p 3ccn 3cd8 3dkf 3dkg 3efj 3efk 3f66 3f82 3i5n 3lq8 3q6u 3q6w 3qti 3r7o 3rhk 3u6h 3u6i 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4eev 4iwd 4knb 4mxc 4r1v 4r1y 4xmo 4xyf 5dg5 5eob 5eyc 5eyd 5hlw 5hni 5ho6 5hti 5t3q 5uab 5uad 5ya5 6sd9 6sdc 6sdd 6ubw 7b3q 7b3t 7b3v 7b3z 7b40 7b41 7b42 7b43 7b44 
+MET,P08581,P1078L,1078,1,AF-P08581-F1-model_v2 1r0p 1r1w 2g15 2rfn 2rfs 2wd1 2wgj 2wkm 3a4p 3ccn 3cd8 3dkf 3dkg 3efj 3efk 3f66 3f82 3i5n 3lq8 3q6u 3q6w 3qti 3r7o 3rhk 3u6h 3u6i 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4eev 4gg5 4gg7 4iwd 4knb 4mxc 4r1v 4r1y 4xmo 4xyf 5dg5 5eob 5eyc 5eyd 5hlw 5hti 5t3q 5uab 5uad 5ya5 6sd9 6sdc 6sdd 6sde 6ubw 7b3q 7b3t 7b3v 7b3w 7b3z 7b40 7b41 7b42 7b43 7b44 
+MET,P08581,E1079K,1079,1,AF-P08581-F1-model_v2 1r0p 1r1w 2g15 2rfn 2rfs 2wd1 2wgj 2wkm 3a4p 3ccn 3cd8 3dkf 3dkg 3efj 3efk 3f66 3f82 3i5n 3lq8 3q6u 3q6w 3qti 3r7o 3rhk 3u6h 3u6i 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4eev 4gg5 4gg7 4iwd 4knb 4mxc 4r1v 4r1y 4xmo 4xyf 5dg5 5eob 5eyc 5eyd 5hlw 5hti 5t3q 5uab 5uad 5ya5 6sd9 6sdc 6sdd 6sde 6ubw 7b3q 7b3t 7b3v 7b3w 7b3z 7b40 7b41 7b42 7b43 7b44 
+MET,P08581,V1101I,1101,1,AF-P08581-F1-model_v2 2g15 2rfn 2wd1 2wkm 3efj 3efk 3i5n 3lq8 3q6u 3q6w 3r7o 3rhk 3u6h 3u6i 3zze 4eev 4gg5 4gg7 4iwd 4mxc 4r1v 5dg5 5eob 5hti 5t3q 6sd9 6sdc 6sdd 7b3q 7b3t 7b3v 7b3z 7b40 7b41 7b42 7b43 7b44 
+MET,P08581,R1104K,1104,1,AF-P08581-F1-model_v2 2g15 2rfn 2rfs 2wd1 2wgj 2wkm 3ccn 3cd8 3efj 3efk 3f66 3f82 3i5n 3lq8 3q6u 3q6w 3qti 3r7o 3rhk 3u6h 3u6i 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4eev 4gg5 4gg7 4iwd 4knb 4mxc 4r1v 4xmo 4xyf 5dg5 5eob 5eyc 5eyd 5hlw 5hni 5hoa 5hor 5hti 5t3q 5ya5 6sd9 6sdc 6sdd 6sde 6ubw 7b3q 7b3t 7b3v 7b3w 7b3z 7b40 7b41 7b42 7b43 7b44 
+MET,P08581,H1124P,1124,1,AF-P08581-F1-model_v2 2g15 2rfn 2rfs 2wd1 2wgj 2wkm 3ccn 3cd8 3efj 3efk 3f66 3i5n 3lq8 3q6u 3q6w 3qti 3r7o 3rhk 3u6h 3u6i 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4eev 4gg5 4gg7 4iwd 4knb 4mxc 4r1v 4r1y 4xmo 4xyf 5dg5 5eob 5eyc 5eyd 5hlw 5ho6 5hoa 5hti 5t3q 5uab 5uad 5ya5 6sd9 6sdc 6sdd 6sde 6ubw 7b3q 7b3t 7b3v 7b3z 7b40 7b41 7b42 7b43 7b44 
+MET,P08581,S1129F,1129,1,AF-P08581-F1-model_v2 2g15 2rfn 2rfs 2wd1 2wgj 2wkm 3ccn 3cd8 3efj 3efk 3f66 3i5n 3lq8 3q6u 3q6w 3qti 3r7o 3rhk 3u6h 3u6i 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4eev 4gg5 4gg7 4iwd 4knb 4mxc 4r1v 4r1y 4xmo 4xyf 5dg5 5eob 5eyc 5eyd 5hlw 5ho6 5hoa 5hti 5t3q 5uab 5uad 5ya5 6sd9 6sdc 6sdd 6sde 6ubw 7b3q 7b3t 7b3v 7b3z 7b40 7b41 7b42 7b43 7b44 
+MET,P08581,G1137R,1137,1,AF-P08581-F1-model_v2 2g15 2rfn 2rfs 2wd1 2wgj 2wkm 3ccn 3cd8 3efj 3efk 3f66 3i5n 3lq8 3q6u 3q6w 3qti 3r7o 3rhk 3u6h 3u6i 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4eev 4gg5 4gg7 4iwd 4knb 4mxc 4r1v 4r1y 4xmo 4xyf 5dg5 5eob 5eyc 5eyd 5hlw 5ho6 5hoa 5hti 5t3q 5uab 5uad 5ya5 6sd9 6sdc 6sdd 6sde 6ubw 7b3q 7b3t 7b3v 7b3w 7b3z 7b40 7b41 7b42 7b43 7b44 
+MET,P08581,E1138K,1138,1,AF-P08581-F1-model_v2 2g15 2rfn 2rfs 2wd1 2wgj 2wkm 3ccn 3cd8 3efj 3efk 3f66 3i5n 3lq8 3q6u 3q6w 3qti 3r7o 3rhk 3u6h 3u6i 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4eev 4gg5 4gg7 4iwd 4knb 4mxc 4r1v 4r1y 4xmo 4xyf 5dg5 5eob 5eyc 5eyd 5hlw 5ho6 5hoa 5hti 5t3q 5uab 5uad 5ya5 6sd9 6sdc 6sdd 6sde 6ubw 7b3q 7b3t 7b3v 7b3w 7b3z 7b40 7b41 7b42 7b43 7b44 
+MET,P08581,I1148V,1148,1,AF-P08581-F1-model_v2 2g15 2rfn 2wd1 2wgj 2wkm 3efj 3efk 3f66 3q6u 3q6w 3r7o 3rhk 3u6h 3u6i 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4eev 4gg5 4gg7 4iwd 4knb 4mxc 4r1v 4xmo 4xyf 5dg5 5eob 5eyc 5eyd 5hti 5t3q 6sdc 6sdd 6sde 7b3q 7b3v 7b3w 
+MET,P08581,G1162E,1162,1,AF-P08581-F1-model_v2 2g15 2rfn 2rfs 2wd1 2wgj 2wkm 3ccn 3cd8 3efj 3efk 3f66 3i5n 3lq8 3q6u 3q6w 3r7o 3rhk 3u6h 3u6i 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4eev 4gg5 4gg7 4iwd 4knb 4mxc 4r1v 4r1y 4xmo 4xyf 5dg5 5eob 5eyc 5eyd 5hti 5t3q 5uab 5uad 5ya5 6sd9 6sdc 6sde 6ubw 7b3q 7b3t 7b3v 7b3w 7b3z 7b40 7b41 7b42 7b43 7b44 
+MET,P08581,E1168K,1168,1,AF-P08581-F1-model_v2 2g15 2rfn 2rfs 2wd1 2wgj 2wkm 3ccn 3cd8 3efj 3efk 3f66 3i5n 3lq8 3q6u 3q6w 3r7o 3rhk 3u6h 3u6i 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4eev 4gg5 4gg7 4iwd 4knb 4mxc 4r1v 4r1y 4xmo 4xyf 5dg5 5eob 5eyc 5eyd 5hti 5t3q 5uab 5uad 5ya5 6sd9 6sdc 6sde 6ubw 7b3q 7b3t 7b3v 7b3w 7b3z 7b40 7b41 7b42 7b43 7b44 
+MET,P08581,S1170F,1170,1,AF-P08581-F1-model_v2 2g15 2rfn 2rfs 2wd1 2wgj 2wkm 3ccn 3cd8 3efj 3efk 3f66 3i5n 3lq8 3q6u 3q6w 3r7o 3rhk 3u6h 3u6i 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4eev 4gg5 4gg7 4iwd 4knb 4mxc 4r1v 4r1y 4xmo 4xyf 5dg5 5eob 5eyc 5eyd 5hti 5t3q 5uab 5uad 5ya5 6sd9 6sdc 6sde 6ubw 7b3q 7b3t 7b3v 7b3w 7b3z 7b40 7b41 7b42 7b43 7b44 
+MET,P08581,P1171S,1171,1,AF-P08581-F1-model_v2 2g15 2rfn 2rfs 2wd1 2wgj 2wkm 3ccn 3cd8 3efj 3efk 3f66 3i5n 3lq8 3q6u 3q6w 3r7o 3rhk 3u6h 3u6i 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4eev 4gg5 4gg7 4iwd 4knb 4mxc 4r1v 4r1y 4xmo 4xyf 5dg5 5eob 5eyc 5eyd 5hti 5t3q 5uab 5uad 5ya5 6sd9 6sdc 6sde 6ubw 7b3q 7b3t 7b3v 7b3w 7b3z 7b40 7b41 7b42 7b43 7b44 
+MET,P08581,P1171L,1171,1,AF-P08581-F1-model_v2 2g15 2rfn 2rfs 2wd1 2wgj 2wkm 3ccn 3cd8 3efj 3efk 3f66 3i5n 3lq8 3q6u 3q6w 3r7o 3rhk 3u6h 3u6i 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4eev 4gg5 4gg7 4iwd 4knb 4mxc 4r1v 4r1y 4xmo 4xyf 5dg5 5eob 5eyc 5eyd 5hti 5t3q 5uab 5uad 5ya5 6sd9 6sdc 6sde 6ubw 7b3q 7b3t 7b3v 7b3w 7b3z 7b40 7b41 7b42 7b43 7b44 
+MET,P08581,V1173M,1173,1,AF-P08581-F1-model_v2 2g15 2rfn 2rfs 2wd1 2wgj 2wkm 3ccn 3cd8 3efj 3efk 3f66 3i5n 3lq8 3q6u 3q6w 3r7o 3rhk 3u6h 3u6i 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4eev 4gg5 4gg7 4iwd 4knb 4mxc 4r1v 4r1y 4xmo 4xyf 5dg5 5eob 5eyc 5eyd 5hti 5t3q 5uab 5uad 5ya5 6sd9 6sde 6ubw 7b3q 7b3t 7b3v 7b3w 7b3z 7b40 7b41 7b42 7b43 7b44 
+MET,P08581,P1176S,1176,1,AF-P08581-F1-model_v2 2g15 2rfn 2rfs 2wd1 2wgj 2wkm 3ccn 3cd8 3efj 3efk 3f66 3i5n 3lq8 3q6u 3q6w 3r7o 3rhk 3u6h 3u6i 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4eev 4gg5 4gg7 4iwd 4knb 4mxc 4r1v 4r1y 4xmo 4xyf 5dg5 5eob 5eyc 5eyd 5hti 5t3q 5uab 5uad 5ya5 6sd9 6sde 6ubw 7b3q 7b3t 7b3v 7b3w 7b3z 7b40 7b41 7b42 7b43 7b44 
+MET,P08581,P1176L,1176,2,AF-P08581-F1-model_v2 2g15 2rfn 2rfs 2wd1 2wgj 2wkm 3ccn 3cd8 3efj 3efk 3f66 3i5n 3lq8 3q6u 3q6w 3r7o 3rhk 3u6h 3u6i 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4eev 4gg5 4gg7 4iwd 4knb 4mxc 4r1v 4r1y 4xmo 4xyf 5dg5 5eob 5eyc 5eyd 5hti 5t3q 5uab 5uad 5ya5 6sd9 6sde 6ubw 7b3q 7b3t 7b3v 7b3w 7b3z 7b40 7b41 7b42 7b43 7b44 
+MET,P08581,L1183F,1183,1,AF-P08581-F1-model_v2 2g15 2rfn 2rfs 2wd1 2wgj 2wkm 3ccn 3cd8 3efj 3efk 3f66 3i5n 3lq8 3q6u 3q6w 3r7o 3rhk 3u6h 3u6i 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4eev 4gg5 4gg7 4iwd 4knb 4mxc 4r1v 4r1y 4xmo 4xyf 5dg5 5eob 5eyc 5eyd 5hti 5t3q 5uab 5uad 5ya5 6sd9 6sde 6ubw 7b3q 7b3t 7b3v 7b3w 7b3z 7b40 7b41 7b42 7b43 7b44 
+MET,P08581,P1194L,1194,1,AF-P08581-F1-model_v2 2g15 2rfn 2rfs 2wd1 2wgj 2wkm 3ccn 3cd8 3efj 3efk 3f66 3i5n 3lq8 3q6u 3q6w 3r7o 3rhk 3u6h 3u6i 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4eev 4gg5 4gg7 4iwd 4knb 4mxc 4r1v 4r1y 4xmo 4xyf 5dg5 5eob 5eyc 5eyd 5hti 5t3q 5uab 5uad 5ya5 6sd9 6sde 6ubw 7b3q 7b3t 7b3v 7b3w 7b3z 7b40 7b41 7b42 7b43 7b44 
+MET,P08581,P1194S,1194,1,AF-P08581-F1-model_v2 2g15 2rfn 2rfs 2wd1 2wgj 2wkm 3ccn 3cd8 3efj 3efk 3f66 3i5n 3lq8 3q6u 3q6w 3r7o 3rhk 3u6h 3u6i 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4eev 4gg5 4gg7 4iwd 4knb 4mxc 4r1v 4r1y 4xmo 4xyf 5dg5 5eob 5eyc 5eyd 5hti 5t3q 5uab 5uad 5ya5 6sd9 6sde 6ubw 7b3q 7b3t 7b3v 7b3w 7b3z 7b40 7b41 7b42 7b43 7b44 
+MET,P08581,T1195I,1195,1,AF-P08581-F1-model_v2 2g15 2rfn 2rfs 2wd1 2wgj 2wkm 3ccn 3cd8 3efj 3efk 3f66 3i5n 3lq8 3q6u 3q6w 3r7o 3rhk 3u6h 3u6i 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4eev 4gg5 4gg7 4iwd 4knb 4mxc 4r1v 4r1y 4xmo 4xyf 5dg5 5eob 5eyc 5eyd 5hti 5t3q 5uab 5uad 5ya5 6sd9 6sde 6ubw 7b3q 7b3t 7b3v 7b3w 7b3z 7b40 7b41 7b42 7b43 7b44 
+MET,P08581,M1210V,1210,1,AF-P08581-F1-model_v2 2g15 2rfn 2rfs 2wd1 2wgj 2wkm 3ccn 3cd8 3efj 3efk 3f66 3i5n 3lq8 3q6u 3q6w 3r7o 3rhk 3u6h 3u6i 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4eev 4gg5 4gg7 4iwd 4knb 4mxc 4r1v 4r1y 4xmo 4xyf 5dg5 5eob 5eyc 5eyd 5hti 5t3q 5uab 5uad 5ya5 6sd9 6sde 6ubw 7b3q 7b3t 7b3v 7b3w 7b3z 7b40 7b41 7b42 7b43 7b44 
+MET,P08581,R1226K,1226,1,AF-P08581-F1-model_v2 2g15 2rfs 2wd1 2wgj 2wkm 3ccn 3cd8 3f66 3i5n 3lq8 3q6w 3r7o 3rhk 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4gg5 4gg7 4iwd 4knb 4mxc 4r1v 4r1y 4xmo 4xyf 5dg5 5eob 5eyc 5eyd 5hti 5uab 5uad 5ya5 6sd9 6sde 6ubw 7b3q 7b3t 7b3v 7b3w 7b3z 7b40 7b41 7b42 7b43 7b44 
+MET,P08581,V1238A,1238,1,AF-P08581-F1-model_v2 2g15 2rfs 2wd1 2wgj 2wkm 3ccn 3cd8 3i5n 3q6w 3r7o 3rhk 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4gg5 4gg7 4iwd 4knb 4r1v 4r1y 4xmo 4xyf 5dg5 5eyc 5eyd 5uab 5uad 5ya5 6sde 6ubw 7b3q 7b3w 7b44 
+MET,P08581,D1283Y,1283,1,AF-P08581-F1-model_v2 1r1w 2g15 2rfn 2rfs 2wd1 2wgj 2wkm 3a4p 3c1x 3ccn 3cd8 3ce3 3cth 3ctj 3dkg 3efj 3efk 3f66 3f82 3i5n 3l8v 3lq8 3qti 3rhk 3u6h 3u6i 3vw8 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4eev 4gg5 4gg7 4knb 4mxc 4r1v 4r1y 4xmo 4xyf 5dg5 5eob 5eyc 5eyd 5hlw 5hni 5ho6 5hoa 5hti 5t3q 5uab 5uad 5ya5 6sd9 6sdc 6sde 6ubw 7b3q 7b3t 7b3v 7b3w 7b3z 7b40 7b41 7b42 7b43 7b44 
+MET,P08581,F1287L,1287,1,AF-P08581-F1-model_v2 2g15 2rfn 2rfs 2wd1 2wgj 2wkm 3a4p 3c1x 3ccn 3cd8 3ce3 3cth 3ctj 3dkg 3efj 3efk 3f66 3f82 3i5n 3l8v 3lq8 3rhk 3u6h 3u6i 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4eev 4gg5 4gg7 4knb 4mxc 4r1v 4r1y 4xmo 4xyf 5dg5 5eob 5eyc 5eyd 5hlw 5hni 5ho6 5hoa 5hti 5t3q 5uab 5uad 5ya5 6sd9 6sdc 6sde 6ubw 7b3q 7b3t 7b3v 7b3w 7b3z 7b40 7b41 7b42 7b43 7b44 
+MET,P08581,G1288N,1288,2,AF-P08581-F1-model_v2 2g15 2rfn 2rfs 2wd1 2wgj 2wkm 3a4p 3c1x 3ccn 3cd8 3ce3 3cth 3ctj 3dkg 3efj 3efk 3f66 3f82 3i5n 3l8v 3lq8 3rhk 3u6h 3u6i 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4eev 4gg5 4gg7 4knb 4mxc 4r1v 4r1y 4xmo 4xyf 5dg5 5eob 5eyc 5eyd 5hlw 5hni 5ho6 5hoa 5hti 5t3q 5uab 5uad 5ya5 6sd9 6sdc 6sde 6ubw 7b3q 7b3t 7b3v 7b3w 7b3z 7b40 7b41 7b42 7b43 7b44 
+MET,P08581,M1295I,1295,1,AF-P08581-F1-model_v2 1r0p 1r1w 2g15 2rfn 2rfs 2wd1 2wgj 2wkm 3a4p 3c1x 3ccn 3cd8 3ce3 3cth 3ctj 3dkg 3efj 3efk 3f66 3f82 3i5n 3l8v 3lq8 3qti 3rhk 3u6h 3u6i 3vw8 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4eev 4gg5 4gg7 4knb 4mxc 4r1v 4r1y 4xmo 4xyf 5dg5 5eob 5eyc 5eyd 5hlw 5hni 5ho6 5hoa 5hti 5t3q 5uab 5uad 5ya5 6sd9 6sdc 6sde 6ubw 7b3q 7b3t 7b3v 7b3w 7b3z 7b40 7b41 7b42 7b43 7b44 
+MET,P08581,P1301F,1301,2,AF-P08581-F1-model_v2 1r0p 1r1w 2g15 2rfn 2rfs 2wd1 2wgj 2wkm 3a4p 3c1x 3ccn 3cd8 3ce3 3cth 3ctj 3dkg 3efj 3efk 3f66 3f82 3i5n 3l8v 3lq8 3qti 3rhk 3u6h 3u6i 3vw8 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4eev 4gg5 4gg7 4knb 4mxc 4r1v 4r1y 4xmo 4xyf 5dg5 5eob 5eyc 5eyd 5hlw 5hni 5ho6 5hoa 5hti 5t3q 5uab 5uad 5ya5 6sd9 6sdc 6sde 6ubw 7b3q 7b3t 7b3v 7b3w 7b3z 7b40 7b41 7b42 7b43 7b44 
+MET,P08581,G1317E,1317,1,AF-P08581-F1-model_v2 1r0p 1r1w 2g15 2rfn 2rfs 2wd1 2wgj 2wkm 3a4p 3c1x 3ccn 3cd8 3ce3 3cth 3ctj 3dkg 3efj 3efk 3f66 3f82 3i5n 3l8v 3lq8 3qti 3rhk 3u6h 3u6i 3vw8 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4eev 4gg5 4gg7 4knb 4mxc 4r1v 4r1y 4xmo 4xyf 5dg5 5eob 5eyc 5eyd 5hlw 5hni 5ho6 5hoa 5hti 5t3q 5uab 5uad 5ya5 6sd9 6sdc 6sde 6ubw 7b3q 7b3t 7b3v 7b3w 7b3z 7b40 7b41 7b42 7b43 7b44 
+MET,P08581,R1318K,1318,1,AF-P08581-F1-model_v2 1r0p 1r1w 2g15 2rfn 2rfs 2wd1 2wgj 2wkm 3a4p 3c1x 3ccn 3cd8 3ce3 3cth 3ctj 3dkg 3efj 3efk 3f66 3f82 3i5n 3l8v 3lq8 3qti 3rhk 3u6h 3u6i 3vw8 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4eev 4gg5 4gg7 4knb 4mxc 4r1v 4r1y 4xmo 4xyf 5dg5 5eob 5eyc 5eyd 5hlw 5hni 5ho6 5hoa 5hti 5t3q 5uab 5uad 5ya5 6sd9 6sdc 6sde 6ubw 7b3q 7b3t 7b3v 7b3w 7b3z 7b40 7b41 7b42 7b43 7b44 
+MET,P08581,P1323L,1323,1,AF-P08581-F1-model_v2 1r0p 1r1w 2g15 2rfn 2rfs 2wd1 2wgj 2wkm 3a4p 3c1x 3ccn 3cd8 3ce3 3cth 3ctj 3dkg 3efj 3efk 3f66 3f82 3i5n 3l8v 3lq8 3qti 3rhk 3u6h 3u6i 3vw8 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4eev 4gg5 4gg7 4knb 4mxc 4r1v 4r1y 4xmo 4xyf 5dg5 5eob 5eyc 5eyd 5hlw 5hni 5ho6 5hoa 5hti 5t3q 5uab 5uad 5ya5 6sd9 6sdc 6sde 6ubw 7b3q 7b3t 7b3v 7b3w 7b3z 7b40 7b41 7b42 7b43 7b44 
+MET,P08581,P1323S,1323,1,AF-P08581-F1-model_v2 1r0p 1r1w 2g15 2rfn 2rfs 2wd1 2wgj 2wkm 3a4p 3c1x 3ccn 3cd8 3ce3 3cth 3ctj 3dkg 3efj 3efk 3f66 3f82 3i5n 3l8v 3lq8 3qti 3rhk 3u6h 3u6i 3vw8 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4eev 4gg5 4gg7 4knb 4mxc 4r1v 4r1y 4xmo 4xyf 5dg5 5eob 5eyc 5eyd 5hlw 5hni 5ho6 5hoa 5hti 5t3q 5uab 5uad 5ya5 6sd9 6sdc 6sde 6ubw 7b3q 7b3t 7b3v 7b3w 7b3z 7b40 7b41 7b42 7b43 7b44 
+MET,P08581,L1335Q,1335,1,AF-P08581-F1-model_v2 1r0p 1r1w 2g15 2rfn 2rfs 2wd1 2wgj 2wkm 3a4p 3c1x 3ccn 3cd8 3ce3 3cth 3ctj 3dkg 3efj 3efk 3f66 3f82 3i5n 3l8v 3lq8 3qti 3rhk 3u6h 3u6i 3vw8 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4eev 4gg5 4gg7 4knb 4mxc 4r1v 4r1y 4xmo 4xyf 5dg5 5eob 5eyc 5eyd 5hlw 5hni 5ho6 5hoa 5hti 5t3q 5uab 5uad 5ya5 6sd9 6sdc 6sde 6ubw 7b3q 7b3t 7b3v 7b3w 7b3z 7b40 7b41 7b42 7b43 7b44 
+MET,P08581,P1340S,1340,2,AF-P08581-F1-model_v2 1r0p 1r1w 2g15 2rfn 2rfs 2wd1 2wgj 2wkm 3a4p 3c1x 3ccn 3cd8 3ce3 3cth 3ctj 3dkg 3efj 3efk 3f66 3f82 3i5n 3l8v 3lq8 3qti 3rhk 3u6h 3u6i 3vw8 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4eev 4gg5 4gg7 4knb 4mxc 4r1v 4r1y 4xmo 4xyf 5dg5 5eob 5eyc 5eyd 5hlw 5hni 5ho6 5hoa 5hti 5t3q 5uab 5uad 5ya5 6sd9 6sdc 6sde 6ubw 7b3q 7b3t 7b3v 7b3w 7b3z 7b40 7b41 7b42 7b43 7b44 
+MET,P08581,K1341R,1341,1,AF-P08581-F1-model_v2 1r0p 1r1w 2g15 2rfn 2rfs 2wd1 2wgj 2wkm 3a4p 3c1x 3ccn 3cd8 3ce3 3cth 3ctj 3dkg 3efj 3efk 3f66 3f82 3i5n 3l8v 3lq8 3qti 3rhk 3u6h 3u6i 3vw8 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4eev 4gg5 4gg7 4knb 4mxc 4r1v 4r1y 4xmo 4xyf 5dg5 5eob 5eyc 5eyd 5hlw 5hni 5ho6 5hoa 5hti 5t3q 5uab 5uad 5ya5 6sd9 6sdc 6sde 6ubw 7b3q 7b3t 7b3v 7b3w 7b3z 7b40 7b41 7b42 7b43 7b44 
+MET,P08581,A1342T,1342,1,AF-P08581-F1-model_v2 1r0p 1r1w 2g15 2rfn 2rfs 2wd1 2wgj 2wkm 3a4p 3c1x 3ccn 3cd8 3ce3 3cth 3ctj 3dkg 3efj 3efk 3f66 3f82 3i5n 3l8v 3lq8 3qti 3rhk 3u6h 3u6i 3vw8 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4eev 4gg5 4gg7 4knb 4mxc 4r1v 4r1y 4xmo 4xyf 5dg5 5eob 5eyc 5eyd 5hlw 5hni 5ho6 5hoa 5hti 5t3q 5uab 5uad 5ya5 6sd9 6sdc 6sde 6ubw 7b3q 7b3t 7b3v 7b3w 7b3z 7b40 7b41 7b42 7b43 7b44 
+MET,P08581,E1343K,1343,1,AF-P08581-F1-model_v2 1r0p 1r1w 2g15 2rfn 2rfs 2wd1 2wgj 2wkm 3a4p 3c1x 3ccn 3cd8 3ce3 3cth 3ctj 3dkg 3efj 3efk 3f66 3f82 3i5n 3l8v 3lq8 3qti 3rhk 3u6h 3u6i 3vw8 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4eev 4gg5 4gg7 4knb 4mxc 4r1v 4r1y 4xmo 4xyf 5dg5 5eob 5eyc 5eyd 5hlw 5hni 5ho6 5hoa 5hti 5t3q 5uab 5uad 5ya5 6sd9 6sdc 6sde 6ubw 7b3q 7b3t 7b3v 7b3w 7b3z 7b40 7b41 7b42 7b43 7b44 
+MET,P08581,M1344T,1344,1,AF-P08581-F1-model_v2 1r0p 1r1w 2g15 2rfn 2rfs 2wd1 2wgj 2wkm 3a4p 3c1x 3ccn 3cd8 3ce3 3cth 3ctj 3dkg 3efj 3efk 3f66 3f82 3i5n 3l8v 3lq8 3qti 3rhk 3u6h 3u6i 3vw8 3zbx 3zc5 3zcl 3zxz 3zze 4aoi 4ap7 4deg 4deh 4dei 4eev 4gg5 4gg7 4knb 4mxc 4r1v 4r1y 4xmo 4xyf 5dg5 5eob 5eyc 5eyd 5hlw 5hni 5ho6 5hoa 5hti 5t3q 5uab 5uad 5ya5 6sd9 6sdc 6sde 6ubw 7b3q 7b3t 7b3v 7b3w 7b3z 7b40 7b41 7b42 7b43 7b44 
+MET,P08581,S1347F,1347,1,AF-P08581-F1-model_v2 1r0p 1r1w 2rfn 3a4p 3c1x 3ce3 3cth 3ctj 3dkg 3efj 3efk 3f66 3f82 3l8v 3qti 3u6h 3u6i 3vw8 5eyd 5hlw 5hni 5ho6 5hoa 5t3q 5uab 5uad 6ubw 
+MET,P08581,R1354W,1354,2,AF-P08581-F1-model_v2 1r0p 1r1w 3a4p 3c1x 3ce3 3cth 3ctj 3dkg 3f82 3l8v 3qti 5hlw 5hni 5ho6 5hoa 5uab 5uad 6ubw 
+MET,P08581,C1379F,1379,1,AF-P08581-F1-model_v2 
+MET,P08581,P1382L,1382,2,AF-P08581-F1-model_v2 
+MET,P08581,P1382S,1382,1,AF-P08581-F1-model_v2 
+MET,P08581,P1382R,1382,1,AF-P08581-F1-model_v2 
+MET,P08581,P1382T,1382,1,AF-P08581-F1-model_v2 
+MET,P08581,P1384S,1384,1,AF-P08581-F1-model_v2 

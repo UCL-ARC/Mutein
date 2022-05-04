@@ -1,0 +1,138 @@
+gene,accession,variant,residue,bases,candidates
+FGFR1,P11362,R9K,9,2,AF-P11362-F1-model_v2 
+FGFR1,P11362,R10K,10,1,AF-P11362-F1-model_v2 
+FGFR1,P11362,E12K,12,1,AF-P11362-F1-model_v2 
+FGFR1,P11362,E16K,16,1,AF-P11362-F1-model_v2 
+FGFR1,P11362,R17Q,17,1,AF-P11362-F1-model_v2 
+FGFR1,P11362,R17W,17,2,AF-P11362-F1-model_v2 
+FGFR1,P11362,R20T,20,1,AF-P11362-F1-model_v2 
+FGFR1,P11362,E22K,22,1,AF-P11362-F1-model_v2 
+FGFR1,P11362,T27A,27,1,AF-P11362-F1-model_v2 
+FGFR1,P11362,G33E,33,1,AF-P11362-F1-model_v2 
+FGFR1,P11362,A49V,49,1,AF-P11362-F1-model_v2 
+FGFR1,P11362,G68E,68,1,AF-P11362-F1-model_v2 
+FGFR1,P11362,E72K,72,2,AF-P11362-F1-model_v2 
+FGFR1,P11362,S75F,75,2,AF-P11362-F1-model_v2 
+FGFR1,P11362,G81D,81,1,AF-P11362-F1-model_v2 
+FGFR1,P11362,D92N,92,2,AF-P11362-F1-model_v2 
+FGFR1,P11362,E108K,108,1,AF-P11362-F1-model_v2 
+FGFR1,P11362,R111C,111,1,AF-P11362-F1-model_v2 
+FGFR1,P11362,S124F,124,1,AF-P11362-F1-model_v2 
+FGFR1,P11362,G130N,130,2,AF-P11362-F1-model_v2 
+FGFR1,P11362,Y132C,132,1,AF-P11362-F1-model_v2 
+FGFR1,P11362,S140L,140,1,AF-P11362-F1-model_v2 
+FGFR1,P11362,V151I,151,1,AF-P11362-F1-model_v2 1evt 
+FGFR1,P11362,P156L,156,1,AF-P11362-F1-model_v2 1evt 
+FGFR1,P11362,E159K,159,1,AF-P11362-F1-model_v2 1evt 
+FGFR1,P11362,D160E,160,1,AF-P11362-F1-model_v2 1evt 
+FGFR1,P11362,D160N,160,1,AF-P11362-F1-model_v2 1evt 
+FGFR1,P11362,D175N,175,1,AF-P11362-F1-model_v2 1evt 
+FGFR1,P11362,P184L,184,1,AF-P11362-F1-model_v2 1evt 
+FGFR1,P11362,P189L,189,1,AF-P11362-F1-model_v2 1evt 
+FGFR1,P11362,M192I,192,1,AF-P11362-F1-model_v2 1evt 
+FGFR1,P11362,V199G,199,1,AF-P11362-F1-model_v2 1evt 
+FGFR1,P11362,V199M,199,1,AF-P11362-F1-model_v2 1evt 
+FGFR1,P11362,P200L,200,1,AF-P11362-F1-model_v2 1evt 
+FGFR1,P11362,P210S,210,1,AF-P11362-F1-model_v2 1evt 
+FGFR1,P11362,P210L,210,1,AF-P11362-F1-model_v2 1evt 
+FGFR1,P11362,H232Y,232,1,AF-P11362-F1-model_v2 1evt 
+FGFR1,P11362,R233K,233,1,AF-P11362-F1-model_v2 1evt 
+FGFR1,P11362,R240H,240,1,AF-P11362-F1-model_v2 1evt 
+FGFR1,P11362,Y241F,241,1,AF-P11362-F1-model_v2 1evt 
+FGFR1,P11362,M248I,248,1,AF-P11362-F1-model_v2 1evt 
+FGFR1,P11362,D249N,249,1,AF-P11362-F1-model_v2 1evt 
+FGFR1,P11362,S250F,250,1,AF-P11362-F1-model_v2 1evt 
+FGFR1,P11362,S254F,254,1,AF-P11362-F1-model_v2 1evt 
+FGFR1,P11362,Q275P,275,1,AF-P11362-F1-model_v2 1evt 
+FGFR1,P11362,D277E,277,1,AF-P11362-F1-model_v2 1evt 
+FGFR1,P11362,P283S,283,1,AF-P11362-F1-model_v2 1evt 
+FGFR1,P11362,R285Q,285,1,AF-P11362-F1-model_v2 1evt 
+FGFR1,P11362,A294T,294,1,AF-P11362-F1-model_v2 
+FGFR1,P11362,C308Y,308,1,AF-P11362-F1-model_v2 1cvs 1evt 1fq9 5w59 
+FGFR1,P11362,G328R,328,1,AF-P11362-F1-model_v2 1cvs 1evt 1fq9 5w59 
+FGFR1,P11362,P333L,333,1,AF-P11362-F1-model_v2 1cvs 1evt 1fq9 5w59 
+FGFR1,P11362,Y338N,338,1,AF-P11362-F1-model_v2 1cvs 1evt 1fq9 5w59 
+FGFR1,P11362,A345V,345,1,AF-P11362-F1-model_v2 1cvs 1evt 1fq9 5w59 
+FGFR1,P11362,E355K,355,1,AF-P11362-F1-model_v2 1cvs 1evt 1fq9 5w59 
+FGFR1,P11362,R360K,360,1,AF-P11362-F1-model_v2 5w59 
+FGFR1,P11362,F364Y,364,1,AF-P11362-F1-model_v2 
+FGFR1,P11362,A367S,367,1,AF-P11362-F1-model_v2 
+FGFR1,P11362,G375S,375,1,AF-P11362-F1-model_v2 
+FGFR1,P11362,N376S,376,1,AF-P11362-F1-model_v2 
+FGFR1,P11362,I378V,378,1,AF-P11362-F1-model_v2 
+FGFR1,P11362,G379R,379,1,AF-P11362-F1-model_v2 
+FGFR1,P11362,S381F,381,1,AF-P11362-F1-model_v2 
+FGFR1,P11362,L390P,390,1,AF-P11362-F1-model_v2 
+FGFR1,P11362,E391K,391,1,AF-P11362-F1-model_v2 
+FGFR1,P11362,P397T,397,1,AF-P11362-F1-model_v2 
+FGFR1,P11362,S402L,402,1,AF-P11362-F1-model_v2 
+FGFR1,P11362,E407K,407,1,AF-P11362-F1-model_v2 
+FGFR1,P11362,Y411F,411,1,AF-P11362-F1-model_v2 1xr0 
+FGFR1,P11362,G414R,414,1,AF-P11362-F1-model_v2 1xr0 
+FGFR1,P11362,T434P,434,1,AF-P11362-F1-model_v2 
+FGFR1,P11362,T434I,434,1,AF-P11362-F1-model_v2 
+FGFR1,P11362,P453S,453,1,AF-P11362-F1-model_v2 
+FGFR1,P11362,S464F,464,1,AF-P11362-F1-model_v2 1agw 1fgk 2fgi 3ky2 4f63 4f64 4nka 4rwi 4uwy 4v01 4v04 5a46 5a4c 5am7 5b7v 5uq0 5ur1 6c19 6c1b 6c1c 6c1o 6mzq 6mzw 6nvl 
+FGFR1,P11362,M468I,468,1,AF-P11362-F1-model_v2 1agw 1fgk 2fgi 3ky2 4f63 4f64 4nka 4nks 4rwi 4rwl 4uwy 4v01 4v04 5a46 5a4c 5am7 5b7v 5flf 5uq0 5ur1 6c18 6c19 6c1b 6c1c 6c1o 6mzq 6mzw 6nvl 
+FGFR1,P11362,N469K,469,1,AF-P11362-F1-model_v2 1agw 1fgk 2fgi 3ky2 4f63 4f64 4nka 4nks 4rwi 4rwl 4uwy 4v01 4v04 5a46 5a4c 5am7 5b7v 5flf 5uq0 5ur1 6c18 6c19 6c1b 6c1c 6c1o 6mzq 6mzw 6nvl 
+FGFR1,P11362,R476Q,476,2,AF-P11362-F1-model_v2 1agw 1fgk 2fgi 3ky2 4f63 4f64 4nka 4nks 4rwi 4rwl 4uwy 4v01 4v04 5a46 5a4c 5am7 5b7v 5flf 5uq0 5ur1 6c18 6c19 6c1b 6c1c 6c1o 6mzq 6mzw 6nvl 
+FGFR1,P11362,R479W,479,1,AF-P11362-F1-model_v2 1agw 1fgk 2fgi 3ky2 4f63 4f64 4nka 4nks 4rwi 4rwl 4uwy 4v01 4v04 5a46 5a4c 5am7 5b7v 5flf 5uq0 5ur1 6c18 6c19 6c1b 6c1c 6c1o 6mzq 6mzw 6nvl 
+FGFR1,P11362,R479Q,479,1,AF-P11362-F1-model_v2 1agw 1fgk 2fgi 3ky2 4f63 4f64 4nka 4nks 4rwi 4rwl 4uwy 4v01 4v04 5a46 5a4c 5am7 5b7v 5flf 5uq0 5ur1 6c18 6c19 6c1b 6c1c 6c1o 6mzq 6mzw 6nvl 
+FGFR1,P11362,S481T,481,1,AF-P11362-F1-model_v2 1agw 1fgk 2fgi 3ky2 4f63 4f64 4nka 4nks 4rwi 4rwl 4uwy 4v01 4v04 5a46 5a4c 5am7 5b7v 5flf 5uq0 5ur1 6c18 6c19 6c1b 6c1c 6c1o 6mzq 6mzw 6nvl 
+FGFR1,P11362,P486T,486,1,AF-P11362-F1-model_v2 3ky2 4nka 4rwi 4rwl 4uwy 4v01 4v04 5a46 5a4c 5am7 5b7v 5uq0 5ur1 6c19 6c1b 6c1c 6c1o 6mzq 6nvl 
+FGFR1,P11362,S492C,492,1,AF-P11362-F1-model_v2 1agw 1fgk 2fgi 3ky2 4f63 4f64 4nka 4nks 4rwl 4uwy 4v01 5a46 5b7v 5flf 5uq0 5ur1 6c18 6c19 6c1b 6c1c 6c1o 6mzq 6mzw 6nvl 
+FGFR1,P11362,P497S,497,1,AF-P11362-F1-model_v2 1agw 1fgk 2fgi 3ky2 4f63 4f64 4nka 4nks 4rwl 4uwy 4v01 5a46 5b7v 5flf 5uq0 5ur1 6c18 6c19 6c1b 6c1c 6c1o 6mzq 6mzw 6nvl 
+FGFR1,P11362,E498K,498,1,AF-P11362-F1-model_v2 1agw 1fgk 2fgi 3ky2 4f63 4f64 4nka 4nks 4rwl 4uwy 4v01 5a46 5b7v 5flf 5uq0 5ur1 6c18 6c19 6c1b 6c1c 6c1o 6mzq 6mzw 6nvl 
+FGFR1,P11362,E503K,503,1,AF-P11362-F1-model_v2 3ky2 4nk9 4nka 4rwl 4uwy 5a46 5b7v 5flf 5ur1 6c18 6c19 6c1b 6c1c 6mzq 6nvl 
+FGFR1,P11362,P505L,505,1,AF-P11362-F1-model_v2 1agw 1fgi 1fgk 2fgi 3ky2 3rhx 4f63 4f64 4f65 4nk9 4nka 4nks 4rwl 4uwy 4v01 4v05 4wun 5a46 5a4c 5b7v 5flf 5o49 5uq0 5ur1 5z0s 6c18 6c19 6c1b 6c1c 6c1o 6mzq 6mzw 6nvl 
+FGFR1,P11362,D507N,507,1,AF-P11362-F1-model_v2 1agw 1fgi 1fgk 2fgi 3ky2 3rhx 4f63 4f64 4f65 4nk9 4nka 4nks 4rwl 4uwy 4v01 4v05 4wun 5a46 5a4c 5b7v 5flf 5o49 5uq0 5ur1 5z0s 6c18 6c19 6c1b 6c1c 6c1o 6mzq 6mzw 6nvl 
+FGFR1,P11362,G516R,516,1,AF-P11362-F1-model_v2 1agw 1fgi 1fgk 2fgi 3ky2 3rhx 4f63 4f64 4f65 4nk9 4nka 4nks 4rwl 4uwy 4v01 4v05 4wun 5a46 5a4c 5b7v 5flf 5o49 5uq0 5ur1 5z0s 6c18 6c19 6c1b 6c1c 6c1o 6mzq 6mzw 6nvl 
+FGFR1,P11362,G521R,521,1,AF-P11362-F1-model_v2 1agw 1fgi 1fgk 2fgi 3ky2 3rhx 4f63 4f64 4f65 4nk9 4nka 4nks 4rwl 4uwy 4v01 4v05 4wun 5a46 5a4c 5b7v 5flf 5o49 5uq0 5ur1 5z0s 6c18 6c19 6c1b 6c1c 6c1o 6mzq 6mzw 6nvl 
+FGFR1,P11362,V524G,524,1,AF-P11362-F1-model_v2 1agw 1fgi 1fgk 2fgi 3ky2 3rhx 4f63 4f64 4f65 4nk9 4nka 4nks 4rwl 4uwy 4v01 4v05 4wun 5a46 5a4c 5b7v 5flf 5o49 5uq0 5ur1 5z0s 6c18 6c19 6c1b 6c1c 6c1o 6mzq 6mzw 6nvl 
+FGFR1,P11362,M546L,546,1,AF-P11362-F1-model_v2 1agw 1fgi 1fgk 2fgi 3ky2 3rhx 4f63 4f64 4f65 4nk9 4nka 4nks 4rwl 4uwy 4v01 4v05 4wun 5a46 5a4c 5b7v 5flf 5o49 5uq0 5ur1 5z0s 6c18 6c19 6c1b 6c1c 6c1o 6mzq 6mzw 6nvl 
+FGFR1,P11362,E553K,553,1,AF-P11362-F1-model_v2 1agw 1fgi 1fgk 2fgi 3ky2 3rhx 4f63 4f64 4f65 4nk9 4nka 4nks 4rwl 4uwy 4v01 4v05 4wun 5a46 5a4c 5b7v 5flf 5o49 5uq0 5ur1 5z0s 6c18 6c19 6c1b 6c1c 6c1o 6mzq 6mzw 6nvl 
+FGFR1,P11362,A581T,581,1,AF-P11362-F1-model_v2 5a46 6nvl 
+FGFR1,P11362,D585N,585,1,AF-P11362-F1-model_v2 5ur1 6c1o 
+FGFR1,P11362,E602A,602,1,AF-P11362-F1-model_v2 1agw 1fgi 1fgk 2fgi 3c4f 3gql 3js2 3kxx 3ky2 3rhx 3tt0 4f63 4f64 4f65 4nk9 4nka 4nks 4rwi 4rwj 4rwk 4rwl 4uwb 4uwc 4uwy 4v01 4v04 4v05 4wun 4zsa 5a46 5a4c 5am6 5am7 5b7v 5ew8 5flf 5o49 5o4a 5uq0 5ur1 5vnd 5z0s 5zv2 6c18 6c19 6c1b 6c1c 6c1o 6itj 6mzq 6mzw 6nvl 6p68 6p69 
+FGFR1,P11362,R607Q,607,2,AF-P11362-F1-model_v2 1agw 1fgi 1fgk 2fgi 3c4f 3gql 3js2 3kxx 3ky2 3rhx 3tt0 4f63 4f64 4f65 4nk9 4nka 4nks 4rwi 4rwj 4rwk 4rwl 4uwb 4uwc 4uwy 4v01 4v04 4v05 4wun 4zsa 5a46 5a4c 5am6 5am7 5b7v 5ew8 5flf 5o49 5o4a 5uq0 5ur1 5vnd 5z0s 5zv2 6c18 6c19 6c1b 6c1c 6c1o 6itj 6mzq 6mzw 6nvl 6p68 6p69 
+FGFR1,P11362,P609L,609,1,AF-P11362-F1-model_v2 1agw 1fgi 1fgk 2fgi 3c4f 3gql 3js2 3kxx 3ky2 3rhx 3tt0 4f63 4f64 4f65 4nk9 4nka 4nks 4rwi 4rwj 4rwk 4rwl 4uwb 4uwc 4uwy 4v01 4v04 4v05 4wun 4zsa 5a46 5a4c 5am6 5am7 5b7v 5ew8 5flf 5o49 5o4a 5uq0 5ur1 5vnd 5z0s 5zv2 6c18 6c19 6c1b 6c1c 6c1o 6itj 6mzq 6mzw 6nvl 6p68 6p69 
+FGFR1,P11362,P610S,610,2,AF-P11362-F1-model_v2 1agw 1fgi 1fgk 2fgi 3c4f 3gql 3js2 3kxx 3ky2 3rhx 3tt0 4f63 4f64 4f65 4nk9 4nka 4nks 4rwi 4rwj 4rwk 4rwl 4uwb 4uwc 4uwy 4v01 4v04 4v05 4wun 4zsa 5a46 5a4c 5am6 5am7 5b7v 5ew8 5flf 5o49 5o4a 5uq0 5ur1 5vnd 5z0s 5zv2 6c18 6c19 6c1b 6c1c 6c1o 6itj 6mzq 6mzw 6nvl 6p68 6p69 
+FGFR1,P11362,P618L,618,2,AF-P11362-F1-model_v2 1agw 1fgi 1fgk 2fgi 3c4f 3gql 3js2 3kxx 3ky2 3rhx 3tt0 4f63 4f64 4f65 4nk9 4nka 4nks 4rwi 4rwj 4rwk 4rwl 4uwb 4uwc 4uwy 4v01 4v04 4v05 4wun 4zsa 5a46 5a4c 5am6 5am7 5b7v 5ew8 5flf 5o49 5o4a 5uq0 5ur1 5vnd 5z0s 5zv2 6c18 6c19 6c1b 6c1c 6c1o 6itj 6mzq 6mzw 6nvl 6p68 6p69 
+FGFR1,P11362,D630N,630,1,AF-P11362-F1-model_v2 1agw 1fgi 1fgk 2fgi 3c4f 3gql 3js2 3kxx 3ky2 3rhx 3tt0 4f63 4f64 4f65 4nk9 4nka 4nks 4rwi 4rwj 4rwk 4rwl 4uwb 4uwc 4uwy 4v01 4v04 4v05 4wun 4zsa 5a46 5a4c 5am6 5am7 5b7v 5ew8 5flf 5o49 5o4a 5uq0 5ur1 5vnd 5z0s 5zv2 6c18 6c19 6c1b 6c1c 6c1o 6itj 6mzq 6mzw 6nvl 6p68 6p69 
+FGFR1,P11362,S633C,633,1,AF-P11362-F1-model_v2 1agw 1fgi 1fgk 2fgi 3c4f 3gql 3js2 3kxx 3ky2 3rhx 3tt0 4f63 4f64 4f65 4nk9 4nka 4nks 4rwi 4rwj 4rwk 4rwl 4uwb 4uwc 4uwy 4v01 4v04 4v05 4wun 4zsa 5a46 5a4c 5am6 5am7 5b7v 5ew8 5flf 5o49 5o4a 5uq0 5ur1 5vnd 5z0s 5zv2 6c18 6c19 6c1b 6c1c 6c1o 6itj 6mzq 6mzw 6nvl 6p68 6p69 
+FGFR1,P11362,G641S,641,1,AF-P11362-F1-model_v2 1agw 1fgi 1fgk 2fgi 3c4f 3gql 3js2 3kxx 3ky2 3rhx 3tt0 4f63 4f64 4f65 4nk9 4nka 4nks 4rwi 4rwj 4rwk 4rwl 4uwb 4uwc 4uwy 4v01 4v04 4v05 4wun 4zsa 5a46 5a4c 5am6 5am7 5b7v 5ew8 5flf 5o49 5o4a 5uq0 5ur1 5vnd 5z0s 5zv2 6c18 6c19 6c1b 6c1c 6c1o 6itj 6mzq 6mzw 6nvl 6p68 6p69 
+FGFR1,P11362,S647F,647,2,AF-P11362-F1-model_v2 1agw 1fgi 1fgk 2fgi 3c4f 3js2 3kxx 3rhx 4f63 4f64 4rwl 4uwb 4uwc 4uwy 4zsa 5a46 5am6 5am7 5ew8 5o49 5o4a 5vnd 5z0s 5zv2 6itj 6p68 6p69 
+FGFR1,P11362,D654N,654,1,AF-P11362-F1-model_v2 1agw 1fgi 1fgk 2fgi 3c4f 3js2 3kxx 3ky2 3rhx 4f63 4f64 4f65 4nk9 4nka 4nks 4rwi 4rwj 4rwk 4rwl 4uwb 4uwc 4v01 4v04 4v05 4zsa 5a46 5a4c 5am6 5am7 5b7v 5ew8 5o49 5o4a 5vnd 5z0s 5zv2 6itj 6nvl 6p68 6p69 
+FGFR1,P11362,M668I,668,1,AF-P11362-F1-model_v2 1agw 1fgi 1fgk 2fgi 3c4f 3gqi 3gql 3js2 3kxx 3ky2 3rhx 3tt0 4f63 4f64 4f65 4nk9 4nka 4nks 4rwi 4rwj 4rwk 4rwl 4uwb 4uwc 4uwy 4v01 4v04 4v05 4wun 4zsa 5a46 5a4c 5am6 5am7 5b7v 5ew8 5o49 5o4a 5uq0 5ur1 5vnd 5z0s 5zv2 6c18 6c19 6c1b 6c1c 6c1o 6itj 6mzq 6mzw 6nvl 6p68 6p69 
+FGFR1,P11362,G691S,691,1,AF-P11362-F1-model_v2 1agw 1fgi 1fgk 2fgi 3c4f 3gqi 3gql 3js2 3kxx 3ky2 3rhx 3tt0 4f63 4f64 4f65 4nk9 4nka 4nks 4rwi 4rwj 4rwk 4rwl 4uwb 4uwc 4uwy 4v01 4v04 4v05 4wun 4zsa 5a46 5a4c 5am6 5am7 5b7v 5ew8 5o49 5o4a 5uq0 5ur1 5vnd 5z0s 5zv2 6c18 6c19 6c1b 6c1c 6c1o 6itj 6mzq 6mzw 6nvl 6p68 6p69 
+FGFR1,P11362,R692L,692,1,AF-P11362-F1-model_v2 1agw 1fgi 1fgk 2fgi 3c4f 3gqi 3gql 3js2 3kxx 3ky2 3rhx 3tt0 4f63 4f64 4f65 4nk9 4nka 4nks 4rwi 4rwj 4rwk 4rwl 4uwb 4uwc 4uwy 4v01 4v04 4v05 4wun 4zsa 5a46 5a4c 5am6 5am7 5b7v 5ew8 5o49 5o4a 5uq0 5ur1 5vnd 5z0s 5zv2 6c18 6c19 6c1b 6c1c 6c1o 6itj 6mzq 6mzw 6nvl 6p68 6p69 
+FGFR1,P11362,T709I,709,1,AF-P11362-F1-model_v2 1agw 1fgi 1fgk 2fgi 3c4f 3gqi 3gql 3js2 3kxx 3ky2 3rhx 3tt0 4f63 4f64 4f65 4nk9 4nka 4nks 4rwi 4rwj 4rwk 4rwl 4uwb 4uwc 4uwy 4v01 4v04 4v05 4wun 4zsa 5a46 5a4c 5am6 5am7 5b7v 5ew8 5o49 5o4a 5uq0 5ur1 5vnd 5z0s 5zv2 6c18 6c19 6c1b 6c1c 6c1o 6itj 6mzq 6mzw 6nvl 6p68 6p69 
+FGFR1,P11362,H710Y,710,1,AF-P11362-F1-model_v2 1agw 1fgi 1fgk 2fgi 3c4f 3gqi 3gql 3js2 3kxx 3ky2 3rhx 3tt0 4f63 4f64 4f65 4nk9 4nka 4nks 4rwi 4rwj 4rwk 4rwl 4uwb 4uwc 4uwy 4v01 4v04 4v05 4wun 4zsa 5a46 5a4c 5am6 5am7 5b7v 5ew8 5o49 5o4a 5uq0 5ur1 5vnd 5z0s 5zv2 6c18 6c19 6c1b 6c1c 6c1o 6itj 6mzq 6mzw 6nvl 6p68 6p69 
+FGFR1,P11362,S716F,716,1,AF-P11362-F1-model_v2 1agw 1fgi 1fgk 2fgi 3c4f 3gqi 3gql 3js2 3kxx 3ky2 3rhx 3tt0 4f63 4f64 4f65 4nk9 4nka 4nks 4rwi 4rwj 4rwk 4rwl 4uwb 4uwc 4uwy 4v01 4v04 4v05 4wun 4zsa 5a46 5a4c 5am6 5am7 5b7v 5ew8 5o49 5o4a 5uq0 5ur1 5vnd 5z0s 5zv2 6c18 6c19 6c1b 6c1c 6c1o 6itj 6mzq 6mzw 6nvl 6p68 6p69 
+FGFR1,P11362,P733S,733,1,AF-P11362-F1-model_v2 1agw 1fgi 1fgk 2fgi 3c4f 3gqi 3gql 3js2 3kxx 3ky2 3rhx 3tt0 4f63 4f64 4f65 4nk9 4nka 4nks 4rwi 4rwj 4rwk 4rwl 4uwb 4uwc 4uwy 4v01 4v04 4v05 4wun 4zsa 5a46 5a4c 5am6 5am7 5b7v 5ew8 5o49 5o4a 5uq0 5ur1 5vnd 5z0s 5zv2 6c18 6c19 6c1b 6c1c 6c1o 6itj 6mzq 6mzw 6nvl 6p68 6p69 
+FGFR1,P11362,G734D,734,1,AF-P11362-F1-model_v2 1agw 1fgi 1fgk 2fgi 3c4f 3gqi 3gql 3js2 3kxx 3ky2 3rhx 3tt0 4f63 4f64 4f65 4nk9 4nka 4nks 4rwi 4rwj 4rwk 4rwl 4uwb 4uwc 4uwy 4v01 4v04 4v05 4wun 4zsa 5a46 5a4c 5am6 5am7 5b7v 5ew8 5o49 5o4a 5uq0 5ur1 5vnd 5z0s 5zv2 6c18 6c19 6c1b 6c1c 6c1o 6itj 6mzq 6mzw 6nvl 6p68 6p69 
+FGFR1,P11362,E738K,738,2,AF-P11362-F1-model_v2 1agw 1fgi 1fgk 2fgi 3c4f 3gqi 3gql 3js2 3kxx 3ky2 3rhx 3tt0 4f63 4f64 4f65 4nk9 4nka 4nks 4rwi 4rwj 4rwk 4rwl 4uwb 4uwc 4uwy 4v01 4v04 4v05 4wun 4zsa 5a46 5a4c 5am6 5am7 5b7v 5ew8 5o49 5o4a 5uq0 5ur1 5vnd 5z0s 5zv2 6c18 6c19 6c1b 6c1c 6c1o 6itj 6mzq 6mzw 6nvl 6p68 6p69 
+FGFR1,P11362,E746K,746,1,AF-P11362-F1-model_v2 1agw 1fgi 1fgk 2fgi 3c4f 3gqi 3gql 3js2 3kxx 3ky2 3rhx 3tt0 4f63 4f64 4f65 4nk9 4nka 4nks 4rwi 4rwj 4rwk 4rwl 4uwb 4uwc 4uwy 4v01 4v04 4v05 4wun 4zsa 5a46 5a4c 5am6 5am7 5b7v 5ew8 5o49 5o4a 5uq0 5ur1 5vnd 5z0s 5zv2 6c18 6c19 6c1b 6c1c 6c1o 6itj 6mzq 6mzw 6nvl 6p68 6p69 
+FGFR1,P11362,M750I,750,1,AF-P11362-F1-model_v2 1agw 1fgi 1fgk 2fgi 3c4f 3gqi 3gql 3js2 3kxx 3ky2 3rhx 3tt0 4f63 4f64 4f65 4nk9 4nka 4nks 4rwi 4rwj 4rwk 4rwl 4uwb 4uwc 4uwy 4v01 4v04 4v05 4wun 4zsa 5a46 5a4c 5am6 5am7 5b7v 5ew8 5o49 5o4a 5uq0 5ur1 5vnd 5z0s 5zv2 6c18 6c19 6c1b 6c1c 6c1o 6itj 6mzq 6mzw 6nvl 6p68 6p69 
+FGFR1,P11362,E759K,759,1,AF-P11362-F1-model_v2 1agw 1fgi 1fgk 2fgi 3c4f 3gqi 3gql 3js2 3kxx 3ky2 3rhx 3tt0 4f63 4f64 4f65 4nk9 4nka 4nks 4rwi 4rwj 4rwk 4rwl 4uwb 4uwc 4uwy 4v01 4v04 4v05 4wun 4zsa 5a46 5a4c 5am6 5am7 5b7v 5ew8 5o49 5o4a 5uq0 5ur1 5vnd 5z0s 5zv2 6c18 6c19 6c1b 6c1c 6c1o 6itj 6mzq 6mzw 6nvl 6p68 6p69 
+FGFR1,P11362,C767G,767,1,AF-P11362-F1-model_v2 3gqi 3gql 
+FGFR1,P11362,H769R,769,1,AF-P11362-F1-model_v2 3gqi 3gql 
+FGFR1,P11362,F778L,778,1,AF-P11362-F1-model_v2 
+FGFR1,P11362,T792I,792,1,AF-P11362-F1-model_v2 
+FGFR1,P11362,N794S,794,1,AF-P11362-F1-model_v2 
+FGFR1,P11362,E796K,796,1,AF-P11362-F1-model_v2 
+FGFR1,P11362,P809L,809,1,AF-P11362-F1-model_v2 
+FGFR1,P11362,R815Q,815,1,AF-P11362-F1-model_v2 
+FGFR1,P11362,S816N,816,1,AF-P11362-F1-model_v2 
+FGFR1,P11362,S820F,820,1,AF-P11362-F1-model_v2 
+FGFR1,P11362,G822E,822,2,AF-P11362-F1-model_v2 
+FGFR1,P11362,S825F,825,1,
+FGFR1,P11362,V826L,826,1,
+FGFR1,P11362,H829Y,829,1,
+FGFR1,P11362,E830G,830,1,
+FGFR1,P11362,E830K,830,1,
+FGFR1,P11362,P833L,833,2,
+FGFR1,P11362,E835K,835,1,
+FGFR1,P11362,G849E,849,1,
+FGFR1,P11362,G849R,849,1,
+FGFR1,P11362,R852S,852,1,

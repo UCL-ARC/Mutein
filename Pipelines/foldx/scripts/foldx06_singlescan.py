@@ -25,6 +25,7 @@ import Paths
 import Arguments
 import Config
 import Foldx
+import FileDf
 
 
 ##### INPUTS #############################################
@@ -49,34 +50,31 @@ def run_pipeline03(args):
     # task=all means all, task=1:n means an explicit row, row=-1 means the mutation string has been passd in explicitly
     if mutation_string == "none":
         filename = pdb_path.pdb_thruputs + "singles_" + str(argus.arg("split")) + ".txt"
-        print("open", filename)
-        with open(filename) as fr:
-            paramscontent = fr.readlines()
-            if task == "all":                
-                for row in paramscontent:
-                    row = row.strip()
-                    print(row)
-                    rowvals = row.split(" ")
-                    mutation = rowvals[2]
-                    row = rowvals[3]
-                    mutations.append([mutation, row])
-            else:
-                row = paramscontent[int(task) - 1].strip()                
-                rowvals = row.split(" ")
-                mutation = rowvals[2]
-                row = rowvals[3]
-                mutations.append([mutation, row])    
+        fio = FileDf.FileDf(filename,sep=" ",cols=["pdb","mut","pdb_mut","task"],header=False)
+        df = fio.openDataFrame()                    
+        if task == "all":                
+            for i in range(len(df.index)):                
+                gene_mut = df["mut"][i]
+                pdb_mut = df["pdb_mut"][i]
+                row = df["task"][i]
+                mutations.append([pdb_mut, gene_mut, row])
+        else:
+            if int(task) <= len(df.index):
+                gene_mut = df["mut"][int(task)-1]
+                pdb_mut = df["pdb_mut"][int(task)-1]
+                row = df["task"][int(task)-1]
+                mutations.append([pdb_mut, gene_mut, row])                            
     else:
         # we have specified a mutation and row from the file
         mutations.append([mutation_string, 0])
     
-    for mut, row in mutations:
-        print(mut, row)
-
+    for pdb_mut, gene_mut, row in mutations:
+        print(pdb_mut, gene_mut, row)
         row_path = pdb_path.pdb_thruputs + str(argus.arg("split")) + "_" + str(row) + "_var" + "/"
         print("### ... change directory", row_path)
         argus.params["thisrow"] = row
-        argus.params["thismut"] = mut
+        argus.params["genemut"] = gene_mut
+        argus.params["pdbmut"] = pdb_mut
         pdb_path.goto_job_dir(row_path, args, argus.params, "_inputs06")
         print(
             "### foldx06: ... copying file",
@@ -86,7 +84,9 @@ def run_pipeline03(args):
         copyfile(pdb_path.pdb_thruputs + pdbfile, row_path + pdbfile)
         
         fx_runner = Foldx.Foldx(argus.arg("foldxe"))    
-        fx_runner.runPosscan(pdbfile,mut)
+        #fx_runner.runPosscan(pdbfile,pdb_mut)
+        pdb = pdbcode + "_rep" + str(argus.arg("repairs"))                
+        fx_runner.createPosscanCsv(row_path,pdb,pdb_mut,gene_mut,row_path + "posscan_df.csv")
         
 
 ##########################################################################################

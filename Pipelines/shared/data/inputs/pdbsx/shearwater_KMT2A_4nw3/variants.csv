@@ -1,0 +1,4 @@
+gene,accession,pdb,residue,mutation,variant
+KMT2A,Q03164,4nw3,1152,S1152L,ANY
+KMT2A,Q03164,4nw3,1156,G1156W,ANY
+KMT2A,Q03164,4nw3,1196,N1196S,ANY

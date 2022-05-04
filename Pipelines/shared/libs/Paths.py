@@ -20,6 +20,12 @@ class Paths:
         # [dataset] 1--* [gene] 1--* [pdb] 1--* [method]
                 
         # Create the dataset paths
+
+        # we have no choice but to make all paths lower case (or upper case)
+        dataset = dataset.lower()
+        gene = gene.lower()
+        pdb = pdb.lower()
+
         if "vcf" == level:
             # clean up first?
             self.get_make_paths_vcf(dataset)
@@ -91,17 +97,17 @@ class Paths:
         self.gene_inputs = self.add_remove_path_levels(
             dir_path,
             0,
-            dir=in_root_path + "/" + append + gene.upper() + "/",
+            dir=in_root_path + "/" + append + gene + "/",
             must_exist=False,
         )
         self.gene_outputs = self.add_remove_path_levels(
-            dir_path, 0, dir=out_root_path + "/" + append + gene.upper() + "/"
+            dir_path, 0, dir=out_root_path + "/" + append + gene + "/"
         )
         self.add_remove_path_levels(
-            dir_path, 0, dir=thru_root_path + "/" + append + gene.upper()
+            dir_path, 0, dir=thru_root_path + "/" + append + gene
         )
         self.gene_outpdbs = self.add_remove_path_levels(
-            dir_path, 0, dir=thru_root_path + "/" + append + gene.upper() + "/pdbs/"
+            dir_path, 0, dir=thru_root_path + "/" + append + gene + "/pdbs/"
         )
         # inputs and outputs directories are overkill here
 
@@ -131,7 +137,7 @@ class Paths:
         if dataset != "":
             append = (dataset + "_").lower()
         if gene != "":
-            append += (gene + "_").upper()
+            append += (gene + "_")
 
         self.pdb_inputs = self.add_remove_path_levels(
             dir_path, 0, dir=in_root_path + "/" + append + pdbcode.lower() + "/"

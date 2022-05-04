@@ -1,0 +1,4 @@
+gene,accession,pdb,residue,mutation,variant
+KMT2A,Q03164,2mtn,134,G134W,ANY
+KMT2A,Q03164,2mtn,139,G139R,ANY
+KMT2A,Q03164,2mtn,150,G150S,ANY

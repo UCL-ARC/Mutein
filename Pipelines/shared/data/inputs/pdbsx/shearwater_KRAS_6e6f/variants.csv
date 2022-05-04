@@ -1,0 +1,5 @@
+gene,accession,pdb,residue,mutation,variant
+KRAS,P01116,6e6f,41,R41K,ANY
+KRAS,P01116,6e6f,54,D54N,ANY
+KRAS,P01116,6e6f,54,D54E,ANY
+KRAS,P01116,6e6f,55,I55T,ANY

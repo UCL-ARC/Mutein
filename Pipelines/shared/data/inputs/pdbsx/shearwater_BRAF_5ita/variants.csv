@@ -1,0 +1,4 @@
+gene,accession,pdb,residue,mutation,variant
+BRAF,P15056,5ita,453,P453S,ANY
+BRAF,P15056,5ita,460,G460R,ANY
+BRAF,P15056,5ita,615,G615R,ANY

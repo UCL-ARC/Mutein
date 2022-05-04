@@ -1,0 +1,4 @@
+gene,accession,pdb,residue,mutation,variant
+ERBB2,P04626,2jwa,645,E645K,ANY
+ERBB2,P04626,2jwa,647,R647K,ANY
+ERBB2,P04626,2jwa,664,V664I,ANY

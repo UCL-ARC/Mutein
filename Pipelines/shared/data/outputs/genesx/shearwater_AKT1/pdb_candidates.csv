@@ -1,0 +1,61 @@
+gene,accession,variant,residue,bases,candidates
+AKT1,P31749,H13Y,13,1,AF-P31749-F1-model_v2 1h10 1unp 1unr 2uvm 3o96 4ejn 5kcv 6hhf 6hhg 6hhh 6hhi 6hhj 6s9w 6s9x 7nh4 7nh5 
+AKT1,P31749,G16E,16,1,AF-P31749-F1-model_v2 1h10 1unp 1unr 2uvm 3o96 4ejn 5kcv 6hhf 6hhg 6hhh 6hhi 6hhj 6s9w 6s9x 7nh4 7nh5 
+AKT1,P31749,E17K,17,2,AF-P31749-F1-model_v2 1h10 1unp 1unr 2uvm 3o96 4ejn 5kcv 6hhf 6hhg 6hhh 6hhi 6hhj 6s9w 6s9x 7nh4 7nh5 
+AKT1,P31749,E40K,40,1,AF-P31749-F1-model_v2 1h10 1unp 1unr 2uvm 3o96 4ejn 5kcv 6hhf 6hhg 6hhh 6hhi 6hhj 6s9w 6s9x 7nh4 7nh5 
+AKT1,P31749,P42L,42,1,AF-P31749-F1-model_v2 1h10 1unp 1unr 2uvm 3o96 4ejn 5kcv 6hhf 6hhg 6hhh 6hhi 6hhj 6s9w 6s9x 7nh4 7nh5 
+AKT1,P31749,M63V,63,1,AF-P31749-F1-model_v2 1unp 1unr 2uvm 2uzr 3o96 4ejn 5kcv 6hhf 6hhg 6hhh 6hhi 6hhj 6s9w 6s9x 7nh4 7nh5 
+AKT1,P31749,E66K,66,1,AF-P31749-F1-model_v2 1h10 1unp 1unr 2uvm 2uzr 3o96 4ejn 5kcv 6hhf 6hhg 6hhh 6hhi 6hhj 6s9w 6s9x 7nh4 7nh5 
+AKT1,P31749,P68L,68,2,AF-P31749-F1-model_v2 1h10 1unp 1unr 2uvm 2uzr 3o96 4ejn 5kcv 6hhf 6hhg 6hhh 6hhi 6hhj 6s9w 6s9x 7nh4 7nh5 
+AKT1,P31749,P70S,70,1,AF-P31749-F1-model_v2 1h10 1unp 1unr 2uvm 2uzr 3o96 4ejn 5kcv 6hhf 6hhg 6hhh 6hhi 6hhj 6s9w 6s9x 7nh4 7nh5 
+AKT1,P31749,T72I,72,1,AF-P31749-F1-model_v2 1h10 1unp 1unr 2uvm 2uzr 3o96 4ejn 5kcv 6hhf 6hhg 6hhh 6hhi 6hhj 6s9w 6s9x 7nh4 7nh5 
+AKT1,P31749,E97K,97,1,AF-P31749-F1-model_v2 1h10 1unp 1unr 2uvm 2uzr 3o96 4ejn 5kcv 6hhf 6hhg 6hhh 6hhi 6hhj 6s9w 6s9x 7nh4 7nh5 
+AKT1,P31749,T101I,101,1,AF-P31749-F1-model_v2 1h10 1unp 1unr 2uvm 2uzr 3o96 4ejn 5kcv 6hhf 6hhg 6hhh 6hhi 6hhj 6s9w 6s9x 7nh4 7nh5 
+AKT1,P31749,M118I,118,1,AF-P31749-F1-model_v2 1unp 1unr 2uzr 
+AKT1,P31749,D119I,119,2,AF-P31749-F1-model_v2 1unp 1unr 2uzr 
+AKT1,P31749,R121W,121,1,AF-P31749-F1-model_v2 1unp 
+AKT1,P31749,S122L,122,1,AF-P31749-F1-model_v2 
+AKT1,P31749,G123S,123,1,AF-P31749-F1-model_v2 
+AKT1,P31749,P125S,125,1,AF-P31749-F1-model_v2 
+AKT1,P31749,S129L,129,1,AF-P31749-F1-model_v2 
+AKT1,P31749,E169K,169,1,AF-P31749-F1-model_v2 3cqu 3cqw 3mv5 3mvh 3o96 3ocb 3ow4 3qkk 3qkl 3qkm 4ejn 4ekk 4ekl 5kcv 6buu 6hhf 6hhg 6hhh 6hhi 6hhj 6npz 6s9w 6s9x 7apj 7nh4 7nh5 
+AKT1,P31749,E184K,184,2,AF-P31749-F1-model_v2 3cqu 3cqw 3mv5 3mvh 3o96 3ocb 3ow4 3qkk 3qkl 3qkm 4ejn 4ekk 4ekl 6buu 6hhf 6hhg 6hhh 6hhi 6hhj 6npz 6s9w 6s9x 7apj 7nh4 7nh5 
+AKT1,P31749,D190N,190,1,AF-P31749-F1-model_v2 3cqu 3cqw 3mv5 3mvh 3ocb 3ow4 3qkk 3qkl 3qkm 4ekk 4ekl 6buu 6hhj 6npz 6s9w 
+AKT1,P31749,T197I,197,1,AF-P31749-F1-model_v2 3cqu 3cqw 3mv5 3mvh 3ocb 3ow4 3qkk 3qkl 3qkm 4ekk 4ekl 6buu 6hhj 6npz 6s9w 
+AKT1,P31749,E198K,198,1,AF-P31749-F1-model_v2 3cqu 3cqw 3mv5 3mvh 3ocb 3ow4 3qkk 3qkl 3qkm 4ekk 4ekl 6buu 6hhj 6npz 6s9w 
+AKT1,P31749,H220Y,220,1,AF-P31749-F1-model_v2 3cqu 3cqw 3mv5 3mvh 3o96 3ocb 3ow4 3qkk 3qkl 3qkm 4ejn 4ekk 4ekl 5kcv 6buu 6hhf 6hhg 6hhh 6hhi 6hhj 6npz 6s9w 6s9x 7apj 7nh5 
+AKT1,P31749,R222C,222,2,AF-P31749-F1-model_v2 3cqu 3cqw 3mv5 3mvh 3o96 3ocb 3ow4 3qkk 3qkl 3qkm 4ejn 4ekk 4ekl 5kcv 6buu 6hhf 6hhg 6hhh 6hhi 6hhj 6npz 6s9w 6s9x 7apj 7nh5 
+AKT1,P31749,G232K,232,2,AF-P31749-F1-model_v2 3cqu 3cqw 3mv5 3mvh 3o96 3ocb 3ow4 3qkk 3qkl 3qkm 4ejn 4ekk 4ekl 5kcv 6buu 6hhf 6hhg 6hhh 6hhi 6hhj 6npz 6s9w 6s9x 7apj 7nh5 
+AKT1,P31749,R241W,241,1,AF-P31749-F1-model_v2 3cqu 3cqw 3mv5 3mvh 3o96 3ocb 3ow4 3qkk 3qkl 3qkm 4ejn 4ekk 4ekl 5kcv 6buu 6hhf 6hhg 6hhh 6hhi 6hhj 6npz 6s9w 6s9x 7apj 7nh5 
+AKT1,P31749,E242K,242,1,AF-P31749-F1-model_v2 3cqu 3cqw 3mv5 3mvh 3o96 3ocb 3ow4 3qkk 3qkl 3qkm 4ejn 4ekk 4ekl 5kcv 6buu 6hhf 6hhg 6hhh 6hhi 6hhj 6npz 6s9w 6s9x 7apj 7nh5 
+AKT1,P31749,R243H,243,1,AF-P31749-F1-model_v2 3cqu 3cqw 3mv5 3mvh 3o96 3ocb 3ow4 3qkk 3qkl 3qkm 4ejn 4ekk 4ekl 5kcv 6buu 6hhf 6hhg 6hhh 6hhi 6hhj 6npz 6s9w 6s9x 7apj 7nh5 
+AKT1,P31749,R249Q,249,1,AF-P31749-F1-model_v2 3cqu 3cqw 3mv5 3mvh 3o96 3ocb 3ow4 3qkk 3qkl 3qkm 4ejn 4ekk 4ekl 5kcv 6buu 6hhf 6hhg 6hhh 6hhi 6hhj 6npz 6s9w 6s9x 7apj 7nh5 
+AKT1,P31749,D262N,262,2,AF-P31749-F1-model_v2 3cqu 3cqw 3mv5 3mvh 3o96 3ocb 3ow4 3qkk 3qkl 3qkm 4ejn 4ekk 4ekl 5kcv 6buu 6hhf 6hhg 6hhh 6hhi 6hhj 6npz 6s9w 6s9x 7apj 7nh5 
+AKT1,P31749,L280F,280,2,AF-P31749-F1-model_v2 3cqu 3cqw 3mv5 3mvh 3o96 3ocb 3ow4 3qkk 3qkl 3qkm 4ejn 4ekk 4ekl 5kcv 6buu 6hhf 6hhg 6hhh 6hhi 6hhj 6npz 6s9w 6s9x 7apj 7nh5 
+AKT1,P31749,G286E,286,2,AF-P31749-F1-model_v2 3cqu 3cqw 3mv5 3mvh 3o96 3ocb 3ow4 3qkk 3qkl 3qkm 4ejn 4ekk 4ekl 5kcv 6buu 6hhf 6hhg 6hhh 6hhi 6hhj 6npz 6s9w 6s9x 7apj 7nh5 
+AKT1,P31749,D292N,292,1,AF-P31749-F1-model_v2 3cqu 3cqw 3mv5 3mvh 3o96 3ocb 3ow4 3qkk 3qkl 3qkm 4ejn 4ekk 4ekl 5kcv 6buu 6hhf 6hhg 6hhh 6hhi 6hhj 6npz 6s9w 6s9x 7apj 7nh5 
+AKT1,P31749,E298K,298,1,AF-P31749-F1-model_v2 3cqu 3cqw 3mv5 3mvh 3o96 3ocb 3ow4 3qkk 3qkl 3qkm 4ejn 4ekk 4ekl 6buu 6hhg 6hhh 6hhi 6hhj 6npz 6s9w 6s9x 7nh5 
+AKT1,P31749,P313A,313,1,AF-P31749-F1-model_v2 3cqu 3cqw 3mv5 3mvh 3o96 3ocb 3ow4 3qkk 3qkl 3qkm 4ejn 4ekk 4ekl 4gv1 5kcv 6buu 6hhf 6hhg 6hhh 6hhi 6hhj 6npz 6s9w 6s9x 7apj 7nh5 
+AKT1,P31749,G336V,336,1,AF-P31749-F1-model_v2 3cqu 3cqw 3mv5 3mvh 3o96 3ocb 3ow4 3qkk 3qkl 3qkm 4ejn 4ekk 4ekl 4gv1 5kcv 6buu 6hhf 6hhg 6hhh 6hhi 6hhj 6npz 6s9w 6s9x 7apj 7nh5 
+AKT1,P31749,Y340H,340,1,AF-P31749-F1-model_v2 3cqu 3cqw 3mv5 3mvh 3o96 3ocb 3ow4 3qkk 3qkl 3qkm 4ejn 4ekk 4ekl 4gv1 5kcv 6buu 6hhf 6hhg 6hhh 6hhi 6hhj 6npz 6s9w 6s9x 7apj 7nh5 
+AKT1,P31749,M363I,363,1,AF-P31749-F1-model_v2 3cqu 3cqw 3mv5 3mvh 3o96 3ocb 3ow4 3qkk 3qkl 3qkm 4ejn 4ekk 4ekl 4gv1 5kcv 6buu 6hhf 6hhg 6hhh 6hhi 6hhj 6npz 6s9w 6s9x 7apj 7nh5 
+AKT1,P31749,E365K,365,2,AF-P31749-F1-model_v2 3cqu 3cqw 3mv5 3mvh 3o96 3ocb 3ow4 3qkk 3qkl 3qkm 4ejn 4ekk 4ekl 4gv1 5kcv 6buu 6hhf 6hhg 6hhh 6hhi 6hhj 6npz 6s9w 6s9x 7apj 7nh5 
+AKT1,P31749,G373S,373,1,AF-P31749-F1-model_v2 3cqu 3cqw 3mv5 3mvh 3o96 3ocb 3ow4 3qkk 3qkl 3qkm 4ejn 4ekk 4ekl 4gv1 5kcv 6buu 6hhf 6hhg 6hhh 6hhi 6hhj 6npz 6s9w 6s9x 7apj 7nh5 
+AKT1,P31749,P374L,374,1,AF-P31749-F1-model_v2 3cqu 3cqw 3mv5 3mvh 3o96 3ocb 3ow4 3qkk 3qkl 3qkm 4ejn 4ekk 4ekl 4gv1 5kcv 6buu 6hhf 6hhg 6hhh 6hhi 6hhj 6npz 6s9w 6s9x 7apj 7nh5 
+AKT1,P31749,P374T,374,1,AF-P31749-F1-model_v2 3cqu 3cqw 3mv5 3mvh 3o96 3ocb 3ow4 3qkk 3qkl 3qkm 4ejn 4ekk 4ekl 4gv1 5kcv 6buu 6hhf 6hhg 6hhh 6hhi 6hhj 6npz 6s9w 6s9x 7apj 7nh5 
+AKT1,P31749,L383R,383,1,AF-P31749-F1-model_v2 3cqu 3cqw 3mv5 3mvh 3o96 3ocb 3ow4 3qkk 3qkl 3qkm 4ejn 4ekk 4ekl 4gv1 5kcv 6buu 6hhf 6hhg 6hhh 6hhi 6hhj 6npz 6s9w 6s9x 7apj 7nh5 
+AKT1,P31749,G394E,394,1,AF-P31749-F1-model_v2 3cqu 3cqw 3mv5 3mvh 3o96 3ocb 3ow4 3qkk 3qkl 3qkm 4ejn 4ekk 4ekl 4gv1 5kcv 6buu 6hhf 6hhg 6hhh 6hhi 6hhj 6npz 6s9w 6s9x 7apj 7nh5 
+AKT1,P31749,S396F,396,1,AF-P31749-F1-model_v2 3cqu 3cqw 3mv5 3mvh 3o96 3ocb 3ow4 3qkk 3qkl 3qkm 4ejn 4ekk 4ekl 4gv1 5kcv 6buu 6hhf 6hhg 6hhh 6hhi 6hhj 6npz 6s9w 6s9x 7apj 7nh5 
+AKT1,P31749,S431L,431,1,AF-P31749-F1-model_v2 3cqu 3cqw 3mv5 3mvh 3ocb 3ow4 3qkk 3qkl 3qkm 4ejn 4ekk 4ekl 4gv1 5kcv 6buu 6hhf 6hhg 6hhh 6hhi 6hhj 6npz 6s9w 6s9x 7apj 7nh5 
+AKT1,P31749,D434Y,434,1,AF-P31749-F1-model_v2 3cqu 3cqw 3mv5 3mvh 3ocb 3ow4 3qkk 3qkl 3qkm 4ejn 4ekk 4ekl 4gv1 5kcv 6buu 6hhf 6hhg 6hhh 6hhi 6hhj 6npz 6s9w 6s9x 7apj 7nh5 
+AKT1,P31749,D434E,434,1,AF-P31749-F1-model_v2 3cqu 3cqw 3mv5 3mvh 3ocb 3ow4 3qkk 3qkl 3qkm 4ejn 4ekk 4ekl 4gv1 5kcv 6buu 6hhf 6hhg 6hhh 6hhi 6hhj 6npz 6s9w 6s9x 7apj 7nh5 
+AKT1,P31749,T435I,435,1,AF-P31749-F1-model_v2 3cqu 3cqw 3mv5 3mvh 3ocb 3ow4 3qkk 3qkl 3qkm 4ejn 4ekk 4ekl 4gv1 5kcv 6buu 6hhf 6hhg 6hhh 6hhi 6hhj 6npz 6s9w 6s9x 7apj 7nh5 
+AKT1,P31749,D439N,439,1,AF-P31749-F1-model_v2 3cqu 3cqw 3mv5 3mvh 3ocb 3ow4 3qkk 3qkl 3qkm 4ekk 4ekl 4gv1 6buu 6hhf 6hhg 6hhh 6hhi 6hhj 6npz 6s9w 6s9x 7apj 7nh5 
+AKT1,P31749,E440M,440,2,AF-P31749-F1-model_v2 3cqu 3cqw 3mv5 3mvh 3ocb 3ow4 3qkk 3qkl 3qkm 4ekk 4ekl 4gv1 6buu 6hhg 6hhi 6hhj 6npz 6s9w 6s9x 7nh5 
+AKT1,P31749,I447T,447,1,AF-P31749-F1-model_v2 3cqw 3mv5 3ocb 3ow4 3qkk 3qkl 3qkm 4ekk 4ekl 4gv1 6buu 6npz 
+AKT1,P31749,T448I,448,2,AF-P31749-F1-model_v2 3ocb 3ow4 3qkk 3qkl 3qkm 4ekl 4gv1 6buu 6npz 
+AKT1,P31749,P452L,452,1,AF-P31749-F1-model_v2 
+AKT1,P31749,S457I,457,1,AF-P31749-F1-model_v2 
+AKT1,P31749,E459K,459,1,AF-P31749-F1-model_v2 
+AKT1,P31749,P467L,467,1,AF-P31749-F1-model_v2 6buu 6npz 
+AKT1,P31749,H468Y,468,2,AF-P31749-F1-model_v2 6buu 6npz 

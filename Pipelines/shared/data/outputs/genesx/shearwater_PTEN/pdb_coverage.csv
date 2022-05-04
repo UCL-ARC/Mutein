@@ -1,0 +1,8 @@
+gene,accession,pdb,method,resolution,coverage
+PTEN,P60484,AF-P60484-F1-model_v2,alphafold,,1:403 
+PTEN,P60484,1d5r,x-ray,2.1,14:281 313:351 
+PTEN,P60484,2kyl,nmr,,391:403 
+PTEN,P60484,4o1v,x-ray,2.0,357:363 
+PTEN,P60484,7juk,x-ray,3.15,7:281 314:351 
+PTEN,P60484,7jul,x-ray,2.53,313:351 
+PTEN,P60484,7jvx,x-ray,3.2,7:282 314:351 

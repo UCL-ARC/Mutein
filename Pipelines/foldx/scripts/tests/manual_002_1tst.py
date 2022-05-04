@@ -38,7 +38,7 @@ def test_foldx_pipeline04_1tst():
 
 def test_foldx_pipeline05_1tst():
     addpath()
-    import foldx05_vparams as p05
+    import Pipelines.foldx.scripts.foldx05_buildparams as p05
     args = ["", "user=CI", "pdb=1tst","repairs=3"]
     p05.run_pipeline05(args)
 

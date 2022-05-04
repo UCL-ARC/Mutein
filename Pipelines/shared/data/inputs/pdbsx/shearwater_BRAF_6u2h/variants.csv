@@ -1,0 +1,3 @@
+gene,accession,pdb,residue,mutation,variant
+BRAF,P15056,6u2h,731,P731L,ANY
+BRAF,P15056,6u2h,732,S732F,ANY

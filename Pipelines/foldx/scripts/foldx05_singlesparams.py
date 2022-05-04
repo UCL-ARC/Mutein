@@ -40,7 +40,7 @@ def run_pipeline05(args):
     ############################################
     pdb = argus.arg("pdb")    
     variant = argus.arg("variant")
-    chainid = argus.arg("chain")
+    #chainid = argus.arg("chain")
     splitrows = int(argus.arg("split"))
     
     # variant file is in the pdb inputs
@@ -59,8 +59,10 @@ def run_pipeline05(args):
     print(mutations)
     mut_list = []
     for i in range(len(mutations.index)):
+        chain = mutations["chain"][i]
         mut = mutations["mutation"][i]
-        mut_list.append(mut)
+        pdb_mut = mutations["pdb_mut"][i]
+        mut_list.append([mut,pdb_mut,chain])
 
     ##### Create a dataframe for the paramterfile in the number of chunks specified
     total_muts = len(mut_list)
@@ -69,22 +71,26 @@ def run_pipeline05(args):
     # so until we get to the remainer we need chunk +1 on each row
     param_dic = {}
     param_dic["pdb"] = []
-    param_dic["chain"] = []
+    #param_dic["chain"] = []
     param_dic["mutation"] = []
+    param_dic["pdb_mut"] = []
     param_dic["row"] = []
     row_size = 0
     row = 0
     for i in range(len(mut_list)):
-        mut = mut_list[i]
-        mutscan = mut[0]+chainid+mut[1:]#format for posscan
+        mut,pdb_mut,chain = mut_list[i]
+        mutscan = mut[0]+chain+mut[1:]#format for posscan
+        pdb_mutscan = pdb_mut[0]+chain+pdb_mut[1:]#format for posscan
         if row_size == 0:
             param_dic["pdb"].append(pdb)
-            param_dic["chain"].append(chainid)
+            #param_dic["chain"].append(chainid)
             param_dic["mutation"].append(mutscan)
+            param_dic["pdb_mut"].append(pdb_mutscan)
             row += 1
             param_dic["row"].append("" + str(row))
         else:
             param_dic["mutation"][row - 1] = param_dic["mutation"][row - 1] + "," + mutscan
+            param_dic["pdb_mut"][row - 1] = param_dic["pdb_mut"][row - 1] + "," + pdb_mutscan
         row_size += 1
 
         if row_size == chunk and row > remainder:

@@ -1,0 +1,4 @@
+gene,accession,pdb,residue,mutation,variant
+AURKA,O14965,3ha6,289,L289F,ANY
+AURKA,O14965,3ha6,343,R343Q,ANY
+AURKA,O14965,3ha6,349,P349R,ANY

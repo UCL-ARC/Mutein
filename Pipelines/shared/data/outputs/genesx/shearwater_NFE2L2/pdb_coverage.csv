@@ -1,0 +1,6 @@
+gene,accession,pdb,method,resolution,coverage
+NFE2L2,Q16236,AF-Q16236-F1-model_v2,alphafold,,1:605 
+NFE2L2,Q16236,2flu,x-ray,1.5,69:84 
+NFE2L2,Q16236,4ifl,x-ray,1.8,69:84 
+NFE2L2,Q16236,5wfv,x-ray,1.91,76:84 
+NFE2L2,Q16236,7k2k,x-ray,1.98,77:82 

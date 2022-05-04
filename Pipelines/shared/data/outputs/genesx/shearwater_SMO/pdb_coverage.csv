@@ -1,0 +1,14 @@
+gene,accession,pdb,method,resolution,coverage
+SMO,Q99835,AF-Q99835-F1-model_v2,alphafold,,1:787 
+SMO,Q99835,4jkv,x-ray,2.45,355:493 507:550 506:552 
+SMO,Q99835,4n4w,x-ray,2.8,443:492 506:553 
+SMO,Q99835,4o9r,x-ray,3.2,192:344 505:551 
+SMO,Q99835,4qim,x-ray,2.61,190:346 
+SMO,Q99835,4qin,x-ray,2.6,506:551 
+SMO,Q99835,5l7d,x-ray,3.2,507:551 
+SMO,Q99835,5l7i,x-ray,3.3,506:551 506:552 
+SMO,Q99835,6ot0,e-m,3.9,190:553 
+SMO,Q99835,6xbj,e-m,3.88,506:538 
+SMO,Q99835,6xbk,e-m,3.24,506:538 
+SMO,Q99835,6xbl,e-m,3.9,63:497 506:538 
+SMO,Q99835,6xbm,e-m,3.15,192:496 513:538 

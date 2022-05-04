@@ -1,0 +1,9 @@
+gene,accession,pdb,method,resolution,coverage
+SOX2,P48431,AF-P48431-F1-model_v2,alphafold,,1:317 
+SOX2,P48431,1o4x,nmr,,39:115 
+SOX2,P48431,6t7b,e-m,5.1,39:114 
+SOX2,P48431,6t90,e-m,3.05,41:114 
+SOX2,P48431,6wx7,x-ray,2.7,41:45 111:118 
+SOX2,P48431,6wx8,x-ray,2.3,39:120 40:120 
+SOX2,P48431,6wx9,x-ray,2.8,40:46 113:120 
+SOX2,P48431,6yov,e-m,3.42,41:113 

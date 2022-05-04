@@ -1,0 +1,3 @@
+gene,accession,pdb,residue,mutation,variant
+EZH2,Q15910,5h15,40,S40G,ANY
+EZH2,Q15910,5h15,65,I65R,ANY

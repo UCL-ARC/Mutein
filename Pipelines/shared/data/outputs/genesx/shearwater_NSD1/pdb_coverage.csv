@@ -1,0 +1,4 @@
+gene,accession,pdb,method,resolution,coverage
+NSD1,Q96L73,AF-Q96L73-F1-model_v2,alphafold,,1:2696 
+NSD1,Q96L73,6kqp,x-ray,2.4,1864:2083 
+NSD1,Q96L73,6kqq,x-ray,1.8,1863:2085 1867:2085 
