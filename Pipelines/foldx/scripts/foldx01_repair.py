@@ -36,7 +36,7 @@ def run_pipeline01(args):
     argus = Arguments.Arguments(args)
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
-    pdbcode = argus.arg("pdb")
+    pdbcode = argus.arg("pdb").lower()
     pdb_path = Paths.Paths("pdb",dataset=dataset,gene=gene,pdb=pdbcode)        
     repair_path = pdb_path.pdb_thruputs + "repair" + str(argus.arg("repairs")) + "/"    
     argus.addConfig({"repair_path":repair_path})

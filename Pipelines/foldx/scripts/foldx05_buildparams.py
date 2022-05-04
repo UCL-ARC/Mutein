@@ -32,7 +32,7 @@ def run_pipeline05(args):
     argus = Arguments.Arguments(args)
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
-    pdbcode = argus.arg("pdb")
+    pdbcode = argus.arg("pdb").lower()
     pdb_path = Paths.Paths("pdb",dataset=dataset,gene=gene,pdb=pdbcode)
     work_path = pdb_path.pdb_thruputs + "vparams/"
     pdb_path.goto_job_dir(work_path, args, argus.params, "_inputs05")    

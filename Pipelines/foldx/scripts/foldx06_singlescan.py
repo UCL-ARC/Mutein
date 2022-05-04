@@ -38,7 +38,7 @@ def run_pipeline03(args):
     argus = Arguments.Arguments(args)
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
-    pdbcode = argus.arg("pdb")
+    pdbcode = argus.arg("pdb").lower()
     pdb_path = Paths.Paths("pdb",dataset=dataset,gene=gene,pdb=pdbcode)
     #pdb_config = Config.Config(pdb_path.pdb_inputs + "/config.yml")
     #argus.addConfig(pdb_config.params)    

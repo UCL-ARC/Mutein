@@ -46,7 +46,7 @@ def run_pipeline(args):
     all_df_vars_AF = []
     all_df_backs_AF = []
     for i in range(len(pm_df.index)):
-        r = pm_df["pdb"][i]
+        r = pm_df["pdb"][i].lower()
         # the file has already been turned into a dataframe called posscan_df.csv        
         pdb_path = Paths.Paths("pdb",dataset=dataset,gene=gene,pdb=r)    
         file_var = pdb_path.pdb_outputs + "ddg_variants.csv"

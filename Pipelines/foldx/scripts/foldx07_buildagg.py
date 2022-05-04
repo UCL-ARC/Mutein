@@ -29,7 +29,7 @@ def run_pipeline07(args):
     print("### Foldx variant aggregate ###")
     ##############################################    
     argus = Arguments.Arguments(args)
-    pdbcode = argus.arg("pdb")
+    pdbcode = argus.arg("pdb").lower()
     pdb_path = Paths.Paths("pdb",dataset="",gene="",pdb=pdbcode)
     pdb_config = Config.Config(pdb_path.pdb_inputs + "/config.yml")
     argus.addConfig(pdb_config.params)
