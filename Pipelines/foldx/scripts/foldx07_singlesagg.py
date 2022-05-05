@@ -67,7 +67,7 @@ def run_pipeline04(args):
         + "_variants_plot.png"
     )
     ana = Analysis.Analysis(ddg_df,argus.arg("pdb"))
-    ana.createDdgResidue(plot_file,"variants")
+    ana.createDdgResidue(plot_file,"variants",xax="gene_no")
     
     print("### COMPLETED FoldX aggregate job ###")
 

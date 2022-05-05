@@ -114,7 +114,8 @@ def run_pipeline(args):
                             start += 1
                             chain = ""
                             if start > 0:
-                                try:
+                                if True:
+                                #try:
                                     resis = pp.get_ca_list()[0]
                                     chain = resis.parent.get_parent().id
                                     #https://biopython.org/docs/1.75/api/Bio.PDB.Atom.html                                                        
@@ -124,10 +125,10 @@ def run_pipeline(args):
                                     offset = start - residue_num
                                     print(pdb,"gene=",start,"pdb=",residue_num,"offset=",offset,seq_one)
                                     has_match = True
-                                    pb = Pdb.Pdb(gene,pdb,chain,start,start+len(seq_one),method,res,offset)
-                                    gn.addPdb(pb)
-                                except:
-                                    print("!!!", resis, gene, pdb)                                                                
+                                    pb = gn.getPdb(pdb,method,res)
+                                    pb.addSegment(start,start-1+len(seq_one),offset,chain)                                    
+                                #except:
+                                #    print("!!!", resis, gene, pdb)                                                                
                         if not has_match:
                             genetoprotein.removePdbStructure(
                                 url, pdb, gene_path.gene_outpdbs + pdb + ".pdb"
@@ -169,8 +170,9 @@ def run_pipeline(args):
                     dfp = gn.getPdbVariantCoverageDataFrame(pdb)
                     dfp.to_csv(pdb_path.pdb_inputs + "/variants.csv", index=False)
                     pdb.downloadPdb(pdb_path.pdb_inputs)
-                    # I don't think I need the config yaml anymore with the new batch system
-                    #gn.createPdbConfigYaml(pdb, pdb_path.pdb_inputs + "/config.yml")
+                    dfp = gn.getSinglePdbCoverageDataFrame(pdb)
+                    dfp.to_csv(pdb_path.pdb_inputs + "/coverage.csv", index=False)
+                    
 
             # And save it all in the dataset output
             # we do this each time so that if it gets abandoned we knw where we were

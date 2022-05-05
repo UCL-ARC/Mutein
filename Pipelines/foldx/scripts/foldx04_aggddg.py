@@ -66,9 +66,17 @@ def run_pipeline04(args):
         + str(argus.arg("repairs"))
         + "_background_plot.png"
     )
+    plot_file_gene = (
+        pdb_path.pdb_outputs
+        + argus.arg("pdb")
+        + "_"
+        + str(argus.arg("repairs"))
+        + "_background_plot_gene.png"
+    )
 
     ana = Analysis.Analysis(ddg_df,argus.arg("pdb"))
-    ana.createDdgResidue(plot_file,"background")
+    ana.createDdgResidue(plot_file,"background")    
+    ana.createDdgResidue(plot_file_gene,"background muts",dropnagene=True,xax="gene_no")
     
     print("### COMPLETED FoldX aggregate job ###")
 

@@ -84,7 +84,7 @@ class Foldx:
             ddg_df.to_csv(df_file, index=False)
             print("### ......... FOLDX:Build_Dataframe: completed",df_file )
 
-    def createPosscanCsv(self, path,pdbfile,pdb_mut,gene_mut,outfile_path):
+    def createPosscanCsv(self, path,pdbfile,pdb_mut,gene_mut,coverage,outfile_path):
         in_file = path + "PS_" + pdbfile + "_scanning_output.txt"
         print(pdb_mut,gene_mut)
         pdb_muts = pdb_mut.split(",")        
@@ -93,9 +93,24 @@ class Foldx:
         else:
             gene_muts = []
         mut_dic = {}
+        print(pdb_muts)
         if len(pdb_muts) == len(gene_muts):
             for i in range(len(pdb_muts)):
                 mut_dic[pdb_muts[i][2:-1]] = gene_muts[i][2:-1]
+        else: #then we are going to imply the gene muts from the coverage
+            for i in range(len(pdb_muts)):
+                pdb_mut = pdb_muts[i]
+                ch = pdb_mut[1]                
+                rid = int(pdb_mut[2:-1])
+                print(ch,rid,pdb_mut)                
+                for i in range(len(coverage.index)):
+                    start = int(coverage["pdb_start"][i])
+                    end = int(coverage["pdb_end"][i])
+                    chain = coverage["chain"][i]
+                    offset = int(coverage["offset"][i])
+                    if chain == ch and rid >= start and rid <= end:
+                        mut_dic[rid] = rid+offset                
+
         print(mut_dic)
             
         print(pdb_muts,gene_muts)
@@ -135,6 +150,9 @@ class Foldx:
                 
         fdic = FileDf.FileDic(outfile_path,posscan_dic)
         fdic.saveAsDf()
+
+    def getCoveredPdbResidue(self,mut,coverage):
+        return ""
         
 
 

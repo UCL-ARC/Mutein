@@ -82,9 +82,15 @@ def run_pipeline03(args):
         copyfile(pdb_path.pdb_thruputs + pdbfile, row_path + pdbfile)
 
         fx_runner = Foldx.Foldx(argus.arg("foldxe"))    
-        fx_runner.runPosscan(pdbfile,mut)
-        pdb = pdbcode + "_rep" + str(argus.arg("repairs"))
-        fx_runner.createPosscanCsv(row_path,pdb,mut,"",row_path + "posscan_df.csv")
+        ###########################################################################
+        #fx_runner.runPosscan(pdbfile,mut)
+        ###########################################################################
+        pdb = pdbcode + "_rep" + str(argus.arg("repairs"))        
+        # pass in the coverage to annotate the csv file
+        filename = pdb_path.pdb_inputs + "coverage.csv"
+        fdfp = FileDf.FileDf(filename)
+        cov_df = fdfp.openDataFrame()        
+        fx_runner.createPosscanCsv(row_path,pdb,mut,"",cov_df,row_path + "posscan_df.csv")
 
         
 

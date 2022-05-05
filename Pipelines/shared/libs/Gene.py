@@ -7,6 +7,8 @@ Class to manage the data associated with a gene
 import os
 import pandas as pd
 
+import Pdb
+
 
 class Gene:
     def __init__(self, gene, accession, seq):
@@ -20,13 +22,14 @@ class Gene:
         if variant.variant not in self.variants:
             self.variants[variant.variant] = variant
 
-    def addPdb(self, pdb):
-        if pdb.pdbcode not in self.pdbs:
-            self.pdbs[pdb.pdbcode] = pdb
-        else:
-            if self.pdbs[pdb.pdbcode].getSegments() != pdb.getSegments():
-                self.pdbs[pdb.pdbcode].addSegments(pdb)
-
+    def getPdb(self, pdbcode,method,res):
+        if pdbcode not in self.pdbs:
+            pdb = Pdb.Pdb(self.gene,pdbcode,method,res)
+            self.pdbs[pdbcode] = pdb
+        else:            
+            pdb = self.pdbs[pdbcode]
+        return pdb
+            
     def getMatchingVarantPdb(self):
         v_p = []
         for v in self.variants:
@@ -65,8 +68,7 @@ class Gene:
         dic_coverage = {}
         dic_coverage["gene"] = []
         dic_coverage["accession"] = []
-        dic_coverage["pdb"] = []
-        dic_coverage["chain"] = []
+        dic_coverage["pdb"] = []        
         dic_coverage["method"] = []
         dic_coverage["resolution"] = []
         dic_coverage["coverage"] = []
@@ -74,11 +76,51 @@ class Gene:
         for pdbcod, pdb in self.pdbs.items():
             dic_coverage["gene"].append(self.gene)
             dic_coverage["accession"].append(self.accession)
-            dic_coverage["pdb"].append(pdbcod)
-            dic_coverage["chain"].append(pdb.chain)
+            dic_coverage["pdb"].append(pdbcod)            
             dic_coverage["method"].append(pdb.getMethod())
             dic_coverage["resolution"].append(pdb.resolution)
             dic_coverage["coverage"].append(pdb.getSegments())
+        pdbs_df = pd.DataFrame.from_dict(dic_coverage)
+        return pdbs_df
+    
+    def getSinglePdbCoverageDataFrame(self,pdb):
+        dic_coverage = {}
+        dic_coverage["gene"] = []
+        dic_coverage["accession"] = []
+        dic_coverage["pdb"] = []
+        dic_coverage["chain"] = []
+        dic_coverage["method"] = []
+        dic_coverage["resolution"] = []
+        dic_coverage["pdb_start"] = []
+        dic_coverage["pdb_end"] = []
+        dic_coverage["offset"] = []
+        dic_coverage["gene_start"] = []
+        dic_coverage["gene_end"] = []
+        
+        #dic_coverage["coverage"].append(pdb.getSegments())
+        #segs += seg_start + ":" + seg_end + ":" + seg_off + ":" + self.chain + " "
+        segments = pdb.getSegments().split(" ")
+        for segment in segments:            
+            segs = segment.split(":")            
+            if len(segs) >= 4:
+                gene_start = int(segs[0])
+                gene_end = int(segs[1])
+                seg_off = int(segs[2])
+                seg_chain = segs[3]
+                pdb_start = gene_start-seg_off
+                pdb_end = gene_end-seg_off
+                        
+                dic_coverage["gene"].append(self.gene)
+                dic_coverage["accession"].append(self.accession)
+                dic_coverage["pdb"].append(pdb.pdbcode)
+                dic_coverage["chain"].append(seg_chain)
+                dic_coverage["method"].append(pdb.getMethod())
+                dic_coverage["resolution"].append(pdb.resolution)            
+                dic_coverage["pdb_start"].append(pdb_start)            
+                dic_coverage["pdb_end"].append(pdb_end)            
+                dic_coverage["offset"].append(seg_off)            
+                dic_coverage["gene_start"].append(gene_start)            
+                dic_coverage["gene_end"].append(gene_end)            
         pdbs_df = pd.DataFrame.from_dict(dic_coverage)
         return pdbs_df
 

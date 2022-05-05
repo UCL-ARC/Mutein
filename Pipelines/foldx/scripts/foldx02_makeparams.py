@@ -22,6 +22,7 @@ sys.path.append(retpath)
 import Paths
 import Arguments
 import Config
+import FileDf
 
 ##### INPUTS #############################################
 # The inputs to this function are the pdbfile and the chain id (might optionally consider the positionscan mutation type)
@@ -108,6 +109,13 @@ def run_pipeline02(args):
                         print("!Error maybe?", aaa)  # TODO think about this
 
     ##### Create a dataframe for the paramterfile in the number of chunks specified
+    ##### Open up the coverage file
+    filename = pdb_path.pdb_inputs + "coverage.csv"
+    fdfp = FileDf.FileDf(filename)
+    cov_df = fdfp.openDataFrame()
+    print(cov_df)
+
+
     rows = int(rows)
     param_dic = {}
     param_dic["pdb"] = []    

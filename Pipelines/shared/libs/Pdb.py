@@ -14,17 +14,28 @@ warnings.filterwarnings("ignore")  # sadly because of the annoying bioython warn
 
 class Pdb:
     def __init__(
-        self, gene, pdb, chain, segment_start, segment_end, method, resolution,offset
+        #self, gene, pdb, chain, segment_start, segment_end, method, resolution,offset
+        self, gene, pdb, method, resolution
     ):
         self.gene = gene.upper()
         self.pdbcode = pdb
-        self.chain = chain.upper()
-        self.segment_starts = [int(segment_start)]
-        self.segment_ends = [int(segment_end)]
-        self.segment_offsets = [int(offset)]
-        self.segment_chains = [chain]
+        #self.chain = chain.upper()
+        self.segment_starts = []#[int(segment_start)]
+        self.segment_ends = []#[int(segment_end)]
+        self.segment_offsets = []#[int(offset)]
+        self.segment_chains = []#[chain]
         self.method = method.lower()
         self.resolution = resolution                
+
+    def addSegment(self, seg_start,seg_end,seg_off,seg_chain):
+        start_in = seg_start not in self.segment_starts
+        end_in = seg_end not in self.segment_ends
+        chain_in = seg_chain not in self.segment_chains
+        if start_in and end_in and chain_in:
+            self.segment_starts.append(int(seg_start))
+            self.segment_ends.append(int(seg_end))
+            self.segment_offsets.append(int(seg_off))
+            self.segment_chains.append(seg_chain)
 
     def matchesResidue(self, residue):
         for s in range(len(self.segment_starts)):
@@ -42,24 +53,10 @@ class Pdb:
             seg_start = str(self.segment_starts[s])
             seg_end = str(self.segment_ends[s])
             seg_off = str(self.segment_offsets[s])            
-            segs += seg_start + ":" + seg_end + ":" + seg_off + ":" + self.chain + " "
+            seg_chain = str(self.segment_chains[s])        
+            segs += seg_start + ":" + seg_end + ":" + seg_off + ":" + seg_chain + " "
         return segs
-
-    def addSegments(self, pdb):
-        segs = ""
-        for s in range(len(pdb.segment_starts)):
-            seg_start = int(pdb.segment_starts[s])
-            seg_end = int(pdb.segment_ends[s])
-            seg_off = int(pdb.segment_offsets[s])
-            seg_chain = pdb.segment_chains[s]
-            start_in = seg_start in self.segment_starts
-            end_in = seg_end in self.segment_ends            
-            if not (start_in and end_in):
-                self.segment_starts.append(seg_start)
-                self.segment_ends.append(seg_end)
-                self.segment_offsets.append(seg_off)
-                self.segment_chains.append(seg_chain)
-
+    
     def getMethod(self):
         if "nmr" in self.method:
             return "nmr"
