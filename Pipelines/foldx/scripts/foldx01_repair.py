@@ -86,7 +86,7 @@ def run_pipeline01(args):
     )
     copyfile(
         argus.arg("repair_path") + repairinnames[numRepairs],
-        pdb_path.pdb_thruputs + "/" + repairinnames[numRepairs], 
+        pdb_path.pdb_thruputs + "/" + repairinnames[numRepairs].lower(), 
     )
 
     print("### COMPLETED FoldX repair job ###")

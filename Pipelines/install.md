@@ -16,6 +16,7 @@ module load python3/recommended
 sh pipeline_covid.sh
 sh pipeline_notch.sh
 sh pipeline_notch_NOTCH1.sh
+sh pipeline_notch_NOTCH1_AF.sh
 ```
 #### 3) GeneProt: This starts with I think a vcf file and ends with the protein structures
 #### 4) FoldX: This pipeline takes a pdb file and a list of mutations and creates xxxx
