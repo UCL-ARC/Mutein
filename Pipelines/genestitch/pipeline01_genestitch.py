@@ -67,19 +67,21 @@ def run_pipeline(args):
             
     # NON Alpha-Fold structures
     outputs = []
-    outputs.append([all_df_vars,"ddg_variants.csv","ddg_variants.png","variants","gene_no"])
-    outputs.append([all_df_backs,"ddg_background.csv","ddg_background.png","background","pdb_rid"])
-    outputs.append([all_df_vars_AF,"ddg_variants_AF.csv","ddg_variants_AF.png","variants AF","gene_no"])
-    outputs.append([all_df_backs_AF,"ddg_background_AF.csv","ddg_background_AF.png","background AF","pdb_rid"])
+    outputs.append([all_df_vars,"ddg_variants.csv","ddg_variants.png","variants","gene_no",False])
+    outputs.append([all_df_backs,"ddg_background.csv","ddg_background.png","background","pdb_rid",False])
+    outputs.append([all_df_backs,"ddg_background.csv","ddg_background_gene.png","background gene","gene_no",True])
+    outputs.append([all_df_vars_AF,"ddg_variants_AF.csv","ddg_variants_AF.png","variants AF","gene_no",False])
+    outputs.append([all_df_backs_AF,"ddg_background_AF.csv","ddg_background_AF.png","background AF","pdb_rid",False])
+    outputs.append([all_df_backs_AF,"ddg_background_AF.csv","ddg_background_gene_AF.png","background AF gene","gene_no",True])
 
-    for dfs,csv_file, png_file, title,xax in outputs:
+    for dfs,csv_file, png_file, title,xax,nagene in outputs:
         if len(dfs) > 0:
             ddg_df = pd.concat(dfs,ignore_index=True)            
             df_file = gene_path.gene_outputs + csv_file
             ddg_df.to_csv(df_file, index=False)            
             plot_file = gene_path.gene_outputs + png_file
             anav = Analysis.Analysis(ddg_df,gene)
-            anav.createDdgResidue(plot_file,title,xax=xax)
+            anav.createDdgResidue(plot_file,title,xax=xax,dropnagene=nagene)
     
 
     #ddg_df_var = pd.concat(all_df_vars,ignore_index=True)        
