@@ -31,7 +31,7 @@ class Pdb:
         start_in = seg_start not in self.segment_starts
         end_in = seg_end not in self.segment_ends
         chain_in = seg_chain not in self.segment_chains
-        if start_in and end_in and chain_in:
+        if start_in and end_in:
             self.segment_starts.append(int(seg_start))
             self.segment_ends.append(int(seg_end))
             self.segment_offsets.append(int(seg_off))

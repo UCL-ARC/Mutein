@@ -87,20 +87,20 @@ def test_foldx_pipeline_singlesagg(inputs):
 ######################################################################
 
 ## GENE_PROT
-#test_geneprot_pipeline("dataset=notch@")
+test_geneprot_pipeline("dataset=notch@")
 
 ## FOLDX
 #test_foldx_pipeline_repair("repairs=2@dataset=notch@gene=NOTCH1@pdb=3v79@chain=A")
 
 #test_foldx_pipeline_params("repairs=2@split=200@dataset=notch@gene=NOTCH1@pdb=3v79@chain=RK@task=1")
 #test_foldx_pipeline_posscan("repairs=2@split=200@dataset=notch@gene=NOTCH1@pdb=3v79@task=1")
-test_foldx_pipeline_agg("repairs=2@split=200@dataset=notch@gene=NOTCH1@pdb=3v79")
+#test_foldx_pipeline_agg("repairs=2@split=200@dataset=notch@gene=NOTCH1@pdb=3v79")
 
 #test_foldx_pipeline_vparams("repairs=2@split=20@dataset=notch@gene=NOTCH1@pdb=3v79@task=1@variant=*")
 ###test_foldx_pipeline_build("repairs=2@split=20@dataset=notch@gene=NOTCH1@pdb=3v79@task=1")
 #test_foldx_pipeline_singlescan("repairs=2@split=20@dataset=notch@gene=NOTCH1@pdb=3v79@@task=1")
 #test_foldx_pipeline_singlescan("repairs=2@split=20@dataset=notch@gene=NOTCH1@pdb=3v79@@task=5")
-test_foldx_pipeline_singlesagg("repairs=2@split=20@dataset=notch@gene=NOTCH1@pdb=3v79")
+#test_foldx_pipeline_singlesagg("repairs=2@split=20@dataset=notch@gene=NOTCH1@pdb=3v79")
 
 ## GENE_STITCH
 #test_genestitch_ppl("dataset=notch@gene=NOTCH1")
