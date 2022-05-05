@@ -15,7 +15,7 @@ from os.path import exists
 
 #import from the shared library in Mutein/Pipelines/shared/lib
 import sys
-dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
+dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-1]
 retpath = "/".join(dirs) + '/shared/libs'
 sys.path.append(retpath)
 import Paths

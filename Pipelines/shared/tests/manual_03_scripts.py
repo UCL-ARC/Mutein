@@ -13,7 +13,7 @@ retpath = "/".join(dirs) + "/foldx/scripts"
 sys.path.append(retpath)
 retpath = "/".join(dirs) + "/geneprot/scripts"
 sys.path.append(retpath)
-retpath = "/".join(dirs) + "/genestitch/scripts"
+retpath = "/".join(dirs) + "/genestitch"
 sys.path.append(retpath)
 import Paths
 
@@ -29,14 +29,14 @@ def test_geneprot_pipeline(inputs):
 
 def test_genestitch_ppl(inputs):
     addpath()
-    import pipeline01_stitch as p01
+    import pipeline01_genestitch as p01
     args = ["", inputs]
     p01.run_pipeline(args)
 
 ########################################################################
 def test_foldx_pipeline_repair(inputs):
     addpath()
-    import foldx01_repair as p01
+    import stitch01_genestitch as p01
     args = ["", inputs]
     p01.run_pipeline01(args)
 
