@@ -47,7 +47,7 @@ time: '1:00:0'
 dependency: 'Foldx1'
 array: 0
 inputs: "repairs=5@split=20@variant=*"
-active: 'Y'
+active: 'N'
 ---
 id: 'Foldx6'
 qsub_id: 'foldx_varscan'
