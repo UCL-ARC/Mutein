@@ -36,7 +36,7 @@ def test_genestitch_ppl(inputs):
 ########################################################################
 def test_foldx_pipeline_repair(inputs):
     addpath()
-    import stitch01_genestitch as p01
+    import foldx01_repair as p01
     args = ["", inputs]
     p01.run_pipeline01(args)
 
@@ -87,13 +87,13 @@ def test_foldx_pipeline_singlesagg(inputs):
 ######################################################################
 
 ## GENE_PROT
-#test_geneprot_pipeline("dataset=notch@")
+test_geneprot_pipeline("dataset=notch@")
 
 ## FOLDX
-#test_foldx_pipeline_repair("repairs=2@dataset=notch@gene=NOTCH1@pdb=3v79@chain=A")
+#test_foldx_pipeline_repair("repairs=1@dataset=notch@gene=NOTCH1@pdb=3i08")
 
-#test_foldx_pipeline_params("repairs=2@split=200@dataset=notch@gene=NOTCH1@pdb=3v79@chain=RK@task=1")
-test_foldx_pipeline_posscan("repairs=2@split=200@dataset=notch@gene=NOTCH1@pdb=3v79@task=1")
+#test_foldx_pipeline_params("repairs=1@split=100@dataset=notch@gene=NOTCH1@pdb=3i08")
+test_foldx_pipeline_posscan("repairs=1@split=100@dataset=notch@gene=NOTCH1@pdb=3i08@task=1")
 #test_foldx_pipeline_posscan("repairs=2@split=200@dataset=notch@gene=NOTCH1@pdb=2f83@task=89")
 #test_foldx_pipeline_agg("repairs=2@split=200@dataset=notch@gene=NOTCH1@pdb=3v79")
 

@@ -148,7 +148,7 @@ def run_pipeline(args):
                             yaml_file = "batch_pdb.yml"
                             if chain != "":
                                 bm.addBatch(
-                                    script_file, yaml_file, dataset, gene, pdb, chain
+                                    script_file, yaml_file, dataset, gene, pdb
                                 )
 
                 bm.printBatchScript(
@@ -162,7 +162,7 @@ def run_pipeline(args):
                 bm2 = BatchMaker.BatchMaker()
                 script_file = "pipeline_qsubber.py"
                 yaml_file = "batch_genestitch.yml"
-                bm2.addBatch(script_file, yaml_file, dataset, gene, "x", "x")
+                bm2.addBatch(script_file, yaml_file, dataset, gene, "x")
                 bm2.printBatchScript(
                     gene_path.gene_outputs
                     + "/ppl_"

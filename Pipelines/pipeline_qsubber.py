@@ -61,9 +61,9 @@ def pipeline_qsubber(args):
         gene = args[4]  # 4) gene
     if len(args) > 4:
         pdb = args[5]  # 5) pdb
-    if len(args) > 5:
-        chain = args[6]  # 6) chain
-    print("#### MUTEIN PIPELINE ####", yaml_file, py_or_sh, dataset, gene, pdb, chain)
+    #if len(args) > 5:
+    #    chain = args[6]  # 6) chain
+    print("#### MUTEIN PIPELINE ####", yaml_file, py_or_sh, dataset, gene, pdb)
 
     # We want the user
     homeuser = pwd.getpwuid(os.getuid())[0]
@@ -99,7 +99,7 @@ def pipeline_qsubber(args):
                 inputs += "dataset=" + dataset
                 inputs += "@gene=" + gene
                 inputs += "@pdb=" + pdb
-                inputs += "@chain=" + chain
+                #inputs += "@chain=" + chain
                 if active:
                     batch_dic[str(id)] = (
                         qsubid,

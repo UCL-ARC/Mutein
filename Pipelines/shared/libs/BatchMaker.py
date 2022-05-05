@@ -14,8 +14,8 @@ class BatchMaker:
         self.batches = []
         self.batches.append("module load python3/recommended")
 
-    def addBatch(self,script_file,yaml_file,dataset,gene,pdb,chain):
-        line = "python " + script_file + " " + yaml_file + " qsub " + dataset + " " + gene + " " + pdb + " " + chain
+    def addBatch(self,script_file,yaml_file,dataset,gene,pdb):
+        line = "python " + script_file + " " + yaml_file + " qsub " + dataset + " " + gene + " " + pdb
         self.batches.append(line)
 
     def printBatchScript(self,file_path):

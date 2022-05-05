@@ -43,7 +43,7 @@ def run_pipeline02(args):
     pdb_path.goto_job_dir(argus.arg("work_path"), args, argus.params, "_inputs02")
 
     pdb = argus.arg("pdb")
-    chainid = argus.arg("chain")
+    #chainid = argus.arg("chain")
     rows = int(argus.arg("split"))
 
     ##########################################################
@@ -98,7 +98,7 @@ def run_pipeline02(args):
             atomtype = linecontents[2].strip()
             if atomtype == "CA":
                 chain = linecontents[4].strip()
-                if chain in chainid:  # list of chains
+                if chain == chain:  # list of chains
                     aaa = linecontents[3].strip()
                     if aaa in aa_dict:
                         aa = aa_dict[aaa]
