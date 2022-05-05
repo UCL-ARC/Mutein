@@ -16,10 +16,11 @@ import pandas as pd
 from shutil import copyfile
 
 
-#import from the shared library in Mutein/Pipelines/shared/lib
+# import from the shared library in Mutein/Pipelines/shared/lib
 import sys
+
 dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
-retpath = "/".join(dirs) + '/shared/libs'
+retpath = "/".join(dirs) + "/shared/libs"
 sys.path.append(retpath)
 import Paths
 import Arguments
@@ -29,16 +30,16 @@ import Foldx
 
 def run_pipeline06(args):
     print("### FoldX build job ###")
-    print(args)    
+    print(args)
     argus = Arguments.Arguments(args)
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
     pdbcode = argus.arg("pdb").lower()
-    pdb_path = Paths.Paths("pdb",dataset=dataset,gene=gene,pdb=pdbcode)
-    #pdb_config = Config.Config(pdb_path.pdb_inputs + "/config.yml")
-    #argus.addConfig(pdb_config.params)    
-    task = argus.arg("task","none")
-    mutation_string = argus.arg("mutation","none")
+    pdb_path = Paths.Paths("pdb", dataset=dataset, gene=gene, pdb=pdbcode)
+    # pdb_config = Config.Config(pdb_path.pdb_inputs + "/config.yml")
+    # argus.addConfig(pdb_config.params)
+    task = argus.arg("task", "none")
+    mutation_string = argus.arg("mutation", "none")
 
     ############################################
     # set up the files and directories
@@ -50,7 +51,7 @@ def run_pipeline06(args):
         print("open", filename)
         with open(filename) as fr:
             paramscontent = fr.readlines()
-            if task == "all":                
+            if task == "all":
                 for row in paramscontent:
                     row = row.strip()
                     print(row)
@@ -59,11 +60,11 @@ def run_pipeline06(args):
                     row = rowvals[3]
                     mutations.append([mutation, row])
             else:
-                row = paramscontent[int(task) - 1].strip()                
+                row = paramscontent[int(task) - 1].strip()
                 rowvals = row.split(" ")
                 mutation = rowvals[2]
                 row = rowvals[3]
-                mutations.append([mutation, row])    
+                mutations.append([mutation, row])
     else:
         # we have specified a mutation and row from the file
         mutations.append([mutation_string, 0])
@@ -71,7 +72,14 @@ def run_pipeline06(args):
     for mut, row in mutations:
         print(mut, row)
 
-        row_path = pdb_path.pdb_thruputs + str(argus.arg("split")) + "_" + str(row) + "_build" + "/"
+        row_path = (
+            pdb_path.pdb_thruputs
+            + str(argus.arg("split"))
+            + "_"
+            + str(row)
+            + "_build"
+            + "/"
+        )
         print("### ... change directory", row_path)
         argus.params["thisrow"] = row
         argus.params["thismut"] = mut
@@ -82,12 +90,13 @@ def run_pipeline06(args):
             row_path + pdbfile,
         )
         copyfile(pdb_path.pdb_thruputs + pdbfile, row_path + pdbfile)
-    
-        fx_runner = Foldx.Foldx(argus.arg("foldxe"))    
-        fx_runner.runBuild(pdbfile,mut,15)    
-        ddg_file = row_path+"/Dif_" + pdbfile + ".fxout"
-        df_file = row_path+"/pdbfile_build_DDG.csv"        
-        fx_runner.createBuildCsv(pdbcode,mut,ddg_file,df_file,task)
+
+        fx_runner = Foldx.Foldx(argus.arg("foldxe"))
+        fx_runner.runBuild(pdbfile, mut, 15)
+        ddg_file = row_path + "/Dif_" + pdbfile + ".fxout"
+        df_file = row_path + "/pdbfile_build_DDG.csv"
+        fx_runner.createBuildCsv(pdbcode, mut, ddg_file, df_file, task)
+
 
 if __name__ == "__main__":
     import sys

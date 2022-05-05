@@ -13,10 +13,11 @@ import pandas as pd
 from shutil import copyfile
 import itertools
 
-#import from the shared library in Mutein/Pipelines/shared/lib
+# import from the shared library in Mutein/Pipelines/shared/lib
 import sys
+
 dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
-retpath = "/".join(dirs) + '/shared/libs'
+retpath = "/".join(dirs) + "/shared/libs"
 sys.path.append(retpath)
 import Paths
 import Arguments
@@ -28,23 +29,23 @@ import Config
 def run_pipeline05(args):
     print("### FoldX make variant params job ###")
     print(args)
-    ##############################################    
+    ##############################################
     argus = Arguments.Arguments(args)
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
     pdbcode = argus.arg("pdb").lower()
-    pdb_path = Paths.Paths("pdb",dataset=dataset,gene=gene,pdb=pdbcode)
+    pdb_path = Paths.Paths("pdb", dataset=dataset, gene=gene, pdb=pdbcode)
     work_path = pdb_path.pdb_thruputs + "vparams/"
-    pdb_path.goto_job_dir(work_path, args, argus.params, "_inputs05")    
+    pdb_path.goto_job_dir(work_path, args, argus.params, "_inputs05")
     ############################################
     pdb = argus.arg("pdb")
-    #jobname = argus.arg("name")
-    #row = argus.arg("row","row0")
+    # jobname = argus.arg("name")
+    # row = argus.arg("row","row0")
     variant = argus.arg("variant")
     chainid = argus.arg("chain")
-    
+
     # variant file is in the pdb inputs
-    pdb_path = Paths.Paths("pdb",dataset=dataset,gene=gene,pdb=pdbcode)
+    pdb_path = Paths.Paths("pdb", dataset=dataset, gene=gene, pdb=pdbcode)
 
     in_mutations_file = pdb_path.pdb_inputs + "variants.csv"
     new_mutations_file = pdb_path.pdb_outputs + "variants.csv"
@@ -52,7 +53,7 @@ def run_pipeline05(args):
     copyfile(in_mutations_file, new_mutations_file)
     ##### Open the variant file ################################
     variant_df = pd.read_csv(new_mutations_file)
-    if variant !="*":
+    if variant != "*":
         mutations = variant_df.query("variant == '" + variant + "'")
     else:
         mutations = variant_df
@@ -88,12 +89,12 @@ def run_pipeline05(args):
         param_dic["chain"].append(chainid)
         param_dic["mutation"].append(mut_str + ";")
         param_dic["row"].append("row" + str(len(mut)) + "_var" + str(row))
-        print(pdb,chainid,mut_str,"row" + str(len(mut)) + "_var" + str(row))
+        print(pdb, chainid, mut_str, "row" + str(len(mut)) + "_var" + str(row))
 
     ##### Turn the dictionary into a dataframe
     data_params = pd.DataFrame.from_dict(param_dic)
     filename = pdb_path.pdb_thruputs + "variant_params.txt"
-    print("## Foldx.vparam: exporting variant file to",filename)
+    print("## Foldx.vparam: exporting variant file to", filename)
     data_params.to_csv(filename, index=False, sep=" ", header=False)
 
 

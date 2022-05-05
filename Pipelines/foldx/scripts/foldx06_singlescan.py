@@ -16,10 +16,11 @@ import os
 import pandas as pd
 from shutil import copyfile
 
-#import from the shared library in Mutein/Pipelines/shared/lib
+# import from the shared library in Mutein/Pipelines/shared/lib
 import sys
+
 dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
-retpath = "/".join(dirs) + '/shared/libs'
+retpath = "/".join(dirs) + "/shared/libs"
 sys.path.append(retpath)
 import Paths
 import Arguments
@@ -39,38 +40,47 @@ def run_pipeline03(args):
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
     pdbcode = argus.arg("pdb").lower()
-    pdb_path = Paths.Paths("pdb",dataset=dataset,gene=gene,pdb=pdbcode)
-    #pdb_config = Config.Config(pdb_path.pdb_inputs + "/config.yml")
-    #argus.addConfig(pdb_config.params)    
-    task = argus.arg("task","none")
-    mutation_string = argus.arg("mutation","none")
+    pdb_path = Paths.Paths("pdb", dataset=dataset, gene=gene, pdb=pdbcode)
+    # pdb_config = Config.Config(pdb_path.pdb_inputs + "/config.yml")
+    # argus.addConfig(pdb_config.params)
+    task = argus.arg("task", "none")
+    mutation_string = argus.arg("mutation", "none")
     ############################################
     pdbfile = pdbcode + "_rep" + str(argus.arg("repairs")) + ".pdb"
     mutations = []
     # task=all means all, task=1:n means an explicit row, row=-1 means the mutation string has been passd in explicitly
     if mutation_string == "none":
         filename = pdb_path.pdb_thruputs + "singles_" + str(argus.arg("split")) + ".txt"
-        fio = FileDf.FileDf(filename,sep=" ",cols=["pdb","mut","pdb_mut","task"],header=False)
-        df = fio.openDataFrame()                    
-        if task == "all":                
-            for i in range(len(df.index)):                
+        fio = FileDf.FileDf(
+            filename, sep=" ", cols=["pdb", "mut", "pdb_mut", "task"], header=False
+        )
+        df = fio.openDataFrame()
+        if task == "all":
+            for i in range(len(df.index)):
                 gene_mut = df["mut"][i]
                 pdb_mut = df["pdb_mut"][i]
                 row = df["task"][i]
                 mutations.append([pdb_mut, gene_mut, row])
         else:
             if int(task) <= len(df.index):
-                gene_mut = df["mut"][int(task)-1]
-                pdb_mut = df["pdb_mut"][int(task)-1]
-                row = df["task"][int(task)-1]
-                mutations.append([pdb_mut, gene_mut, row])                            
+                gene_mut = df["mut"][int(task) - 1]
+                pdb_mut = df["pdb_mut"][int(task) - 1]
+                row = df["task"][int(task) - 1]
+                mutations.append([pdb_mut, gene_mut, row])
     else:
         # we have specified a mutation and row from the file
         mutations.append([mutation_string, 0])
-    
+
     for pdb_mut, gene_mut, row in mutations:
         print(pdb_mut, gene_mut, row)
-        row_path = pdb_path.pdb_thruputs + str(argus.arg("split")) + "_" + str(row) + "_var" + "/"
+        row_path = (
+            pdb_path.pdb_thruputs
+            + str(argus.arg("split"))
+            + "_"
+            + str(row)
+            + "_var"
+            + "/"
+        )
         print("### ... change directory", row_path)
         argus.params["thisrow"] = row
         argus.params["genemut"] = gene_mut
@@ -82,18 +92,20 @@ def run_pipeline03(args):
             row_path + pdbfile,
         )
         copyfile(pdb_path.pdb_thruputs + pdbfile, row_path + pdbfile)
-        
-        fx_runner = Foldx.Foldx(argus.arg("foldxe"))    
+
+        fx_runner = Foldx.Foldx(argus.arg("foldxe"))
         ################################################################
-        fx_runner.runPosscan(pdbfile,pdb_mut)
+        fx_runner.runPosscan(pdbfile, pdb_mut)
         ################################################################
-        pdb = pdbcode + "_rep" + str(argus.arg("repairs"))              
+        pdb = pdbcode + "_rep" + str(argus.arg("repairs"))
         # pass in the coverage to annotate the csv file
         filename = pdb_path.pdb_inputs + "coverage.csv"
         fdfp = FileDf.FileDf(filename)
-        cov_df = fdfp.openDataFrame()          
-        fx_runner.createPosscanCsv(row_path,pdb,pdb_mut,gene_mut,cov_df,row_path + "posscan_df.csv")
-        
+        cov_df = fdfp.openDataFrame()
+        fx_runner.createPosscanCsv(
+            row_path, pdb, pdb_mut, gene_mut, cov_df, row_path + "posscan_df.csv"
+        )
+
 
 ##########################################################################################
 if __name__ == "__main__":

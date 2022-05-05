@@ -28,10 +28,11 @@ import os
 import pwd
 import yaml
 
-#import from the shared library in Mutein/Pipelines/shared/lib
+# import from the shared library in Mutein/Pipelines/shared/lib
 import sys
+
 dirs = os.path.dirname(os.path.realpath(__file__)).split("/")
-retpath = "/".join(dirs) + '/shared/libs'
+retpath = "/".join(dirs) + "/shared/libs"
 sys.path.append(retpath)
 import Config
 import Paths
@@ -43,34 +44,34 @@ import SubRunner as sub
 ##### INPUTS #############################################
 ## Pipeline jobs sequence
 
+
 def pipeline_qsubber(args):
     # The environment is loaded by arguments by default
-    print("ARGS=",args)
-    argus = Arguments.Arguments(args,spaced=False)
-    
+    print("ARGS=", args)
+    argus = Arguments.Arguments(args, spaced=False)
 
     # There are 6 arguments
-    yaml_file = args[1] #1) a yaml file path with the batch definition    
-    py_or_sh = args[2] #2) qsub or py or sh for python or hpc batch or just sh
-    # everything is defined in the yaml APART from dataset, gene, pdb        
-    dataset,gene,pdb,chain = "","","",""
+    yaml_file = args[1]  # 1) a yaml file path with the batch definition
+    py_or_sh = args[2]  # 2) qsub or py or sh for python or hpc batch or just sh
+    # everything is defined in the yaml APART from dataset, gene, pdb
+    dataset, gene, pdb, chain = "", "", "", ""
     if len(args) > 2:
-        dataset = args[3] #3) dataset
+        dataset = args[3]  # 3) dataset
     if len(args) > 3:
-        gene = args[4] #4) gene
+        gene = args[4]  # 4) gene
     if len(args) > 4:
-        pdb = args[5] #5) pdb
+        pdb = args[5]  # 5) pdb
     if len(args) > 5:
-        chain = args[6] #6) chain
-    print("#### MUTEIN PIPELINE ####", yaml_file,py_or_sh, dataset, gene, pdb,chain)
+        chain = args[6]  # 6) chain
+    print("#### MUTEIN PIPELINE ####", yaml_file, py_or_sh, dataset, gene, pdb, chain)
 
     # We want the user
     homeuser = pwd.getpwuid(os.getuid())[0]
     print("HomeUser=", homeuser)
-    print("Running",yaml_file," for user=",homeuser)
-    # We want to be in the script directory    
+    print("Running", yaml_file, " for user=", homeuser)
+    # We want to be in the script directory
     script_path = os.path.dirname(os.path.realpath(__file__))
-    dir_path =  script_path + "/"
+    dir_path = script_path + "/"
     print("# overall pipeline: changing directory to", dir_path)
     os.chdir(dir_path)
 
@@ -82,7 +83,7 @@ def pipeline_qsubber(args):
         pipes = yaml.safe_load_all(fr)
         for pipe in pipes:
             if pipe != None:
-                print('### yaml load|',pipe)
+                print("### yaml load|", pipe)
                 id = pipe["id"]
                 qsubid = pipe["qsub_id"]
                 work_dir = pipe["work_dir"].strip()
@@ -91,7 +92,7 @@ def pipeline_qsubber(args):
                 dependency = pipe["dependency"].strip()
                 array = pipe["array"]
                 inputs = pipe["inputs"].strip()
-                active = pipe["active"].strip()=="Y"
+                active = pipe["active"].strip() == "Y"
                 # add the dataset, gene and pdb onto inputs
                 if len(inputs) > 0:
                     inputs += "@"
@@ -100,37 +101,64 @@ def pipeline_qsubber(args):
                 inputs += "@pdb=" + pdb
                 inputs += "@chain=" + chain
                 if active:
-                    batch_dic[str(id)] = (qsubid,work_dir,script, time, dependency, array, inputs)
+                    batch_dic[str(id)] = (
+                        qsubid,
+                        work_dir,
+                        script,
+                        time,
+                        dependency,
+                        array,
+                        inputs,
+                    )
                     batch_list.append(str(id))
 
     dependencies = {}
     for id in batch_list:
-        isarray =  int(array)>0
-        qsubid,work_dir,script, time, dependency, array, inputs = batch_dic[id]
-        #print("# overall pipeline script:",id,qsubid,work_dir,script, time, dependency, array, inputs)        
+        isarray = int(array) > 0
+        qsubid, work_dir, script, time, dependency, array, inputs = batch_dic[id]
+        # print("# overall pipeline script:",id,qsubid,work_dir,script, time, dependency, array, inputs)
         if "qsub" in py_or_sh:
             dep = -1
             if str(dependency) != "-1":
-                if dependency in dependencies:                
+                if dependency in dependencies:
                     dep = dependencies[dependency]
                 else:
-                    dep = -1            
-            runner = qsub.QSubRunner(id,qsubid,script, dir_path,work_dir,dep,time,array,homeuser,inputs,py_or_sh!="qsub")
+                    dep = -1
+            runner = qsub.QSubRunner(
+                id,
+                qsubid,
+                script,
+                dir_path,
+                work_dir,
+                dep,
+                time,
+                array,
+                homeuser,
+                inputs,
+                py_or_sh != "qsub",
+            )
             dep = runner.run()
             dependencies[id] = dep
         elif py_or_sh == "py":
-            runner = sub.SubRunner(argus.arg("pythonexe"),dir_path,work_dir,script,".py",inputs,isarray)
+            runner = sub.SubRunner(
+                argus.arg("pythonexe"),
+                dir_path,
+                work_dir,
+                script,
+                ".py",
+                inputs,
+                isarray,
+            )
             dep = runner.run()
-        elif py_or_sh == "sh":                                                
-            runner = sub.SubRunner("bash",dir_path,work_dir,script,".sh",inputs,isarray)
+        elif py_or_sh == "sh":
+            runner = sub.SubRunner(
+                "bash", dir_path, work_dir, script, ".sh", inputs, isarray
+            )
             dep = runner.run()
 
-
-    
-    
 
 ####################################################################################################
 if __name__ == "__main__":
     import sys
-    globals()["pipeline_qsubber"](sys.argv)
 
+    globals()["pipeline_qsubber"](sys.argv)

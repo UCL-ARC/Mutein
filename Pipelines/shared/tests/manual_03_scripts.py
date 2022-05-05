@@ -93,7 +93,8 @@ def test_foldx_pipeline_singlesagg(inputs):
 #test_foldx_pipeline_repair("repairs=2@dataset=notch@gene=NOTCH1@pdb=3v79@chain=A")
 
 #test_foldx_pipeline_params("repairs=2@split=200@dataset=notch@gene=NOTCH1@pdb=3v79@chain=RK@task=1")
-test_foldx_pipeline_posscan("repairs=2@split=200@dataset=notch@gene=NOTCH1@pdb=3v79@task=1")
+#test_foldx_pipeline_posscan("repairs=2@split=200@dataset=notch@gene=NOTCH1@pdb=3v79@task=1")
+test_foldx_pipeline_posscan("repairs=2@split=200@dataset=notch@gene=NOTCH1@pdb=2f83@task=89")
 #test_foldx_pipeline_agg("repairs=2@split=200@dataset=notch@gene=NOTCH1@pdb=3v79")
 
 #test_foldx_pipeline_vparams("repairs=2@split=20@dataset=notch@gene=NOTCH1@pdb=3v79@task=1@variant=*")

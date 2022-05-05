@@ -26,7 +26,6 @@ import Pdb
 import Variant
 
 
-
 def run_pipeline(args):
     argus = Arguments.Arguments(args)
     dataset = argus.arg("dataset")
@@ -92,7 +91,7 @@ def run_pipeline(args):
                         )
                         res = 0
                         try:
-                            res =  float(reso)
+                            res = float(reso)
                         except:
                             pass
 
@@ -104,31 +103,42 @@ def run_pipeline(args):
                         has_match = False
                         peptides = []
                         try:
-                            peptides= ppb.build_peptides(biopdb)
+                            peptides = ppb.build_peptides(biopdb)
                         except:
                             print("Build peptides error", pdb)
 
                         for pp in peptides:
-                            seq_one = str(pp.get_sequence())                            
-                            start = wholeseq.find(seq_one)                            
+                            seq_one = str(pp.get_sequence())
+                            start = wholeseq.find(seq_one)
                             start += 1
                             chain = ""
                             if start > 0:
                                 if True:
-                                #try:
+                                    # try:
                                     resis = pp.get_ca_list()[0]
                                     chain = resis.parent.get_parent().id
-                                    #https://biopython.org/docs/1.75/api/Bio.PDB.Atom.html                                                        
-                                    #get_full_id(self): Return the full id of the atom.
-                                    #The full id of an atom is the tuple (structure id, model id, chain id, residue id, atom name, altloc).                                    
+                                    # https://biopython.org/docs/1.75/api/Bio.PDB.Atom.html
+                                    # get_full_id(self): Return the full id of the atom.
+                                    # The full id of an atom is the tuple (structure id, model id, chain id, residue id, atom name, altloc).
                                     residue_num = resis.get_full_id()[3][1]
                                     offset = start - residue_num
-                                    print(pdb,"gene=",start,"pdb=",residue_num,"offset=",offset,seq_one)
+                                    print(
+                                        pdb,
+                                        "gene=",
+                                        start,
+                                        "pdb=",
+                                        residue_num,
+                                        "offset=",
+                                        offset,
+                                        seq_one,
+                                    )
                                     has_match = True
-                                    pb = gn.getPdb(pdb,method,res)
-                                    pb.addSegment(start,start-1+len(seq_one),offset,chain)                                    
-                                #except:
-                                #    print("!!!", resis, gene, pdb)                                                                
+                                    pb = gn.getPdb(pdb, method, res)
+                                    pb.addSegment(
+                                        start, start - 1 + len(seq_one), offset, chain
+                                    )
+                                # except:
+                                #    print("!!!", resis, gene, pdb)
                         if not has_match:
                             genetoprotein.removePdbStructure(
                                 url, pdb, gene_path.gene_outpdbs + pdb + ".pdb"
@@ -137,19 +147,39 @@ def run_pipeline(args):
                             script_file = "pipeline_qsubber.py"
                             yaml_file = "batch_pdb.yml"
                             if chain != "":
-                                bm.addBatch(script_file,yaml_file,dataset,gene,pdb,chain)
-                
-                bm.printBatchScript(gene_path.gene_outputs + "/ppl_"+dataset+"_"+ gene + ".sh")
-                bm.printBatchScript(gene_path.pipeline_path + "/ppl_"+dataset+"_"+ gene + ".sh")
+                                bm.addBatch(
+                                    script_file, yaml_file, dataset, gene, pdb, chain
+                                )
+
+                bm.printBatchScript(
+                    gene_path.gene_outputs + "/ppl_" + dataset + "_" + gene + ".sh"
+                )
+                bm.printBatchScript(
+                    gene_path.pipeline_path + "/ppl_" + dataset + "_" + gene + ".sh"
+                )
 
                 # and we want only 1 batch for the stitching
                 bm2 = BatchMaker.BatchMaker()
                 script_file = "pipeline_qsubber.py"
-                yaml_file = "batch_genestitch.yml"                
-                bm2.addBatch(script_file,yaml_file,dataset,gene,"x","x")
-                bm2.printBatchScript(gene_path.gene_outputs + "/ppl_"+dataset+"_"+ gene + "_stitch.sh")
-                bm2.printBatchScript(gene_path.pipeline_path + "/ppl_"+dataset+"_"+ gene + "_stitch.sh")
-                            
+                yaml_file = "batch_genestitch.yml"
+                bm2.addBatch(script_file, yaml_file, dataset, gene, "x", "x")
+                bm2.printBatchScript(
+                    gene_path.gene_outputs
+                    + "/ppl_"
+                    + dataset
+                    + "_"
+                    + gene
+                    + "_stitch.sh"
+                )
+                bm2.printBatchScript(
+                    gene_path.pipeline_path
+                    + "/ppl_"
+                    + dataset
+                    + "_"
+                    + gene
+                    + "_stitch.sh"
+                )
+
             # having found our collection of genes with assopciated pdbs and variants we can now create the pdb datasets
             # for gn in genes:
             # gene_path = Paths.Paths("geneprot",dataset=dataset,gene=gn.gene)
@@ -159,7 +189,7 @@ def run_pipeline(args):
             dfp.to_csv(gene_path.gene_outputs + "/pdb_coverage.csv", index=False)
 
             for pdbcod, pdb in gn.pdbs.items():
-                print("Gene contains:",pdb.pdbcode)
+                print("Gene contains:", pdb.pdbcode)
                 # only use x-ray and alphafold:
                 if (
                     True
@@ -172,7 +202,6 @@ def run_pipeline(args):
                     pdb.downloadPdb(pdb_path.pdb_inputs)
                     dfp = gn.getSinglePdbCoverageDataFrame(pdb)
                     dfp.to_csv(pdb_path.pdb_inputs + "/coverage.csv", index=False)
-                    
 
             # And save it all in the dataset output
             # we do this each time so that if it gets abandoned we knw where we were

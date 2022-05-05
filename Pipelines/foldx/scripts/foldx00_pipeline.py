@@ -24,10 +24,11 @@ import subprocess
 import pandas as pd
 import yaml
 
-#import from the shared library in Mutein/Pipelines/shared/lib
+# import from the shared library in Mutein/Pipelines/shared/lib
 import sys
+
 dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
-retpath = "/".join(dirs) + '/shared/libs'
+retpath = "/".join(dirs) + "/shared/libs"
 sys.path.append(retpath)
 import Config
 import Paths
@@ -48,10 +49,10 @@ import Arguments
 def run_pipeline00(args):
     ret_array = []
     print("#### FOLDX PIPELINE - batch creation ####")
-    #The arguments HAVE to include a pdb name
-    argus = Arguments.Arguments(args)    
+    # The arguments HAVE to include a pdb name
+    argus = Arguments.Arguments(args)
     pdbcode = argus.arg("pdb")
-    pdb_path = Paths.Paths("pdb",dataset="",gene="",pdb=pdbcode)    
+    pdb_path = Paths.Paths("pdb", dataset="", gene="", pdb=pdbcode)
     pdb_config = Config.Config(pdb_path.pdb_inputs + "/config.yml")
     argus.addConfig(pdb_config.params)
 
@@ -62,10 +63,10 @@ def run_pipeline00(args):
     homeuser = pwd.getpwuid(os.getuid())[0]
     print("HomeUser=", homeuser)
     ### Process paramaters in order of preference, job, config, pipeline
-    
-    #cfgplparams = hlp.configpipelineparams(argus.arg("pdb"))
+
+    # cfgplparams = hlp.configpipelineparams(argus.arg("pdb"))
     pipelineparams = argus.pipelineparams
-    #print("Pipelines=", pipelineparams)
+    # print("Pipelines=", pipelineparams)
     # script extension is either sh or py depending on bash or python environment
     ext = ".sh"
     if argus.arg("env") == "python":
@@ -124,10 +125,7 @@ def run_pipeline00(args):
             )  # $ -wd /home/ucbtlcr/Scratch/workspace
 
         args.append(script)
-        if (
-            argus.arg("env") == "hpc"
-            or argus.arg("env") == "inputs_hpc"
-        ):
+        if argus.arg("env") == "hpc" or argus.arg("env") == "inputs_hpc":
             args.append(argus.arg("pdb"))  # 1
             args.append("xxx")  # 2
             args.append(argus.arg("split"))  # 3
@@ -137,7 +135,7 @@ def run_pipeline00(args):
             args.append(argus.arg("repairs"))  # 7
         else:
             args.append(script)
-            args.append("pdb=" + argus.arg("pdb"))  # 1            
+            args.append("pdb=" + argus.arg("pdb"))  # 1
             args.append("name=xxx")  # 2
             args.append("split=" + str(argus.arg("split")))  # 3
             args.append("mutation=" + argus.arg("mutation"))  # 4

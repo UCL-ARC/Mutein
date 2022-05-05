@@ -18,15 +18,17 @@ import os
 from shutil import copyfile
 
 
-#import from the shared library in Mutein/Pipelines/shared/lib
+# import from the shared library in Mutein/Pipelines/shared/lib
 import sys
+
 dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
-retpath = "/".join(dirs) + '/shared/libs'
+retpath = "/".join(dirs) + "/shared/libs"
 sys.path.append(retpath)
 import Paths
 import Arguments
 import Config
 import Foldx
+
 
 def run_pipeline01(args):
 
@@ -37,9 +39,9 @@ def run_pipeline01(args):
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
     pdbcode = argus.arg("pdb").lower()
-    pdb_path = Paths.Paths("pdb",dataset=dataset,gene=gene,pdb=pdbcode)        
-    repair_path = pdb_path.pdb_thruputs + "repair" + str(argus.arg("repairs")) + "/"    
-    argus.addConfig({"repair_path":repair_path})
+    pdb_path = Paths.Paths("pdb", dataset=dataset, gene=gene, pdb=pdbcode)
+    repair_path = pdb_path.pdb_thruputs + "repair" + str(argus.arg("repairs")) + "/"
+    argus.addConfig({"repair_path": repair_path})
     pdb_path.goto_job_dir(repair_path, args, argus.params, "_inputs01")
     ############################################
     pdbfile = pdbcode + ".pdb"
@@ -64,13 +66,13 @@ def run_pipeline01(args):
     )
 
     # Create Foldx class
-    fx_runner = Foldx.Foldx(argus.arg("foldxe"))    
+    fx_runner = Foldx.Foldx(argus.arg("foldxe"))
     # Run desired number of repairs
     for r in range(numRepairs):
         pdb = repairinnames[r]
         output_file = "repair_" + str(r) + ".txt"
-        fx_runner.runRepair(pdb,output_file)
-              
+        fx_runner.runRepair(pdb, output_file)
+
         print(
             "### foldx03:  ... copying file",
             argus.arg("repair_path") + repairoutnames[r],
@@ -82,11 +84,11 @@ def run_pipeline01(args):
     print(
         "### ... copying file",
         argus.arg("repair_path") + repairinnames[numRepairs],
-        pdb_path.pdb_thruputs + "/" + repairinnames[numRepairs],        
+        pdb_path.pdb_thruputs + "/" + repairinnames[numRepairs],
     )
     copyfile(
         argus.arg("repair_path") + repairinnames[numRepairs],
-        pdb_path.pdb_thruputs + "/" + repairinnames[numRepairs].lower(), 
+        pdb_path.pdb_thruputs + "/" + repairinnames[numRepairs].lower(),
     )
 
     print("### COMPLETED FoldX repair job ###")

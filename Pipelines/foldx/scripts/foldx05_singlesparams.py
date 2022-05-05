@@ -13,10 +13,11 @@ import pandas as pd
 from shutil import copyfile
 import itertools
 
-#import from the shared library in Mutein/Pipelines/shared/lib
+# import from the shared library in Mutein/Pipelines/shared/lib
 import sys
+
 dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
-retpath = "/".join(dirs) + '/shared/libs'
+retpath = "/".join(dirs) + "/shared/libs"
 sys.path.append(retpath)
 import Paths
 import Arguments
@@ -29,22 +30,22 @@ import Config
 def run_pipeline05(args):
     print("### FoldX make variant params job ###")
     print(args)
-    ##############################################    
+    ##############################################
     argus = Arguments.Arguments(args)
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
     pdbcode = argus.arg("pdb").lower()
-    pdb_path = Paths.Paths("pdb",dataset=dataset,gene=gene,pdb=pdbcode)
+    pdb_path = Paths.Paths("pdb", dataset=dataset, gene=gene, pdb=pdbcode)
     work_path = pdb_path.pdb_thruputs + "vparams/"
-    pdb_path.goto_job_dir(work_path, args, argus.params, "_inputs05")    
+    pdb_path.goto_job_dir(work_path, args, argus.params, "_inputs05")
     ############################################
-    pdb = argus.arg("pdb")    
+    pdb = argus.arg("pdb")
     variant = argus.arg("variant")
-    #chainid = argus.arg("chain")
+    # chainid = argus.arg("chain")
     splitrows = int(argus.arg("split"))
-    
+
     # variant file is in the pdb inputs
-    pdb_path = Paths.Paths("pdb",dataset=dataset,gene=gene,pdb=pdbcode)
+    pdb_path = Paths.Paths("pdb", dataset=dataset, gene=gene, pdb=pdbcode)
 
     in_mutations_file = pdb_path.pdb_inputs + "variants.csv"
     new_mutations_file = pdb_path.pdb_outputs + "variants.csv"
@@ -52,7 +53,7 @@ def run_pipeline05(args):
     copyfile(in_mutations_file, new_mutations_file)
     ##### Open the variant file ################################
     variant_df = pd.read_csv(new_mutations_file)
-    if variant !="*":
+    if variant != "*":
         mutations = variant_df.query("variant == '" + variant + "'")
     else:
         mutations = variant_df
@@ -62,7 +63,7 @@ def run_pipeline05(args):
         chain = mutations["chain"][i]
         mut = mutations["mutation"][i]
         pdb_mut = mutations["pdb_mut"][i]
-        mut_list.append([mut,pdb_mut,chain])
+        mut_list.append([mut, pdb_mut, chain])
 
     ##### Create a dataframe for the paramterfile in the number of chunks specified
     total_muts = len(mut_list)
@@ -71,26 +72,30 @@ def run_pipeline05(args):
     # so until we get to the remainer we need chunk +1 on each row
     param_dic = {}
     param_dic["pdb"] = []
-    #param_dic["chain"] = []
+    # param_dic["chain"] = []
     param_dic["mutation"] = []
     param_dic["pdb_mut"] = []
     param_dic["row"] = []
     row_size = 0
     row = 0
     for i in range(len(mut_list)):
-        mut,pdb_mut,chain = mut_list[i]
-        mutscan = mut[0]+chain+mut[1:]#format for posscan
-        pdb_mutscan = pdb_mut[0]+chain+pdb_mut[1:]#format for posscan
+        mut, pdb_mut, chain = mut_list[i]
+        mutscan = mut[0] + chain + mut[1:]  # format for posscan
+        pdb_mutscan = pdb_mut[0] + chain + pdb_mut[1:]  # format for posscan
         if row_size == 0:
             param_dic["pdb"].append(pdb)
-            #param_dic["chain"].append(chainid)
+            # param_dic["chain"].append(chainid)
             param_dic["mutation"].append(mutscan)
             param_dic["pdb_mut"].append(pdb_mutscan)
             row += 1
             param_dic["row"].append("" + str(row))
         else:
-            param_dic["mutation"][row - 1] = param_dic["mutation"][row - 1] + "," + mutscan
-            param_dic["pdb_mut"][row - 1] = param_dic["pdb_mut"][row - 1] + "," + pdb_mutscan
+            param_dic["mutation"][row - 1] = (
+                param_dic["mutation"][row - 1] + "," + mutscan
+            )
+            param_dic["pdb_mut"][row - 1] = (
+                param_dic["pdb_mut"][row - 1] + "," + pdb_mutscan
+            )
         row_size += 1
 
         if row_size == chunk and row > remainder:
@@ -101,10 +106,12 @@ def run_pipeline05(args):
     ##### Turn the dictionary into a dataframe
     data_params = pd.DataFrame.from_dict(param_dic)
     filename = pdb_path.pdb_thruputs + "singles_" + str(argus.arg("split")) + ".txt"
-    print("### foldx05: ... savig df",filename)
+    print("### foldx05: ... savig df", filename)
     data_params.to_csv(filename, index=False, sep=" ", header=False)
+
 
 ##########################################################################################
 if __name__ == "__main__":
     import sys
+
     globals()["run_pipeline05"](sys.argv)

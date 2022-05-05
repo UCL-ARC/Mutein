@@ -14,10 +14,11 @@ N.b this file may be run on the myriad clusters or on a local machine
 import os
 import pandas as pd
 
-#import from the shared library in Mutein/Pipelines/shared/lib
+# import from the shared library in Mutein/Pipelines/shared/lib
 import sys
+
 dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
-retpath = "/".join(dirs) + '/shared/libs'
+retpath = "/".join(dirs) + "/shared/libs"
 sys.path.append(retpath)
 import Paths
 import Arguments
@@ -33,15 +34,15 @@ def run_pipeline02(args):
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
     pdbcode = argus.arg("pdb").lower()
-    pdb_path = Paths.Paths("pdb",dataset=dataset,gene=gene,pdb=pdbcode)
-    #pdb_config = Config.Config(pdb_path.pdb_inputs + "/config.yml")
-    #argus.addConfig(pdb_config.params)
-        
+    pdb_path = Paths.Paths("pdb", dataset=dataset, gene=gene, pdb=pdbcode)
+    # pdb_config = Config.Config(pdb_path.pdb_inputs + "/config.yml")
+    # argus.addConfig(pdb_config.params)
+
     work_path = pdb_path.pdb_thruputs + "params" + str(argus.arg("split")) + "/"
     argus.addConfig({"work_path": work_path})
     pdb_path.goto_job_dir(argus.arg("work_path"), args, argus.params, "_inputs02")
 
-    pdb = argus.arg("pdb")    
+    pdb = argus.arg("pdb")
     chainid = argus.arg("chain")
     rows = int(argus.arg("split"))
 
@@ -97,13 +98,13 @@ def run_pipeline02(args):
             atomtype = linecontents[2].strip()
             if atomtype == "CA":
                 chain = linecontents[4].strip()
-                if chain in chainid:#list of chains
+                if chain in chainid:  # list of chains
                     aaa = linecontents[3].strip()
                     if aaa in aa_dict:
                         aa = aa_dict[aaa]
                         mut = (
                             aa + linecontents[4].strip() + linecontents[5].strip() + "a"
-                        )  # aa chain rid mutation = mutation string                        
+                        )  # aa chain rid mutation = mutation string
                         params_lst.append(mut)
                     else:
                         print("!Error maybe?", aaa)  # TODO think about this
@@ -115,11 +116,10 @@ def run_pipeline02(args):
     cov_df = fdfp.openDataFrame()
     print(cov_df)
 
-
     rows = int(rows)
     param_dic = {}
-    param_dic["pdb"] = []    
-    param_dic["mutation"] = []    
+    param_dic["pdb"] = []
+    param_dic["mutation"] = []
     param_dic["row"] = []
     mut_str = ""
 
@@ -132,12 +132,12 @@ def run_pipeline02(args):
     for i in range(len(params_lst)):
         mut = params_lst[i]
         if row_size == 0:
-            param_dic["pdb"].append(pdb)            
-            param_dic["mutation"].append(mut)            
+            param_dic["pdb"].append(pdb)
+            param_dic["mutation"].append(mut)
             row += 1
             param_dic["row"].append("" + str(row))
         else:
-            param_dic["mutation"][row - 1] = param_dic["mutation"][row - 1] + "," + mut            
+            param_dic["mutation"][row - 1] = param_dic["mutation"][row - 1] + "," + mut
         row_size += 1
 
         if row_size == chunk and row > remainder:
@@ -148,7 +148,7 @@ def run_pipeline02(args):
     ##### Turn the dictionary into a dataframe
     data_params = pd.DataFrame.from_dict(param_dic)
     filename = pdb_path.pdb_thruputs + "params_" + str(argus.arg("split")) + ".txt"
-    print("### foldx02: ... savig df",filename)
+    print("### foldx02: ... savig df", filename)
     data_params.to_csv(filename, index=False, sep=" ", header=False)
 
 
