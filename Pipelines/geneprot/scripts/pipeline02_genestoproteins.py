@@ -144,7 +144,7 @@ def run_pipeline(args):
 
                 # and we want only 1 batch for the stitching
                 bm2 = BatchMaker.BatchMaker()
-                script_file = "overall_rsa.py"
+                script_file = "pipeline_qsubber.py"
                 yaml_file = "batch_genestitch.yml"                
                 bm2.addBatch(script_file,yaml_file,dataset,gene,"x","x")
                 bm2.printBatchScript(gene_path.gene_outputs + "/ppl_"+dataset+"_"+ gene + "_stitch.sh")

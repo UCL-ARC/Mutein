@@ -1,2 +1,2 @@
 module load python3/recommended
-python overall_rsa.py batch_genestitch.yml qsub notch NOTCH1 x x
+python pipeline_qsubber.py batch_genestitch.yml qsub notch NOTCH1 x x
