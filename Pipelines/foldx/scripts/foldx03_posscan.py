@@ -96,7 +96,7 @@ def run_pipeline03(args):
         fdfp = FileDf.FileDf(filename)
         cov_df = fdfp.openDataFrame()
         fx_runner.createPosscanCsv(
-            row_path, pdb, mut, "", cov_df, row_path + "posscan_df.csv"
+            row_path, pdb, mut, "x", cov_df, row_path + "posscan_df.csv"
         )
 
 

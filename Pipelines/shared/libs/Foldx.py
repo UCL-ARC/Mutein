@@ -109,7 +109,8 @@ class Foldx:
                     chain = coverage["chain"][i]
                     offset = int(coverage["offset"][i])
                     if chain == ch and rid >= start and rid <= end:
-                        mut_dic[rid] = rid+offset                
+                        mut_dic[rid] = rid+offset
+                        print(rid,rid+offset)
 
         print(mut_dic)
             
