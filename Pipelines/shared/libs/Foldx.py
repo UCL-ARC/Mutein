@@ -87,9 +87,9 @@ class Foldx:
     def createPosscanCsv(self, path,pdbfile,pdb_mut,gene_mut,coverage,outfile_path):
         in_file = path + "PS_" + pdbfile + "_scanning_output.txt"
         print(pdb_mut,gene_mut)
-        pdb_muts = pdb_mut.split(",")        
+        pdb_muts = pdb_mut.split(",")
         if gene_mut != "x":
-            gene_muts = gene_mut.split(",")                        
+            gene_muts = gene_mut.split(",")
         else:
             gene_muts = []
         mut_dic = {}
@@ -134,7 +134,7 @@ class Foldx:
             ch = pdb_mut[3]
             a_to = pdb_mut[-1]
             aaa_to = self.AA.convert(a_to)
-            rid = pdb_mut[4:-1]            
+            rid = int(pdb_mut[4:-1])
             gene_rid = ""            
             if rid in mut_dic:
                 gene_rid = mut_dic[rid]                

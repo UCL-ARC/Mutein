@@ -58,11 +58,41 @@ When you have an array job, all that changes is that the array job will pass int
     pdb=6vxx@repairs=5@task=1
 ```
 You can handle the task number however you like in the python script.
+The template bash script for array jobs and single jobs are:
+- pipeline_array.sh
+- pipeline_single.sh
+WARNING these should not be changed (unless fixed) as everything uses them, they are templates. Change your python scripts.
 
 ## Bash script for QSUB
-The bash script is simply a call to the template python script that knows how to submit to qsub
+The bash script is simply a call to the template python script that knows how to submit to qsub.
+The template script is called pipeline_qsubber.py and doesn't need changing.... unless....
 
-- Each pipeline needs a yaml script to set it up, and a batch sh script to run on the server.
-- Additionally the way the batch runs expects the python script parameters tto be in a certain format.
-- Best practice: also add a test to the tests director
+...The bash scripts match up the template script and yaml files along with 3 specific parameters for the domain:
+
+python pipeline_qsubber.py batch_pdb.yml qsub "dataset" "gene" "pdb" "chain"
+e.g.```
+python pipeline_qsubber.py batch_pdb.yml qsub notch NOTCH1 AF-P46531-F1-model_v2 A
+```
+The reason for these is that they provide a template to the yaml files so that a single yaml file can be used for different structures.
+The inputs are appended to the "inputs" with the same format pdb= @ etc
+**TODO so I see now that I could have just passed params in that format in and it would be entirely flexible**
+
+## Testing
+Each python script can be automatically run for debugging as per below.
+```
+retpath = "/".join(dirs) + "/genestitch"
+sys.path.append(retpath)
+import Paths
+
+def addpath():        
+    print(sys.path)
+
+def test_geneprot_pipeline(inputs):
+    addpath()
+    import pipeline02_genestoproteins as p02
+    args = ["", inputs]
+    p02.run_pipeline(args)
+
+test_geneprot_pipeline("dataset=notch@")
+```
 
