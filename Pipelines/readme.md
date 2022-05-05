@@ -16,7 +16,7 @@ There is a framework set up so it should be relatively easy to create new pipeli
 - Each pipeline needs a yaml script to set it up, and a batch sh script to run on the server.
 - Additionally the way the batch runs expects the python script parameters tto be in a certain format.
 - Best practice: also add a test to the tests directory.
-More information is in the detailed document: [a relative link](../Documents/new_pipeline.md)
+More information is in the detailed document: [Creating a new pipeline](../Documents/new_pipeline.md)
 
 
 
