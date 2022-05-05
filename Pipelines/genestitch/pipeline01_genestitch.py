@@ -39,7 +39,7 @@ def run_pipeline(args):
     gene_path.goto_job_dir(argus.arg("work_path"), args, argus.params, "_inputs01")
     ############################################
     params_file = gene_path.gene_outputs + "pdb_coverage.csv"
-    fdfp = FileDf.FileDf(params_file,cols=["gene","accession","pdb","chain","method","resolution","coverage"])
+    fdfp = FileDf.FileDf(params_file)
     pm_df = fdfp.openDataFrame()
     all_df_vars = []
     all_df_backs = []

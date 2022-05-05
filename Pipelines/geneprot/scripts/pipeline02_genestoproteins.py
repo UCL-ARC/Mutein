@@ -134,21 +134,21 @@ def run_pipeline(args):
                                 url, pdb, gene_path.gene_outpdbs + pdb + ".pdb"
                             )
                         else:
-                            script_file = "overall_rsa.py"
+                            script_file = "pipeline_qsubber.py"
                             yaml_file = "batch_pdb.yml"
                             if chain != "":
                                 bm.addBatch(script_file,yaml_file,dataset,gene,pdb,chain)
                 
-                bm.printBatchScript(gene_path.gene_outputs + "/pipeline_"+dataset+"_"+ gene + ".sh")
-                bm.printBatchScript(gene_path.pipeline_path + "/pipeline_"+dataset+"_"+ gene + ".sh")
+                bm.printBatchScript(gene_path.gene_outputs + "/ppl_"+dataset+"_"+ gene + ".sh")
+                bm.printBatchScript(gene_path.pipeline_path + "/ppl_"+dataset+"_"+ gene + ".sh")
 
                 # and we want only 1 batch for the stitching
                 bm2 = BatchMaker.BatchMaker()
                 script_file = "overall_rsa.py"
                 yaml_file = "batch_genestitch.yml"                
                 bm2.addBatch(script_file,yaml_file,dataset,gene,"x","x")
-                bm2.printBatchScript(gene_path.gene_outputs + "/pipeline_"+dataset+"_"+ gene + "_stitch.sh")
-                bm2.printBatchScript(gene_path.pipeline_path + "/pipeline_"+dataset+"_"+ gene + "_stitch.sh")
+                bm2.printBatchScript(gene_path.gene_outputs + "/ppl_"+dataset+"_"+ gene + "_stitch.sh")
+                bm2.printBatchScript(gene_path.pipeline_path + "/ppl_"+dataset+"_"+ gene + "_stitch.sh")
                             
             # having found our collection of genes with assopciated pdbs and variants we can now create the pdb datasets
             # for gn in genes:

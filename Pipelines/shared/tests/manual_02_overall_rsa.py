@@ -20,7 +20,7 @@ def addpath():
 
 def test_pipeline(method, batch_file,dataset,gene,pdb,chain):
     addpath()
-    import overall_rsa as pipe
+    import Pipelines.pipeline_qsubber as pipe
     args = [
         "",
         batch_file,                           
@@ -30,7 +30,7 @@ def test_pipeline(method, batch_file,dataset,gene,pdb,chain):
         pdb,
         chain
     ]
-    pipe.overall_rsa(args)
+    pipe.pipeline_qsubber(args)
 
 
 ######################################

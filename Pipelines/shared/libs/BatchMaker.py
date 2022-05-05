@@ -3,7 +3,7 @@ RSA 3/5/22
 Automatically create batches of this format
 -----------------------------
 module load python3/recommended
-python overall_rsa.py batch_tst01.yml qsub notch NOTCH1 ""
+python pipeline_qsubber.py batch_tst01.yml qsub notch NOTCH1 ""
 
 """
 

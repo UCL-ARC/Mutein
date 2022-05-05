@@ -13,7 +13,7 @@ The python scripts take a specific format in order to process the inputs from th
 ```
 where args[1] is a long string of inputs in the format key=value@key=value@...e.g.
 ```
-    pdb=6vxx@repairs=5@task=1
+    pdb=6vxx@repairs=5
 ```
 The arguments can be parsed out easily with the arguments class:
 ```
@@ -46,8 +46,22 @@ inputs: "repairs=5@split=100"
 active: 'Y'
 ---
 ```
+- Use the id for dependencies, other qsub specific params are the time and memory. 
+- work_dir is the directory where the script lives.
+- array is for array jobs, if it is other than 0 and array batch is submitted
+- active set to N means it is skipped(testing)
+- qsub_id is what you will see in the qsub admin
 
-the bash script is simply a call
+## Array jobs
+When you have an array job, all that changes is that the array job will pass into the python script the task number appended to the unputs, so for example the inputs above would become:
+```
+    pdb=6vxx@repairs=5@task=1
+```
+You can handle the task number however you like in the python script.
+
+## Bash script for QSUB
+The bash script is simply a call to the template python script that knows how to submit to qsub
+
 - Each pipeline needs a yaml script to set it up, and a batch sh script to run on the server.
 - Additionally the way the batch runs expects the python script parameters tto be in a certain format.
 - Best practice: also add a test to the tests director

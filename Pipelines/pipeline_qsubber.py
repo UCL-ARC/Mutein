@@ -43,7 +43,7 @@ import SubRunner as sub
 ##### INPUTS #############################################
 ## Pipeline jobs sequence
 
-def overall_rsa(args):
+def pipeline_qsubber(args):
     # The environment is loaded by arguments by default
     print("ARGS=",args)
     argus = Arguments.Arguments(args,spaced=False)
@@ -132,5 +132,5 @@ def overall_rsa(args):
 ####################################################################################################
 if __name__ == "__main__":
     import sys
-    globals()["overall_rsa"](sys.argv)
+    globals()["pipeline_qsubber"](sys.argv)
 
