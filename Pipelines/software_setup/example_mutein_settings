@@ -12,11 +12,11 @@ export MUT_CONDA_SETUP=/shared/ucl/apps/miniconda/4.5.11/etc/profile.d/conda.sh
 #which command to generate a timestamp string each time these settings are loaded
 export TIMESTAMP=$(date +%Y%m%d%H%M%S)
 
-#make the module function available
+#make myriad's "module" function available (alternative to using #!/bin/bash -l)
 source /etc/profile.d/modules.sh
 
-#make conda commands available
+#make sure conda commands are available
 source ${MUT_CONDA_SETUP}
 
-#add scripts to the path
-export PATH=${MUT_DIR}/Pipelines/premapping:${PATH}
+#add Mutein scripts to the path
+export PATH=${MUT_DIR}/Pipelines/scripts:${PATH}

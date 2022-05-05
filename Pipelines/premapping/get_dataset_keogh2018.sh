@@ -12,14 +12,6 @@
 # click on Select=>Total=>Metadata and save the SraRunTable.txt file
 # click on Select=>Total=>Accession List and save the SRR_Acc_List.txt file
 
-# in the metadata SraRunTable.txt file seems like:
-# Compare to Supplementary Table 4
-# Isolate == LibraryName == Sample Name:
-# Snnn_xxx_ttt
-# nnn = sample number
-# xxx = 001,002,003 = Control,Alzheimers,Lewy Body (see disease column)
-# ttt: A,B,C,D,E,BLD = Cerebellum, Entorhinal cortex, Frontal Cortex, Medulla, Cingulate, Blood (see Cell_type column)
-
 set -eu
 source ~/.mutein_settings
 

@@ -1,6 +1,6 @@
 #!/bin/bash -l
 
-#$ -l h_rt=3:00:0
+#$ -l h_rt=0:30:0
 #$ -l mem=1G
 #$ -l tmpfs=15G
 #$ -pe smp 4
@@ -9,7 +9,7 @@
 #$ -o sge_logs/$JOB_NAME.$JOB_ID.$TASK_ID.out
 #$ -e sge_logs/$JOB_NAME.$JOB_ID.$TASK_ID.err
 #$ -N fastqc
-#$ -tc 10
+###$ -tc 10
 
 set -eu
 source ~/.mutein_settings
