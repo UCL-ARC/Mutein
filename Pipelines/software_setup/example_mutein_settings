@@ -20,3 +20,6 @@ source ${MUT_CONDA_SETUP}
 
 #add Mutein scripts to the path
 export PATH=${MUT_DIR}/Pipelines/scripts:${PATH}
+
+#which file inside reference subfolder to use as the reference
+export MUT_REFERENCE=GCA_000001405.15_GRCh38_no_alt_plus_hs38d1_analysis_set.fna.gz

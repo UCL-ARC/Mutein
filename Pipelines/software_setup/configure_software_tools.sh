@@ -17,13 +17,20 @@ conda config --add channels bioconda
 conda config --add channels conda-forge
 
 #required for enaDataGet command
-conda create --name enabrowsertools
+conda create --yes --name enabrowsertools
 conda activate enabrowsertools
-conda install enabrowsertools
+conda install --yes "enabrowsertools>=1.5.4"
 conda deactivate
 
 #required for trim_galore
-conda create --name trim-galore
+conda create --yes --name trim-galore
 conda activate trim-galore
-conda install trim-galore
+conda install --yes "trim-galore>=0.6.7"
+conda deactivate
+
+#required for bwa
+conda create --yes --name bwa
+conda activate bwa
+conda install --yes "bwa>=0.7.15"
+conda install --yes "samtools>=1.15.1"
 conda deactivate

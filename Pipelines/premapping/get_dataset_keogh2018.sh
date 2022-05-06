@@ -20,6 +20,7 @@ DATA_DIR=datasets/keogh2018
 ACC_FILE=SRR_Acc_List.txt
 
 module load ${MUT_CONDA_MODULE}
+conda activate enabrowsertools
 
 cd "${DATA_DIR}"
 
