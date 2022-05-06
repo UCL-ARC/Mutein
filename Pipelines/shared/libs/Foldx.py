@@ -96,7 +96,8 @@ class Foldx:
         print(pdb_muts)
         if len(pdb_muts) == len(gene_muts):
             for i in range(len(pdb_muts)):
-                mut_dic[pdb_muts[i][2:-1]] = gene_muts[i][2:-1]
+                mut_dic[int(pdb_muts[i][2:-1])] = int(gene_muts[i][2:-1])
+                print(int(pdb_muts[i][2:-1]),gene_muts[i][2:-1])
         else: #then we are going to imply the gene muts from the coverage
             for i in range(len(pdb_muts)):
                 pdb_mut = pdb_muts[i]
