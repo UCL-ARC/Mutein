@@ -155,7 +155,7 @@ def run_pipeline(args):
                 bm2 = BatchMaker.BatchMaker(script_file,yaml_file)                
                 bm2.addBatch(dataset, gene, "x")
                 bm2.printBatchScript(gene_path.gene_outputs+"/ppl_"+dataset+"_"+gene+"_stitch.sh","")
-                bm2.printBatchScript(gene_path.pipeline_path+"/ppl_"+dataset+"_"+gene+"_stitch.sh",gene_path.pipeline_path+"/ppl_"+dataset+"_"+gene+"_STITCH")
+                bm2.printBatchScript(gene_path.pipeline_path+"/ppl_"+dataset+"_"+gene+"_stitch.sh",gene_path.pipeline_path+"/ppl_"+dataset+"_"+gene+"_STITCH_sym.sh")
 
             # having found our collection of genes with assopciated pdbs and variants we can now create the pdb datasets
             # for gn in genes:
@@ -185,7 +185,7 @@ def run_pipeline(args):
             dfp.to_csv(dataset_path.dataset_outputs + "/pdb_coverage.csv", index=False)
 
             bm.printBatchScript(gene_path.gene_outputs+"/ppl_"+dataset+"_"+gene+".sh","")
-            bm.printBatchScript(gene_path.pipeline_path +"/ppl_"+dataset+"_"+gene+".sh",gene_path.pipeline_path +"/ppl_"+dataset+"_"+gene)
+            bm.printBatchScript(gene_path.pipeline_path +"/ppl_"+dataset+"_"+gene+".sh",gene_path.pipeline_path +"/ppl_"+dataset+"_"+gene + "sym.sh")
 
     ##### INPUTS #############################################
     # The inputs to this function are the pdbfile and the chain id (might optionally consider the positionscan mutation type)
