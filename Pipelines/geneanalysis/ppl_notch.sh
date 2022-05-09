@@ -1,7 +1,7 @@
 ### SCRIPT FOT MUTEIN PIPELINE (UCL-ARC 2022) ###
 run=qsub
 install_dir=$1
-script=${install_dir}Pipelines/lib/pipeline_qsubber.py
+script=${install_dir}Pipelines/libs/pipeline_qsubber.py
 config=${install_dir}Pipelines/geneanalysis/config/batch_pdb.yml
 echo "EXE PATH=$install_dir"
 echo "CURRENT=$PWD"

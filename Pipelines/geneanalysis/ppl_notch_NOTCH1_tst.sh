@@ -4,7 +4,7 @@
 #../Mutein/Pipelines/geneanalysis/ppl_notch_NOTCH1.sh /home/rachel/UCL/github/Mutein/
 run=py
 install_dir=$1
-script=${install_dir}Pipelines/lib/pipeline_qsubber.py
+script=${install_dir}Pipelines/libs/pipeline_qsubber.py
 config=${install_dir}Pipelines/geneanalysis/config/batch_pdb.yml
 echo "EXE PATH=$install_dir"
 echo "CURRENT=$PWD"
