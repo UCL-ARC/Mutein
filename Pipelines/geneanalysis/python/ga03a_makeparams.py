@@ -53,15 +53,14 @@ def run_pipeline02(args):
     work_path = pdb_path.pdb_thruputs + "params" + str(argus.arg("split")) + "/"
     argus.addConfig({"work_path": work_path})
     pdb_path.goto_job_dir(argus.arg("work_path"), args, argus.params, "_inputs02")
-
-    pdb = argus.arg("pdb")
+    
     # chainid = argus.arg("chain")
     rows = int(argus.arg("split"))
 
     ##########################################################
 
     ##### Open the pdb file ################################
-    pdb_file = pdb + "_rep" + str(argus.arg("repairs")) + ".pdb"
+    pdb_file = pdbcode + "_rep" + str(argus.arg("repairs")) + ".pdb"
     with open(pdb_path.pdb_thruputs + pdb_file) as f:
         pdbcontent = f.readlines()
 
