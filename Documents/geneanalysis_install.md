@@ -2,14 +2,17 @@
 --------------------------------------------------------------------------
 ## HPC FoldX Pipeline for myriad
 --------------------------------------------------------------------------
-### When everything is installed and running, you just need to do the following to run the pipeline
+- When everything is installed and running, the batch scripts are in the main scripts directory as symlinks
+- Navigate to your chosen working directory, from wich the inputs/outputs directory are assumed to be present
+- Then run the approriate batch symlink
 ```
->> cd ~/MuteinPipeline/foldx/scripts/
 >> module load python3/recommended
->> python3 foldx00_pipeline.py jobs=1234567 pdb=6vxx  
+>> cd ~/MuteinData
+>> /home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_notch_NOTCH1.sh /home/ucbtlcr/Mutein/
+
+(when the environment variables are created it will be simplified to)
+>> ppl_notch_NOTCH1.sh
 ```
---------------------------------------------------------------------------
-#### -- But to get to that state - 
 --------------------------------------------------------------------------
 ### 1.The data is structured in folders
 ```
@@ -41,41 +44,27 @@ DA614G,Alpha
 # Get the code
 >> git checkout .
 >> git pull
-# Run the install script
->> chmod +x Pipelines/foldx/install.sh
->> Pipelines/foldx/install.sh
-# 3. This has created/copied the scripts in ~/MuteinPipeline/foldx/scripts/
-# Now navigate there and run the pipeline
->> cd ~/MuteinPipeline/foldx/scripts/
->> module load python3/recommended
->> python3 foldx00_pipeline.py jobs=1234567 pdb=6vxx (or whatever parameters)
+
+# The data directory needs to be set up with inputs
+(this could be a different githun, for now I have a git_sync directory)
 
 ```
 -----------------------------------------------------------------------
 ```
 The scripts dependency is:
-
-                                    SCRIPT 01: FOLDX REPAIR
+                                    [Per Gene]:01_Gene_To_Protein
+                                              |
+                                    [Per PDB]:2:FOLDX REPAIR
                                         |                |
-                            SCRIPT 02: SPLIT          SCRIPT 05: VARIANT SPLIT
+                            [Per PDB]:03a:SPLIT         03b:VARIANT SPLIT
                                         |                |
-            [ARRAY JOBS]    SCRIPT 03: FOLDX POSSCAN  SCRIPT 06: FOLDX BUILD
+            [ARRAY JOBS]    [Per PDB]:04a:POS_SCAN       04b:SINGLE_SCAN
                                         |                |
-                            SCRIPT 04: AGGREGATE      SCRIPT 07: VARIANT AGGREGATE
+                            [Per PDB]:05a:AGGREGATE     05b:VARIANT AGGREGATE
+                                                         |
+                            [PDBs->GENE]:SCRIPT 06: Structures->Gene under selection 
  ```
 -----------------------------------------------------------------------
-##### The batch can be run manually and on each individual script too, environment variables will recognise
-##### whether you are running locally or on a server (you may need to add yourself)
--------------------------------------------------------------------------------------------------
-### Useful docs
-### Continuous integration
-https://www.techiediaries.com/python-unit-tests-github-actions/
-
-##### Using VSCode and WSL
-- necessarily easy (access and security problems, but the beginning of this works)Not
--- Virtual env in vscode: https://techinscribed.com/python-virtual-environment-in-vscode/#:~:text=Using%20Python%20Virtual%20Environment%20in%20VSCode%201%20Install,installed%2C%20VSCode%20will%20show%20an%20error%20like%20this.
-- In vscode once created, the venv can be selected in the bottom-right next to "Python3"
-- Install things into the venv from the command line within VSCode 
 
 
 

@@ -27,7 +27,7 @@ Example batch config:
 ---
 id: 'Foldx1'
 qsub_id: 'foldx_repair'
-work_dir: 'foldx/scripts/'
+pipe_dir: 'foldx/scripts/'
 script: 'foldx01_repair'
 time: '3:00:0'
 dependency: '-1'
