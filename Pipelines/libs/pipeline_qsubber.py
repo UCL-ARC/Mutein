@@ -30,6 +30,7 @@ import yaml
 
 # import from the shared library in Mutein/Pipelines/shared/lib
 import sys
+
 dirs = os.path.dirname(os.path.realpath(__file__)).split("/")
 retpath = "/".join(dirs) + ""
 sys.path.append(retpath)
@@ -48,30 +49,43 @@ def pipeline_qsubber(args):
     ## $PWD ${config} $run notch NOTCH1 AF-P46531-F1-model_v2
 
     # There are 7 arguments
-    install_dir = args[1]   # 1) the executable installation directory, the root directory of the peipeline
+    install_dir = args[
+        1
+    ]  # 1) the executable installation directory, the root directory of the peipeline
     sys.path.append(install_dir)
     sys.path.append(install_dir + "/Pipelines")
     sys.path.append(install_dir + "/Pipelines/libs")
-    working_dir = args[2]   # 1) the working dir, the root that the data output and input lives in
-    yaml_file = args[3]     # 2) a yaml file path with the batch definition
-    py_or_sh = args[4]      # 3) qsub or py or sh for python or hpc batch or just sh
+    working_dir = args[
+        2
+    ]  # 1) the working dir, the root that the data output and input lives in
+    yaml_file = args[3]  # 2) a yaml file path with the batch definition
+    py_or_sh = args[4]  # 3) qsub or py or sh for python or hpc batch or just sh
     # everything is defined in the yaml APART from 3 template inputs
-    dataset, gene, pdb = "", "", ""    
-    dataset = args[5]  # 3) dataset    
-    gene = args[6]  # 4) gene    
+    dataset, gene, pdb = "", "", ""
+    dataset = args[5]  # 3) dataset
+    gene = args[6]  # 4) gene
     pdb = args[7]  # 5) pdb
-    
-    print("#### MUTEIN PIPELINE ####", install_dir, working_dir,yaml_file, py_or_sh, dataset, gene, pdb)
+
+    print(
+        "#### MUTEIN PIPELINE ####",
+        install_dir,
+        working_dir,
+        yaml_file,
+        py_or_sh,
+        dataset,
+        gene,
+        pdb,
+    )
 
     # We want the user
     homeuser = pwd.getpwuid(os.getuid())[0]
     print("HomeUser=", homeuser)
     print("Running", yaml_file, " for user=", homeuser)
     # We want to be in the script directory
-    #script_path = os.path.dirname(os.path.realpath(__file__))
-    dir_path = install_dir + "Pipelines/"        
-    #print("# overall pipeline: changing directory to", dir_path)
-    #os.chdir(dir_path)
+    # script_path = os.path.dirname(os.path.realpath(__file__))
+    dir_path = install_dir + "Pipelines/"
+    # print("# overall pipeline: changing directory to", dir_path)
+    # os.chdir(dir_path)
 
     # Load in the batch yaml file, which contains ONLY batch related parameters
     # apart from the final line inputs which are space delim inputs for the script
@@ -99,7 +113,7 @@ def pipeline_qsubber(args):
                 inputs += "@dataset=" + dataset
                 inputs += "@gene=" + gene
                 inputs += "@pdb=" + pdb
-                #inputs += "@chain=" + chain
+                # inputs += "@chain=" + chain
                 if active:
                     batch_dic[str(id)] = (
                         qsubid,
@@ -152,9 +166,18 @@ def pipeline_qsubber(args):
                 isarray,
             )
             dep = runner.run()
-        elif py_or_sh == "sh": #TODO make this go simply straight through passing all inputs
+        elif (
+            py_or_sh == "sh"
+        ):  # TODO make this go simply straight through passing all inputs
             runner = sub.SubRunner(
-                "bash", install_dir,working_dir, pipe_dir, script, ".sh", inputs, isarray
+                "bash",
+                install_dir,
+                working_dir,
+                pipe_dir,
+                script,
+                ".sh",
+                inputs,
+                isarray,
             )
             dep = runner.run()
 

@@ -18,6 +18,7 @@ from shutil import copyfile
 
 # import from the shared library in Mutein/Pipelines/shared/lib
 import sys
+
 dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
 retpath = "/".join(dirs) + "/libs"
 sys.path.append(retpath)
@@ -40,11 +41,18 @@ def run_pipeline03(args):
     sys.path.append(install_dir)
     sys.path.append(install_dir + "/Pipelines")
     sys.path.append(install_dir + "/Pipelines/libs")
-    data_dir = argus.arg("data_dir")    
+    data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
     pdbcode = argus.arg("pdb").lower()
-    pdb_path = Paths.Paths("pdb", data_dir,install_dir+"Pipelines/geneanalysis",dataset=dataset, gene=gene, pdb=pdbcode)
+    pdb_path = Paths.Paths(
+        "pdb",
+        data_dir,
+        install_dir + "Pipelines/geneanalysis",
+        dataset=dataset,
+        gene=gene,
+        pdb=pdbcode,
+    )
     # pdb_config = Config.Config(pdb_path.pdb_inputs + "/config.yml")
     # argus.addConfig(pdb_config.params)
     task = argus.arg("task", "none")
@@ -92,7 +100,7 @@ def run_pipeline03(args):
 
         fx_runner = Foldx.Foldx(argus.arg("foldxe"))
         ###########################################################################
-        fx_runner.runPosscan(pdbfile,mut)
+        fx_runner.runPosscan(pdbfile, mut)
         ###########################################################################
         pdb = pdbcode + "_rep" + str(argus.arg("repairs"))
         # pass in the coverage to annotate the csv file

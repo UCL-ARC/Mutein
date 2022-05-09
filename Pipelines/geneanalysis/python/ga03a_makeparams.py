@@ -16,6 +16,7 @@ import pandas as pd
 
 # import from the shared library in Mutein/Pipelines/shared/lib
 import sys
+
 dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
 retpath = "/".join(dirs) + "/libs"
 sys.path.append(retpath)
@@ -28,7 +29,7 @@ import FileDf
 # The inputs to this function are the pdbfile and the chain id (might optionally consider the positionscan mutation type)
 def run_pipeline02(args):
     print("### FoldX make params job ###")
-    print(args)    
+    print(args)
     argus = Arguments.Arguments(args)
     install_dir = argus.arg("install_dir")
     sys.path.append(install_dir)
@@ -38,7 +39,14 @@ def run_pipeline02(args):
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
     pdbcode = argus.arg("pdb").lower()
-    pdb_path = Paths.Paths("pdb", data_dir,install_dir+"Pipelines/geneanalysis",dataset=dataset, gene=gene, pdb=pdbcode)
+    pdb_path = Paths.Paths(
+        "pdb",
+        data_dir,
+        install_dir + "Pipelines/geneanalysis",
+        dataset=dataset,
+        gene=gene,
+        pdb=pdbcode,
+    )
     # pdb_config = Config.Config(pdb_path.pdb_inputs + "/config.yml")
     # argus.addConfig(pdb_config.params)
 
@@ -47,7 +55,7 @@ def run_pipeline02(args):
     pdb_path.goto_job_dir(argus.arg("work_path"), args, argus.params, "_inputs02")
 
     pdb = argus.arg("pdb")
-    #chainid = argus.arg("chain")
+    # chainid = argus.arg("chain")
     rows = int(argus.arg("split"))
 
     ##########################################################

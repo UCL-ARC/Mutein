@@ -15,6 +15,7 @@ from shutil import copyfile
 
 # import from the shared library in Mutein/Pipelines/shared/lib
 import sys
+
 dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
 retpath = "/".join(dirs) + "/libs"
 sys.path.append(retpath)
@@ -38,7 +39,14 @@ def run_pipeline04(args):
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
     pdbcode = argus.arg("pdb").lower()
-    pdb_path = Paths.Paths("pdb",data_dir,install_dir+"Pipelines/geneanalysis", dataset=dataset, gene=gene, pdb=pdbcode)
+    pdb_path = Paths.Paths(
+        "pdb",
+        data_dir,
+        install_dir + "Pipelines/geneanalysis",
+        dataset=dataset,
+        gene=gene,
+        pdb=pdbcode,
+    )
     # pdb_config = Config.Config(pdb_path.pdb_inputs + "/config.yml")
     # argus.addConfig(pdb_config.params)
 

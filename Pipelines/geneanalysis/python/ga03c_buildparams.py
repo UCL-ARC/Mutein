@@ -15,6 +15,7 @@ import itertools
 
 # import from the shared library in Mutein/Pipelines/shared/lib
 import sys
+
 dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
 retpath = "/".join(dirs) + "/libs"
 sys.path.append(retpath)
@@ -49,7 +50,14 @@ def run_pipeline05(args):
     chainid = argus.arg("chain")
 
     # variant file is in the pdb inputs
-    pdb_path = Paths.Paths("pdb", data_dir,install_dir+"Pipelines/geneanalysis",dataset=dataset, gene=gene, pdb=pdbcode)
+    pdb_path = Paths.Paths(
+        "pdb",
+        data_dir,
+        install_dir + "Pipelines/geneanalysis",
+        dataset=dataset,
+        gene=gene,
+        pdb=pdbcode,
+    )
 
     in_mutations_file = pdb_path.pdb_inputs + "variants.csv"
     new_mutations_file = pdb_path.pdb_outputs + "variants.csv"

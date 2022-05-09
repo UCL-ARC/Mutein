@@ -12,19 +12,21 @@ import os
 
 
 class Paths:
-    def __init__(self, level, data_dir, pipe_path,dataset="", gene="", pdb="", method=""):
-        # Depending on the levels we will ensure the correct paths are present for inputs and ouputs        
+    def __init__(
+        self, level, data_dir, pipe_path, dataset="", gene="", pdb="", method=""
+    ):
+        # Depending on the levels we will ensure the correct paths are present for inputs and ouputs
         self.data_dir = data_dir
-        if self.data_dir[-1]!= "/":
+        if self.data_dir[-1] != "/":
             self.data_dir += "/"
-        print("Initialising PATH CLASS with datadir=",data_dir)
+        print("Initialising PATH CLASS with datadir=", data_dir)
         self.pipeline_path = pipe_path
-        
+
         # there are levels of ids as many to 1 is slowly whittled down by dataset, gene, pdb and perhaps method (eg ddg or other)
         # [dataset] 1--* [gene] 1--* [pdb] 1--* [method]
-                
+
         # Create the dataset paths
-        
+
         dataset = dataset.lower()
         gene = gene.lower()
         pdb = pdb.lower()
@@ -45,7 +47,7 @@ class Paths:
     def get_make_paths_vcf(self, dataset):
         paths_dic = {}
         # The path structure is relative to the script file (it will be easy to change to a given one)
-        
+
         in_root_path = "inputs"
         print(in_root_path)
         self.add_remove_path_levels(0, dir=in_root_path)
@@ -62,15 +64,19 @@ class Paths:
         thru_root_path = "thruputs/datasets"
         self.add_remove_path_levels(0, dir=thru_root_path)
 
-        self.dataset_inputs = self.add_remove_path_levels(0, dir=in_root_path+"/"+dataset+"/")
-        self.dataset_outputs = self.add_remove_path_levels(0, dir=out_root_path+"/"+dataset+"/")
+        self.dataset_inputs = self.add_remove_path_levels(
+            0, dir=in_root_path + "/" + dataset + "/"
+        )
+        self.dataset_outputs = self.add_remove_path_levels(
+            0, dir=out_root_path + "/" + dataset + "/"
+        )
 
     def get_make_paths_geneprot(self, dataset, gene):
         paths_dic = {}
-        # The path structure is relative to the script file (it will be easy to change to a given one)        
+        # The path structure is relative to the script file (it will be easy to change to a given one)
         dir_script_path = os.path.dirname(os.path.realpath(__file__))
         dir_path = self.add_remove_path_levels(2)
-        
+
         in_root_path = "inputs"
         self.add_remove_path_levels(0, dir=in_root_path)
         in_root_path = "inputs/genes"
@@ -90,14 +96,22 @@ class Paths:
         if dataset != "":
             append = (dataset + "_").lower()
 
-        self.gene_inputs = self.add_remove_path_levels(0,dir=in_root_path + "/" + append + gene + "/", must_exist=False, )
-        self.gene_outputs = self.add_remove_path_levels(0, dir=out_root_path + "/" + append + gene + "/")
-        self.add_remove_path_levels(0, dir=thru_root_path + "/" + append + gene )
-        self.gene_outpdbs = self.add_remove_path_levels(0, dir=thru_root_path + "/" + append + gene + "/pdbs/")
+        self.gene_inputs = self.add_remove_path_levels(
+            0,
+            dir=in_root_path + "/" + append + gene + "/",
+            must_exist=False,
+        )
+        self.gene_outputs = self.add_remove_path_levels(
+            0, dir=out_root_path + "/" + append + gene + "/"
+        )
+        self.add_remove_path_levels(0, dir=thru_root_path + "/" + append + gene)
+        self.gene_outpdbs = self.add_remove_path_levels(
+            0, dir=thru_root_path + "/" + append + gene + "/pdbs/"
+        )
         # inputs and outputs directories are overkill here
 
-    def get_make_paths_pdb(self, dataset, gene, pdbcode):        
-        # The path structure is relative to the script file (it will be easy to change to a given one)                
+    def get_make_paths_pdb(self, dataset, gene, pdbcode):
+        # The path structure is relative to the script file (it will be easy to change to a given one)
         in_root_path = "inputs"
         self.add_remove_path_levels(0, dir=in_root_path)
         in_root_path = "inputs/pdbs"
@@ -117,11 +131,17 @@ class Paths:
         if dataset != "":
             append = (dataset + "_").lower()
         if gene != "":
-            append += (gene + "_")
+            append += gene + "_"
 
-        self.pdb_inputs = self.add_remove_path_levels(0, dir=in_root_path + "/" + append + pdbcode.lower() + "/")
-        self.pdb_thruputs = self.add_remove_path_levels(0, dir=thru_root_path + "/" + append + pdbcode.lower() + "/")
-        self.pdb_outputs = self.add_remove_path_levels(0, dir=out_root_path + "/" + append + pdbcode.lower() + "/")
+        self.pdb_inputs = self.add_remove_path_levels(
+            0, dir=in_root_path + "/" + append + pdbcode.lower() + "/"
+        )
+        self.pdb_thruputs = self.add_remove_path_levels(
+            0, dir=thru_root_path + "/" + append + pdbcode.lower() + "/"
+        )
+        self.pdb_outputs = self.add_remove_path_levels(
+            0, dir=out_root_path + "/" + append + pdbcode.lower() + "/"
+        )
 
     def add_remove_path_levels(self, levels=0, dir="", must_exist=False):
         dirs = self.data_dir.split("/")

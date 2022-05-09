@@ -11,6 +11,7 @@ import os
 import sys
 import yaml
 import pandas as pd
+
 dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
 retpath = "/".join(dirs) + "/libs"
 sys.path.append(retpath)
@@ -32,7 +33,9 @@ def run_pipeline(args):
     sys.path.append(install_dir + "/Pipelines/libs")
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
-    dataset_path = Paths.Paths("vcf",data_dir, install_dir+"Pipelines/geneanalysis", dataset=dataset)
+    dataset_path = Paths.Paths(
+        "vcf", data_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset
+    )
     genes = []
     """
     "gene_name"	"n_syn"	"n_mis"	"n_non"	"n_spl"	"n_ind"	"wmis_cv"	"wnon_cv"	"wspl_cv"	"wind_cv"	"pmis_cv"	"ptrunc_cv"	"pallsubs_cv"	"pind_cv"	"qmis_cv"	"qtrunc_cv"	"qallsubs_cv"	"pglobal_cv"	"qglobal_cv"
@@ -55,7 +58,13 @@ def run_pipeline(args):
                 gene = gene[1:]
             if gene[-1] == '"':
                 gene = gene[:-1]
-            gene_path = Paths.Paths("geneprot", data_dir,install_dir+"Pipelines/geneanalysis",dataset=dataset, gene=gene)
+            gene_path = Paths.Paths(
+                "geneprot",
+                data_dir,
+                install_dir + "Pipelines/geneanalysis",
+                dataset=dataset,
+                gene=gene,
+            )
             accession = genetoprotein.accession_from_bioservices(gene)
             if len(accession) > 1:
                 seq = genetoprotein.sequence_from_bioservices(accession)
@@ -68,7 +77,7 @@ def run_pipeline(args):
                 genes.append(gn)  # main repository for data we are creating in function
                 script_file = "libs/pipeline_qsubber.py"
                 yaml_file = "geneanalysis/config/batch_pdb.yml"
-                bm = BatchMaker.BatchMaker(script_file,yaml_file)
+                bm = BatchMaker.BatchMaker(script_file, yaml_file)
                 # CREATE the variants for the gene
                 vrs = gene_variant_dic[gene.upper()]
                 for i in range(len(vrs["bases"])):
@@ -145,16 +154,38 @@ def run_pipeline(args):
                                 # except:
                                 #    print("!!!", resis, gene, pdb)
                         if not has_match:
-                            genetoprotein.removePdbStructure(url, pdb, gene_path.gene_outpdbs)
-                                     
-                                            
+                            genetoprotein.removePdbStructure(
+                                url, pdb, gene_path.gene_outpdbs
+                            )
+
                 # and we want only 1 batch for the stitching
                 script_file = "libs/pipeline_qsubber.py"
                 yaml_file = "geneanalysis/config/batch_genestitch.yml"
-                bm2 = BatchMaker.BatchMaker(script_file,yaml_file)                
+                bm2 = BatchMaker.BatchMaker(script_file, yaml_file)
                 bm2.addBatch(dataset, gene, "x")
-                bm2.printBatchScript(gene_path.gene_outputs+"/ppl_"+dataset+"_"+gene+"_stitch.sh","")
-                bm2.printBatchScript(gene_path.pipeline_path+"/ppl_"+dataset+"_"+gene+"_stitch.sh",gene_path.pipeline_path+"/ppl_"+dataset+"_"+gene+"_STITCH_sym.sh")
+                bm2.printBatchScript(
+                    gene_path.gene_outputs
+                    + "/ppl_"
+                    + dataset
+                    + "_"
+                    + gene
+                    + "_stitch.sh",
+                    "",
+                )
+                bm2.printBatchScript(
+                    gene_path.pipeline_path
+                    + "/ppl_"
+                    + dataset
+                    + "_"
+                    + gene
+                    + "_stitch.sh",
+                    gene_path.pipeline_path
+                    + "/ppl_"
+                    + dataset
+                    + "_"
+                    + gene
+                    + "_STITCH_sym.sh",
+                )
 
             # having found our collection of genes with assopciated pdbs and variants we can now create the pdb datasets
             # for gn in genes:
@@ -168,7 +199,14 @@ def run_pipeline(args):
                 print("Gene contains:", pdb.pdbcode)
                 # only use x-ray and alphafold:
                 if pdb.getMethod() != "nmr":
-                    pdb_path = Paths.Paths("pdb", data_dir,install_dir+"Pipelines/geneanalysis",dataset=dataset, gene=gn.gene, pdb=pdb.pdbcode)                    
+                    pdb_path = Paths.Paths(
+                        "pdb",
+                        data_dir,
+                        install_dir + "Pipelines/geneanalysis",
+                        dataset=dataset,
+                        gene=gn.gene,
+                        pdb=pdb.pdbcode,
+                    )
                     dfp = gn.getPdbVariantCoverageDataFrame(pdb)
                     dfp.to_csv(pdb_path.pdb_inputs + "/variants.csv", index=False)
                     pdb.downloadPdb(pdb_path.pdb_inputs)
@@ -183,8 +221,13 @@ def run_pipeline(args):
             dfp = genes[0].getDatasetGenesPdbsDataFrame(dataset, genes)
             dfp.to_csv(dataset_path.dataset_outputs + "/pdb_coverage.csv", index=False)
 
-            bm.printBatchScript(gene_path.gene_outputs+"/ppl_"+dataset+"_"+gene+".sh","")
-            bm.printBatchScript(gene_path.pipeline_path +"/ppl_"+dataset+"_"+gene+".sh",gene_path.pipeline_path +"/ppl_"+dataset+"_"+gene + "sym.sh")
+            bm.printBatchScript(
+                gene_path.gene_outputs + "/ppl_" + dataset + "_" + gene + ".sh", ""
+            )
+            bm.printBatchScript(
+                gene_path.pipeline_path + "/ppl_" + dataset + "_" + gene + ".sh",
+                gene_path.pipeline_path + "/ppl_" + dataset + "_" + gene + "sym.sh",
+            )
 
     ##### INPUTS #############################################
     # The inputs to this function are the pdbfile and the chain id (might optionally consider the positionscan mutation type)

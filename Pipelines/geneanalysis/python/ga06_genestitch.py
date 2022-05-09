@@ -15,6 +15,7 @@ from os.path import exists
 
 # import from the shared library in Mutein/Pipelines/shared/lib
 import sys
+
 dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
 retpath = "/".join(dirs) + "/libs"
 sys.path.append(retpath)
@@ -37,7 +38,13 @@ def run_pipeline(args):
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
-    gene_path = Paths.Paths("geneprot",data_dir,install_dir+"Pipelines/geneanalysis",dataset=dataset, gene=gene)
+    gene_path = Paths.Paths(
+        "geneprot",
+        data_dir,
+        install_dir + "Pipelines/geneanalysis",
+        dataset=dataset,
+        gene=gene,
+    )
     work_path = gene_path.gene_outputs + "agg/"
     argus.params["work_path"] = work_path
     gene_path.goto_job_dir(argus.arg("work_path"), args, argus.params, "_inputs01")
@@ -52,7 +59,14 @@ def run_pipeline(args):
     for i in range(len(pm_df.index)):
         r = pm_df["pdb"][i].lower()
         # the file has already been turned into a dataframe called posscan_df.csv
-        pdb_path = Paths.Paths("pdb", data_dir,install_dir+"Pipelines/geneanalysis",dataset=dataset, gene=gene, pdb=r)
+        pdb_path = Paths.Paths(
+            "pdb",
+            data_dir,
+            install_dir + "Pipelines/geneanalysis",
+            dataset=dataset,
+            gene=gene,
+            pdb=r,
+        )
         file_var = pdb_path.pdb_outputs + "ddg_variants.csv"
         file_back = pdb_path.pdb_outputs + "ddg_background.csv"
         if exists(file_var):

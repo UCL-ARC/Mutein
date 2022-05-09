@@ -21,8 +21,8 @@ def accession_from_bioservices(genename):
     u = UniProt()
 
     ## If you have any uniprot problems this line should work so check it, eg you might have a connction error
-    #res = u.search("P43403", frmt="txt")
-    #print(res)
+    # res = u.search("P43403", frmt="txt")
+    # print(res)
 
     result = u.search(
         "organism:9606+and+reviewed:yes+and+gene:" + genename,

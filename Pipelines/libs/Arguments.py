@@ -15,9 +15,9 @@ import environments
 
 
 class Arguments:
-    def __init__(self, inputs, spaced=True):        
+    def __init__(self, inputs, spaced=True):
         # combine config and job input params
-        print("### Arguments",inputs)
+        print("### Arguments", inputs)
         if spaced:
             self.params = self.spacedparams(inputs)
         else:
