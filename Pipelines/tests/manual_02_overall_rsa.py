@@ -20,22 +20,23 @@ def addpath():
 
 def test_pipeline(method, batch_file,dataset,gene,pdb,chain):
     addpath()
-    import Pipelines.pipeline_qsubber as pipe
+    import Pipelines.libs.pipeline_qsubber as pipe
     args = [
         "",
-        batch_file,                           
+        "/home/rachel/UCL/github/Mutein/",
+        "/home/rachel/UCL/github/MuteinData/",
+        "/home/rachel/UCL/github/Mutein/Pipelines/geneanalysis/config/" + batch_file,                           
         method,
         dataset,
         gene,
-        pdb,
-        chain
+        pdb        
     ]
     pipe.pipeline_qsubber(args)
 
 
 ######################################
 ## Tests for the geneprot
-test_pipeline("qsub_tst","batch_genestitch.yml","notch","NOTCH1","","")
+test_pipeline("qsub_tst","batch_geneprot.yml","notch","NOTCH1","","")
 
 ## Tests for the pdb
 #test_pipeline("py","batch_pdb.yml","notch","NOTCH1","1toz","A")

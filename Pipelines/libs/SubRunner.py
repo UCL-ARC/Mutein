@@ -9,16 +9,15 @@ import subprocess
 
 
 class SubRunner:
-    def __init__(self, exe, curr_dir,work_dir,script,ext,inputs,isarray):
-        # need to add the array btach option here
-        self.work_dir = work_dir
+    def __init__(self, exe, install_dir,data_dir,pipe_dir,script,ext,inputs,isarray):
+        # need to add the array btach option here        
         self.args = []
         self.args.append(exe) #0 arg=executable        
         if not isarray:
-            sh_script_name = "pipeline_array.sh"        
+            sh_script_name = install_dir + "Pipelines/libs/pipeline_array.sh"        
         else:
-            sh_script_name = "pipeline_single.sh"                  
-        py_script = curr_dir + work_dir + script + ".py"
+            sh_script_name = install_dir + "Pipelines/libs/pipeline_single.sh"                  
+        py_script = install_dir + pipe_dir + script + ".py"
         
         if exe == "bash":
             exe_script = curr_dir + sh_script_name

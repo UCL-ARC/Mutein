@@ -1,8 +1,8 @@
 ---
 id: '1'
 qsub_id: 'genestitch'
-work_dir: 'genestitch/'
-script: 'pipeline01_genestitch'
+pipe_dir: 'Pipelines/geneanalysis/python'
+script: 'ga06_genestitch'
 time: '1:00:0'
 dependency: '-1'
 array: 0

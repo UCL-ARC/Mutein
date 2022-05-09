@@ -9,12 +9,12 @@ import subprocess
 
 
 class QSubRunner:
-    def __init__(self, runid,qsubid,script,dir_path,work_dir, dependency, time, array, homeuser, inputs, print_only):
+    def __init__(self, runid,qsubid,script,install_dir,data_dir,pipe_dir, dependency, time, array, homeuser, inputs, print_only):
         isarray = int(array)>0
         if isarray:
-            sh_script_name = "pipeline_array.sh"        
+            sh_script_name = install_dir + "Pipelines/libs/pipeline_array.sh"
         else:
-            sh_script_name = "pipeline_single.sh"                  
+            sh_script_name = install_dir + "Pipelines/libs/pipeline_single.sh"                  
         os.system("chmod +x " + sh_script_name)
         self.runid=runid
         self.print_only = print_only
@@ -34,8 +34,8 @@ class QSubRunner:
         self.args.append("/home/" + homeuser + "/Scratch/workspace")        
         self.args.append(sh_script_name) #1 executable script               
         self.args.append(inputs) #2 inputs
-        self.args.append(dir_path+work_dir+script+".py") #3 pyscript
-        self.args.append(dir_path+work_dir) #4 workspace
+        self.args.append(install_dir+pipe_dir+script+".py") #3 pyscript
+        self.args.append(install_dir+pipe_dir) #4 workspace
         
 
     def run(self):
