@@ -145,9 +145,7 @@ def run_pipeline(args):
                                 # except:
                                 #    print("!!!", resis, gene, pdb)
                         if not has_match:
-                            genetoprotein.removePdbStructure(
-                                url, pdb, gene_path.gene_outpdbs + pdb + ".pdb"
-                            )
+                            genetoprotein.removePdbStructure(url, pdb, gene_path.gene_outpdbs)
                                      
                                             
                 # and we want only 1 batch for the stitching

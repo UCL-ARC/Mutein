@@ -1,4 +1,13 @@
 ---------------------------------------------------------------------------
+### Before a pull request
+- Run the pep8 code formatter (https://pypi.org/project/black/)
+```
+python -m black Pipelines/geneanalysis/python/*.py
+python -m black Pipelines/libs/*.py
+```
+- Run the manual regression tests
+
+---------------------------------------------------------------------------
 #### dev todo list
 - I am only being very simple in job splits - can foldx multithread?
 - Make the code and comments and variables up to rsdg standard
@@ -8,16 +17,39 @@
 - the array number for the variant split is the combination of individual variants, so it should be calculated rather than passed in
 - unsatisfactory use of both split and array jobs needs thinking about
 - use argparse (https://docs.python.org/3/library/argparse.html#)
-- Make foldx a "runner" so it is easier to understand what has gone into it.
-- Make a foldx runner class (code review TY 7.4.22)
-- Need to make the pdb input cfg file yaml too
 - The CI has hardcoded the user name "runner" which is the CI name, but I should pass the user in as a variable.
 - I followed instructions for the CI requirements.txt file but there seems too much, I must be able to cut it down.
 - Migrate the helper functions to the shared/lib folder 1 level up, the arguments are more generic
+- need to scope out how long things could take
+- The tests no longer work 
+- Make it so I can choose to use mouse or human or other and all that entails including the alphafold structures
+
 ---------------------------------------------------------------------------
 #### discuss todo list 
 - Analytics - establish agreement or what the future action is on the number differences as per above
----------------------------------------------------------------------------
+
+-------------------------------------------------------------------
+#### Sprint #3
+DONE
+- Batches are now defined in the pieline directory in yaml without the overrides
+- need to make sure the covid batch still works on hpc
+- need a yaml that takes papramaters and lists
+- Does any of it work on hpc now?
+- Change the analysis for the foldx pipeline to NOT use combinations
+- Do a full test on notch1, human and mouse
+- Make foldx a "runner" so it is easier to understand what has gone into it.
+- Make a foldx runner class (code review TY 7.4.22)
+- Need to make the pdb input cfg file yaml too
+-------------------------------------------------------------------
+#### Sprint #2
+DONE
+- Make a lib higher up to be used by all pipelines
+- A new structure is needed to be used by all pipelines, or an outer and inner file structure for the pipelines, ie a gene could have a folder with multiple pdbs, one of those pdbs may be hosen
+- work out how to do the web scraping, the pdb just announced a new interface which would definitely be the best thing to do: http://search-beta.rcsb.org/#search-api - I have used bioservices
+- comments before pull request
+- pep8 before pull request
+- I have shearwater hardcoded at the moment
+--------------------------------------------------------------------------
 #### sprint 1 - 7/4/22
 DEV-ED
 - Put the repairs in another folder

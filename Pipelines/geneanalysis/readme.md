@@ -5,13 +5,17 @@
 ```
 The scripts structure is:
 
-                                    SCRIPT 01:FOLDX REPAIR
+                                    [Per Gene]:01_Gene_To_Protein
+                                              |
+                                    [Per PDB]:2:FOLDX REPAIR
                                         |                |
-                            SCRIPT 02:SPLIT          SCRIPT 05:VARIANT SPLIT
+                            [Per PDB]:03a:SPLIT         03b:VARIANT SPLIT
                                         |                |
-            [ARRAY JOBS]    SCRIPT 03:FOLDX POSSCAN  SCRIPT 06:FOLDX BUILD
+            [ARRAY JOBS]    [Per PDB]:04a:POS_SCAN       04b:SINGLE_SCAN
                                         |                |
-                            SCRIPT 04:AGGREGATE      SCRIPT 07:VARIANT AGGREGATE
+                            [Per PDB]:05a:AGGREGATE     05b:VARIANT AGGREGATE
+                                                         |
+                            [PDBs->GENE]:SCRIPT 06: Structures->Gene under selection 
  ```
 -----------------------------------------------------------------------
 ### Overview
@@ -28,18 +32,20 @@ This pipeline compares the background protein folding stability of a given pdb s
 - The 00 script is a parent script that runs all the other scripts with the correct dependencies
 -----------------------------------------------------------------------
 ### Scripts
-1. This runs foldx repairs on a pdb file, the repairs ensure that the atom positions are relaxed into a favoured position.
-- background mutations
-2. This splits the possible mutations up into a config file ready for parallelizing
-3. An array job: This calls foldx positionscan function with 1 of the rows from the config file, 1 set of mutations
-4. This aggregates and performs some analysis on all the individual mutations
-- variant mutations
-5. This permutes the possible mutations and makes a config file
-6. An array job: This calls build for each mutation
-7. And finally aggregates and analyses
+##### prepare
+- 1] This takes the gene and finds the appropriate pdb structues
+- 2] This runs foldx repairs on a pdb file, the repairs ensure that the atom positions are relaxed into a favoured position.
+##### background mutations
+- 3a] This splits the possible mutations up into a config file ready for parallelizing
+- 4a] An array job: This calls foldx positionscan function with 1 of the rows from the config file, 1 set of mutations
+- 5a] This aggregates and performs some analysis on all the individual mutations
+##### variant mutations
+- 3b] This makes a config for the variants
+- 4b] An array job: This calls posscan for the variants
+- 5b] And finally aggregates and analyses
+##### aggregate to the gene
+- 6] Aggregates all the pdb results into a gene result directory
 
-- N.B. there is not yet a job that compares the background to the variant data
-- N.B.2 the number of array jobs is arbitrary for script 3 and specific to the number of variants for script 6
 -----------------------------------------------------------------------
 ### Structure
 There are pairs of scripts bash/python. The bash submits to qsub, the python runs in python. This enables a test environment to run the python scripts via both CI and user testing from the tests directory.
