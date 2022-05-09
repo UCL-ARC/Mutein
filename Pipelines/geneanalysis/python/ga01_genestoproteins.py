@@ -14,8 +14,8 @@ import pandas as pd
 
 # import from the shared library in Mutein/Pipelines/shared/lib
 dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
-retpath = "/".join(dirs) + "/shared/libs"
-sys.path.append(retpath)
+retpath = "/".join(dirs) + "/libs"
+#sys.path.append(retpath)
 import Paths
 import Arguments
 import BatchMaker
@@ -65,7 +65,7 @@ def run_pipeline(args):
                     wholeseq += sl
                 gn = Gene.Gene(gene, accession, wholeseq)
                 genes.append(gn)  # main repository for data we are creating in function
-                script_file = "lib/pipeline_qsubber.py"
+                script_file = "libs/pipeline_qsubber.py"
                 yaml_file = "geneanalysis/config/batch_pdb.yml"
                 bm = BatchMaker.BatchMaker(script_file,yaml_file)
                 # CREATE the variants for the gene
@@ -150,7 +150,7 @@ def run_pipeline(args):
                                      
                                             
                 # and we want only 1 batch for the stitching
-                script_file = "lib/pipeline_qsubber.py"
+                script_file = "libs/pipeline_qsubber.py"
                 yaml_file = "geneanalysis/config/batch_genestitch.yml"
                 bm2 = BatchMaker.BatchMaker(script_file,yaml_file)                
                 bm2.addBatch(dataset, gene, "x")

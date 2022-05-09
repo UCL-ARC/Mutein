@@ -17,7 +17,7 @@ from os.path import exists
 import sys
 
 dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-1]
-retpath = "/".join(dirs) + "/shared/libs"
+retpath = "/".join(dirs) + "/libs"
 sys.path.append(retpath)
 import Paths
 import Arguments

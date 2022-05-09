@@ -7,7 +7,7 @@ It enables debugging of the scripts as if run from a batch
 import sys, os
 # import from the shared library in Mutein/Pipelines/shared/lib
 dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-1]
-retpath = "/".join(dirs) + "/lib"
+retpath = "/".join(dirs) + "/libs"
 sys.path.append(retpath)
 retpath = "/".join(dirs) + "/geneanalysis/python"
 sys.path.append(retpath)
