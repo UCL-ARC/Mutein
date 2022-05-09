@@ -20,7 +20,6 @@ from shutil import copyfile
 
 # import from the shared library in Mutein/Pipelines/shared/lib
 import sys
-
 dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
 retpath = "/".join(dirs) + "/libs"
 sys.path.append(retpath)
@@ -37,6 +36,9 @@ def run_pipeline01(args):
     print("### FoldX repair job ###")
     argus = Arguments.Arguments(args)
     install_dir = argus.arg("install_dir")
+    sys.path.append(install_dir)
+    sys.path.append(install_dir + "/Pipelines")
+    sys.path.append(install_dir + "/Pipelines/libs")
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")

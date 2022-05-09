@@ -9,7 +9,9 @@ import subprocess
 
 
 class QSubRunner:
-    def __init__(self, runid,qsubid,script,install_dir,data_dir,pipe_dir, dependency, time, array, homeuser, inputs, print_only):
+    def __init__(self, runid,qsubid,script,install_dir,data_dir,pipe_dir, dependency, time, array, homeuser, inputs, print_only):        
+        inputs += "@install_dir=" + install_dir
+        inputs += "@data_dir=" + data_dir        
         isarray = int(array)>0
         if isarray:
             sh_script_name = install_dir + "Pipelines/libs/pipeline_array.sh"

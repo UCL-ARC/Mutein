@@ -2,7 +2,7 @@
 run=qsub
 install_dir=$1
 script=${install_dir}Pipelines/libs/pipeline_qsubber.py
-config=${install_dir}Pipelines/geneanalysis/config/batch_pdb.yml
+config=${install_dir}Pipelines/geneanalysis/config/batch_geneprot.yml
 echo "EXE PATH=$install_dir"
 echo "CURRENT=$PWD"
 module load python3/recommended

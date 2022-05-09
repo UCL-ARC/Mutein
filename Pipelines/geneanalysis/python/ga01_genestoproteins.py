@@ -11,11 +11,9 @@ import os
 import sys
 import yaml
 import pandas as pd
-
-# import from the shared library in Mutein/Pipelines/shared/lib
 dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
 retpath = "/".join(dirs) + "/libs"
-#sys.path.append(retpath)
+sys.path.append(retpath)
 import Paths
 import Arguments
 import BatchMaker
@@ -29,6 +27,9 @@ import genestovariants
 def run_pipeline(args):
     argus = Arguments.Arguments(args)
     install_dir = argus.arg("install_dir")
+    sys.path.append(install_dir)
+    sys.path.append(install_dir + "/Pipelines")
+    sys.path.append(install_dir + "/Pipelines/libs")
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
     dataset_path = Paths.Paths("vcf",data_dir, install_dir+"Pipelines/geneanalysis", dataset=dataset)

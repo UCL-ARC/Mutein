@@ -11,6 +11,8 @@ import subprocess
 class SubRunner:
     def __init__(self, exe, install_dir,data_dir,pipe_dir,script,ext,inputs,isarray):
         # need to add the array btach option here        
+        inputs += "@install_dir=" + install_dir
+        inputs += "@data_dir=" + data_dir        
         self.args = []
         self.args.append(exe) #0 arg=executable        
         if not isarray:
@@ -28,9 +30,9 @@ class SubRunner:
             exe_script = install_dir + pipe_dir + sh_script_name        
             self.args.append(py_script) #1 arg=executable script          
         
-        self.args.append(inputs) #2 arg=inputs
-        self.args.append(py_script) #3 arg=python script
-        self.args.append(install_dir + pipe_dir) #4 workspace
+        #self.args.append(py_script) #3 arg=python script
+        self.args.append(inputs) #2 arg=inputs        
+        #self.args.append(install_dir + pipe_dir) #4 workspace
                         
 
     def run(self):

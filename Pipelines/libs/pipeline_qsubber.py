@@ -30,16 +30,12 @@ import yaml
 
 # import from the shared library in Mutein/Pipelines/shared/lib
 import sys
-
 dirs = os.path.dirname(os.path.realpath(__file__)).split("/")
 retpath = "/".join(dirs) + ""
 sys.path.append(retpath)
-import Config
-import Paths
 import Arguments
 import QSubRunner as qsub
 import SubRunner as sub
-
 
 ##### INPUTS #############################################
 ## Pipeline jobs sequence
@@ -53,6 +49,9 @@ def pipeline_qsubber(args):
 
     # There are 7 arguments
     install_dir = args[1]   # 1) the executable installation directory, the root directory of the peipeline
+    sys.path.append(install_dir)
+    sys.path.append(install_dir + "/Pipelines")
+    sys.path.append(install_dir + "/Pipelines/libs")
     working_dir = args[2]   # 1) the working dir, the root that the data output and input lives in
     yaml_file = args[3]     # 2) a yaml file path with the batch definition
     py_or_sh = args[4]      # 3) qsub or py or sh for python or hpc batch or just sh
@@ -96,8 +95,8 @@ def pipeline_qsubber(args):
                 if len(inputs) > 0:
                     inputs += "@"
                 inputs += "install_dir=" + install_dir
-                inputs += "data_dir=" + working_dir
-                inputs += "dataset=" + dataset
+                inputs += "@data_dir=" + working_dir
+                inputs += "@dataset=" + dataset
                 inputs += "@gene=" + gene
                 inputs += "@pdb=" + pdb
                 #inputs += "@chain=" + chain

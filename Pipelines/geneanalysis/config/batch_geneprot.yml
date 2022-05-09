@@ -1,7 +1,7 @@
 ---
 id: '1'
 qsub_id: 'geneprot02'
-pipe_dir: 'Pipelines/geneanalysis/python'
+pipe_dir: 'Pipelines/geneanalysis/python/'
 script: 'ga01_genestoproteins'
 time: '1:00:0'
 dependency: '-1'

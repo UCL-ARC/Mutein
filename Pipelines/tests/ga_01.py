@@ -15,11 +15,18 @@ def addpath():
     newpath = "/".join(dirs)        
     print("Adding sys path=", newpath)
     sys.path.append(newpath)
-    
-
-
-def test_pipeline(method, batch_file,dataset,gene,pdb,chain):
+        
+def test_pipeline(method, batch_file,dataset,gene,pdb):
     addpath()
+    # There are 7 arguments
+    #install_dir = args[1]   # 1) the executable installation directory, the root directory of the peipeline    
+    #working_dir = args[2]   # 1) the working dir, the root that the data output and input lives in
+    #yaml_file = args[3]     # 2) a yaml file path with the batch definition
+    #py_or_sh = args[4]      # 3) qsub or py or sh for python or hpc batch or just sh        
+    #dataset = args[5]  # 3) dataset    
+    #gene = args[6]  # 4) gene    
+    #pdb = args[7]  # 5) pdb
+
     import Pipelines.libs.pipeline_qsubber as pipe
     args = [
         "",
@@ -36,7 +43,7 @@ def test_pipeline(method, batch_file,dataset,gene,pdb,chain):
 
 ######################################
 ## Tests for the geneprot
-test_pipeline("qsub_tst","batch_geneprot.yml","notch","NOTCH1","","")
+test_pipeline("py","batch_geneprot.yml","notch","NOTCH1","")
 
 ## Tests for the pdb
 #test_pipeline("py","batch_pdb.yml","notch","NOTCH1","1toz","A")

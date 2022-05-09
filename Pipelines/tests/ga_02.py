@@ -86,10 +86,10 @@ def test_foldx_pipeline_singlesagg(inputs):
 ######################################################################
 
 ## GENE_PROT
-test_geneprot_pipeline("dataset=notch@")
+#test_geneprot_pipeline("dataset=notch@")
 
 ## FOLDX
-#test_foldx_pipeline_repair("repairs=1@dataset=notch@gene=NOTCH1@pdb=3i08")
+test_foldx_pipeline_repair("repairs=1@dataset=notch@gene=NOTCH1@pdb=3i08")
 
 #test_foldx_pipeline_params("repairs=1@split=100@dataset=notch@gene=NOTCH1@pdb=3i08")
 #test_foldx_pipeline_posscan("repairs=1@split=100@dataset=notch@gene=NOTCH1@pdb=3i08@task=1")
