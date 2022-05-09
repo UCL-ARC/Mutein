@@ -1,22 +1,13 @@
-
 # Pipeline Overview
-#### 1)
-#### 2)
-#### 3) GeneProt: This starts with I think a vcf file and ends with the protein structures
-#### 4) FoldX: This pipeline takes a pdb file and a list of mutations and creates data frames of ddg
-#### 4) GeneStitch: This pipeline puts all the structures back together to show ddg for a gene
 
+There is one Pipeline subfolder for each step in the pipeline, which should be run in
+the order shown below. The convention is to issue the pipeline commands from the top level folder of your project data folder, after first having added the scripts to your path by running "source ~/.mutein_settings" or adding this line to your .bashrc. The scripts should create the required subfolders within your data folder.
 
-
-# Instructions for users
-
-
-# Instructions for developers
-There is a framework set up so it should be relatively easy to create new pipelines that can be submitted to qsub or run locally.
-- Each pipeline needs a yaml script to set it up, and a batch sh script to run on the server.
-- Additionally the way the batch runs expects the python script parameters tto be in a certain format.
-- Best practice: also add a test to the tests directory.
-More information is in the detailed document: [Creating a new pipeline](../Documents/new_pipeline.md)
+#### 1) software_setup: script to setup conda environments for various required tools
+#### 2) premapping: downloads the reference and datasets, and performs read quality control
+#### 3) mapping: maps reads against the reference genome
+#### 10) geneprot: This starts with I think a vcf file and ends with the protein structures
+#### 11) foldx: This pipeline takes a pdb file and a list of mutations and creates xxxx
 
 
 

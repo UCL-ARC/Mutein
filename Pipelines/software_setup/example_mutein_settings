@@ -1,0 +1,25 @@
+#edit this file and save as ~/.mutein_settings
+
+#where the Mutein repo was checkout to
+export MUT_DIR=~/repos/Mutein
+
+#which module name to give to "module load" command
+export MUT_CONDA_MODULE=python/miniconda3/4.5.11
+
+#which script to run and append output to bashrc to config conda
+export MUT_CONDA_SETUP=/shared/ucl/apps/miniconda/4.5.11/etc/profile.d/conda.sh
+
+#which command to generate a timestamp string each time these settings are loaded
+export TIMESTAMP=$(date +%Y%m%d%H%M%S)
+
+#make myriad's "module" function available (alternative to using #!/bin/bash -l)
+source /etc/profile.d/modules.sh
+
+#make sure conda commands are available
+source ${MUT_CONDA_SETUP}
+
+#add Mutein scripts to the path
+export PATH=${MUT_DIR}/Pipelines/scripts:${PATH}
+
+#which file inside reference subfolder to use as the reference
+export MUT_REFERENCE=GCA_000001405.15_GRCh38_no_alt_plus_hs38d1_analysis_set.fna.gz
