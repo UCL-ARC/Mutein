@@ -1,6 +1,12 @@
-# Load the necessary python libraries
+### SCRIPT FOT MUTEIN PIPELINE (UCL-ARC 2022) ###
+run=qsub
+install_dir=$1
+script=${install_dir}Pipelines/lib/pipeline_qsubber.py
+config=${install_dir}Pipelines/geneanalysis/config/batch_pdb.yml
+echo "EXE PATH=$install_dir"
+echo "CURRENT=$PWD"
 module load python3/recommended
 echo "~~~~~~~~~~~~~~~~~~ Call python script ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-python pipeline_qsubber.py batch_geneprot.yml qsub notch NOTCH1 ""
+python ${script} $install_dir $PWD ${config} $run notch NOTCH1 ""
 
 
