@@ -1,0 +1,1 @@
+../mapping/bwa_generator.sh
