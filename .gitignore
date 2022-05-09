@@ -128,7 +128,7 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-.vscode/settings.json
+.vscode/*
 
 # Don't include results directories in the github sync
 Pipelines/foldx/interim/*
