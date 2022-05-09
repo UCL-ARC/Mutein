@@ -34,3 +34,9 @@ conda activate bwa
 conda install --yes "bwa>=0.7.15"
 conda install --yes "samtools>=1.15.1"
 conda deactivate
+
+#required for gatk
+conda create --yes --name gatk
+conda activate gatk
+conda install --yes "gatk>=3.8"
+conda deactivate
