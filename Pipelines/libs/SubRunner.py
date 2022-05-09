@@ -20,17 +20,17 @@ class SubRunner:
         py_script = install_dir + pipe_dir + script + ".py"
         
         if exe == "bash":
-            exe_script = curr_dir + sh_script_name
+            exe_script = install_dir + pipe_dir + sh_script_name
             print("### SubRunner: chmod +x",exe_script)
             os.system("chmod +x " + exe_script)
             self.args.append(exe_script) #1 arg=executable script     
         else:
-            exe_script = curr_dir + work_dir + sh_script_name        
+            exe_script = install_dir + pipe_dir + sh_script_name        
             self.args.append(py_script) #1 arg=executable script          
         
         self.args.append(inputs) #2 arg=inputs
         self.args.append(py_script) #3 arg=python script
-        self.args.append(curr_dir+work_dir) #4 workspace
+        self.args.append(install_dir + pipe_dir) #4 workspace
                         
 
     def run(self):

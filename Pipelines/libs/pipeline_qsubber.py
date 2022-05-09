@@ -85,7 +85,7 @@ def pipeline_qsubber(args):
                 print("### yaml load|", pipe)
                 id = pipe["id"]
                 qsubid = pipe["qsub_id"]
-                work_dir = pipe["work_dir"].strip()
+                pipe_dir = pipe["pipe_dir"].strip()
                 script = pipe["script"].strip()
                 time = pipe["time"].strip()
                 dependency = pipe["dependency"].strip()
@@ -104,7 +104,7 @@ def pipeline_qsubber(args):
                 if active:
                     batch_dic[str(id)] = (
                         qsubid,
-                        work_dir,
+                        pipe_dir,
                         script,
                         time,
                         dependency,
@@ -116,8 +116,8 @@ def pipeline_qsubber(args):
     dependencies = {}
     for id in batch_list:
         isarray = int(array) > 0
-        qsubid, work_dir, script, time, dependency, array, inputs = batch_dic[id]
-        # print("# overall pipeline script:",id,qsubid,work_dir,script, time, dependency, array, inputs)
+        qsubid, pipe_dir, script, time, dependency, array, inputs = batch_dic[id]
+        # print("# overall pipeline script:",id,qsubid,pipe_dir,script, time, dependency, array, inputs)
         if "qsub" in py_or_sh:
             dep = -1
             if str(dependency) != "-1":
@@ -131,7 +131,7 @@ def pipeline_qsubber(args):
                 script,
                 install_dir,
                 working_dir,
-                work_dir,
+                pipe_dir,
                 dep,
                 time,
                 array,
@@ -144,17 +144,18 @@ def pipeline_qsubber(args):
         elif py_or_sh == "py":
             runner = sub.SubRunner(
                 argus.arg("pythonexe"),
-                dir_path,
-                work_dir,
+                install_dir,
+                working_dir,
+                pipe_dir,
                 script,
                 ".py",
                 inputs,
                 isarray,
             )
             dep = runner.run()
-        elif py_or_sh == "sh":
+        elif py_or_sh == "sh": #TODO make this go simply straight through passing all inputs
             runner = sub.SubRunner(
-                "bash", dir_path, work_dir, script, ".sh", inputs, isarray
+                "bash", install_dir,working_dir, pipe_dir, script, ".sh", inputs, isarray
             )
             dep = runner.run()
 
