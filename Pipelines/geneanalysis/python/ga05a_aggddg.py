@@ -68,7 +68,7 @@ def run_pipeline04(args):
             + str(argus.arg("split"))
             + "_"
             + str(r)
-            + "/posscan_df.csv"
+            + "/ddg_background.csv"
         )
         if exists(file_path):
             fdf = FileDf.FileDf(file_path)

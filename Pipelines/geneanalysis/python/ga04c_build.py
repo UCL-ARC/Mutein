@@ -26,6 +26,7 @@ import Paths
 import Arguments
 import Config
 import Foldx
+import FileDf
 
 
 def run_pipeline06(args):
@@ -55,6 +56,7 @@ def run_pipeline06(args):
 
     ############################################
     # set up the files and directories
+    pdb = pdbcode + "_rep" + str(argus.arg("repairs"))
     pdbfile = pdbcode + "_rep" + str(argus.arg("repairs")) + ".pdb"
     mutations = []
 
@@ -104,10 +106,18 @@ def run_pipeline06(args):
         copyfile(pdb_path.pdb_thruputs + pdbfile, row_path + pdbfile)
 
         fx_runner = Foldx.Foldx(argus.arg("foldxe"))
-        fx_runner.runBuild(pdbfile, mut, 15)
-        ddg_file = row_path + "/Dif_" + pdbfile + ".fxout"
-        df_file = row_path + "/pdbfile_build_DDG.csv"
-        fx_runner.createBuildCsv(pdbcode, mut, ddg_file, df_file, task)
+        #fx_runner.runBuild(pdbfile, mut, 15)
+        #Dif_af-p46531-f1-model_v2_rep1.fxout
+        ddg_file = row_path + "Dif_" + pdb + ".fxout"
+        df_file = row_path + "pdbfile_build_DDG.csv"
+        
+        filename = pdb_path.pdb_inputs + "coverage.csv"
+        fdfp = FileDf.FileDf(filename)
+        cov_df = fdfp.openDataFrame()
+
+        #path, pdbfile, pdb_mut, gene_mut, coverage, outfile_path
+        #fx_runner.createBuildCsv(pdbcode, mut, ddg_file, df_file, task)
+        fx_runner.createBuildCsv(row_path,pdbcode, mut, ddg_file, df_file, task)
 
 
 if __name__ == "__main__":
