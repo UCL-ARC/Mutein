@@ -1,0 +1,71 @@
+---
+id: 'Foldx1'
+qsub_id: 'foldx_repair'
+work_dir: 'foldx/scripts/'
+script: 'foldx01_repair'
+time: '3:00:0'
+dependency: '-1'
+array: 0
+inputs: "dataset=notch@gene=NOTCH1@pdb=6py8@repairs=2"
+active: 'N'
+---
+id: 'Foldx2'
+qsub_id: 'foldx_params'
+work_dir: 'foldx/scripts/'
+script: 'foldx02_makeparams'
+time: '3:00:0'
+dependency: 'Foldx1'
+array: 0
+inputs: "dataset=notch@gene=NOTCH1@pdb=6py8@repairs=2@split=10@chain=F"
+active: 'N'
+---
+id: 'Foldx3'
+qsub_id: 'foldx_posscan'
+work_dir: 'foldx/scripts/'
+script: 'foldx03_posscan'
+time: '3:00:0'
+dependency: 'Foldx2'
+array: 10
+inputs: "dataset=notch@gene=NOTCH1@pdb=6py8@repairs=2@split=10@chain=F@task=1"
+active: 'N'
+---
+id: 'Foldx4'
+qsub_id: 'foldx_agg'
+work_dir: 'foldx/scripts/'
+script: 'foldx04_aggddg'
+time: '3:00:0'
+dependency: 'Foldx3'
+array: 0
+inputs: "dataset=notch@gene=NOTCH1@pdb=6py8@repairs=2@split=10@chain=F"
+active: 'Y'
+---
+id: 'Foldx5'
+qsub_id: 'foldx_varp'
+work_dir: 'foldx/scripts/'
+script: 'foldx05_singlesparams'
+time: '3:00:0'
+dependency: 'Foldx1'
+array: 0
+inputs: "dataset=notch@gene=NOTCH1@pdb=6py8@repairs=2@split=10@chain=F@variant=*"
+active: 'N'
+---
+id: 'Foldx6'
+qsub_id: 'foldx_varscan'
+work_dir: 'foldx/scripts/'
+script: 'foldx06_singlescan'
+time: '3:00:0'
+dependency: 'Foldx5'
+array: 10
+inputs: "dataset=notch@gene=NOTCH1@pdb=6py8@repairs=2@split=10@chain=F@variant=*@task=1"
+active: 'Y'
+---
+id: 'Foldx7'
+qsub_id: 'foldx_varagg'
+work_dir: 'foldx/scripts/'
+script: 'foldx07_singlesagg'
+time: '3:00:0'
+dependency: 'Foldx6'
+array: 0
+inputs: "dataset=notch@gene=NOTCH1@pdb=6py8@repairs=2@split=10@chain=F@variant=*"
+active: 'Y'
+---

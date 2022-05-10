@@ -1,3 +1,0 @@
-Mutation,Variant
-AA27Y,Alpha
-YA28A,Alpha

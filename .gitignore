@@ -128,7 +128,7 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-.vscode/settings.json
+.vscode/*
 
 # Don't include results directories in the github sync
 Pipelines/foldx/interim/*
@@ -138,4 +138,7 @@ Pipelines/foldx/outputs/*
 Pipelines/shared/data/outputs/genes/shearwater*
 Pipelines/shared/data/outputs/pdbs/*
 Pipelines/shared/data/thruputs*
-Pipelines/shared/data/inputs/pdbs/shearwater*
+Pipelines/shared/data/inputs/pdbs/*
+
+Pipelines/geneanalysis/ppl_notch_NOTCH1sym.sh
+Pipelines/geneanalysis/ppl_notch_NOTCH1_STITCH_sym.sh
