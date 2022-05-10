@@ -2,7 +2,7 @@
 
 #Open file in the data directory and then...
 #../Mutein/Pipelines/geneanalysis/ppl_notch_NOTCH1.sh /home/rachel/UCL/github/Mutein/
-run=py
+run=qsub
 install_dir=$1
 script=${install_dir}Pipelines/libs/pipeline_qsubber.py
 config=${install_dir}Pipelines/geneanalysis/config/batch_pdb.yml
