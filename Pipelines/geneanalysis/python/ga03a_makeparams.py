@@ -143,7 +143,7 @@ def run_pipeline02(args):
     for i in range(len(params_lst)):
         mut = params_lst[i]
         if row_size == 0:
-            param_dic["pdb"].append(pdb)
+            param_dic["pdb"].append(pdbcode)
             param_dic["mutation"].append(mut)
             row += 1
             param_dic["row"].append("" + str(row))
