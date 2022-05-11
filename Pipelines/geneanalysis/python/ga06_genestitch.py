@@ -51,9 +51,10 @@ def run_pipeline(args):
     ############################################
     params_file = gene_path.gene_outputs + "pdb_coverage.csv"
     fdfp = FileDf.FileDf(params_file)
-    pm_df = fdfp.openDataFrame()
+    pm_df = fdfp.openDataFrame()    
     all_df_vars_ps = []
     all_df_vars_bm = []
+    all_df_backs_all = []
     all_df_backs = []
     all_df_vars_AF_ps = []
     all_df_vars_AF_bm = []
@@ -90,6 +91,7 @@ def run_pipeline(args):
                 all_df_backs_AF.append(fdf.openDataFrame())
             else:
                 all_df_backs.append(fdf.openDataFrame())
+            all_df_backs_all.append(fdf.openDataFrame())
 
     # NON Alpha-Fold structures
     outputs = []
@@ -100,7 +102,7 @@ def run_pipeline(args):
             "ddg_variants_ps.png",
             "variants",
             "gene_no",
-            False,
+            False,            
         ]
     )
     outputs.append(#variants done with buildmodel
@@ -110,7 +112,7 @@ def run_pipeline(args):
             "ddg_variants_bm.png",
             "variants",
             "gene_no",
-            False,
+            False,            
         ]
     )
     outputs.append(
@@ -120,7 +122,7 @@ def run_pipeline(args):
             "ddg_background.png",
             "background",
             "pdb_rid",
-            False,
+            False,            
         ]
     )
     outputs.append(
@@ -130,7 +132,7 @@ def run_pipeline(args):
             "ddg_background_gene.png",
             "background gene",
             "gene_no",
-            True,
+            True,            
         ]
     )
     outputs.append(
@@ -140,7 +142,7 @@ def run_pipeline(args):
             "AF_ddg_variants_ps.png",
             "variants AF",
             "gene_no",
-            False,
+            False,            
         ]
     )
     outputs.append(
@@ -150,7 +152,7 @@ def run_pipeline(args):
             "AF_ddg_variants_bm.png",
             "variants AF",
             "gene_no",
-            False,
+            False,            
         ]
     )
     outputs.append(
@@ -160,7 +162,7 @@ def run_pipeline(args):
             "AF_ddg_background.png",
             "background AF",
             "pdb_rid",
-            False,
+            False,            
         ]
     )
     outputs.append(
@@ -170,7 +172,7 @@ def run_pipeline(args):
             "AF_ddg_background_gene.png",
             "background AF gene",
             "gene_no",
-            True,
+            True,            
         ]
     )
 
@@ -182,6 +184,14 @@ def run_pipeline(args):
             plot_file = gene_path.gene_outputs + png_file
             anav = Analysis.Analysis(ddg_df, gene)
             anav.createDdgResidue(plot_file, title, xax=xax, dropnagene=nagene)
+    # The coverage of the pdb structures is across all structures, inc AF and SM
+    if len(all_df_backs_all) > 0:
+            ddg_df = pd.concat(all_df_backs_all, ignore_index=True)
+            df_file = gene_path.gene_outputs + "all_background.csv"
+            ddg_df.to_csv(df_file, index=False)
+            plot_file = gene_path.gene_outputs + "all_pdbcoverage.png"
+            anav = Analysis.Analysis(ddg_df, gene)                        
+            anav.createPdbSummary(plot_file, "PDB Coverage")
 
     print("### COMPLETED GENE STITCH job ###")
 

@@ -97,3 +97,58 @@ class Analysis:
         # plt.legend(title=hue,bbox_to_anchor=(1.01, 1), loc=2, borderaxespad=0.,shadow=False,fancybox=False)  # Put the legend out of the figure
         plt.savefig(file_path)
         print("### Analysis:OutputDdgResidue to", file_path)
+
+    def createPdbSummary(
+        self,
+        file_path,
+        title,
+        stabilising=-1,
+        destabilising=2.5,
+        xax="gene_no",
+        dropnagene=True,
+    ):
+        # And save something visual as a starting point for some analysis
+        df = self.data
+        df["ddg"] = pd.to_numeric(self.data["ddg"])
+        print(df)
+        if dropnagene:
+            df = df.dropna()
+        print(df)
+        
+        count = len(df.index)
+        
+        fig, ax1 = plt.subplots(1, 1, figsize=(25, 5))
+        fig.suptitle(
+            self.pdb_gene
+            + " "
+            + title
+            + " ("
+            + str(count)
+            + ")\nddg <-1=stabilising >2.5=destabilising"            
+        )
+        yax = "pdb"
+        hue = "ddg"
+        
+        ###  third plt ######
+        vmin = -2.5  # ddg_df[hue].min() #they have defined >2.5 as destabilising
+        vmax = -1 * vmin
+        ddg_df = df.sort_values(by=yax, ascending=False)
+        g = ax1.scatter(
+            ddg_df[xax],
+            ddg_df[yax],
+            c=ddg_df[hue],
+            cmap="Spectral",
+            edgecolor="silver",
+            alpha=0.35,
+            linewidth=0.1,
+            s=20,
+            vmin=vmin,
+            vmax=vmax,
+        )
+        cb = plt.colorbar(g, extend="both")
+        cb.set_label(hue)
+        ax1.set_xlabel(xax)
+        ax1.set_ylabel("")
+        # plt.legend(title=hue,bbox_to_anchor=(1.01, 1), loc=2, borderaxespad=0.,shadow=False,fancybox=False)  # Put the legend out of the figure
+        plt.savefig(file_path)
+        print("### Analysis:OutputPdbSummary to", file_path)
