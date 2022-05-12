@@ -24,6 +24,34 @@ This pipeline compares the background protein folding stability of a given pdb s
 - The background folding stability is calculated by mutating every single possible residue in a protein structure
 - The variants are calculating by permuting the possibilities of the known variants
 -----------------------------------------------------------------------
+### How to run
+- Navigate to your chosen data directory
+- Load python
+```
+module load python3/recommended
+```
+- Run the script in this example the notch1 test data
+- there are 3 scripts to run in the pipeline
+- - notch turns the entire vcs dataset into genes
+- -- (notch could automatically kick off all the sub genes in the future)
+- - notch_NOTCH1 runs the pdb files for the chosen gene
+- - notch_NOTCH1_stitch aggregates the separate structures together
+- -- (only not a dependent script due to multiple dependencies at the moment)
+
+
+```
+ chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_notch.sh
+ chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_notch_NOTCH1.sh
+ chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_notch_NOTCH1_stitch.sh
+ 
+ /home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_notch.sh /home/ucbtlcr/Mutein/
+ /home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_notch_NOTCH1.sh /home/ucbtlcr/Mutein/
+ /home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_notch_NOTCH1_stitch.sh /home/ucbtlcr/Mutein/
+```
+- It assumes you have gone to your working directory
+- You need the full path to the executable script
+- which also needs the executable directory passed o it
+- - these will be set up as environment variables
 ### Inputs
 1. A pdb file
 2. A variants file
