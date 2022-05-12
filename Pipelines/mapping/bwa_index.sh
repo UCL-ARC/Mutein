@@ -16,5 +16,14 @@ source ~/.mutein_settings
 module load ${MUT_CONDA_MODULE}
 conda activate bwa
 
+#extract gzipped file
+gunzip reference/${MUT_REFERENCE}
+
+#recompress with bgzip
+bgzip reference/${MUT_REFERENCE/\.gz/}
+
+#run approx ??? hour
+samtools faidx reference/${MUT_REFERENCE}
+
 #run time approx 1 hour
 bwa index -a bwtsw reference/${MUT_REFERENCE}

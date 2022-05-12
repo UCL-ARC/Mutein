@@ -12,7 +12,8 @@ do
         READS2=datasets/${DATASET}/${ACCESSION}/${ACCESSION}_2.fastq.gz
         REF=reference/${MUT_REFERENCE}
         BAMOUT=datasets/${DATASET}/${ACCESSION}/${ACCESSION}_aln_sort.bam
-        echo -n "bwa mem -t 4 ${REF} ${READS1} ${READS2} |"
+        echo -n "bwa mem -t 4 ${REF} ${READS1} ${READS2} | "
+        echo -n "samtools addreplacerg -r \"ID:${DATASET}_${ACCESSION}\" - | "
         echo    "samtools sort -T /tmp/${USER}-sam -O bam -m 2G - > ${BAMOUT}"
     done
 done \

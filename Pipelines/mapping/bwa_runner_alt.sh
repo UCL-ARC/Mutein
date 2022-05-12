@@ -2,7 +2,7 @@
 
 #$ -l h_rt=3:00:0
 #$ -l mem=2G
-#$ -l tmpfs=8G
+#$ -l tmpfs=4G
 #$ -pe smp 4
 #$ -cwd
 #$ -V
@@ -18,4 +18,8 @@ conda activate bwa
 
 mkdir -p /tmp/${USER}-sam
 
-head -n ${SGE_TASK_ID} bwa_joblist | tail -n 1 | bash
+CMD=$(head -n ${SGE_TASK_ID} bwa_joblist | tail -n 1)
+echo "Running ${CMD}"
+echo "${CMD}" | bash
+echo "Mutein ${SGE_JOB_NAME} ${SGE_JOB_ID} ${SGE_TASK_ID}"
+echo "Mutein task completed"

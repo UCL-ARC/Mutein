@@ -36,7 +36,7 @@ conda install --yes "samtools>=1.15.1"
 conda deactivate
 
 #required for gatk
-conda create --yes --name gatk
-conda activate gatk
-conda install --yes "gatk>=3.8"
+conda create --yes --name gatk4
+conda activate gatk4
+conda install --yes gatk4
 conda deactivate
