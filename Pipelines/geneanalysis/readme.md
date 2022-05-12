@@ -30,7 +30,8 @@ This pipeline compares the background protein folding stability of a given pdb s
 ```
 module load python3/recommended
 ```
-- Run the script in this example the notch1 test data
+- Run the scripts - in this example the notch1 test data
+- - they have to be run one by one, wait until they finish. The 1st and 3rd take moments, the 2nd takes.... a day...?
 - there are 3 scripts to run in the pipeline
 - - notch turns the entire vcs dataset into genes
 - - - (notch could automatically kick off all the sub genes in the future)
