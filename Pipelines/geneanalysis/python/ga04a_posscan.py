@@ -107,9 +107,10 @@ def run_pipeline03(args):
         filename = pdb_path.pdb_inputs + "coverage.csv"
         fdfp = FileDf.FileDf(filename)
         cov_df = fdfp.openDataFrame()
-        fx_runner.createPosscanCsv(
-            row_path, pdb, mut, "x", cov_df, row_path + "posscan_df.csv"
-        )
+        ddg_file = row_path + "PS_" + pdb + "_scanning_output.txt"
+        df_file = row_path + "ddg_background.csv"        
+        fx_runner.createPosscanCsv(row_path, pdb, mut.split(","), [], cov_df, ddg_file,df_file)
+        
 
 
 ##########################################################################################

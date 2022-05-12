@@ -105,18 +105,44 @@ def run_pipeline03(args):
         )
         copyfile(pdb_path.pdb_thruputs + pdbfile, row_path + pdbfile)
 
+        #### TEMPORARILY DO BOTH POSCAN AND BUILD #####################
         fx_runner = Foldx.Foldx(argus.arg("foldxe"))
-        ################################################################
-        fx_runner.runPosscan(pdbfile, pdb_mut)
-        ################################################################
         pdb = pdbcode + "_rep" + str(argus.arg("repairs"))
-        # pass in the coverage to annotate the csv file
         filename = pdb_path.pdb_inputs + "coverage.csv"
         fdfp = FileDf.FileDf(filename)
-        cov_df = fdfp.openDataFrame()
-        fx_runner.createPosscanCsv(
-            row_path, pdb, pdb_mut, gene_mut, cov_df, row_path + "posscan_df.csv"
-        )
+        cov_df = fdfp.openDataFrame()        
+        if gene_mut.lower() == "x" or gene_mut == "":
+            gene_muts = []
+        else:
+            gene_muts = gene_mut.split(",")
+        
+        if True:
+            #~~~~~~~~~~~~~~~~~~~~~~~~~~ POSITION SCAN ~~~~~~~~~~~~~~~~~~~~~~~~#        
+            ################################################################
+            fx_runner.runPosscan(pdbfile, pdb_mut)
+            ################################################################                        
+            ddg_file = row_path + "PS_" + pdb + "_scanning_output.txt"
+            df_file = row_path + "ddg_posscan.csv"        
+            pdb_muts = pdb_mut.split(",")
+            fx_runner.createPosscanCsv(row_path, pdb, pdb_muts, gene_muts, cov_df, ddg_file,df_file)
+        
+        if True:            
+            #~~~~~~~~~~~~~~~~~~~~~~~~~~ BUILD MODEL ~~~~~~~~~~~~~~~~~~~~~~~~#                    
+            
+            ddg_files = []
+            tag = 0
+            pdb_muts = pdb_mut.split(",")
+            for pm in pdb_muts:
+                tag+=1
+                ################################################################        
+                fx_runner.runBuild(pdbfile, pm,tag)
+                ################################################################                        
+                ddg_file = row_path + "Dif_" + str(tag) + "_" + pdb + ".fxout"                
+                ddg_files.append([ddg_file,pm])
+            
+            #create them all into 1 ddg file
+            df_file = row_path + "ddg_buildmodel.csv"        
+            fx_runner.createBuildCsv(row_path, pdb, pdb_muts, gene_muts, cov_df, ddg_files,df_file)
 
 
 ##########################################################################################

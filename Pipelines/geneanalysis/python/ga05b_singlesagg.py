@@ -55,39 +55,35 @@ def run_pipeline04(args):
     pdb_path.goto_job_dir(argus.arg("work_path"), args, argus.params, "_inputs07")
     ############################################
     params_file = pdb_path.pdb_thruputs + "singles_" + str(argus.arg("split")) + ".txt"
-
-    fdfp = FileDf.FileDf(
-        params_file, sep=" ", cols=["pdb", "gene_mut", "pdb_mut", "task"], header=False
-    )
+    fdfp = FileDf.FileDf(params_file, sep=" ", cols=["pdb", "gene_mut", "pdb_mut", "task"], header=False)
     pm_df = fdfp.openDataFrame()
-    all_df = []
-    for i in range(len(pm_df.index)):
-        r = pm_df["task"][i]
-        # the file has already been turned into a dataframe called posscan_df.csv
-        file_path = (
-            pdb_path.pdb_thruputs
-            + str(argus.arg("split"))
-            + "_"
-            + str(r)
-            + "_var/posscan_df.csv"
-        )
-        if exists(file_path):
-            fdf = FileDf.FileDf(file_path)
-            all_df.append(fdf.openDataFrame())
-    ddg_df = pd.concat(all_df, ignore_index=True)
-    df_file = pdb_path.pdb_outputs + "ddg_variants.csv"
-    ddg_df.to_csv(df_file, index=False)
-    plot_file = (
-        pdb_path.pdb_outputs
-        + argus.arg("pdb")
-        + "_"
-        + str(argus.arg("repairs"))
-        + "_variants_plot.png"
-    )
-    ana = Analysis.Analysis(ddg_df, argus.arg("pdb"))
-    ana.createDdgResidue(plot_file, "variants", xax="gene_no")
+    
 
-    print("### COMPLETED FoldX aggregate job ###")
+                
+    analyses = []
+    analyses.append([   "ddg_posscan.csv",
+                        pdb_path.pdb_outputs + "ddg_posscan.csv",                        
+                        pdb_path.pdb_outputs + argus.arg("pdb")+"_ps_"+str(argus.arg("repairs"))+"_variants_plot.png"                        
+                    ])
+    analyses.append([   "ddg_buildmodel.csv",
+                        pdb_path.pdb_outputs + "ddg_buildmodel.csv",                        
+                        pdb_path.pdb_outputs + argus.arg("pdb")+"_bm_"+str(argus.arg("repairs"))+"_variants_plot.png"                        
+                    ])
+    
+    for in_csv, out_csv, plot_file in analyses: 
+        all_df = []
+        for i in range(len(pm_df.index)):
+            r = pm_df["task"][i]
+            in_csv_i = pdb_path.pdb_thruputs+ str(argus.arg("split"))+"_"+ str(r)+"_var/"+in_csv                                                                
+            if exists(in_csv_i):
+                fdf = FileDf.FileDf(in_csv_i)
+                all_df.append(fdf.openDataFrame())
+        ddg_df = pd.concat(all_df, ignore_index=True)        
+        ddg_df.to_csv(out_csv, index=False)        
+        ana = Analysis.Analysis(ddg_df, argus.arg("pdb"))
+        ana.createDdgResidue(plot_file, "variants", xax="gene_no")
+
+        print("### COMPLETED FoldX aggregate job ###")
 
 
 ##########################################################################################

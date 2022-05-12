@@ -51,10 +51,13 @@ def run_pipeline(args):
     ############################################
     params_file = gene_path.gene_outputs + "pdb_coverage.csv"
     fdfp = FileDf.FileDf(params_file)
-    pm_df = fdfp.openDataFrame()
-    all_df_vars = []
+    pm_df = fdfp.openDataFrame()    
+    all_df_vars_ps = []
+    all_df_vars_bm = []
+    all_df_backs_all = []
     all_df_backs = []
-    all_df_vars_AF = []
+    all_df_vars_AF_ps = []
+    all_df_vars_AF_bm = []
     all_df_backs_AF = []
     for i in range(len(pm_df.index)):
         r = pm_df["pdb"][i].lower()
@@ -67,32 +70,49 @@ def run_pipeline(args):
             gene=gene,
             pdb=r,
         )
-        file_var = pdb_path.pdb_outputs + "ddg_variants.csv"
+        file_var_ps = pdb_path.pdb_outputs + "ddg_posscan.csv"
+        file_var_bm = pdb_path.pdb_outputs + "ddg_buildmodel.csv"
         file_back = pdb_path.pdb_outputs + "ddg_background.csv"
-        if exists(file_var):
-            fdf = FileDf.FileDf(file_var)
-            all_df_vars.append(fdf.openDataFrame())
+        if exists(file_var_ps):
+            fdf = FileDf.FileDf(file_var_ps)            
             if r[:2].upper() == "AF":
-                all_df_vars_AF.append(fdf.openDataFrame())
+                all_df_vars_AF_ps.append(fdf.openDataFrame())
             else:
-                all_df_vars.append(fdf.openDataFrame())
+                all_df_vars_ps.append(fdf.openDataFrame())
+        if exists(file_var_bm):
+            fdf = FileDf.FileDf(file_var_bm)            
+            if r[:2].upper() == "AF":
+                all_df_vars_AF_bm.append(fdf.openDataFrame())
+            else:
+                all_df_vars_bm.append(fdf.openDataFrame())
         if exists(file_back):
             fdf = FileDf.FileDf(file_back)
             if r[:2].upper() == "AF":
                 all_df_backs_AF.append(fdf.openDataFrame())
             else:
                 all_df_backs.append(fdf.openDataFrame())
+            all_df_backs_all.append(fdf.openDataFrame())
 
     # NON Alpha-Fold structures
     outputs = []
-    outputs.append(
+    outputs.append(#variants done with posscan
         [
-            all_df_vars,
-            "ddg_variants.csv",
-            "ddg_variants.png",
+            all_df_vars_ps,
+            "ddg_variants_ps.csv",
+            "ddg_variants_ps.png",
             "variants",
             "gene_no",
-            False,
+            False,            
+        ]
+    )
+    outputs.append(#variants done with buildmodel
+        [
+            all_df_vars_bm,
+            "ddg_variants_bm.csv",
+            "ddg_variants_bm.png",
+            "variants",
+            "gene_no",
+            False,            
         ]
     )
     outputs.append(
@@ -102,7 +122,7 @@ def run_pipeline(args):
             "ddg_background.png",
             "background",
             "pdb_rid",
-            False,
+            False,            
         ]
     )
     outputs.append(
@@ -112,17 +132,27 @@ def run_pipeline(args):
             "ddg_background_gene.png",
             "background gene",
             "gene_no",
-            True,
+            True,            
         ]
     )
     outputs.append(
         [
-            all_df_vars_AF,
-            "AF_ddg_variants.csv",
-            "AF_ddg_variants.png",
+            all_df_vars_AF_ps,
+            "AF_ddg_variants_ps.csv",
+            "AF_ddg_variants_ps.png",
             "variants AF",
             "gene_no",
-            False,
+            False,            
+        ]
+    )
+    outputs.append(
+        [
+            all_df_vars_AF_bm,
+            "AF_ddg_variants_bm.csv",
+            "AF_ddg_variants_bm.png",
+            "variants AF",
+            "gene_no",
+            False,            
         ]
     )
     outputs.append(
@@ -132,7 +162,7 @@ def run_pipeline(args):
             "AF_ddg_background.png",
             "background AF",
             "pdb_rid",
-            False,
+            False,            
         ]
     )
     outputs.append(
@@ -142,7 +172,7 @@ def run_pipeline(args):
             "AF_ddg_background_gene.png",
             "background AF gene",
             "gene_no",
-            True,
+            True,            
         ]
     )
 
@@ -154,6 +184,14 @@ def run_pipeline(args):
             plot_file = gene_path.gene_outputs + png_file
             anav = Analysis.Analysis(ddg_df, gene)
             anav.createDdgResidue(plot_file, title, xax=xax, dropnagene=nagene)
+    # The coverage of the pdb structures is across all structures, inc AF and SM
+    if len(all_df_backs_all) > 0:
+            ddg_df = pd.concat(all_df_backs_all, ignore_index=True)
+            df_file = gene_path.gene_outputs + "all_background.csv"
+            ddg_df.to_csv(df_file, index=False)
+            plot_file = gene_path.gene_outputs + "all_pdbcoverage.png"
+            anav = Analysis.Analysis(ddg_df, gene)                        
+            anav.createPdbSummary(plot_file, "PDB Coverage")
 
     print("### COMPLETED GENE STITCH job ###")
 
