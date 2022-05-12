@@ -33,12 +33,10 @@ module load python3/recommended
 - Run the script in this example the notch1 test data
 - there are 3 scripts to run in the pipeline
 - - notch turns the entire vcs dataset into genes
-- -- (notch could automatically kick off all the sub genes in the future)
+- - - (notch could automatically kick off all the sub genes in the future)
 - - notch_NOTCH1 runs the pdb files for the chosen gene
 - - notch_NOTCH1_stitch aggregates the separate structures together
-- -- (only not a dependent script due to multiple dependencies at the moment)
-
-
+- - - (only not a dependent script due to multiple dependencies at the moment)
 ```
  chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_notch.sh
  chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_notch_NOTCH1.sh
