@@ -44,8 +44,7 @@ def run_pipeline01(args):
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
     pdbcode = argus.arg("pdb").lower()
-    pdb_path = Paths.Paths(
-        "pdb",
+    pdb_path = Paths.Paths(        
         data_dir,
         install_dir + "Pipelines/geneanalysis",
         dataset=dataset,

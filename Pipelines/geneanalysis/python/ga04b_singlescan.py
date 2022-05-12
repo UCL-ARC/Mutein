@@ -45,8 +45,7 @@ def run_pipeline03(args):
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
     pdbcode = argus.arg("pdb").lower()
-    pdb_path = Paths.Paths(
-        "pdb",
+    pdb_path = Paths.Paths(        
         data_dir,
         install_dir + "Pipelines/geneanalysis",
         dataset=dataset,
@@ -64,18 +63,18 @@ def run_pipeline03(args):
     if mutation_string == "none":
         filename = pdb_path.pdb_thruputs + "singles_" + str(argus.arg("split")) + ".txt"
         fio = FileDf.FileDf(
-            filename, sep=" ", cols=["pdb", "mut", "pdb_mut", "task"], header=False
+            filename, sep=" ", cols=["pdb", "gene_mut", "pdb_mut", "task"], header=False
         )
         df = fio.openDataFrame()
         if task == "all":
             for i in range(len(df.index)):
-                gene_mut = df["mut"][i]
+                gene_mut = df["gene_mut"][i]
                 pdb_mut = df["pdb_mut"][i]
                 row = df["task"][i]
                 mutations.append([pdb_mut, gene_mut, row])
         else:
             if int(task) <= len(df.index):
-                gene_mut = df["mut"][int(task) - 1]
+                gene_mut = df["gene_mut"][int(task) - 1]
                 pdb_mut = df["pdb_mut"][int(task) - 1]
                 row = df["task"][int(task) - 1]
                 mutations.append([pdb_mut, gene_mut, row])
@@ -108,7 +107,7 @@ def run_pipeline03(args):
         #### TEMPORARILY DO BOTH POSCAN AND BUILD #####################
         fx_runner = Foldx.Foldx(argus.arg("foldxe"))
         pdb = pdbcode + "_rep" + str(argus.arg("repairs"))
-        filename = pdb_path.pdb_inputs + "coverage.csv"
+        filename = pdb_path.pdb_inputs + "Coverage.csv"
         fdfp = FileDf.FileDf(filename)
         cov_df = fdfp.openDataFrame()        
         if gene_mut.lower() == "x" or gene_mut == "":

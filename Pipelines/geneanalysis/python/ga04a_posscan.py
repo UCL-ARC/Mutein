@@ -45,8 +45,7 @@ def run_pipeline03(args):
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
     pdbcode = argus.arg("pdb").lower()
-    pdb_path = Paths.Paths(
-        "pdb",
+    pdb_path = Paths.Paths(        
         data_dir,
         install_dir + "Pipelines/geneanalysis",
         dataset=dataset,
@@ -104,7 +103,7 @@ def run_pipeline03(args):
         ###########################################################################
         pdb = pdbcode + "_rep" + str(argus.arg("repairs"))
         # pass in the coverage to annotate the csv file
-        filename = pdb_path.pdb_inputs + "coverage.csv"
+        filename = pdb_path.pdb_inputs + "Coverage.csv"
         fdfp = FileDf.FileDf(filename)
         cov_df = fdfp.openDataFrame()
         ddg_file = row_path + "PS_" + pdb + "_scanning_output.txt"

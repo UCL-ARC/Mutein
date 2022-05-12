@@ -84,29 +84,27 @@ def test_foldx_pipeline_singlesagg(inputs):
     p07.run_pipeline04(args)
 
 ######################################################################
-
-## GENE_PROT
-
-#test_geneprot_pipeline("dataset=notch@")
-
-## FOLDX
-#pdbcode = "AF-P46531-F1-model_v2"
-pdbcode = "1yyh"
+### INPUTS
+dataset="notch"
+gene = "NOTCH1"
 repairs = 1
 split=5000
 vsplit=700
-#test_foldx_pipeline_repair("repairs=1@dataset=notch@gene=NOTCH1@pdb="+pdbcode)
 
-#test_foldx_pipeline_params("repairs="+str(repairs)+"@split="+str(split)+"@dataset=notch@gene=NOTCH1@pdb="+pdbcode)
-#test_foldx_pipeline_posscan("repairs="+str(repairs)+"@split="+str(split)+"@dataset=notch@gene=NOTCH1@pdb="+pdbcode+"@task=1")
-#test_foldx_pipeline_posscan("repairs="+str(repairs)+"@split="+str(split)+"@dataset=notch@gene=NOTCH1pdb="+pdbcode+"@task=2")
-#test_foldx_pipeline_agg("repairs="+str(repairs)+"@split="+str(split)+"@dataset=notch@gene=NOTCH1@pdb="+pdbcode)
-
-#test_foldx_pipeline_vparams("repairs="+str(repairs)+"@split="+str(vsplit)+"@dataset=notch@gene=NOTCH1@pdb="+pdbcode+"@task=1@variant=*")
-#############test_foldx_pipeline_build("repairs="+str(repairs)+"@split="+str(vsplit)+"@dataset=notch@gene=NOTCH1@pdb="+pdbcode+"@task=1")
-#test_foldx_pipeline_singlescan("repairs="+str(repairs)+"@split="+str(vsplit)+"@dataset=notch@gene=NOTCH1@pdb="+pdbcode+"@task=1")
-#test_foldx_pipeline_singlescan("repairs="+str(repairs)+"@split="+str(vsplit)+"@dataset=notch@gene=NOTCH1@pdb="+pdbcode+"@task=2")
-#test_foldx_pipeline_singlesagg("repairs="+str(repairs)+"@split="+str(vsplit)+"@dataset=notch@gene=NOTCH1@pdb="+pdbcode)
-
+#test_geneprot_pipeline("dataset="+dataset+"@")
+for pdbcode in ["AF-P46531-F1-model_v2","smhom_4xbm_2_a_20_256","smexp_3v79_1759_2119","1yyh"]:
+#for pdbcode in ["smhom_4xbm_2_a_20_256"]:
+    print(pdbcode)
+    #test_foldx_pipeline_repair("repairs=1@dataset="+dataset+"@gene="+gene+"@pdb="+pdbcode)
+    #############test_foldx_pipeline_background
+    #test_foldx_pipeline_params("repairs="+str(repairs)+"@split="+str(split)+"@dataset="+dataset+"@gene="+gene+"@pdb="+pdbcode)
+    #test_foldx_pipeline_posscan("repairs="+str(repairs)+"@split="+str(split)+"@dataset="+dataset+"@gene="+gene+"@pdb="+pdbcode+"@task=1")
+    #test_foldx_pipeline_posscan("repairs="+str(repairs)+"@split="+str(split)+"@dataset="+dataset+"@gene="+gene+"@pdb="+pdbcode+"@task=2")
+    #test_foldx_pipeline_agg("repairs="+str(repairs)+"@split="+str(split)+"@dataset="+dataset+"@gene="+gene+"@pdb="+pdbcode)
+    #############test_foldx_pipeline_variants
+    #test_foldx_pipeline_vparams("repairs="+str(repairs)+"@split="+str(vsplit)+"@dataset="+dataset+"@gene="+gene+"@pdb="+pdbcode+"@task=1@variant=*")
+    #test_foldx_pipeline_singlescan("repairs="+str(repairs)+"@split="+str(vsplit)+"@dataset="+dataset+"@gene="+gene+"@pdb="+pdbcode+"@task=1")
+    #test_foldx_pipeline_singlescan("repairs="+str(repairs)+"@split="+str(vsplit)+"@dataset="+dataset+"@gene="+gene+"@pdb="+pdbcode+"@task=2")
+    #test_foldx_pipeline_singlesagg("repairs="+str(repairs)+"@split="+str(vsplit)+"@dataset="+dataset+"@gene="+gene+"@pdb="+pdbcode)
 ## GENE_STITCH
 test_genestitch_ppl("dataset=notch@gene=NOTCH1")

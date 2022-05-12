@@ -38,8 +38,7 @@ def run_pipeline(args):
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
-    gene_path = Paths.Paths(
-        "geneprot",
+    gene_path = Paths.Paths(        
         data_dir,
         install_dir + "Pipelines/geneanalysis",
         dataset=dataset,
@@ -49,150 +48,66 @@ def run_pipeline(args):
     argus.params["work_path"] = work_path
     gene_path.goto_job_dir(argus.arg("work_path"), args, argus.params, "_inputs01")
     ############################################
-    params_file = gene_path.gene_outputs + "pdb_coverage.csv"
-    fdfp = FileDf.FileDf(params_file)
+    params_file = gene_path.gene_outputs + "Coverage_all.csv"
+    fdfp = FileDf.FileDf(params_file)    
     pm_df = fdfp.openDataFrame()    
-    all_df_vars_ps = []
-    all_df_vars_bm = []
-    all_df_backs_all = []
-    all_df_backs = []
-    all_df_vars_AF_ps = []
-    all_df_vars_AF_bm = []
-    all_df_backs_AF = []
-    for i in range(len(pm_df.index)):
-        r = pm_df["pdb"][i].lower()
+    pdbs = pm_df["pdb"].unique()
+    
+    all_back = []
+    all_var_scan = []
+    all_var_build = []
+    
+    # first concat all the dfs, variants and backgrount
+    for pdb in pdbs:        
         # the file has already been turned into a dataframe called posscan_df.csv
-        pdb_path = Paths.Paths(
-            "pdb",
+        pdb_path = Paths.Paths(            
             data_dir,
             install_dir + "Pipelines/geneanalysis",
             dataset=dataset,
             gene=gene,
-            pdb=r,
+            pdb=pdb,
         )
         file_var_ps = pdb_path.pdb_outputs + "ddg_posscan.csv"
         file_var_bm = pdb_path.pdb_outputs + "ddg_buildmodel.csv"
         file_back = pdb_path.pdb_outputs + "ddg_background.csv"
         if exists(file_var_ps):
-            fdf = FileDf.FileDf(file_var_ps)            
-            if r[:2].upper() == "AF":
-                all_df_vars_AF_ps.append(fdf.openDataFrame())
-            else:
-                all_df_vars_ps.append(fdf.openDataFrame())
+            fdf = FileDf.FileDf(file_var_ps)                        
+            all_var_scan.append(fdf.openDataFrame())            
         if exists(file_var_bm):
-            fdf = FileDf.FileDf(file_var_bm)            
-            if r[:2].upper() == "AF":
-                all_df_vars_AF_bm.append(fdf.openDataFrame())
-            else:
-                all_df_vars_bm.append(fdf.openDataFrame())
+            fdf = FileDf.FileDf(file_var_bm)                        
+            all_var_build.append(fdf.openDataFrame())            
         if exists(file_back):
-            fdf = FileDf.FileDf(file_back)
-            if r[:2].upper() == "AF":
-                all_df_backs_AF.append(fdf.openDataFrame())
-            else:
-                all_df_backs.append(fdf.openDataFrame())
-            all_df_backs_all.append(fdf.openDataFrame())
+            fdf = FileDf.FileDf(file_back)            
+            all_back.append(fdf.openDataFrame())
 
-    # NON Alpha-Fold structures
-    outputs = []
-    outputs.append(#variants done with posscan
-        [
-            all_df_vars_ps,
-            "ddg_variants_ps.csv",
-            "ddg_variants_ps.png",
-            "variants",
-            "gene_no",
-            False,            
-        ]
-    )
-    outputs.append(#variants done with buildmodel
-        [
-            all_df_vars_bm,
-            "ddg_variants_bm.csv",
-            "ddg_variants_bm.png",
-            "variants",
-            "gene_no",
-            False,            
-        ]
-    )
-    outputs.append(
-        [
-            all_df_backs,
-            "ddg_background.csv",
-            "ddg_background.png",
-            "background",
-            "pdb_rid",
-            False,            
-        ]
-    )
-    outputs.append(
-        [
-            all_df_backs,
-            "ddg_background.csv",
-            "ddg_background_gene.png",
-            "background gene",
-            "gene_no",
-            True,            
-        ]
-    )
-    outputs.append(
-        [
-            all_df_vars_AF_ps,
-            "AF_ddg_variants_ps.csv",
-            "AF_ddg_variants_ps.png",
-            "variants AF",
-            "gene_no",
-            False,            
-        ]
-    )
-    outputs.append(
-        [
-            all_df_vars_AF_bm,
-            "AF_ddg_variants_bm.csv",
-            "AF_ddg_variants_bm.png",
-            "variants AF",
-            "gene_no",
-            False,            
-        ]
-    )
-    outputs.append(
-        [
-            all_df_backs_AF,
-            "AF_ddg_background.csv",
-            "AF_ddg_background.png",
-            "background AF",
-            "pdb_rid",
-            False,            
-        ]
-    )
-    outputs.append(
-        [
-            all_df_backs_AF,
-            "AF_ddg_background.csv",
-            "AF_ddg_background_gene.png",
-            "background AF gene",
-            "gene_no",
-            True,            
-        ]
-    )
+    ddg_df_back = pd.concat(all_back,ignore_index=True)
+    ddg_df_var_scan = pd.concat(all_var_scan,ignore_index=True)
+    ddg_df_var_build = pd.concat(all_var_build,ignore_index=True)
+    ddg_df_back.to_csv(gene_path.gene_outputs+"ddg_background.csv", index=False)
+    ddg_df_var_scan.to_csv(gene_path.gene_outputs+"ddg_variant_ps.csv", index=False)
+    ddg_df_var_build.to_csv(gene_path.gene_outputs+"ddg_variant_bm.csv", index=False)
+            
+    #DB Coverage reports    
+    plot_file = gene_path.gene_outputs + "ALL_coverage.png"
+    anav = Analysis.Analysis(ddg_df_back, gene)                        
+    anav.createPdbSummary(plot_file, "PDB Coverage")
+        
+    tags = ["SMHOM","SMEXP","AF","EXP"]
+    for tag in tags:
+        df_back = ddg_df_back.query("source=='"+tag+"'")
+        df_scan = ddg_df_var_scan.query("source=='"+tag+"'")
+        df_build = ddg_df_var_build.query("source=='"+tag+"'")        
+        
+        anav_back = Analysis.Analysis(df_back, gene)
+        anav_back.createDdgResidue(gene_path.gene_outputs+tag+ "_background_rid.png", "Background (residue) "+ tag, xax="pdb_rid", dropnagene=False)
+        anav_back.createDdgResidue(gene_path.gene_outputs+tag+ "_background_gene.png", "Background (gene no) "+ tag, xax="gene_no", dropnagene=True)
 
-    for dfs, csv_file, png_file, title, xax, nagene in outputs:
-        if len(dfs) > 0:
-            ddg_df = pd.concat(dfs, ignore_index=True)
-            df_file = gene_path.gene_outputs + csv_file
-            ddg_df.to_csv(df_file, index=False)
-            plot_file = gene_path.gene_outputs + png_file
-            anav = Analysis.Analysis(ddg_df, gene)
-            anav.createDdgResidue(plot_file, title, xax=xax, dropnagene=nagene)
-    # The coverage of the pdb structures is across all structures, inc AF and SM
-    if len(all_df_backs_all) > 0:
-            ddg_df = pd.concat(all_df_backs_all, ignore_index=True)
-            df_file = gene_path.gene_outputs + "all_background.csv"
-            ddg_df.to_csv(df_file, index=False)
-            plot_file = gene_path.gene_outputs + "all_pdbcoverage.png"
-            anav = Analysis.Analysis(ddg_df, gene)                        
-            anav.createPdbSummary(plot_file, "PDB Coverage")
+        anav_scan = Analysis.Analysis(df_scan, gene)
+        anav_scan.createDdgResidue(gene_path.gene_outputs+tag+ "_variant_ps.png", "Variant PosScan "+ tag, xax="gene_no", dropnagene=False)
 
+        anav_build = Analysis.Analysis(df_build, gene)
+        anav_build.createDdgResidue(gene_path.gene_outputs+tag+ "_variant_bm.png", "Variant BuildModel "+ tag, xax="gene_no", dropnagene=False)
+                            
     print("### COMPLETED GENE STITCH job ###")
 
 

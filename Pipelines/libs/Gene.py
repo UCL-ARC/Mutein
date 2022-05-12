@@ -29,7 +29,10 @@ class Gene:
         else:
             pdb = self.pdbs[pdbcode]
         return pdb
-
+    
+    def addPdb(self, pdb):        
+        self.pdbs[pdb.pdbcode] = pdb
+        
     def getMatchingVarantPdb(self):
         v_p = []
         for v in self.variants:
@@ -132,18 +135,12 @@ class Gene:
         dic_coverage["variant"] = []
         dic_coverage["chain"] = []
         dic_coverage["residue"] = []
-        dic_coverage["mutation"] = []
-        dic_coverage["offset"] = []
+        dic_coverage["mutation"] = []        
         dic_coverage["pdb_residue"] = []
         dic_coverage["pdb_mut"] = []
 
         for vrcod, vr in self.variants.items():
-            included, offset, chain = vr.includedInRange(
-                pdb.segment_starts,
-                pdb.segment_ends,
-                pdb.segment_offsets,
-                pdb.segment_chains,
-            )
+            included, chain, pdb_residue = vr.includedInRange(pdb.segments)                            
             if included:
                 dic_coverage["gene"].append(self.gene)
                 dic_coverage["accession"].append(self.accession)
@@ -151,11 +148,9 @@ class Gene:
                 dic_coverage["variant"].append("ANY")
                 dic_coverage["chain"].append(chain)
                 dic_coverage["residue"].append(vr.residue)
-                dic_coverage["mutation"].append(vrcod)
-                dic_coverage["offset"].append(offset)
-                dic_coverage["pdb_residue"].append(int(vr.residue) - int(offset))
-                dic_coverage["pdb_mut"].append(
-                    vrcod[0] + str(int(vr.residue) - int(offset)) + vrcod[-1]
+                dic_coverage["mutation"].append(vrcod)                
+                dic_coverage["pdb_residue"].append(int(pdb_residue))
+                dic_coverage["pdb_mut"].append(vrcod[0]+str(pdb_residue)+vrcod[-1]
                 )
 
         pdbs_df = pd.DataFrame.from_dict(dic_coverage)

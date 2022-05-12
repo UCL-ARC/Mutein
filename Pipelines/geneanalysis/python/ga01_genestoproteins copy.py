@@ -19,12 +19,10 @@ import Paths
 import Arguments
 import BatchMaker
 import Gene
+import Pdb
 import Variant
 import genetoprotein
 import genestovariants
-import SwissModel
-import UniProt
-import PdbRunner
 
 
 def run_pipeline(args):
@@ -35,7 +33,9 @@ def run_pipeline(args):
     sys.path.append(install_dir + "/Pipelines/libs")
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
-    dataset_path = Paths.Paths(data_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset)
+    dataset_path = Paths.Paths(
+        "vcf", data_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset
+    )
     genes = []
     """
     "gene_name"	"n_syn"	"n_mis"	"n_non"	"n_spl"	"n_ind"	"wmis_cv"	"wnon_cv"	"wspl_cv"	"wind_cv"	"pmis_cv"	"ptrunc_cv"	"pallsubs_cv"	"pind_cv"	"qmis_cv"	"qtrunc_cv"	"qallsubs_cv"	"pglobal_cv"	"qglobal_cv"
@@ -48,7 +48,7 @@ def run_pipeline(args):
     genes_file = dataset_path.dataset_outputs + "/genes.txt"
     with open(genes_file, "r") as fr:
         lines = fr.readlines()
-        #lines = ["","FAT1"]
+        # lines = ["","FAT1"]
         for l in range(1, len(lines)):
             # for l in range(1,2):
             line = lines[l]
@@ -58,7 +58,13 @@ def run_pipeline(args):
                 gene = gene[1:]
             if gene[-1] == '"':
                 gene = gene[:-1]
-            gene_path = Paths.Paths(data_dir,install_dir + "Pipelines/geneanalysis",dataset=dataset,gene=gene)
+            gene_path = Paths.Paths(
+                "geneprot",
+                data_dir,
+                install_dir + "Pipelines/geneanalysis",
+                dataset=dataset,
+                gene=gene,
+            )
             accession = genetoprotein.accession_from_bioservices(gene)
             if len(accession) > 1:
                 seq = genetoprotein.sequence_from_bioservices(accession)
@@ -83,27 +89,75 @@ def run_pipeline(args):
                     # print(bs,p1,rs,na,vr)
                     vrnt = Variant.Variant(gene, vr, bs)
                     gn.addVariant(vrnt)
-                # CREATE the pdbs for the gene                
-                # both these searches retun a tuple list of the pdb code and the thruput gene file path, ready for pdb inputs
-                up = UniProt.UniProt(gene)
-                df, pdb_list_up = up.searchForStructures(gene_path.gene_outputs,gene_path.gene_outpdbs,fragment=50)
-                accession = up.accession
-                sm = SwissModel.SwissModel(gene,accession)
-                dfs, pdb_list_sm = sm.searchForStructures(gene_path.gene_outputs,gene_path.gene_outpdbs,fragment=50)                
-                dfs.append(df)
-                pdb_list = pdb_list_up + pdb_list_sm
-                vc = pd.concat(dfs, axis=0)
-                vc.to_csv(gene_path.gene_outputs + "Coverage_all.csv",index=False)
-                print(vc)                
-                for pdb in pdb_list:                    
-                    pdb_path = Paths.Paths(data_dir,install_dir + "Pipelines/geneanalysis",dataset=dataset,gene=gn.gene,pdb=pdb.pdbcode)
-                    prun = PdbRunner.PdbRunner(pdb.pdbcode)
-                    prun.copyToInput(gene_path.gene_outpdbs, pdb_path.pdb_inputs,vc)
-                    dfp = gn.getPdbVariantCoverageDataFrame(pdb)
-                    dfp.to_csv(pdb_path.pdb_inputs + "/variants.csv", index=False)
-                    bm.addBatch(dataset, gn.gene, pdb.pdbcode)
-                    gn.addPdb(pdb)
-                                    
+                # CREATE the pdbs for the gene
+                pdbs_paths = genetoprotein.pdbs_from_accession_bioservices(accession)
+                print("gene=", gene, "accession=", accession)  # ,"pdbs=",pdbs_paths)
+                for pdb_path in pdbs_paths:
+                    pdb = pdb_path["pdb"]
+                    url = pdb_path["path"]
+                    biopdb = genetoprotein.retrievePdbStructure(
+                        url, pdb, gene_path.gene_outpdbs + pdb + ".pdb"
+                    )
+                    if biopdb != None:
+                        method, reso = (
+                            biopdb.header["structure_method"],
+                            biopdb.header["resolution"],
+                        )
+                        res = 0
+                        try:
+                            res = float(reso)
+                        except:
+                            pass
+
+                        import Bio.PDB as bio
+
+                        ppb = (
+                            bio.CaPPBuilder()
+                        )  # PPBuilder is C-N and CAPPBuilder is CA-CA
+                        has_match = False
+                        peptides = []
+                        try:
+                            peptides = ppb.build_peptides(biopdb)
+                        except:
+                            print("Build peptides error", pdb)
+
+                        for pp in peptides:
+                            seq_one = str(pp.get_sequence())
+                            start = wholeseq.find(seq_one)
+                            start += 1
+                            chain = ""
+                            if start > 0:
+                                if True:
+                                    # try:
+                                    resis = pp.get_ca_list()[0]
+                                    chain = resis.parent.get_parent().id
+                                    # https://biopython.org/docs/1.75/api/Bio.PDB.Atom.html
+                                    # get_full_id(self): Return the full id of the atom.
+                                    # The full id of an atom is the tuple (structure id, model id, chain id, residue id, atom name, altloc).
+                                    residue_num = resis.get_full_id()[3][1]
+                                    offset = start - residue_num
+                                    print(
+                                        pdb,
+                                        "gene=",
+                                        start,
+                                        "pdb=",
+                                        residue_num,
+                                        "offset=",
+                                        offset,
+                                        seq_one,
+                                    )
+                                    has_match = True
+                                    pb = gn.getPdb(pdb, method, res)
+                                    pb.addSegment(
+                                        start, start - 1 + len(seq_one), offset, chain
+                                    )
+                                # except:
+                                #    print("!!!", resis, gene, pdb)
+                        if not has_match:
+                            genetoprotein.removePdbStructure(
+                                url, pdb, gene_path.gene_outpdbs
+                            )
+
                 # and we want only 1 batch for the stitching
                 script_file = "libs/pipeline_qsubber.py"
                 yaml_file = "geneanalysis/config/batch_genestitch.yml"
@@ -138,7 +192,30 @@ def run_pipeline(args):
             # gene_path = Paths.Paths("geneprot",dataset=dataset,gene=gn.gene)
             dfv = gn.getVariantCandidatesDataFrame()
             dfv.to_csv(gene_path.gene_outputs + "/pdb_candidates.csv", index=False)
-            
+            dfp = gn.getPdbCoverageDataFrame()
+            dfp.to_csv(gene_path.gene_outputs + "/pdb_coverage.csv", index=False)
+
+            for pdbcod, pdb in gn.pdbs.items():
+                print("Gene contains:", pdb.pdbcode)
+                # only use x-ray and alphafold:
+                if pdb.getMethod() != "nmr":
+                    pdb_path = Paths.Paths(
+                        "pdb",
+                        data_dir,
+                        install_dir + "Pipelines/geneanalysis",
+                        dataset=dataset,
+                        gene=gn.gene,
+                        pdb=pdb.pdbcode,
+                    )
+                    dfp = gn.getPdbVariantCoverageDataFrame(pdb)
+                    dfp.to_csv(pdb_path.pdb_inputs + "/variants.csv", index=False)
+                    pdb.downloadPdb(pdb_path.pdb_inputs)
+                    dfp = gn.getSinglePdbCoverageDataFrame(pdb)
+                    dfp.to_csv(pdb_path.pdb_inputs + "/coverage.csv", index=False)
+
+                    # so we want to use it in analysis
+                    bm.addBatch(dataset, gn.gene, pdbcod)
+
             # And save it all in the dataset output
             # we do this each time so that if it gets abandoned we knw where we were
             dfp = genes[0].getDatasetGenesPdbsDataFrame(dataset, genes)
@@ -151,8 +228,7 @@ def run_pipeline(args):
                 gene_path.pipeline_path + "/ppl_" + dataset + "_" + gene + ".sh",
                 gene_path.pipeline_path + "/ppl_" + dataset + "_" + gene + "sym.sh",
             )
-
-
+    
     print("### COMPLETED genes to proteins pipeline ###")
 
 

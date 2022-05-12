@@ -12,9 +12,7 @@ import os
 
 
 class Paths:
-    def __init__(
-        self, level, data_dir, pipe_path, dataset="", gene="", pdb="", method=""
-    ):
+    def __init__(self, data_dir, pipe_path, dataset="", gene="", pdb=""):
         # Depending on the levels we will ensure the correct paths are present for inputs and ouputs
         self.data_dir = data_dir
         if self.data_dir[-1] != "/":
@@ -26,16 +24,24 @@ class Paths:
         # [dataset] 1--* [gene] 1--* [pdb] 1--* [method]
 
         # Create the dataset paths
+        level = "pdb"
+        if pdb == "":
+            level = "gene"
+            if gene == "":
+                level = "dataset"
+        dataset = dataset.replace(".","_")
+        gene = gene.replace(".","_")
+        pdb = pdb.replace(".","_")
 
         dataset = dataset.lower()
         gene = gene.lower()
         pdb = pdb.lower()
 
-        if "vcf" == level:
+        if "dataset" == level:
             # clean up first?
             self.get_make_paths_vcf(dataset)
         # Create the geneprot paths
-        elif "geneprot" == level:
+        elif "gene" == level:
             # clean up first?
             self.get_make_paths_geneprot(dataset, gene)
         elif "pdb" == level:

@@ -68,9 +68,11 @@ class Foldx:
         os.system(foldxcommand)
         print("### ......... FOLDX:Build: completed")
 
-    def createAnaysisCsv(self, pdb,mut_ddg, mut_dic,file_name):
+    def createAnaysisCsv(self, pdb,mut_ddg, mut_dic,file_name,score,source):
         posscan_dic = {}
+        posscan_dic["source"] = []
         posscan_dic["pdb"] = []
+        posscan_dic["score"] = []
         posscan_dic["pdb_mut"] = []
         posscan_dic["pdb_rid"] = []
         posscan_dic["pdb_chain"] = []
@@ -90,7 +92,9 @@ class Foldx:
             print(aaa_from, ch, a_to, rid)
             #if the from and to are the same then skip them TODO is this a good decision
             if aaa_from != aaa_to:
+                posscan_dic["source"].append(source)
                 posscan_dic["pdb"].append(pdb)
+                posscan_dic["score"].append(score)
                 posscan_dic["pdb_mut"].append(pdb_mut)
                 posscan_dic["pdb_rid"].append(rid)
                 posscan_dic["pdb_chain"].append(ch)
@@ -109,7 +113,9 @@ class Foldx:
         self, path, pdbfile, pdb_muts, gene_muts, coverage, ddg_files, df_file):
         # create a list of pdb_muts to ddg
         ### WARNING - there is onyl ONE ddg per build file, unlike posscan where all the ddg are unique
-        mut_ddg=[]        
+        mut_ddg=[]     
+        score = coverage["score"][0]   
+        source = coverage["source"][0]   
         for ddg_file,mut_string in ddg_files:
             if exists(ddg_file): #I want it to error if it is missing
                 with open(ddg_file) as fr:
@@ -129,20 +135,22 @@ class Foldx:
                 raise FileNotFoundError("DDG file does not exist " +ddg_file)
 
         mut_dic = self.makeMutMapDictionary(pdb_muts,gene_muts,coverage)
-        self.createAnaysisCsv(pdbfile,mut_ddg, mut_dic,df_file)                                        
+        self.createAnaysisCsv(pdbfile,mut_ddg, mut_dic,df_file,score,source)                                        
 
     def createPosscanCsv(self, path, pdbfile, pdb_muts, gene_muts, coverage, ddg_file, outfile_path):  
         mut_ddg=[] 
         
         fdf = FileDf.FileDf(ddg_file, sep="\t", header=False, cols=["mut", "ddg"])
-        df = fdf.openDataFrame()     
+        df = fdf.openDataFrame()
+        score = coverage["score"][0]
+        source = coverage["source"][0]   
         for i in range(len(df.index)):
             pdb_mut = df["mut"][i]            
             ddg = df["ddg"][i]                        
             mut_ddg.append([pdb_mut,ddg])
         
         mut_dic = self.makeMutMapDictionary(pdb_muts,gene_muts,coverage)
-        self.createAnaysisCsv(pdbfile,mut_ddg, mut_dic,outfile_path)                                              
+        self.createAnaysisCsv(pdbfile,mut_ddg, mut_dic,outfile_path,score,source)                                              
 
     def makeMutMapDictionary(self,pdb_muts,gene_muts,coverage):        
         # firs if the pdb_muts' 3rd charavter is a number then convert it to 3 code AA
@@ -169,10 +177,10 @@ class Foldx:
                     start = int(coverage["pdb_start"][i])
                     end = int(coverage["pdb_end"][i])
                     chain = coverage["chain"][i]
-                    offset = int(coverage["offset"][i])
+                    gene_start = int(coverage["gene_start"][i])
                     if chain == ch and rid >= start and rid <= end:
-                        mut_dic[rid] = rid + offset
-                        print(rid, rid + offset)
+                        mut_dic[rid] = int(gene_start)
+                        print(rid, gene_start)
 
         print(mut_dic)
         return mut_dic

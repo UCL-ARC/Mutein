@@ -39,8 +39,7 @@ def run_pipeline02(args):
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
     pdbcode = argus.arg("pdb").lower()
-    pdb_path = Paths.Paths(
-        "pdb",
+    pdb_path = Paths.Paths(        
         data_dir,
         install_dir + "Pipelines/geneanalysis",
         dataset=dataset,
@@ -122,7 +121,7 @@ def run_pipeline02(args):
 
     ##### Create a dataframe for the paramterfile in the number of chunks specified
     ##### Open up the coverage file
-    filename = pdb_path.pdb_inputs + "coverage.csv"
+    filename = pdb_path.pdb_inputs + "Coverage.csv"
     fdfp = FileDf.FileDf(filename)
     cov_df = fdfp.openDataFrame()
     print(cov_df)
