@@ -182,14 +182,14 @@ def pipeline_qsubber(args):
             dep = runner.run()
     # finally create the file with the error and output files for qsub
     if "qsub" in py_or_sh:
-        fdf = FileDf.FileDic(working_dir + "BatchJobs_"+dataset+"_"+gene+"_"+pdb+".csv", {})
+        fdf = FileDf.FileDic(working_dir + "/BatchJobs_"+dataset+"_"+gene+"_"+pdb+".csv", {})
         for qsubid,depid in names_and_ids:
             errorname = qsubid + ".e" + str(depid)
             outname = qsubid + ".o" + str(depid)
             fdf.add("outfile",outname)
             fdf.add("errorfile",errorname)        
         fdf.saveAsDf()
-        print("saved error and output file list to",working_dir + "BatchJobs_"+dataset+"_"+gene+"_"+pdb+".csv")
+        print("saved error and output file list to",working_dir + "/BatchJobs_"+dataset+"_"+gene+"_"+pdb+".csv")
 
 
 ####################################################################################################
