@@ -159,12 +159,18 @@ class Paths:
         elif must_exist:
             raise Exception("The folder is missing: " + retpath)
         else:
-            os.mkdir(retpath)
+            try:
+                os.mkdir(retpath)
+            except:
+                pass #this could be a rare case of 2 nodes creating it at the same time
         return retpath
 
     def goto_job_dir(self, dir_path, args, params, name):
         if not os.path.exists(dir_path):
-            os.mkdir(dir_path)
+            try:
+                os.mkdir(dir_path)
+            except:
+                pass #this could be a rare case of 2 nodes creating it at the same time
         os.chdir(dir_path)
         inputs_file = name + ".log"
         with open(inputs_file, "w") as fw:
