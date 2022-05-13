@@ -189,6 +189,7 @@ def pipeline_qsubber(args):
             fdf.add("outfile",outname)
             fdf.add("errorfile",errorname)        
         fdf.saveAsDf()
+        print("saved error and output file list to",working_dir + "BatchJobs_"+dataset+"_"+gene+"_"+pdb+".csv")
 
 
 ####################################################################################################
