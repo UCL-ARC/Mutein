@@ -80,6 +80,8 @@ def run_pipeline03(args):
         # we have specified a mutation and row from the file
         mutations.append([mutation_string, 0])
 
+    work_path = pdb_path.pdb_thruputs + "agg/"
+    pdb_path.goto_job_dir(work_path, args, argus.params, "_inputs04a")
     for mut, row in mutations:
         print(mut, row)
 
@@ -99,7 +101,7 @@ def run_pipeline03(args):
 
         fx_runner = Foldx.Foldx(argus.arg("foldxe"))
         ###########################################################################
-        fx_runner.runPosscan(pdbfile, mut)
+        #fx_runner.runPosscan(pdbfile, mut)
         ###########################################################################
         pdb = pdbcode + "_rep" + str(argus.arg("repairs"))
         # pass in the coverage to annotate the csv file
@@ -107,7 +109,7 @@ def run_pipeline03(args):
         fdfp = FileDf.FileDf(filename)
         cov_df = fdfp.openDataFrame()
         ddg_file = row_path + "PS_" + pdb + "_scanning_output.txt"
-        df_file = row_path + "ddg_background.csv"        
+        df_file = pdb_path.pdb_thruputs+"agg/"+str(row) + "_ddg_background.csv"        
         fx_runner.createPosscanCsv(row_path, pdb, mut.split(","), [], cov_df, ddg_file,df_file)
         
 

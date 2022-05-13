@@ -178,8 +178,9 @@ class Foldx:
                     end = int(coverage["pdb_end"][i])
                     chain = coverage["chain"][i]
                     gene_start = int(coverage["gene_start"][i])
+                    offset = gene_start - start
                     if chain == ch and rid >= start and rid <= end:
-                        mut_dic[rid] = int(gene_start)
+                        mut_dic[rid] = int(rid)+int(offset)
                         print(rid, gene_start)
 
         print(mut_dic)

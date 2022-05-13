@@ -62,15 +62,9 @@ def run_pipeline04(args):
     for i in range(len(pm_df.index)):
         r = pm_df["task"][i]
         # the file has already been turned into a dataframe called posscan_df.csv
-        file_path = (
-            pdb_path.pdb_thruputs
-            + str(argus.arg("split"))
-            + "_"
-            + str(r)
-            + "/ddg_background.csv"
-        )
-        if exists(file_path):
-            fdf = FileDf.FileDf(file_path)
+        in_csv_i = work_path+str(r) + "_ddg_background.csv"                
+        if exists(in_csv_i):
+            fdf = FileDf.FileDf(in_csv_i)
             all_df.append(fdf.openDataFrame())
     ddg_df = pd.concat(all_df, ignore_index=True)
     df_file = pdb_path.pdb_outputs + "ddg_background.csv"

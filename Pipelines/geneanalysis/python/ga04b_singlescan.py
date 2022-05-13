@@ -115,32 +115,36 @@ def run_pipeline03(args):
         else:
             gene_muts = gene_mut.split(",")
         
+        work_path = pdb_path.pdb_thruputs + "vagg/"
+        pdb_path.goto_job_dir(work_path, args, argus.params, "_inputs04b")
+        
         if True:
             #~~~~~~~~~~~~~~~~~~~~~~~~~~ POSITION SCAN ~~~~~~~~~~~~~~~~~~~~~~~~#        
             ################################################################
-            fx_runner.runPosscan(pdbfile, pdb_mut)
+            #fx_runner.runPosscan(pdbfile, pdb_mut)
             ################################################################                        
             ddg_file = row_path + "PS_" + pdb + "_scanning_output.txt"
-            df_file = row_path + "ddg_posscan.csv"        
+            #df_file = row_path + "ddg_posscan.csv"        
+            df_file = pdb_path.pdb_thruputs+"vagg/"+str(row) + "_ddg_posscan.csv"              
             pdb_muts = pdb_mut.split(",")
             fx_runner.createPosscanCsv(row_path, pdb, pdb_muts, gene_muts, cov_df, ddg_file,df_file)
         
         if True:            
-            #~~~~~~~~~~~~~~~~~~~~~~~~~~ BUILD MODEL ~~~~~~~~~~~~~~~~~~~~~~~~#                    
-            
+            #~~~~~~~~~~~~~~~~~~~~~~~~~~ BUILD MODEL ~~~~~~~~~~~~~~~~~~~~~~~~#                                            
             ddg_files = []
             tag = 0
             pdb_muts = pdb_mut.split(",")
             for pm in pdb_muts:
                 tag+=1
                 ################################################################        
-                fx_runner.runBuild(pdbfile, pm,tag)
+                #fx_runner.runBuild(pdbfile, pm,tag)
                 ################################################################                        
                 ddg_file = row_path + "Dif_" + str(tag) + "_" + pdb + ".fxout"                
                 ddg_files.append([ddg_file,pm])
             
             #create them all into 1 ddg file
-            df_file = row_path + "ddg_buildmodel.csv"        
+            #df_file = row_path + "ddg_buildmodel.csv"  
+            df_file = pdb_path.pdb_thruputs+"vagg/"+str(row) + "_ddg_buildmodel.csv"              
             fx_runner.createBuildCsv(row_path, pdb, pdb_muts, gene_muts, cov_df, ddg_files,df_file)
 
 

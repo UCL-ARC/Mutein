@@ -49,7 +49,7 @@ def run_pipeline04(args):
     # pdb_config = Config.Config(pdb_path.pdb_inputs + "/config.yml")
     # argus.addConfig(pdb_config.params)
 
-    work_path = pdb_path.pdb_thruputs + "agg/"
+    work_path = pdb_path.pdb_thruputs + "vagg/"
     argus.params["work_path"] = work_path
     pdb_path.goto_job_dir(argus.arg("work_path"), args, argus.params, "_inputs07")
     ############################################
@@ -73,7 +73,7 @@ def run_pipeline04(args):
         all_df = []
         for i in range(len(pm_df.index)):
             r = pm_df["task"][i]
-            in_csv_i = pdb_path.pdb_thruputs+ str(argus.arg("split"))+"_"+ str(r)+"_var/"+in_csv                                                                
+            in_csv_i = work_path+str(r) + "_"+in_csv
             if exists(in_csv_i):
                 fdf = FileDf.FileDf(in_csv_i)
                 all_df.append(fdf.openDataFrame())
