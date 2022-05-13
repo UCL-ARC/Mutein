@@ -37,6 +37,7 @@ sys.path.append(retpath)
 import Arguments
 import QSubRunner as qsub
 import SubRunner as sub
+import FileDf
 
 ##### INPUTS #############################################
 ## Pipeline jobs sequence
@@ -49,15 +50,11 @@ def pipeline_qsubber(args):
     ## $PWD ${config} $run notch NOTCH1 AF-P46531-F1-model_v2
 
     # There are 7 arguments
-    install_dir = args[
-        1
-    ]  # 1) the executable installation directory, the root directory of the peipeline
+    install_dir = args[1]  # 1) the executable installation directory, the root directory of the peipeline
     sys.path.append(install_dir)
     sys.path.append(install_dir + "/Pipelines")
     sys.path.append(install_dir + "/Pipelines/libs")
-    working_dir = args[
-        2
-    ]  # 1) the working dir, the root that the data output and input lives in
+    working_dir = args[2]  # 1) the working dir, the root that the data output and input lives in
     yaml_file = args[3]  # 2) a yaml file path with the batch definition
     py_or_sh = args[4]  # 3) qsub or py or sh for python or hpc batch or just sh
     # everything is defined in the yaml APART from 3 template inputs
@@ -180,6 +177,10 @@ def pipeline_qsubber(args):
                 isarray,
             )
             dep = runner.run()
+    # finally create the file with the error and output files for qsub
+    if "qsub" in py_or_sh:
+        fdf = FileDf.FileDic(dataset+"_"+gene+"_"+pdb+".csv", dependencies)
+        fdf.saveAsDf()
 
 
 ####################################################################################################

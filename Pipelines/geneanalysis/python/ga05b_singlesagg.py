@@ -77,10 +77,11 @@ def run_pipeline04(args):
             if exists(in_csv_i):
                 fdf = FileDf.FileDf(in_csv_i)
                 all_df.append(fdf.openDataFrame())
-        ddg_df = pd.concat(all_df, ignore_index=True)        
-        ddg_df.to_csv(out_csv, index=False)        
-        ana = Analysis.Analysis(ddg_df, argus.arg("pdb"))
-        ana.createDdgResidue(plot_file, "variants", xax="gene_no")
+        if len(all_df) > 0:
+            ddg_df = pd.concat(all_df, ignore_index=True)        
+            ddg_df.to_csv(out_csv, index=False)        
+            ana = Analysis.Analysis(ddg_df, argus.arg("pdb"))
+            ana.createDdgResidue(plot_file, "variants", xax="gene_no")
 
         print("### COMPLETED FoldX aggregate job ###")
 
