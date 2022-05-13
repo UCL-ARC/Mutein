@@ -8,7 +8,7 @@
 #$ -V
 #$ -o sge_logs/$JOB_NAME.$JOB_ID.$TASK_ID.out
 #$ -e sge_logs/$JOB_NAME.$JOB_ID.$TASK_ID.err
-#$ -N bwa
+#$ -N bwa-step1
 ###$ -tc 10
 
 set -eu
@@ -16,6 +16,10 @@ source ~/.mutein_settings
 module load ${MUT_CONDA_MODULE}
 conda activate bwa
 
-mkdir -p /tmp/${USER}-sam
+JOBLIST=$1
 
-head -n ${SGE_TASK_ID} bwa_joblist | tail -n 1 | bash
+mkdir -p /tmp/${USER}-sam-${SGE_TASK_ID}
+
+head -n ${SGE_TASK_ID} ${JOBLIST} | tail -n 1 | bash
+
+rm -rf /tmp/${USER}-bwa-${SGE_TASK_ID}
