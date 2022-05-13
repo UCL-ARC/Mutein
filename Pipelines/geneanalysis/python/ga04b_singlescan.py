@@ -121,7 +121,7 @@ def run_pipeline03(args):
         if True:
             #~~~~~~~~~~~~~~~~~~~~~~~~~~ POSITION SCAN ~~~~~~~~~~~~~~~~~~~~~~~~#        
             ################################################################
-            #fx_runner.runPosscan(pdbfile, pdb_mut)
+            fx_runner.runPosscan(pdbfile, pdb_mut)
             ################################################################                        
             ddg_file = row_path + "PS_" + pdb + "_scanning_output.txt"
             #df_file = row_path + "ddg_posscan.csv"        
@@ -137,7 +137,7 @@ def run_pipeline03(args):
             for pm in pdb_muts:
                 tag+=1
                 ################################################################        
-                #fx_runner.runBuild(pdbfile, pm,tag)
+                fx_runner.runBuild(pdbfile, pm,tag)
                 ################################################################                        
                 ddg_file = row_path + "Dif_" + str(tag) + "_" + pdb + ".fxout"                
                 ddg_files.append([ddg_file,pm])

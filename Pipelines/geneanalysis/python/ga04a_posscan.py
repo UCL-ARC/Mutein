@@ -101,7 +101,7 @@ def run_pipeline03(args):
 
         fx_runner = Foldx.Foldx(argus.arg("foldxe"))
         ###########################################################################
-        #fx_runner.runPosscan(pdbfile, mut)
+        fx_runner.runPosscan(pdbfile, mut)
         ###########################################################################
         pdb = pdbcode + "_rep" + str(argus.arg("repairs"))
         # pass in the coverage to annotate the csv file

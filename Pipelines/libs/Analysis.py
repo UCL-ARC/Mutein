@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+pd.options.mode.chained_assignment = None  # default='warn'
 
 
 class Analysis:
