@@ -184,5 +184,4 @@ def pipeline_qsubber(args):
 ####################################################################################################
 if __name__ == "__main__":
     import sys
-
     globals()["pipeline_qsubber"](sys.argv)
