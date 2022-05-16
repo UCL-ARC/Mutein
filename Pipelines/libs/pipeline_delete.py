@@ -35,8 +35,7 @@ def run_pipeline(args):
     scratch_dir = "/home/" + homeuser + "/Scratch/workspace/"    
     print("scratch_dir",scratch_dir)
     
-    onlyfiles = [f for f in listdir(scratch_dir) if isfile(join(scratch_dir, f))]
-    print(onlyfiles)
+    onlyfiles = [f for f in listdir(scratch_dir) if isfile(join(scratch_dir, f))]    
     file_numbers = {}
     for file in onlyfiles:
         name = file.split(".")[0]
