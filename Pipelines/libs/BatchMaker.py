@@ -23,7 +23,7 @@ class BatchMaker:
         self.batches.append("config=${install_dir}Pipelines/" + yaml_file)
         self.batches.append('echo "EXE PATH=$install_dir"')
         self.batches.append('echo "CURRENT=$PWD"')
-        self.batches.append("module load python3/recommended")
+        #self.batches.append("module load python3/recommended")       
         self.batches.append(
             'echo "~~~~~~~~~~~~~~~~~~ Call python script ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"'
         )

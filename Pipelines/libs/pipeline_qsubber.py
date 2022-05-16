@@ -189,6 +189,7 @@ def pipeline_qsubber(args):
 
             inputs = "errorfile="+errorname + "@outfile="+outname
             script = "pipeline_delete"
+            time = "0:20:0"
 
             runner = qsub.QSubRunner(
                 0,

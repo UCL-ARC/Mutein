@@ -5,7 +5,7 @@ script=${install_dir}Pipelines/libs/pipeline_qsubber.py
 config=${install_dir}Pipelines/geneanalysis/config/batch_pdb.yml
 echo "EXE PATH=$install_dir"
 echo "CURRENT=$PWD"
-module load python3/recommended
+
 echo "~~~~~~~~~~~~~~~~~~ Call python script ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 python ${script} $install_dir $PWD ${config} $run notch NOTCH1 af-p46531-f1-model_v2
 python ${script} $install_dir $PWD ${config} $run notch NOTCH1 1pb5

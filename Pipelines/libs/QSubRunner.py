@@ -42,6 +42,11 @@ class QSubRunner:
         if int(array) > 0:
             self.args.append("-t")
             self.args.append("1-" + str(array))
+        if script == "cleanup": #redirect the ogs as we don't care about them
+            self.args.append("-o")
+            self.args.append("clean_out.txt")
+            self.args.append("-e")
+            self.args.append("clean_error.txt")
         self.args.append("-N")  # $ -N foldx-posscan
         self.args.append(qsubid)  # $
         self.args.append("-l")  # $ -l h_rt=5:00:0

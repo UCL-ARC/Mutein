@@ -5,6 +5,6 @@ script=${install_dir}Pipelines/libs/pipeline_qsubber.py
 config=${install_dir}Pipelines/geneanalysis/config/batch_genestitch.yml
 echo "EXE PATH=$install_dir"
 echo "CURRENT=$PWD"
-module load python3/recommended
+
 echo "~~~~~~~~~~~~~~~~~~ Call python script ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 python ${script} $install_dir $PWD ${config} $run shearwater FAT1 x
