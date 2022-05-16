@@ -39,7 +39,10 @@ def run_pipeline(args):
     file_numbers = {}
     for file in onlyfiles:
         name = file.split(".")[0]
-        number = int(file.split(".")[1][1:])
+        number = file.split(".")[1][1:]
+        if len(file.split(".")) > 2:
+            number+= "." + file.split(".")[2]
+        
         if number not in file_numbers:
             file_numbers[number] = name
 
