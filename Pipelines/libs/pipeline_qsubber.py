@@ -180,42 +180,7 @@ def pipeline_qsubber(args):
                 isarray,
             )
             dep = runner.run()
-    # finally create the file with the error and output files for qsub
-    if "qsub" in py_or_sh:
-        #fdf = FileDf.FileDic(working_dir + "/BatchJobs_"+dataset+"_"+gene+"_"+pdb+".csv", {})
-        for qsubid,depid in names_and_ids:
-            errorname = qsubid + ".e" + str(depid)
-            outname = qsubid + ".o" + str(depid)
-
-            inputs = "errorfile="+errorname + "@outfile="+outname
-            script = "pipeline_delete"
-            time = "0:20:0"
-
-            runner = qsub.QSubRunner(
-                0,
-                "cleanup",
-                script,
-                install_dir,
-                working_dir,
-                pipe_dir,
-                depid,
-                time,
-                0,
-                homeuser,
-                inputs,
-                py_or_sh != "qsub",
-            )
-            dep = runner.run()
-
-
-
-
-            #fdf.add("outfile",outname)
-            #fdf.add("errorfile",errorname)        
-        #fdf.saveAsDf()
-        print("saved error and output file list to",working_dir + "/BatchJobs_"+dataset+"_"+gene+"_"+pdb+".csv")
-
-
+        
 ####################################################################################################
 if __name__ == "__main__":
     import sys
