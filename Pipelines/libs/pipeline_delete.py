@@ -61,7 +61,7 @@ def run_pipeline(args):
                         os.remove(out_file)
                         print("...removing",number,name)
             else:
-                print("Errors",number,name,lines_err)                
+                print("Errors",number,name)                
         else:
             print("Missing files",number,name)
                                             
