@@ -55,10 +55,10 @@ def run_pipeline(args):
             if len(lines_err) == 0:
                 if lines_out[-1] == "MUTEIN SCRIPT ENDED":                
                     os.remove(error_file)                
-                    os.remove(out_file)                    
+                    os.remove(out_file)
+                    print("...removing",number,name)
             else:
-                print(number,name)
-                print(lines_err)
+                print("Errors",number,name,lines_err)                
         else:
             print("Missing files",number,name)
                     
