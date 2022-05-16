@@ -46,6 +46,7 @@ def run_pipeline(args):
     gene_variant_dic = genestovariants.extractVariantsFromFile(genes_variant_file)
     # 2.) Now go and find all the pdbs, also look at the variants per gene
     genes_file = dataset_path.dataset_outputs + "/genes.txt"
+    batches = [] #all the single batches for the entire dataset
     with open(genes_file, "r") as fr:
         lines = fr.readlines()
         #lines = ["","FAT1"]
@@ -53,7 +54,7 @@ def run_pipeline(args):
             # for l in range(1,2):
             line = lines[l]
             cols = line.split("\t")
-            gene = cols[0].upper()
+            gene = cols[0].upper()            
             if gene[0] == '"':
                 gene = gene[1:]
             if gene[-1] == '"':
@@ -144,13 +145,24 @@ def run_pipeline(args):
             dfp = genes[0].getDatasetGenesPdbsDataFrame(dataset, genes)
             dfp.to_csv(dataset_path.dataset_outputs + "/pdb_coverage.csv", index=False)
 
-            bm.printBatchScript(
+            batch_to_add = bm.printBatchScript(
                 gene_path.gene_outputs + "/ppl_" + dataset + "_" + gene + ".sh", ""
             )
             bm.printBatchScript(
                 gene_path.pipeline_path + "/ppl_" + dataset + "_" + gene + ".sh",
                 gene_path.pipeline_path + "/ppl_" + dataset + "_" + gene + "sym.sh",
             )
+
+            batches.append(batch_to_add)
+        
+
+    bmAll = BatchMaker.BatchMaker("", "")        
+    bmAll.printBatches(
+        gene_path.gene_outputs
+        + "/ppl_"
+        + dataset
+        + "_all.sh",            
+        batches)
 
 
     print("### COMPLETED genes to proteins pipeline ###")

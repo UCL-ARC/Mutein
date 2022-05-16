@@ -49,6 +49,14 @@ class BatchMaker:
         # if sym_link !="":
         #    self.createSymLink(file_path,sym_link)
         #    self.changeMod(sym_link)
+        return file_path
+    
+    def printBatches(self,file_path,batches):
+        print("BATCH created in", file_path)
+        with open(file_path, "w") as fw:
+            for line in batches:
+                fw.write(line + "\n")
+        self.changeMod(file_path)
 
     def createSymLink(self, file_path, sym_path):
         # ln -s ~/code/notes/notes ~/bin/notes
