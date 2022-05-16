@@ -64,10 +64,11 @@ class Arguments:
 
     def spacedparams(self, argvs):
         params = {}
-        argvss = argvs[1].split("@")
-        for i in range(0, len(argvss)):
-            arg = argvss[i]
-            params = self.addlinetoparams(arg, params)
+        if len(argvss)>1:
+            argvss = argvs[1].split("@")
+            for i in range(0, len(argvss)):
+                arg = argvss[i]
+                params = self.addlinetoparams(arg, params)
         if "pdb" not in params:
             params["pdb"] = "6vxx"
         if "configfile" not in params:
