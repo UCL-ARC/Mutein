@@ -7,3 +7,4 @@ echo "CURRENT=$PWD"
 
 echo "~~~~~~~~~~~~~~~~~~ Call python script ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 python ${script}
+echo "MUTEIN SCRIPT ENDED"

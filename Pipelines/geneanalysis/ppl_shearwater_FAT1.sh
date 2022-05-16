@@ -11,3 +11,4 @@ python ${script} $install_dir $PWD ${config} $run shearwater FAT1 smhom_6vg4.1.a
 python ${script} $install_dir $PWD ${config} $run shearwater FAT1 smhom_6vg1.1.a_2923_3535
 python ${script} $install_dir $PWD ${config} $run shearwater FAT1 smhom_6vg4.1.a_2862_3432
 python ${script} $install_dir $PWD ${config} $run shearwater FAT1 smhom_6vg4.1.a_767_1346
+echo "MUTEIN SCRIPT ENDED"

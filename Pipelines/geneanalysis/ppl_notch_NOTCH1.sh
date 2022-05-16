@@ -61,3 +61,4 @@ python ${script} $install_dir $PWD ${config} $run notch NOTCH1 smhom_4xbm_2_a_98
 python ${script} $install_dir $PWD ${config} $run notch NOTCH1 smhom_4xbm_2_a_201_489
 python ${script} $install_dir $PWD ${config} $run notch NOTCH1 smhom_4xbm_2_a_741_982
 python ${script} $install_dir $PWD ${config} $run notch NOTCH1 smhom_4xbm_2_a_20_256
+echo "MUTEIN SCRIPT ENDED"

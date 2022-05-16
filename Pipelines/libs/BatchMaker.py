@@ -41,6 +41,7 @@ class BatchMaker:
         self.batches.append(line)
 
     def printBatchScript(self, file_path, sym_link=""):
+        self.batches.append('echo "MUTEIN SCRIPT ENDED"')
         print("BATCH created in", file_path)
         with open(file_path, "w") as fw:
             for line in self.batches:
