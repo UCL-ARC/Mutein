@@ -51,7 +51,7 @@ def run_pipeline04(args):
 
     work_path = pdb_path.pdb_thruputs + "vagg/"
     argus.params["work_path"] = work_path
-    pdb_path.goto_job_dir(argus.arg("work_path"), args, argus.params, "_inputs07")
+    pdb_path.goto_job_dir(argus.arg("work_path"), args, argus.params, "_inputs05b")
     ############################################
     params_file = pdb_path.pdb_thruputs + "singles_" + str(argus.arg("split")) + ".txt"
     fdfp = FileDf.FileDf(params_file, sep=" ", cols=["pdb", "gene_mut", "pdb_mut", "task"], header=False)

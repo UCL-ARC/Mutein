@@ -51,7 +51,7 @@ def run_pipeline04(args):
 
     work_path = pdb_path.pdb_thruputs + "agg/"
     argus.params["work_path"] = work_path
-    pdb_path.goto_job_dir(argus.arg("work_path"), args, argus.params, "_inputs04")
+    pdb_path.goto_job_dir(argus.arg("work_path"), args, argus.params, "_inputs05a")
     ############################################
     params_file = pdb_path.pdb_thruputs + "params_" + str(argus.arg("split")) + ".txt"
     fdfp = FileDf.FileDf(

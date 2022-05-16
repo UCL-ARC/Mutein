@@ -91,7 +91,7 @@ def run_pipeline03(args):
         print("### ... change directory", row_path)
         argus.params["thisrow"] = row
         argus.params["thismut"] = mut
-        pdb_path.goto_job_dir(row_path, args, argus.params, "_inputs03")
+        pdb_path.goto_job_dir(row_path, args, argus.params, "_inputs04a")
         print(
             "### foldx03: ... copying file",
             pdb_path.pdb_thruputs + pdbfile,

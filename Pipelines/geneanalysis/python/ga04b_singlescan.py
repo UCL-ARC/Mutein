@@ -116,7 +116,8 @@ def run_pipeline03(args):
             gene_muts = gene_mut.split(",")
         
         work_path = pdb_path.pdb_thruputs + "vagg/"
-        pdb_path.goto_job_dir(work_path, args, argus.params, "_inputs04b")
+        pdb_path.make_job_dir(work_path)        
+        pdb_path.goto_job_dir(row_path, args, argus.params, "_inputs04b")
         
         if True:
             #~~~~~~~~~~~~~~~~~~~~~~~~~~ POSITION SCAN ~~~~~~~~~~~~~~~~~~~~~~~~#        
