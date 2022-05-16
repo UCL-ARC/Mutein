@@ -64,7 +64,7 @@ class Arguments:
 
     def spacedparams(self, argvs):
         params = {}
-        if len(argvss)>1:
+        if len(argvs)>1:
             argvss = argvs[1].split("@")
             for i in range(0, len(argvss)):
                 arg = argvss[i]
