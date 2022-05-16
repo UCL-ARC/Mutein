@@ -43,9 +43,17 @@ module load python3/recommended
  chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_notch_NOTCH1.sh
  chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_notch_NOTCH1_stitch.sh
  
+ ## Possible batches to run
  /home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_notch.sh /home/ucbtlcr/Mutein/
  /home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_notch_NOTCH1.sh /home/ucbtlcr/Mutein/
  /home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_notch_NOTCH1_stitch.sh /home/ucbtlcr/Mutein/
+  
+  /home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_shearwater.sh /home/ucbtlcr/Mutein/
+  /home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_shearwater_all.sh /home/ucbtlcr/Mutein/
+  /home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_shearwater_all_stitch.sh /home/ucbtlcr/Mutein/
+
+## Clean up at the end to remove successful logs leaving only errors
+ /home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_cleanup_and_report.sh /home/ucbtlcr/Mutein/
 ```
 - It assumes you have gone to your working directory
 - You need the full path to the executable script
