@@ -52,11 +52,11 @@ class BatchMaker:
         #    self.changeMod(sym_link)
         return file_path
     
-    def printBatches(self,file_path,batches):
+    def printBatches(self,file_path,batches, script_dir):
         print("BATCH created in", file_path)
         with open(file_path, "w") as fw:
             for line in batches:
-                fw.write(line + "\n")
+                fw.write(line + " " + script_dir + "\n")
         self.changeMod(file_path)
 
     def createSymLink(self, file_path, sym_path):

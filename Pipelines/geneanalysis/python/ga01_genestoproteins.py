@@ -163,7 +163,8 @@ def run_pipeline(args):
         + "/ppl_"
         + dataset
         + "_all.sh",            
-        batches)
+        batches,
+        gene_path.pipeline_path)
 
     bmAll_stitch = BatchMaker.BatchMaker("", "")        
     bmAll_stitch.printBatches(
@@ -171,7 +172,8 @@ def run_pipeline(args):
         + "/ppl_"
         + dataset
         + "_all_stitch.sh",            
-        batches_stitch)
+        batches_stitch,
+        gene_path.pipeline_path)
 
 
 
