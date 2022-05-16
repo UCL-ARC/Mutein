@@ -46,7 +46,8 @@ def run_pipeline(args):
     gene_variant_dic = genestovariants.extractVariantsFromFile(genes_variant_file)
     # 2.) Now go and find all the pdbs, also look at the variants per gene
     genes_file = dataset_path.dataset_outputs + "/genes.txt"
-    batches = [] #all the single batches for the entire dataset
+    batches = [] #all the gene batches for the entire dataset
+    batches_stitch= [] #all the gene stitches for the entire dataset
     with open(genes_file, "r") as fr:
         lines = fr.readlines()
         #lines = ["","FAT1"]
@@ -119,7 +120,7 @@ def run_pipeline(args):
                     + "_stitch.sh",
                     "",
                 )
-                bm2.printBatchScript(
+                batches_stitch.append(bm2.printBatchScript(
                     gene_path.pipeline_path
                     + "/ppl_"
                     + dataset
@@ -132,7 +133,7 @@ def run_pipeline(args):
                     + "_"
                     + gene
                     + "_STITCH_sym.sh",
-                )
+                ))
 
             # having found our collection of genes with assopciated pdbs and variants we can now create the pdb datasets
             # for gn in genes:
@@ -145,10 +146,10 @@ def run_pipeline(args):
             dfp = genes[0].getDatasetGenesPdbsDataFrame(dataset, genes)
             dfp.to_csv(dataset_path.dataset_outputs + "/pdb_coverage.csv", index=False)
 
-            batch_to_add = bm.printBatchScript(
+            bm.printBatchScript(
                 gene_path.gene_outputs + "/ppl_" + dataset + "_" + gene + ".sh", ""
             )
-            bm.printBatchScript(
+            batch_to_add = bm.printBatchScript(
                 gene_path.pipeline_path + "/ppl_" + dataset + "_" + gene + ".sh",
                 gene_path.pipeline_path + "/ppl_" + dataset + "_" + gene + "sym.sh",
             )
@@ -158,11 +159,21 @@ def run_pipeline(args):
 
     bmAll = BatchMaker.BatchMaker("", "")        
     bmAll.printBatches(
-        gene_path.gene_outputs
+        gene_path.pipeline_path
         + "/ppl_"
         + dataset
         + "_all.sh",            
         batches)
+
+    bmAll_stitch = BatchMaker.BatchMaker("", "")        
+    bmAll_stitch.printBatches(
+        gene_path.pipeline_path
+        + "/ppl_"
+        + dataset
+        + "_all_stitch.sh",            
+        batches_stitch)
+
+
 
 
     print("### COMPLETED genes to proteins pipeline ###")
