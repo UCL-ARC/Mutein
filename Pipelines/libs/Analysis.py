@@ -118,7 +118,7 @@ class Analysis:
         
         count = len(df.index)
         
-        fig, ax1 = plt.subplots(1, 1, figsize=(25, 5))
+        fig, ax1 = plt.subplots(1, 1, figsize=(25, 10))
         fig.suptitle(
             self.pdb_gene
             + " "
