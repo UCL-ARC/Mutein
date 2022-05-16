@@ -53,10 +53,11 @@ def run_pipeline(args):
             with open(out_file) as fr:
                 lines_out = fr.readlines()
             if len(lines_err) == 0:
-                if lines_out[-1] == "MUTEIN SCRIPT ENDED":                
-                    os.remove(error_file)                
-                    os.remove(out_file)
-                    print("...removing",number,name)
+                if len(lines_out)>0:
+                    if lines_out[-1] == "MUTEIN SCRIPT ENDED":                
+                        os.remove(error_file)                
+                        os.remove(out_file)
+                        print("...removing",number,name)
             else:
                 print("Errors",number,name,lines_err)                
         else:
