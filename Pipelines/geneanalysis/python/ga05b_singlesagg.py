@@ -84,6 +84,7 @@ def run_pipeline04(args):
             ana.createDdgResidue(plot_file, "variants", xax="gene_no")
 
         print("### COMPLETED FoldX aggregate job ###")
+        print("MUTEIN SCRIPT ENDED")
 
 
 ##########################################################################################

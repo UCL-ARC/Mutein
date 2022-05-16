@@ -92,6 +92,7 @@ def run_pipeline04(args):
     )
 
     print("### COMPLETED FoldX aggregate job ###")
+    print("MUTEIN SCRIPT ENDED")
 
 
 ##########################################################################################

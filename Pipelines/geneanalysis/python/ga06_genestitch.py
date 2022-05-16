@@ -109,6 +109,7 @@ def run_pipeline(args):
         anav_build.createDdgResidue(gene_path.gene_outputs+tag+ "_variant_bm.png", "Variant BuildModel "+ tag, xax="gene_no", dropnagene=False)
                             
     print("### COMPLETED GENE STITCH job ###")
+    print("MUTEIN SCRIPT ENDED")
 
 
 ##########################################################################################

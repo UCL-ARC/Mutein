@@ -61,17 +61,10 @@ def run_pipeline(args):
                 print("Errors",number,name,lines_err)                
         else:
             print("Missing files",number,name)
-                    
-    
-    
-
-
-    
-    
-    
-    
+                                            
                             
     print("### COMPLETED CLEAN UP job ###")
+    print("MUTEIN SCRIPT ENDED")
 
 
 ##########################################################################################

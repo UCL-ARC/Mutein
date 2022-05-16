@@ -110,6 +110,7 @@ def run_pipeline07(args):
     print("saved plot to", pdb_path.pdb_outputs + plot_file)
 
     print("### COMPLETED FoldX aggregate job ###")
+    print("MUTEIN SCRIPT ENDED")
 
 
 #####################################################################################################

@@ -177,6 +177,7 @@ def run_pipeline(args):
 
 
     print("### COMPLETED genes to proteins pipeline ###")
+    print("MUTEIN SCRIPT ENDED")
 
 
 ##########################################################################################

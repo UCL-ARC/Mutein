@@ -103,6 +103,7 @@ def run_pipeline01(args):
     )
 
     print("### COMPLETED FoldX repair job ###")
+    print("MUTEIN SCRIPT ENDED")
 
 
 ##########################################################################################
