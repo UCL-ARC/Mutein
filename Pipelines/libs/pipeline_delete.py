@@ -47,17 +47,20 @@ def run_pipeline(args):
     for number,name in file_numbers.items():
         error_file = scratch_dir+name +".e" + str(number)
         out_file = scratch_dir+name +".o" + str(number)
-        if exists(error_file):
+        if exists(out_file) and exists(error_file):        
             with open(error_file) as fr:
-                lines = fr.readlines()
-                if len(lines) == 0:
-                    if exists(error_file):
-                        os.remove(error_file)
-                    if exists(out_file):
-                        os.remove(out_file)                    
-                else:
-                    print(number,name)
-                    print(lines)            
+                lines_err = fr.readlines()
+            with open(out_file) as fr:
+                lines_out = fr.readlines()
+            if len(lines_err) == 0:
+                if lines_out[-1] == "MUTEIN SCRIPT ENDED":                
+                    os.remove(error_file)                
+                    os.remove(out_file)                    
+            else:
+                print(number,name)
+                print(lines_err)
+        else:
+            print("Missing files",number,name)
                     
     
     
