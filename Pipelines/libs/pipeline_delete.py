@@ -56,7 +56,7 @@ def run_pipeline(args):
                 lines_out = fr.readlines()
             if len(lines_err) == 0:
                 if len(lines_out)>0:
-                    if lines_out[-1] == "MUTEIN SCRIPT ENDED":                
+                    if lines_out[-1].strip() == "MUTEIN SCRIPT ENDED":                
                         os.remove(error_file)                
                         os.remove(out_file)
                         print("...removing",number,name)
