@@ -152,8 +152,12 @@ def pipeline_qsubber(args):
                 py_or_sh != "qsub",
             )
             dep = runner.run()
-            dependencies[id] = dep
-            names_and_ids.append([qsubid,dep])
+            if dep == "x":
+                print("!!!Abandoning submissions!!!")
+                return
+            else:                
+                dependencies[id] = dep
+                names_and_ids.append([qsubid,dep])
         elif py_or_sh == "py":
             runner = sub.SubRunner(
                 argus.arg("pythonexe"),
