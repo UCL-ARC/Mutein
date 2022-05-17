@@ -180,6 +180,19 @@ class Gene:
         pdbs_df = pd.DataFrame.from_dict(dic_coverage)
         return pdbs_df
 
+    def getPdbTaskList(self):
+        dic_coverage = {}        
+        dic_coverage["gene"] = []
+        dic_coverage["accession"] = []                
+        dic_coverage["pdb"] = []
+
+        for pdbcod,pdb in self.pdbs.items():            
+            dic_coverage["gene"].append(self.gene)
+            dic_coverage["accession"].append(self.accession)
+            dic_coverage["pdb"].append(pdbcod)                        
+        pdbs_df = pd.DataFrame.from_dict(dic_coverage)
+        return pdbs_df
+
     def createPdbConfigYaml(self, pdb, file_path):
         """
         id='1tst'

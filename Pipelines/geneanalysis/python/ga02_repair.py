@@ -28,6 +28,7 @@ import Paths
 import Arguments
 import Config
 import Foldx
+import FileDf
 
 
 def run_pipeline01(args):
@@ -43,7 +44,20 @@ def run_pipeline01(args):
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
-    pdbcode = argus.arg("pdb").lower()
+    
+    gene_path = Paths.Paths(        
+        data_dir,
+        install_dir + "Pipelines/geneanalysis",
+        dataset=dataset,
+        gene=gene,        
+    )
+
+    pdbtasks = gene_path.gene_outputs + "pdb_tasklist.csv"
+    fio = FileDf.FileDf(pdbtasks)
+    df = fio.openDataFrame()
+    task = int(argus.arg("task", "none"))
+    pdbcode = df["pdb"][task-1].lower()
+            
     pdb_path = Paths.Paths(        
         data_dir,
         install_dir + "Pipelines/geneanalysis",

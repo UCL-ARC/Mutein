@@ -16,7 +16,7 @@ def addpath():
     print("Adding sys path=", newpath)
     sys.path.append(newpath)
         
-def test_pipeline(method, batch_file,dataset,gene,pdb):
+def test_pipeline(method, batch_file,dataset,gene):
     addpath()
     # There are 7 arguments
     #install_dir = args[1]   # 1) the executable installation directory, the root directory of the peipeline    
@@ -35,15 +35,14 @@ def test_pipeline(method, batch_file,dataset,gene,pdb):
         "/home/rachel/UCL/github/Mutein/Pipelines/geneanalysis/config/" + batch_file,                           
         method,
         dataset,
-        gene,
-        pdb        
+        gene        
     ]
     pipe.pipeline_qsubber(args)
 
 
 ######################################
 ## Tests for the geneprot
-#test_pipeline("py","batch_geneprot.yml","notch","NOTCH1","")
+test_pipeline("py","batch_geneprot.yml","notch","NOTCH1")
 
 ## Tests for the pdb
 #test_pipeline("py","batch_pdb.yml","notch","NOTCH1","1toz","A")
@@ -54,5 +53,5 @@ def test_pipeline(method, batch_file,dataset,gene,pdb):
 #test_pipeline("sh","batch_tst02.yml")
 
 ## Tests for the gene stitch
-test_pipeline("qsub_tst","batch_genestitch.yml","notch","NOTCH1","")
+#test_pipeline("qsub_tst","batch_genestitch.yml","notch","NOTCH1","")
 

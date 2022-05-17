@@ -103,14 +103,16 @@ def run_pipeline(args):
                     prun.copyToInput(gene_path.gene_outpdbs, pdb_path.pdb_inputs,vc)
                     dfp = gn.getPdbVariantCoverageDataFrame(pdb)
                     dfp.to_csv(pdb_path.pdb_inputs + "/variants.csv", index=False)
-                    bm.addBatch(dataset, gn.gene, pdb.pdbcode)
+                    #bm.addBatch(dataset, gn.gene, pdb.pdbcode)
                     gn.addPdb(pdb)
-                                    
+                
+                bm.addBatch(dataset, gn.gene)                                
+                
                 # and we want only 1 batch for the stitching
                 script_file = "libs/pipeline_qsubber.py"
                 yaml_file = "geneanalysis/config/batch_genestitch.yml"
                 bm2 = BatchMaker.BatchMaker(script_file, yaml_file)
-                bm2.addBatch(dataset, gene, "x")
+                bm2.addBatch(dataset, gene)
                 bm2.printBatchScript(
                     gene_path.gene_outputs
                     + "/ppl_"
@@ -134,6 +136,9 @@ def run_pipeline(args):
                     + gene
                     + "_STITCH_sym.sh",
                 ))
+
+                dfpdb = gn.getPdbTaskList()
+                dfpdb.to_csv(gene_path.gene_outputs + "/pdb_tasklist.csv", index=False)
 
             # having found our collection of genes with assopciated pdbs and variants we can now create the pdb datasets
             # for gn in genes:

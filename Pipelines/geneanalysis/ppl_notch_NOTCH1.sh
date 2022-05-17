@@ -5,60 +5,7 @@ script=${install_dir}Pipelines/libs/pipeline_qsubber.py
 config=${install_dir}Pipelines/geneanalysis/config/batch_pdb.yml
 echo "EXE PATH=$install_dir"
 echo "CURRENT=$PWD"
-
 echo "~~~~~~~~~~~~~~~~~~ Call python script ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 af-p46531-f1-model_v2
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 1pb5
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 1toz
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 1yyh
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 2f8x
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 2f8y
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 2he0
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 2vj3
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 3eto
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 3i08
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 3l95
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 3nbn
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 3v79
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 4cud
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 4cue
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 4cuf
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 4d0e
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 5fm9
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 5fma
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 5kzo
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 5l0r
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 6py8
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 smexp_6py8_1759_2119
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 smexp_3v79_1759_2119
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 smexp_3l95_1448_1726
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 smexp_2f8x_1883_2119
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 smexp_3nbn_1923_2118
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 smexp_5l0r_452_491
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 smexp_3i08_1448_1728
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 smexp_2he0_1921_2115
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 smexp_5fm9_141_294
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 smexp_4cud_412_526
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 smexp_4cue_412_526
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 smexp_3eto_1448_1726
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 smexp_2f8y_1908_2122
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 smexp_1yyh_1923_2114
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 smexp_5fma_142_294
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 smexp_2vj3_411_529
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 smexp_1toz_411_526
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 smexp_4d0e_412_526
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 smexp_4cuf_412_526
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 smexp_5kzo_1721_1771
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 smexp_1pb5_1446_1480
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 smhom_3l95_1_c_1448_1726
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 smhom_6py8_1_e_1759_2119
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 smhom_4xbm_2_a_283_527
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 smhom_4xbm_2_a_931_1144
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 smhom_4xbm_2_a_47_294
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 smhom_4xbm_2_a_778_1020
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 smhom_4xbm_2_a_663_906
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 smhom_4xbm_2_a_985_1220
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 smhom_4xbm_2_a_201_489
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 smhom_4xbm_2_a_741_982
-python ${script} $install_dir $PWD ${config} $run notch NOTCH1 smhom_4xbm_2_a_20_256
+python ${script} $install_dir $PWD ${config} $run notch NOTCH1
+echo "MUTEIN SCRIPT ENDED"
 echo "MUTEIN SCRIPT ENDED"

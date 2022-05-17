@@ -47,8 +47,9 @@ def pipeline_qsubber(args):
     # The environment is loaded by arguments by default
     print("ARGS=", args)
     argus = Arguments.Arguments(args, spaced=False)
+        
     ## $PWD ${config} $run notch NOTCH1 AF-P46531-F1-model_v2
-
+    
     # There are 7 arguments
     install_dir = args[1]  # 1) the executable installation directory, the root directory of the peipeline
     sys.path.append(install_dir)
@@ -60,8 +61,15 @@ def pipeline_qsubber(args):
     # everything is defined in the yaml APART from 3 template inputs
     dataset, gene, pdb = "", "", ""
     dataset = args[5]  # 3) dataset
-    gene = args[6]  # 4) gene
-    pdb = args[7]  # 5) pdb
+    gene = args[6]  # 4) gene    
+    
+    #last_stat = args[8]  # 5) the last status or count
+    #if last_stat == "x":
+    #    print("!!! qsub in fail state, exiting")
+    #    return "x"    
+
+    #count = int(last_stat)
+    count = 0
 
     print(
         "#### MUTEIN PIPELINE ####",
@@ -70,8 +78,7 @@ def pipeline_qsubber(args):
         yaml_file,
         py_or_sh,
         dataset,
-        gene,
-        pdb,
+        gene,        
     )
 
     names_and_ids = []
@@ -154,8 +161,9 @@ def pipeline_qsubber(args):
             dep = runner.run()
             if dep == "x":
                 print("!!!Abandoning submissions!!!")
-                return
-            else:                
+                return "x"
+            else:
+                count +=1              
                 dependencies[id] = dep
                 names_and_ids.append([qsubid,dep])
         elif py_or_sh == "py":
@@ -184,6 +192,8 @@ def pipeline_qsubber(args):
                 isarray,
             )
             dep = runner.run()
+
+    return str(count)
         
 ####################################################################################################
 if __name__ == "__main__":

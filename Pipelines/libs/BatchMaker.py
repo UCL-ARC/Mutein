@@ -28,15 +28,13 @@ class BatchMaker:
             'echo "~~~~~~~~~~~~~~~~~~ Call python script ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"'
         )
 
-    def addBatch(self, dataset, gene, pdb):
+    def addBatch(self, dataset, gene):
         # python ${script} $install_dir $PWD ${config} $run notch NOTCH1 1pb5
         line = (
             "python ${script} $install_dir $PWD ${config} $run "
             + dataset
             + " "
-            + gene
-            + " "
-            + pdb
+            + gene            
         )
         self.batches.append(line)
 
