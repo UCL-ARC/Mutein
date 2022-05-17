@@ -61,7 +61,7 @@ def run_pipeline06(args):
     mutations = []
 
     if mutation_string == "none":
-        filename = pdb_path.pdb_thruputs + "singles_" + str(argus.arg("split")) + ".txt"
+        filename = pdb_path.pdb_thruputs +"params_variants.txt"
         print("open", filename)
         with open(filename) as fr:
             paramscontent = fr.readlines()

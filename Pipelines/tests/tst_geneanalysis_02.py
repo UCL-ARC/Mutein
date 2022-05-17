@@ -94,18 +94,19 @@ pdbtask = 2
 
 #test_geneprot_pipeline("dataset="+dataset+"@")
 for pdbcode in ["x"]:    
+    print(pdbcode)
     #test_foldx_pipeline_repair("repairs="+str(repairs) + "@dataset="+dataset+"@gene="+gene+"@task="+str(pdbtask))
     #############test_foldx_pipeline_background
     #test_foldx_pipeline_params("repairs="+str(repairs)+"@split="+str(split)+"@dataset="+dataset+"@gene="+gene)
-    #test_foldx_pipeline_posscan("repairs="+str(repairs)+"@split="+str(split)+"@dataset="+dataset+"@gene="+gene+"@task=1")
+    #test_foldx_pipeline_posscan("repairs="+str(repairs)+"@dataset="+dataset+"@gene="+gene+"@task=1001")
     #test_foldx_pipeline_posscan("repairs="+str(repairs)+"@split="+str(split)+"@dataset="+dataset+"@gene="+gene+"@pdb="+pdbcode+"@task=2")
     #test_foldx_pipeline_posscan("repairs="+str(repairs)+"@split="+str(split)+"@dataset="+dataset+"@gene="+gene+"@pdb="+pdbcode+"@task=3")
-    test_foldx_pipeline_agg("repairs="+str(repairs)+"@split="+str(split)+"@dataset="+dataset+"@gene="+gene+"@pdb="+pdbcode)
+    #test_foldx_pipeline_agg("repairs="+str(repairs)+"@dataset="+dataset+"@gene="+gene+"@pdb="+pdbcode)
     #############test_foldx_pipeline_variants
     #test_foldx_pipeline_vparams("repairs="+str(repairs)+"@split="+str(vsplit)+"@dataset="+dataset+"@gene="+gene+"@variant=*")
-    #test_foldx_pipeline_singlescan("repairs="+str(repairs)+"@split="+str(vsplit)+"@dataset="+dataset+"@gene="+gene+"@pdb="+pdbcode+"@task=1")
+    #test_foldx_pipeline_singlescan("repairs="+str(repairs)+"@dataset="+dataset+"@gene="+gene+"@pdb="+pdbcode+"@task=1")
     #test_foldx_pipeline_singlescan("repairs="+str(repairs)+"@split="+str(vsplit)+"@dataset="+dataset+"@gene="+gene+"@pdb="+pdbcode+"@task=2")
     #test_foldx_pipeline_singlescan("repairs="+str(repairs)+"@split="+str(vsplit)+"@dataset="+dataset+"@gene="+gene+"@pdb="+pdbcode+"@task=3")
-    #test_foldx_pipeline_singlesagg("repairs="+str(repairs)+"@split="+str(vsplit)+"@dataset="+dataset+"@gene="+gene+"@pdb="+pdbcode)
+    test_foldx_pipeline_singlesagg("repairs="+str(repairs)+"@dataset="+dataset+"@gene="+gene+"@pdb="+pdbcode)
 ## GENE_STITCH
 #test_genestitch_ppl("dataset=notch@gene=NOTCH1")

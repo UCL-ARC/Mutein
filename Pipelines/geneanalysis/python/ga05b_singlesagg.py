@@ -66,7 +66,7 @@ def run_pipeline04(args):
         argus.params["work_path"] = work_path
         pdb_path.goto_job_dir(argus.arg("work_path"), args, argus.params, "_inputs05b")
         ############################################
-        params_file = gene_path.gene_outputs + "singles_" + str(argus.arg("split")) + ".txt"
+        params_file = gene_path.gene_outputs + "params_variants.txt"
         fdfp = FileDf.FileDf(params_file, sep=" ", cols=["pdb", "gene_mut", "pdb_mut", "task"], header=False)
         pm_df = fdfp.openDataFrame()
         

@@ -53,8 +53,8 @@ def run_pipeline03(args):
         dataset=dataset,
         gene=gene,        
     )    
-    all_tasks = gene_path.gene_outputs + "singles_" + str(argus.arg("split")) + ".txt"    
-    fio = FileDf.FileDf(all_tasks, sep=" ", cols=["pdb", "mut", "task"], header=False)
+    all_tasks = gene_path.gene_outputs + "params_variants.txt"    
+    fio = FileDf.FileDf(all_tasks, sep=" ", cols=["pdb", "gene_mut","pdb_mut", "task"], header=False)
     df = fio.openDataFrame()
     
     if task <= len(df.index):
@@ -75,12 +75,7 @@ def run_pipeline03(args):
         pdbfile = pdbcode + "_rep" + str(argus.arg("repairs")) + ".pdb"
         mutations = []
         # task=all means all, task=1:n means an explicit row, row=-1 means the mutation string has been passd in explicitly
-        if mutation_string == "none":
-            filename = pdb_path.pdb_thruputs + "singles_" + str(argus.arg("split")) + ".txt"
-            fio = FileDf.FileDf(
-                filename, sep=" ", cols=["pdb", "gene_mut", "pdb_mut", "task"], header=False
-            )
-            df = fio.openDataFrame()
+        if mutation_string == "none":            
             if task == "all":
                 for i in range(len(df.index)):
                     gene_mut = df["gene_mut"][i]
@@ -100,11 +95,9 @@ def run_pipeline03(args):
         for pdb_mut, gene_mut, row in mutations:
             print(pdb_mut, gene_mut, row)
             row_path = (
-                pdb_path.pdb_thruputs
-                + str(argus.arg("split"))
-                + "_"
-                + str(row)
-                + "_var"
+                pdb_path.pdb_thruputs                
+                + "var_"
+                + str(row)                
                 + "/"
             )
             print("### ... change directory", row_path)

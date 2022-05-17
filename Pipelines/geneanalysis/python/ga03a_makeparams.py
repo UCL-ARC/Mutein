@@ -174,12 +174,12 @@ def run_pipeline02(args):
             print(total_muts, rows, chunk, row)
             ##### Turn the dictionary into a dataframe
             data_params = pd.DataFrame.from_dict(param_dic)
-            filename = pdb_path.pdb_thruputs + "params_" + str(argus.arg("split")) + ".txt"
+            filename = pdb_path.pdb_thruputs + "params_background.txt"
             print("### foldx02: ... savig df", filename)
             data_params.to_csv(filename, index=False, sep=" ", header=False)
             all_params.append(data_params)
         
-    all_path = gene_path.gene_outputs + "params_" + str(argus.arg("split")) + ".txt"
+    all_path = gene_path.gene_outputs +  "params_background.txt"
     all_df = pd.concat(all_params, axis=0)
     all_df.to_csv(all_path,index=False,sep=" ",header=False)
 

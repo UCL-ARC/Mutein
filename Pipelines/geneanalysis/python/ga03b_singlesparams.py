@@ -65,8 +65,7 @@ def run_pipeline05(args):
         )
         work_path = pdb_path.pdb_thruputs + "vparams/"
         pdb_path.goto_job_dir(work_path, args, argus.params, "_inputs05")
-        ############################################
-        pdb = argus.arg("pdb")
+        ############################################        
         variant = argus.arg("variant")
         # chainid = argus.arg("chain")
         splitrows = int(argus.arg("split"))
@@ -116,7 +115,7 @@ def run_pipeline05(args):
             mutscan = mut[0] + chain + mut[1:]  # format for posscan
             pdb_mutscan = pdb_mut[0] + chain + pdb_mut[1:]  # format for posscan
             if row_size == 0:
-                param_dic["pdb"].append(pdb)
+                param_dic["pdb"].append(pdbcode)
                 # param_dic["chain"].append(chainid)
                 param_dic["mutation"].append(mutscan)
                 param_dic["pdb_mut"].append(pdb_mutscan)
@@ -138,12 +137,12 @@ def run_pipeline05(args):
         print(total_muts, splitrows, chunk, row)
         ##### Turn the dictionary into a dataframe
         data_params = pd.DataFrame.from_dict(param_dic)
-        filename = pdb_path.pdb_thruputs + "singles_" + str(argus.arg("split")) + ".txt"
+        filename = pdb_path.pdb_thruputs + "params_variants.txt"
         print("### foldx05: ... savig df", filename)
         data_params.to_csv(filename, index=False, sep=" ", header=False)
         all_params.append(data_params)
     
-    all_path = gene_path.gene_outputs + "singles_" + str(argus.arg("split")) + ".txt"
+    all_path = gene_path.gene_outputs + "params_variants.txt"
     all_df = pd.concat(all_params, axis=0)
     all_df.to_csv(all_path,index=False,sep=" ",header=False)
 

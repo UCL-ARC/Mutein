@@ -52,7 +52,7 @@ def run_pipeline03(args):
         dataset=dataset,
         gene=gene,        
     )    
-    all_tasks = gene_path.gene_outputs + "params_" + str(argus.arg("split")) + ".txt"    
+    all_tasks = gene_path.gene_outputs +  "params_background.txt"
     fio = FileDf.FileDf(all_tasks, sep=" ", cols=["pdb", "mut", "task"], header=False)
     df = fio.openDataFrame()
     
@@ -93,7 +93,7 @@ def run_pipeline03(args):
             print(mut, row)
 
             row_path = (
-                pdb_path.pdb_thruputs + str(argus.arg("split")) + "_" + str(row) + "/"
+                pdb_path.pdb_thruputs + "back_" + str(row) + "/"
             )
             print("### ... change directory", row_path)
             argus.params["thisrow"] = row
