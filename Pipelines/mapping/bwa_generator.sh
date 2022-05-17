@@ -15,7 +15,10 @@ else
     JOBLIST_BASE=bwa_joblist_$1
 fi
 
-rm -f ${JOBLIST_BASE}_step1 ${JOBLIST_BASE}_step2
+JOBLIST1=${JOBLIST_BASE}_step1
+JOBLIST2=${JOBLIST_BASE}_step2
+
+rm -f ${JOBLIST1} ${JOBLIST2}
 
 SGE_TASK_ID=0
 for DATASET in $(cat datasets/active_datasets)
@@ -31,22 +34,22 @@ do
         #array job commands for step1:
         #map with bwa mem, add readgroup tag to say "these are all from the same sample"
         #sort mapped read by mapping position, output to bam file
-        echo -n "bwa mem -t 4 ${REF} ${READS1} ${READS2} | "              >> ${JOBLIST_BASE}_step1
-        echo -n "samtools addreplacerg -r \"ID:${DATASET}_${ACCESSION}\"" >> ${JOBLIST_BASE}_step1
-        echo -n " -r \"SM:${DATASET}_${ACCESSION}\" - | "                 >> ${JOBLIST_BASE}_step1
-        echo    "samtools sort -T /tmp/${USER}-bwa-${SGE_TASK_ID} -O bam -m 2G - > ${BAMOUT}"  >> ${JOBLIST_BASE}_step1
+        echo -n "bwa mem -t 4 ${REF} ${READS1} ${READS2} | "              >> ${JOBLIST1}
+        echo -n "samtools addreplacerg -r \"ID:${DATASET}_${ACCESSION}\"" >> ${JOBLIST1}
+        echo -n " -r \"SM:${DATASET}_${ACCESSION}\" - | "                 >> ${JOBLIST1}
+        echo    "samtools sort -T /tmp/${USER}-bwa-${SGE_TASK_ID} -O bam -m 2G - > ${BAMOUT}"  >> ${JOBLIST1}
 
         #array job commands for step2:
         #index the sorted bam file
-        echo "samtools index ${BAMOUT}"              >> ${JOBLIST_BASE}_step2
+        echo "samtools index ${BAMOUT}"              >> ${JOBLIST2}
     done
 done
 
 #print the required qsub commands to screen for manual copy-pasting
 echo qsub ${MUT_DIR}/Pipelines/mapping/bwa_index.sh
 
-TOTAL_TASKS1=$(cat ${JOBLIST_BASE}_step1 | wc --lines)
-echo qsub -t 1-${TOTAL_TASKS1} ${MUT_DIR}/Pipelines/mapping/bwa_runner_step1.sh ${JOBLIST_BASE}_step1
+TOTAL_TASKS1=$(cat ${JOBLIST1} | wc --lines)
+echo qsub -t 1-${TOTAL_TASKS1} ${MUT_DIR}/Pipelines/mapping/bwa_runner_step1.sh ${JOBLIST1}
 
-TOTAL_TASKS2=$(cat ${JOBLIST_BASE}_step2 | wc --lines)
-echo qsub -t 1-${TOTAL_TASKS2} ${MUT_DIR}/Pipelines/mapping/bwa_runner_step2.sh ${JOBLIST_BASE}_step2
+TOTAL_TASKS2=$(cat ${JOBLIST2} | wc --lines)
+echo qsub -t 1-${TOTAL_TASKS2} ${MUT_DIR}/Pipelines/mapping/bwa_runner_step2.sh ${JOBLIST2}
