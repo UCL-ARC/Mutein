@@ -60,7 +60,8 @@ chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_shearwater_all_stitch.s
 
 ## Clean up at the end to remove successful logs leaving only errors
 chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_cleanup_and_report.sh
-/home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_cleanup_and_report.sh /home/ucbtlcr/Mutein/
+/home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_cleanup_and_report.sh ALL /home/ucbtlcr/Mutein/
+/home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_cleanup_and_report.sh CLEAN /home/ucbtlcr/Mutein/
 ```
 - It assumes you have gone to your working directory
 - You need the full path to the executable script

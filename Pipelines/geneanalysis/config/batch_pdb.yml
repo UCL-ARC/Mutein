@@ -23,9 +23,9 @@ id: 'Foldx3'
 qsub_id: 'foldx_posscan'
 pipe_dir: 'Pipelines/geneanalysis/python/'
 script: 'ga04a_posscan'
-time: '6:00:0'
+time: '10:00:0'
 dependency: 'Foldx2'
-array: 100
+array: 20
 inputs: "repairs=5@split=100"
 active: 'Y'
 ---
@@ -53,9 +53,9 @@ id: 'Foldx6'
 qsub_id: 'foldx_varscan'
 pipe_dir: 'Pipelines/geneanalysis/python/'
 script: 'ga04b_singlescan'
-time: '6:00:0'
+time: '10:00:0'
 dependency: 'Foldx5'
-array: 20
+array: 10
 inputs: "repairs=5@split=20@variant=*"
 active: 'Y'
 ---
