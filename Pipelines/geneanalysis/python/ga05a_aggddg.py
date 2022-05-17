@@ -38,58 +38,73 @@ def run_pipeline04(args):
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
-    pdbcode = argus.arg("pdb").lower()
-    pdb_path = Paths.Paths(        
+
+    gene_path = Paths.Paths(        
         data_dir,
         install_dir + "Pipelines/geneanalysis",
         dataset=dataset,
-        gene=gene,
-        pdb=pdbcode,
+        gene=gene,        
     )
-    # pdb_config = Config.Config(pdb_path.pdb_inputs + "/config.yml")
-    # argus.addConfig(pdb_config.params)
+    pdbtasks = gene_path.gene_outputs + "pdb_tasklist.csv"
+    fio = FileDf.FileDf(pdbtasks)
+    df = fio.openDataFrame()
+    
+    for t in range(len(df.index)):
+        pdbcode = df["pdb"][t].lower()
+        
+        pdb_path = Paths.Paths(        
+            data_dir,
+            install_dir + "Pipelines/geneanalysis",
+            dataset=dataset,
+            gene=gene,
+            pdb=pdbcode,
+        )
+        # pdb_config = Config.Config(pdb_path.pdb_inputs + "/config.yml")
+        # argus.addConfig(pdb_config.params)
 
-    work_path = pdb_path.pdb_thruputs + "agg/"
-    argus.params["work_path"] = work_path
-    pdb_path.goto_job_dir(argus.arg("work_path"), args, argus.params, "_inputs05a")
-    ############################################
-    params_file = pdb_path.pdb_thruputs + "params_" + str(argus.arg("split")) + ".txt"
-    fdfp = FileDf.FileDf(
-        params_file, sep=" ", cols=["pdb", "mut", "task"], header=False
-    )
-    pm_df = fdfp.openDataFrame()
-    all_df = []
-    for i in range(len(pm_df.index)):
-        r = pm_df["task"][i]
-        # the file has already been turned into a dataframe called posscan_df.csv
-        in_csv_i = work_path+str(r) + "_ddg_background.csv"                
-        if exists(in_csv_i):
-            fdf = FileDf.FileDf(in_csv_i)
-            all_df.append(fdf.openDataFrame())
-    ddg_df = pd.concat(all_df, ignore_index=True)
-    df_file = pdb_path.pdb_outputs + "ddg_background.csv"
-    ddg_df.to_csv(df_file, index=False)
+        work_path = pdb_path.pdb_thruputs + "agg/"
+        argus.params["work_path"] = work_path
+        pdb_path.goto_job_dir(argus.arg("work_path"), args, argus.params, "_inputs05a")
+        ############################################
+        params_file = gene_path.gene_outputs + "params_" + str(argus.arg("split")) + ".txt"
+        fdfp = FileDf.FileDf(
+            params_file, sep=" ", cols=["pdb", "mut", "task"], header=False
+        )
+        pm_df = fdfp.openDataFrame()
+        all_df = []
+        for i in range(len(pm_df.index)):
+            r = pm_df["task"][i]
+            rpdb = pm_df["pdb"][i]
+            if rpdb == pdbcode:            
+                # the file has already been turned into a dataframe called posscan_df.csv
+                in_csv_i = work_path+str(r) + "_ddg_background.csv"                
+                if exists(in_csv_i):
+                    fdf = FileDf.FileDf(in_csv_i)
+                    all_df.append(fdf.openDataFrame())
+        ddg_df = pd.concat(all_df, ignore_index=True)
+        df_file = pdb_path.pdb_outputs + "ddg_background.csv"
+        ddg_df.to_csv(df_file, index=False)
 
-    plot_file = (
-        pdb_path.pdb_outputs
-        + argus.arg("pdb")
-        + "_"
-        + str(argus.arg("repairs"))
-        + "_background_plot.png"
-    )
-    plot_file_gene = (
-        pdb_path.pdb_outputs
-        + argus.arg("pdb")
-        + "_"
-        + str(argus.arg("repairs"))
-        + "_background_plot_gene.png"
-    )
+        plot_file = (
+            pdb_path.pdb_outputs
+            + argus.arg("pdb")
+            + "_"
+            + str(argus.arg("repairs"))
+            + "_background_plot.png"
+        )
+        plot_file_gene = (
+            pdb_path.pdb_outputs
+            + argus.arg("pdb")
+            + "_"
+            + str(argus.arg("repairs"))
+            + "_background_plot_gene.png"
+        )
 
-    ana = Analysis.Analysis(ddg_df, argus.arg("pdb"))
-    ana.createDdgResidue(plot_file, "background")
-    ana.createDdgResidue(
-        plot_file_gene, "background muts", dropnagene=True, xax="gene_no"
-    )
+        ana = Analysis.Analysis(ddg_df, argus.arg("pdb"))
+        ana.createDdgResidue(plot_file, "background")
+        ana.createDdgResidue(
+            plot_file_gene, "background muts", dropnagene=True, xax="gene_no"
+        )
 
     print("### COMPLETED FoldX aggregate job ###")
     print("MUTEIN SCRIPT ENDED")

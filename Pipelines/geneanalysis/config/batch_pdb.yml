@@ -37,7 +37,7 @@ time: '1:00:0'
 dependency: 'Foldx3'
 array: 0
 inputs: "repairs=1@split=100"
-active: 'N'
+active: 'Y'
 ---
 id: 'Foldx5'
 qsub_id: 'foldx_varp'
@@ -47,7 +47,7 @@ time: '1:00:0'
 dependency: 'Foldx1'
 array: 0
 inputs: "repairs=1@split=20@variant=*"
-active: 'N'
+active: 'Y'
 ---
 id: 'Foldx6'
 qsub_id: 'foldx_varscan'
@@ -57,7 +57,7 @@ time: '10:00:0'
 dependency: 'Foldx5'
 array: 10
 inputs: "repairs=1@split=20@variant=*"
-active: 'N'
+active: 'Y'
 ---
 id: 'Foldx7'
 qsub_id: 'foldx_varagg'
@@ -67,4 +67,15 @@ time: '1:00:0'
 dependency: 'Foldx6'
 array: 0
 inputs: "repairs=1@split=20@variant=*"
-active: 'N'
+active: 'Y'
+---
+id: 'Foldx8'
+qsub_id: 'genestitch'
+pipe_dir: 'Pipelines/geneanalysis/python/'
+script: 'ga06_genestitch'
+time: '1:00:0'
+dependency: 'Foldx7'
+array: 0
+inputs: ""
+active: 'Y'
+---
