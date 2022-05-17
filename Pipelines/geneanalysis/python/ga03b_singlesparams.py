@@ -22,6 +22,7 @@ sys.path.append(retpath)
 import Paths
 import Arguments
 import Config
+import FileDf
 
 
 ##### INPUTS #############################################
@@ -39,92 +40,112 @@ def run_pipeline05(args):
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
-    pdbcode = argus.arg("pdb").lower()
-    pdb_path = Paths.Paths(        
+
+    gene_path = Paths.Paths(        
         data_dir,
         install_dir + "Pipelines/geneanalysis",
         dataset=dataset,
-        gene=gene,
-        pdb=pdbcode,
+        gene=gene,        
     )
-    work_path = pdb_path.pdb_thruputs + "vparams/"
-    pdb_path.goto_job_dir(work_path, args, argus.params, "_inputs05")
-    ############################################
-    pdb = argus.arg("pdb")
-    variant = argus.arg("variant")
-    # chainid = argus.arg("chain")
-    splitrows = int(argus.arg("split"))
+    pdbtasks = gene_path.gene_outputs + "pdb_tasklist.csv"
+    fio = FileDf.FileDf(pdbtasks)
+    df = fio.openDataFrame()
+    
+    all_params = []
 
-    # variant file is in the pdb inputs
-    pdb_path = Paths.Paths(        
-        data_dir,
-        install_dir + "Pipelines/geneanalysis",
-        dataset=dataset,
-        gene=gene,
-        pdb=pdbcode,
-    )
+    for t in range(len(df.index)):
+        pdbcode = df["pdb"][t].lower()
+        
+        pdb_path = Paths.Paths(        
+            data_dir,
+            install_dir + "Pipelines/geneanalysis",
+            dataset=dataset,
+            gene=gene,
+            pdb=pdbcode,
+        )
+        work_path = pdb_path.pdb_thruputs + "vparams/"
+        pdb_path.goto_job_dir(work_path, args, argus.params, "_inputs05")
+        ############################################
+        pdb = argus.arg("pdb")
+        variant = argus.arg("variant")
+        # chainid = argus.arg("chain")
+        splitrows = int(argus.arg("split"))
 
-    in_mutations_file = pdb_path.pdb_inputs + "variants.csv"
-    new_mutations_file = pdb_path.pdb_outputs + "variants.csv"
-    print("### foldx05: ... copying file", in_mutations_file, new_mutations_file)
-    copyfile(in_mutations_file, new_mutations_file)
-    ##### Open the variant file ################################
-    variant_df = pd.read_csv(new_mutations_file)
-    if variant != "*":
-        mutations = variant_df.query("variant == '" + variant + "'")
-    else:
-        mutations = variant_df
-    print(mutations)
-    mut_list = []
-    for i in range(len(mutations.index)):
-        chain = mutations["chain"][i]
-        mut = mutations["mutation"][i]
-        pdb_mut = mutations["pdb_mut"][i]
-        mut_list.append([mut, pdb_mut, chain])
+        # variant file is in the pdb inputs
+        pdb_path = Paths.Paths(        
+            data_dir,
+            install_dir + "Pipelines/geneanalysis",
+            dataset=dataset,
+            gene=gene,
+            pdb=pdbcode,
+        )
 
-    ##### Create a dataframe for the paramterfile in the number of chunks specified
-    total_muts = len(mut_list)
-    chunk = int(total_muts / splitrows)
-    remainder = int(total_muts % splitrows)
-    # so until we get to the remainer we need chunk +1 on each row
-    param_dic = {}
-    param_dic["pdb"] = []
-    # param_dic["chain"] = []
-    param_dic["mutation"] = []
-    param_dic["pdb_mut"] = []
-    param_dic["row"] = []
-    row_size = 0
-    row = 0
-    for i in range(len(mut_list)):
-        mut, pdb_mut, chain = mut_list[i]
-        mutscan = mut[0] + chain + mut[1:]  # format for posscan
-        pdb_mutscan = pdb_mut[0] + chain + pdb_mut[1:]  # format for posscan
-        if row_size == 0:
-            param_dic["pdb"].append(pdb)
-            # param_dic["chain"].append(chainid)
-            param_dic["mutation"].append(mutscan)
-            param_dic["pdb_mut"].append(pdb_mutscan)
-            row += 1
-            param_dic["row"].append("" + str(row))
+        in_mutations_file = pdb_path.pdb_inputs + "variants.csv"
+        new_mutations_file = pdb_path.pdb_outputs + "variants.csv"
+        print("### foldx05: ... copying file", in_mutations_file, new_mutations_file)
+        copyfile(in_mutations_file, new_mutations_file)
+        ##### Open the variant file ################################
+        variant_df = pd.read_csv(new_mutations_file)
+        if variant != "*":
+            mutations = variant_df.query("variant == '" + variant + "'")
         else:
-            param_dic["mutation"][row - 1] = (
-                param_dic["mutation"][row - 1] + "," + mutscan
-            )
-            param_dic["pdb_mut"][row - 1] = (
-                param_dic["pdb_mut"][row - 1] + "," + pdb_mutscan
-            )
-        row_size += 1
+            mutations = variant_df
+        print(mutations)
+        mut_list = []
+        for i in range(len(mutations.index)):
+            chain = mutations["chain"][i]
+            mut = mutations["mutation"][i]
+            pdb_mut = mutations["pdb_mut"][i]
+            mut_list.append([mut, pdb_mut, chain])
 
-        if row_size == chunk and row > remainder:
-            row_size = 0
-        elif row_size == chunk + 1:
-            row_size = 0
-    print(total_muts, splitrows, chunk, row)
-    ##### Turn the dictionary into a dataframe
-    data_params = pd.DataFrame.from_dict(param_dic)
-    filename = pdb_path.pdb_thruputs + "singles_" + str(argus.arg("split")) + ".txt"
-    print("### foldx05: ... savig df", filename)
-    data_params.to_csv(filename, index=False, sep=" ", header=False)
+        ##### Create a dataframe for the paramterfile in the number of chunks specified
+        total_muts = len(mut_list)
+        chunk = int(total_muts / splitrows)
+        remainder = int(total_muts % splitrows)
+        # so until we get to the remainer we need chunk +1 on each row
+        param_dic = {}
+        param_dic["pdb"] = []
+        # param_dic["chain"] = []
+        param_dic["mutation"] = []
+        param_dic["pdb_mut"] = []
+        param_dic["row"] = []
+        row_size = 0
+        row = 0
+        for i in range(len(mut_list)):
+            mut, pdb_mut, chain = mut_list[i]
+            mutscan = mut[0] + chain + mut[1:]  # format for posscan
+            pdb_mutscan = pdb_mut[0] + chain + pdb_mut[1:]  # format for posscan
+            if row_size == 0:
+                param_dic["pdb"].append(pdb)
+                # param_dic["chain"].append(chainid)
+                param_dic["mutation"].append(mutscan)
+                param_dic["pdb_mut"].append(pdb_mutscan)
+                row += 1
+                param_dic["row"].append("" + str(row))
+            else:
+                param_dic["mutation"][row - 1] = (
+                    param_dic["mutation"][row - 1] + "," + mutscan
+                )
+                param_dic["pdb_mut"][row - 1] = (
+                    param_dic["pdb_mut"][row - 1] + "," + pdb_mutscan
+                )
+            row_size += 1
+
+            if row_size == chunk and row > remainder:
+                row_size = 0
+            elif row_size == chunk + 1:
+                row_size = 0
+        print(total_muts, splitrows, chunk, row)
+        ##### Turn the dictionary into a dataframe
+        data_params = pd.DataFrame.from_dict(param_dic)
+        filename = pdb_path.pdb_thruputs + "singles_" + str(argus.arg("split")) + ".txt"
+        print("### foldx05: ... savig df", filename)
+        data_params.to_csv(filename, index=False, sep=" ", header=False)
+        all_params.append(data_params)
+    
+    all_path = gene_path.gene_outputs + "singles_" + str(argus.arg("split")) + ".txt"
+    all_df = pd.concat(all_params, axis=0)
+    all_df.to_csv(all_path,index=False,sep=" ",header=False)
 
 
 ##########################################################################################

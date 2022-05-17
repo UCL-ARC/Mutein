@@ -6,7 +6,7 @@ script: 'ga02_repair'
 time: '3:00:0'
 dependency: '-1'
 array: 100
-inputs: "repairs=5"
+inputs: "repairs=1"
 active: 'Y'
 ---
 id: 'Foldx2'
@@ -16,8 +16,8 @@ script: 'ga03a_makeparams'
 time: '1:00:0'
 dependency: 'Foldx1'
 array: 0
-inputs: "repairs=5@split=100"
-active: 'N'
+inputs: "repairs=1@split=100"
+active: 'Y'
 ---
 id: 'Foldx3'
 qsub_id: 'foldx_posscan'
@@ -25,9 +25,9 @@ pipe_dir: 'Pipelines/geneanalysis/python/'
 script: 'ga04a_posscan'
 time: '10:00:0'
 dependency: 'Foldx2'
-array: 20
-inputs: "repairs=5@split=100"
-active: 'N'
+array: 100
+inputs: "repairs=1@split=100"
+active: 'Y'
 ---
 id: 'Foldx4'
 qsub_id: 'foldx_agg'
@@ -36,7 +36,7 @@ script: 'ga05a_aggddg'
 time: '1:00:0'
 dependency: 'Foldx3'
 array: 0
-inputs: "repairs=5@split=100"
+inputs: "repairs=1@split=100"
 active: 'N'
 ---
 id: 'Foldx5'
@@ -46,7 +46,7 @@ script: 'ga03b_singlesparams'
 time: '1:00:0'
 dependency: 'Foldx1'
 array: 0
-inputs: "repairs=5@split=20@variant=*"
+inputs: "repairs=1@split=20@variant=*"
 active: 'N'
 ---
 id: 'Foldx6'
@@ -56,7 +56,7 @@ script: 'ga04b_singlescan'
 time: '10:00:0'
 dependency: 'Foldx5'
 array: 10
-inputs: "repairs=5@split=20@variant=*"
+inputs: "repairs=1@split=20@variant=*"
 active: 'N'
 ---
 id: 'Foldx7'
@@ -66,5 +66,5 @@ script: 'ga05b_singlesagg'
 time: '1:00:0'
 dependency: 'Foldx6'
 array: 0
-inputs: "repairs=5@split=20@variant=*"
+inputs: "repairs=1@split=20@variant=*"
 active: 'N'
