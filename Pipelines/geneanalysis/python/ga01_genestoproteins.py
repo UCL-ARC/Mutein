@@ -97,7 +97,7 @@ def run_pipeline(args):
                 gn.addVariant(vrnt)
             # CREATE the pdbs for the gene                
             # both these searches retun a tuple list of the pdb code and the thruput gene file path, ready for pdb inputs            
-            frag = 50
+            frag = -1
             up = UniProt.UniProt(gene)
             df, pdb_list_up = up.searchForStructures(gene_path.gene_outputs,gene_path.gene_outpdbs,fragment=frag)
             accession = up.accession

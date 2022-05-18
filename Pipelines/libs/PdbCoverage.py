@@ -18,6 +18,7 @@ class PdbCoverage:
         self.seq = seq
     
     def getCoverage(self,minfrag=-1):
+        minfrag = -1 #no matter what is passed in, it only works with whole fragments at the moment
         # PPBuilder is C-N and CAPPBuilder is CA-CA
         ppb = bio.CaPPBuilder()                        
         has_match = False
@@ -65,9 +66,13 @@ class PdbCoverage:
                             gene_start=gene_start_new
                         else:
                             matches=False
-                            end -=1                                                            
+                            end -=1   
+                            seq_frag = seq_frag[:-1]                                                         
                 if a_match:
-                    residue_num += start
+                    resis = pp.get_ca_list()[start]
+                    residue_num = pp.get_ca_list()[start].get_full_id()[3][1]            
+                    chain = resis.parent.get_parent().id
+                    #residue_num += start
                     residue_end = residue_num + len(seq_frag)-1
                     gene_end = gene_start + len(seq_frag)-1
                     coverage = round(len(seq_frag)/len(self.seq),4)
