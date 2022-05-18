@@ -67,6 +67,8 @@ class PdbCoverage:
                             matches=False
                             end -=1                                                            
                 if a_match:
+                    residue_num += start
+                    residue_end = residue_num + len(seq_frag)-1
                     gene_end = gene_start + len(seq_frag)-1
                     coverage = round(len(seq_frag)/len(self.seq),4)
                     segment = [chain,residue_num,residue_end,gene_start,gene_end,coverage]

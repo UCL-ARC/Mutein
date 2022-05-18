@@ -98,7 +98,7 @@ pdb_add = ""
 if pdbcode != "x":
     pdb_add = "@pdb="+pdbcode
 
-#test_geneprot_pipeline("dataset="+dataset)
+test_geneprot_pipeline("dataset="+dataset)
 
 #test_foldx_pipeline_repair("repairs="+str(repairs) + "@dataset="+dataset+"@gene="+gene+"@task="+str(pdbtask))
 #############test_foldx_pipeline_background
@@ -109,7 +109,7 @@ if pdbcode != "x":
 #test_foldx_pipeline_agg("repairs="+str(repairs)+"@dataset="+dataset+"@gene="+gene+"@pdb="+pdbcode)
 #############test_foldx_pipeline_variants
 #test_foldx_pipeline_vparams("repairs="+str(repairs)+"@split="+str(vsplit)+"@dataset="+dataset+"@gene="+gene+"@variant=*")
-test_foldx_pipeline_singlescan("repairs="+str(repairs)+"@dataset="+dataset+"@gene="+gene+"@task=152")
+#test_foldx_pipeline_singlescan("repairs="+str(repairs)+"@dataset="+dataset+"@gene="+gene+"@task=115")
 #test_foldx_pipeline_singlescan("repairs="+str(repairs)+"@split="+str(vsplit)+"@dataset="+dataset+"@gene="+gene+"@pdb="+pdbcode+"@task=2")
 #test_foldx_pipeline_singlescan("repairs="+str(repairs)+"@split="+str(vsplit)+"@dataset="+dataset+"@gene="+gene+"@pdb="+pdbcode+"@task=3")
 #test_foldx_pipeline_singlesagg("repairs="+str(repairs)+"@dataset="+dataset+"@gene="+gene+pdb_add)
