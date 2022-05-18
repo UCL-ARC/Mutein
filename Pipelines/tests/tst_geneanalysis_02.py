@@ -85,14 +85,14 @@ def test_foldx_pipeline_singlesagg(inputs):
 
 ######################################################################
 ### INPUTS
-dataset="notch"
-gene = "NOTCH1"
+dataset="any"
+gene = "any"
 repairs = 1
 split=100
 vsplit=20
 pdbtask = 2
 
-#test_geneprot_pipeline("dataset="+dataset+"@")
+test_geneprot_pipeline("dataset="+dataset+"@")
 for pdbcode in ["x"]:        
     print(pdbcode)
     pdb_add = ""
@@ -107,7 +107,7 @@ for pdbcode in ["x"]:
     #test_foldx_pipeline_agg("repairs="+str(repairs)+"@dataset="+dataset+"@gene="+gene+"@pdb="+pdbcode)
     #############test_foldx_pipeline_variants
     #test_foldx_pipeline_vparams("repairs="+str(repairs)+"@split="+str(vsplit)+"@dataset="+dataset+"@gene="+gene+"@variant=*")
-    test_foldx_pipeline_singlescan("repairs="+str(repairs)+"@dataset="+dataset+"@gene="+gene+"@pdb="+pdbcode+"@task=154")
+    #test_foldx_pipeline_singlescan("repairs="+str(repairs)+"@dataset="+dataset+"@gene="+gene+"@pdb="+pdbcode+"@task=154")
     #test_foldx_pipeline_singlescan("repairs="+str(repairs)+"@split="+str(vsplit)+"@dataset="+dataset+"@gene="+gene+"@pdb="+pdbcode+"@task=2")
     #test_foldx_pipeline_singlescan("repairs="+str(repairs)+"@split="+str(vsplit)+"@dataset="+dataset+"@gene="+gene+"@pdb="+pdbcode+"@task=3")
     #test_foldx_pipeline_singlesagg("repairs="+str(repairs)+"@dataset="+dataset+"@gene="+gene+pdb_add)

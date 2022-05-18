@@ -134,8 +134,8 @@ class Gene:
         dic_coverage["pdb"] = []
         dic_coverage["variant"] = []
         dic_coverage["chain"] = []
-        dic_coverage["residue"] = []
-        dic_coverage["mutation"] = []        
+        dic_coverage["gene_no"] = []
+        dic_coverage["gene_mut"] = []        
         dic_coverage["pdb_residue"] = []
         dic_coverage["pdb_mut"] = []
 
@@ -147,14 +147,14 @@ class Gene:
                 dic_coverage["pdb"].append(pdb.pdbcode)
                 dic_coverage["variant"].append("ANY")
                 dic_coverage["chain"].append(chain)
-                dic_coverage["residue"].append(vr.residue)
-                dic_coverage["mutation"].append(vrcod)                
+                dic_coverage["gene_no"].append(vr.residue)
+                dic_coverage["gene_mut"].append(vrcod)                
                 dic_coverage["pdb_residue"].append(int(pdb_residue))
                 dic_coverage["pdb_mut"].append(vrcod[0]+str(pdb_residue)+vrcod[-1]
                 )
 
         pdbs_df = pd.DataFrame.from_dict(dic_coverage)
-        pdbs_df = pdbs_df.sort_values(by="residue", ascending=True)
+        pdbs_df = pdbs_df.sort_values(by="gene_no", ascending=True)
         return pdbs_df
 
     def getDatasetGenesPdbsDataFrame(self, dataset, genes):

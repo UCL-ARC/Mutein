@@ -44,7 +44,7 @@ class UniProt:
                 method = biopdb.header["structure_method"]                            
                 reso = biopdb.header["resolution"]                
             pc = PdbCoverage.PdbCoverage(biopdb,self.seq)     
-            segments = pc.getCoverage(fragment=fragment)            
+            segments = pc.getCoverage(minfrag=fragment)            
             for chain,residue_num,residue_end,gene_start,gene_end,coverage in segments:                                    
                 if pdb[0:2].upper() == "AF":
                     fd_pdb.add("source","AF")

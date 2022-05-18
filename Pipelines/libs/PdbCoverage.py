@@ -17,7 +17,7 @@ class PdbCoverage:
         self.struc = struc
         self.seq = seq
     
-    def getCoverage(self,fragment=-1):
+    def getCoverage(self,minfrag=-1):
         # PPBuilder is C-N and CAPPBuilder is CA-CA
         ppb = bio.CaPPBuilder()                        
         has_match = False
@@ -41,8 +41,10 @@ class PdbCoverage:
             residue_end = residue_num + len(seq_one)-1            
 
             
-            if fragment == -1 or fragment > len(seq_one):
+            if minfrag == -1 or minfrag > len(seq_one):
                 fragment = len(seq_one)
+            else:
+                fragment = minfrag
             
             start = 0            
             while start < len(seq_one)-fragment+1:

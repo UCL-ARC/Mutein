@@ -61,7 +61,7 @@ class SwissModel:
                     method = biopdb.header["structure_method"]                            
                     reso = biopdb.header["resolution"]                
                 pc = PdbCoverage.PdbCoverage(smpdb,seq)     
-                segments = pc.getCoverage(fragment=fragment)
+                segments = pc.getCoverage(minfrag=fragment)
                 
                 for chain,residue_num,residue_end,gene_start,gene_end,coverage in segments:                                    
                     fd_exp.add("source","SMEXP")
@@ -90,7 +90,7 @@ class SwissModel:
                 sm_file = pdb_path+sm_pdb + ".pdb"                                
                 smpdb = genetoprotein.retrievePdbStructure(sm_url, s["template"], sm_file)            
                 pc = PdbCoverage.PdbCoverage(smpdb,seq)     
-                segments = pc.getCoverage(fragment=fragment)
+                segments = pc.getCoverage(minfrag=fragment)
                 similarity = s["similarity"]
                 if len(segments) > 0:                                   
                     for chain,residue_num,residue_end,gene_start,gene_end,coverage in segments:                                                
