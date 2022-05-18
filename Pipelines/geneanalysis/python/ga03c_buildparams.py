@@ -72,7 +72,7 @@ def run_pipeline05(args):
     print(mutations)
     mut_list = []
     for i in range(len(variant_df.index)):
-        mut = variant_df["mutation"][i]
+        mut = variant_df["gene_mut"][i]
         mut_list.append(mut)
 
     mut_combos = []

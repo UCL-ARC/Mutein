@@ -93,7 +93,7 @@ def run_pipeline05(args):
         mut_list = []
         for i in range(len(mutations.index)):
             chain = mutations["chain"][i]
-            mut = mutations["mutation"][i]
+            mut = mutations["gene_mut"][i]
             pdb_mut = mutations["pdb_mut"][i]
             mut_list.append([mut, pdb_mut, chain])
 

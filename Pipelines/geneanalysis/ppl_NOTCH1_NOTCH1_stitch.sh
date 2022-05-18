@@ -2,10 +2,10 @@
 run=qsub
 install_dir=$1
 script=${install_dir}Pipelines/libs/pipeline_qsubber.py
-config=${install_dir}Pipelines/geneanalysis/config/batch_pdb.yml
+config=${install_dir}Pipelines/geneanalysis/config/batch_genestitch.yml
 echo "EXE PATH=$install_dir"
 echo "CURRENT=$PWD"
 echo "~~~~~~~~~~~~~~~~~~ Call python script ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-python ${script} $install_dir $PWD ${config} $run any NOTCH1
+python ${script} $install_dir $PWD ${config} $run NOTCH1 NOTCH1
 echo "MUTEIN SCRIPT ENDED"
 echo "MUTEIN SCRIPT ENDED"
