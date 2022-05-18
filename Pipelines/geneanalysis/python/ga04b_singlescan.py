@@ -54,7 +54,7 @@ def run_pipeline03(args):
         gene=gene,        
     )    
     all_tasks = gene_path.gene_outputs + "params_variants.txt"    
-    fio = FileDf.FileDf(all_tasks, sep=" ", cols=["pdb", "gene_mut","pdb_mut", "task"], header=False)
+    fio = FileDf.FileDf(all_tasks, sep=" ", header=True)
     df = fio.openDataFrame()
     
     if task <= len(df.index):
@@ -80,13 +80,13 @@ def run_pipeline03(args):
                 for i in range(len(df.index)):
                     gene_mut = df["gene_mut"][i]
                     pdb_mut = df["pdb_mut"][i]
-                    row = df["task"][i]
+                    row = df["row"][i]
                     mutations.append([pdb_mut, gene_mut, row])
             else:
                 if int(task) <= len(df.index):
                     gene_mut = df["gene_mut"][int(task) - 1]
                     pdb_mut = df["pdb_mut"][int(task) - 1]
-                    row = df["task"][int(task) - 1]
+                    row = df["row"][int(task) - 1]
                     mutations.append([pdb_mut, gene_mut, row])
         else:
             # we have specified a mutation and row from the file

@@ -105,7 +105,7 @@ def run_pipeline05(args):
         param_dic = {}
         param_dic["pdb"] = []
         # param_dic["chain"] = []
-        param_dic["mutation"] = []
+        param_dic["gene_mut"] = []
         param_dic["pdb_mut"] = []
         param_dic["row"] = []
         row_size = 0
@@ -117,13 +117,13 @@ def run_pipeline05(args):
             if row_size == 0:
                 param_dic["pdb"].append(pdbcode)
                 # param_dic["chain"].append(chainid)
-                param_dic["mutation"].append(mutscan)
+                param_dic["gene_mut"].append(mutscan)
                 param_dic["pdb_mut"].append(pdb_mutscan)
                 row += 1
                 param_dic["row"].append("" + str(row))
             else:
-                param_dic["mutation"][row - 1] = (
-                    param_dic["mutation"][row - 1] + "," + mutscan
+                param_dic["gene_mut"][row - 1] = (
+                    param_dic["gene_mut"][row - 1] + "," + mutscan
                 )
                 param_dic["pdb_mut"][row - 1] = (
                     param_dic["pdb_mut"][row - 1] + "," + pdb_mutscan
@@ -139,12 +139,12 @@ def run_pipeline05(args):
         data_params = pd.DataFrame.from_dict(param_dic)
         filename = pdb_path.pdb_thruputs + "params_variants.txt"
         print("### foldx05: ... savig df", filename)
-        data_params.to_csv(filename, index=False, sep=" ", header=False)
+        data_params.to_csv(filename, index=False, sep=" ", header=True)
         all_params.append(data_params)
     
     all_path = gene_path.gene_outputs + "params_variants.txt"
     all_df = pd.concat(all_params, axis=0)
-    all_df.to_csv(all_path,index=False,sep=" ",header=False)
+    all_df.to_csv(all_path,index=False,sep=" ",header=True)
 
 
 ##########################################################################################

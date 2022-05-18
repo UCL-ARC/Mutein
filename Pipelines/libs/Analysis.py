@@ -97,6 +97,7 @@ class Analysis:
         ax3.set_ylabel("")
         # plt.legend(title=hue,bbox_to_anchor=(1.01, 1), loc=2, borderaxespad=0.,shadow=False,fancybox=False)  # Put the legend out of the figure
         plt.savefig(file_path)
+        self.clearPlots()
         print("### Analysis:OutputDdgResidue to", file_path)
 
     def createPdbSummary(
@@ -152,4 +153,13 @@ class Analysis:
         ax1.set_ylabel("")
         # plt.legend(title=hue,bbox_to_anchor=(1.01, 1), loc=2, borderaxespad=0.,shadow=False,fancybox=False)  # Put the legend out of the figure
         plt.savefig(file_path)
+        self.clearPlots()
         print("### Analysis:OutputPdbSummary to", file_path)
+
+    def clearPlots(self):
+        # clear all plots from memory
+        fig = plt.figure()
+        plt.figure().clear()
+        plt.close()
+        plt.cla()
+        plt.clf()

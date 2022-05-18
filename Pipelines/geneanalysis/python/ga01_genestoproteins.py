@@ -87,11 +87,12 @@ def run_pipeline(args):
                     gn.addVariant(vrnt)
                 # CREATE the pdbs for the gene                
                 # both these searches retun a tuple list of the pdb code and the thruput gene file path, ready for pdb inputs
+                frag = -1
                 up = UniProt.UniProt(gene)
-                df, pdb_list_up = up.searchForStructures(gene_path.gene_outputs,gene_path.gene_outpdbs,fragment=50)
+                df, pdb_list_up = up.searchForStructures(gene_path.gene_outputs,gene_path.gene_outpdbs,fragment=frag)
                 accession = up.accession
                 sm = SwissModel.SwissModel(gene,accession)
-                dfs, pdb_list_sm = sm.searchForStructures(gene_path.gene_outputs,gene_path.gene_outpdbs,fragment=50)                
+                dfs, pdb_list_sm = sm.searchForStructures(gene_path.gene_outputs,gene_path.gene_outpdbs,fragment=frag)                
                 dfs.append(df)
                 pdb_list = pdb_list_up + pdb_list_sm
                 vc = pd.concat(dfs, axis=0)
