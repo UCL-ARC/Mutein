@@ -32,9 +32,7 @@ class BatchMaker:
         # python ${script} $install_dir $PWD ${config} $run notch NOTCH1 1pb5
         line = (
             "python ${script} $install_dir $PWD ${config} $run "
-            + dataset
-            + " "
-            + gene            
+            + dataset  + " " + gene + ' ""'
         )
         self.batches.append(line)
 

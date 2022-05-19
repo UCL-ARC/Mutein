@@ -162,6 +162,8 @@ def run_pipeline(args):
         filename = pdb_path.pdb_thruputs + "params_background.txt"
         print("### foldx02: ... savig df", filename)
         data_params.to_csv(filename, index=False, sep=" ", header=True)
+        
+    print("MUTEIN SCRIPT ENDED")
                     
 
 ##########################################################################################

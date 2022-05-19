@@ -41,6 +41,11 @@ def run_pipeline(args):
     import Pipelines.geneanalysis.python.ga_1_genestogene as ppla
     ppla.run_pipeline(args)
 
+    # and we want only 1 batch for the stitching
+    script_file = "libs/pipeline_qsubber.py"
+    yaml_file = "geneanalysis/config/batch_gene_tasks.yml"
+    bm = BatchMaker.BatchMaker(script_file, yaml_file)
+
     # load the list of the genes
     genes_fd = FileDf.FileDf(dataset_path.dataset_inputs + "genes_list.csv")    
     genes_csv = genes_fd.openDataFrame()
@@ -71,7 +76,11 @@ def run_pipeline(args):
     for gn in genes:
         genes_csv.add("dataset",dataset)
         genes_csv.add("gene",gn)
+        bm.addBatch(dataset, gn)
+
     genes_csv.saveAsDf()
+            
+    bm.printBatchScript(dataset_path.pipeline_path + "/foldx_"+ dataset + "_tasks.sh")
 
      
                             
