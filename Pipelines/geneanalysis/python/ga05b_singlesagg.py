@@ -26,7 +26,7 @@ import Analysis
 import FileDf
 
 
-def run_pipeline04(args):
+def run_pipeline(args):
     print("### Foldx aggregate pos scan ###")
     print(args)
     ##############################################
@@ -106,4 +106,4 @@ def run_pipeline04(args):
 if __name__ == "__main__":
     import sys
 
-    globals()["run_pipeline04"](sys.argv)
+    globals()["run_pipeline"](sys.argv)

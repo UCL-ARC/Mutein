@@ -1,5 +1,5 @@
 ---
-id: 'Foldx1'
+id: 'REP'
 qsub_id: 'foldx_repair'
 pipe_dir: 'Pipelines/geneanalysis/python/'
 script: 'ga02_repair'
@@ -8,27 +8,47 @@ dependency: '-1'
 array: -1
 arrayfile: "pdbs"
 inputs: "repairs=1"
-active: 'Y'
+active: 'N'
 ---
-id: 'Foldx2'
+id: 'TASKS'
 qsub_id: 'foldx_posscan'
 pipe_dir: 'Pipelines/geneanalysis/python/'
 script: 'ga04a_posscan'
 time: '10:00:0'
-dependency: 'Foldx1'
+dependency: 'REP'
 array: -1
 arrayfile: "params"
 inputs: "repairs=1"
 active: 'Y'
 ---
-id: 'Foldx3'
+id: 'VTASKS'
 qsub_id: 'foldx_varscan'
 pipe_dir: 'Pipelines/geneanalysis/python/'
 script: 'ga04b_singlescan'
 time: '10:00:0'
-dependency: 'Foldx1'
+dependency: 'REP'
 array: -1
 arrayfile: "vparams"
+inputs: "repairs=1@variant=*"
+active: 'N'
+---
+id: 'STITCHA'
+qsub_id: 'foldx_varscan'
+pipe_dir: 'Pipelines/geneanalysis/python/'
+script: 'ga_2_genestitch'
+time: '1:00:0'
+dependency: 'TASKS'
+array: 0
+inputs: "repairs=1@variant=*"
+active: 'Y'
+---
+id: 'STITCHB'
+qsub_id: 'foldx_varscan'
+pipe_dir: 'Pipelines/geneanalysis/python/'
+script: 'ga_2_genestitch'
+time: '1:00:0'
+dependency: 'VTASKS'
+array: 0
 inputs: "repairs=1@variant=*"
 active: 'Y'
 ---
