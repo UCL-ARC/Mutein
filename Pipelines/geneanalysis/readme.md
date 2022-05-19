@@ -42,6 +42,10 @@ module load python3/recommended
  ## first prepare the data
  chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_dataset_prep.sh
  /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_dataset_prep.sh notch /home/ucbtlcr/Mutein/
+
+ # These are on a gene by gene basis, having all ready prepared
+ chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_gene_tasks.sh
+ /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_gene_tasks.sh notch notch1 /home/ucbtlcr/Mutein/
  
  
  ## notch smaller test set

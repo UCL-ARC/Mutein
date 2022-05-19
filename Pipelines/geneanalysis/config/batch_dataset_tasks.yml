@@ -1,0 +1,34 @@
+---
+id: 'Foldx1'
+qsub_id: 'foldx_repair'
+pipe_dir: 'Pipelines/geneanalysis/python/'
+script: 'ga02_repair'
+time: '3:00:0'
+dependency: '-1'
+array: -1
+arrayfile: "pdbs"
+inputs: "repairs=1"
+active: 'Y'
+---
+id: 'Foldx2'
+qsub_id: 'foldx_posscan'
+pipe_dir: 'Pipelines/geneanalysis/python/'
+script: 'ga04a_posscan'
+time: '10:00:0'
+dependency: 'Foldx1'
+array: -1
+arrayfile: "params"
+inputs: "repairs=1"
+active: 'Y'
+---
+id: 'Foldx3'
+qsub_id: 'foldx_varscan'
+pipe_dir: 'Pipelines/geneanalysis/python/'
+script: 'ga04b_singlescan'
+time: '10:00:0'
+dependency: 'Foldx1'
+array: -1
+arrayfile: "vparams"
+inputs: "repairs=1@variant=*"
+active: 'Y'
+---

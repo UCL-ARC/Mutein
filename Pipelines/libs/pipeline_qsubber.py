@@ -27,6 +27,7 @@ inputs: dataset=shearwater
 import os
 import pwd
 import yaml
+from os.path import exists
 
 # import from the shared library in Mutein/Pipelines/shared/lib
 import sys
@@ -38,6 +39,7 @@ import Arguments
 import QSubRunner as qsub
 import SubRunner as sub
 import FileDf
+import Paths
 
 ##### INPUTS #############################################
 ## Pipeline jobs sequence
@@ -62,6 +64,7 @@ def pipeline_qsubber(args):
     dataset, gene, pdb = "", "", ""
     dataset = args[5]  # 3) dataset
     gene = args[6]  # 4) gene    
+    pdb = args[7]  # 4) pdb
     
     #last_stat = args[8]  # 5) the last status or count
     #if last_stat == "x":
@@ -82,6 +85,28 @@ def pipeline_qsubber(args):
     )
 
     names_and_ids = []
+
+    # There are 3 files that can control the number of tasks to be run. If those files exists we load up those numbers now.
+    pdb_tasks = 0
+    params_tasks = 0
+    vparams_tasks = 0
+    path = Paths.Paths(working_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset,gene=gene,pdb=pdb)
+    pdb_tasks_file = path.gene_outputs + "pdb_tasklist.csv"
+    if exists(pdb_tasks_file):
+        with open(pdb_tasks_file) as fr:
+            lines = fr.readlines()
+            pdb_tasks = len(lines)-1
+    params_tasks_file = path.gene_thruputs + "params_background.txt"
+    if exists(params_tasks_file):
+        with open(params_tasks_file) as fr:
+            lines = fr.readlines()
+            params_tasks = len(lines)-1
+    vparams_tasks_file = path.gene_thruputs + "params_variants.txt"
+    if exists(vparams_tasks_file):
+        with open(vparams_tasks_file) as fr:
+            lines = fr.readlines()
+            vparams_tasks = len(lines)-1
+
 
     # We want the user
     homeuser = pwd.getpwuid(os.getuid())[0]
@@ -109,6 +134,15 @@ def pipeline_qsubber(args):
                 time = pipe["time"].strip()
                 dependency = pipe["dependency"].strip()
                 array = pipe["array"]
+                if int(array) == -1:
+                    arrayfile = pipe["arrayfile"].strip()
+                    if arrayfile == "pdbs":
+                        array=pdb_tasks
+                    if arrayfile == "params":
+                        array=params_tasks
+                    if arrayfile == "vparams":
+                        array=vparams_tasks
+
                 inputs = pipe["inputs"].strip()
                 active = pipe["active"].strip() == "Y"
                 # add the dataset, gene and pdb onto inputs
@@ -133,9 +167,9 @@ def pipeline_qsubber(args):
                     batch_list.append(str(id))
 
     dependencies = {}
-    for id in batch_list:
-        isarray = int(array) > 0
+    for id in batch_list:        
         qsubid, pipe_dir, script, time, dependency, array, inputs = batch_dic[id]
+        isarray = int(array) > 0
         # print("# overall pipeline script:",id,qsubid,pipe_dir,script, time, dependency, array, inputs)
         if "qsub" in py_or_sh:
             dep = -1
