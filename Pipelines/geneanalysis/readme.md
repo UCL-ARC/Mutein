@@ -47,6 +47,10 @@ module load python3/recommended
  chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_gene_tasks.sh
  /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_gene_tasks.sh notch notch1 /home/ucbtlcr/Mutein/
 
+ OR the whole dataset can be run
+ chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_notch_tasks.sh
+ /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_notch_tasks.sh /home/ucbtlcr/Mutein/
+
  # This is a single pdb for background
   chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_pdb_background.sh
  /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_pdb_background.sh 7w7g /home/ucbtlcr/Mutein/
