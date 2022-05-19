@@ -1,0 +1,32 @@
+---
+id: '2'
+qsub_id: 'repair'
+pipe_dir: 'Pipelines/geneanalysis/python/'
+script: 'ga_3_proteinrepair'
+time: '1:00:0'
+dependency: '-1'
+array: 0
+inputs: "repairs=5"
+active: 'Y'
+---
+id: '3'
+qsub_id: 'foldx_posscan'
+pipe_dir: 'Pipelines/geneanalysis/python/'
+script: 'ga04a_posscan'
+time: '10:00:0'
+dependency: '2'
+array: -1
+arrayfile: "params"
+inputs: "repairs=5"
+active: 'Y'
+---
+id: '4'
+qsub_id: 'foldx_agg'
+pipe_dir: 'Pipelines/geneanalysis/python/'
+script: 'ga05a_aggddg'
+time: '1:00:0'
+dependency: '3'
+array: 0
+inputs: "repairs=5"
+active: 'Y'
+---

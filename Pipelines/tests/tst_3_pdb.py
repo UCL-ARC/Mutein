@@ -20,6 +20,12 @@ def addpath(inputs):
     return inputs
 
 ######################################################################
+def test_proteinprep(inputs):
+    inputs = addpath(inputs)
+    import ga_3_0_pdbprep as ppl
+    args = ["", inputs]
+    ppl.run_pipeline(args)
+
 def test_proteinrepair(inputs):
     inputs = addpath(inputs)
     import ga_3_proteinrepair as ppl
@@ -42,14 +48,17 @@ def test_proteinvsplit(inputs):
 ######################################################################
 ### INPUTS
 dataset=""
-gene="notch1"
-pdb="1pb5"
+gene=""
+pdb="7w7g"
 
 repairs=1
+split=100
+vsplit=20
+
+#test_proteinprep("dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@split="+str(split)+"@vsplit="+str(vsplit))
+
 #test_proteinrepair("dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@repairs="+str(repairs))
 
-split=100
-#test_proteinsplit("dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@split="+str(split))
+test_proteinsplit("dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@split="+str(split))
 
-vsplit=20
-test_proteinvsplit("variant=*@dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@vsplit="+str(vsplit))
+#test_proteinvsplit("variant=*@dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@vsplit="+str(vsplit))

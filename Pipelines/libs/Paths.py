@@ -14,6 +14,18 @@ import os
 class Paths:
     def __init__(self, data_dir, pipe_path, dataset="", gene="", pdb=""):
         # Depending on the levels we will ensure the correct paths are present for inputs and ouputs
+        self.dataset_inputs = ""
+        self.dataset_thruputs = ""
+        self.dataset_outputs = ""
+
+        self.gene_inputs = ""
+        self.gene_thruputs = ""
+        self.gene_outputs = ""
+
+        self.pdb_inputs = ""
+        self.pdb_thruputs = ""
+        self.pdb_outputs = ""
+                
         self.data_dir = data_dir
         if self.data_dir[-1] != "/":
             self.data_dir += "/"

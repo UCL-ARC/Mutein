@@ -53,7 +53,7 @@ def run_pipeline03(args):
         dataset=dataset,
         gene=gene,        
     )    
-    all_tasks = gene_path.gene_outputs + "params_variants.txt"    
+    all_tasks = gene_path.gene_thruputs + "params_variants.txt"    
     fio = FileDf.FileDf(all_tasks, sep=" ", header=True)
     df = fio.openDataFrame()
     

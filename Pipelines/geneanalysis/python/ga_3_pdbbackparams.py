@@ -123,10 +123,10 @@ def run_pipeline(args):
 
         ##### Create a dataframe for the paramterfile in the number of chunks specified
         ##### Open up the coverage file
-        filename = pdb_path.pdb_inputs + "Coverage.csv"
-        fdfp = FileDf.FileDf(filename)
-        cov_df = fdfp.openDataFrame()
-        print(cov_df)
+        #filename = pdb_path.pdb_inputs + "Coverage.csv"
+        #fdfp = FileDf.FileDf(filename)
+        #cov_df = fdfp.openDataFrame()
+        #print(cov_df)
 
         rows = int(rows)
         param_dic = {}

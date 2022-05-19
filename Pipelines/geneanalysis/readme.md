@@ -46,6 +46,13 @@ module load python3/recommended
  # These are on a gene by gene basis, having all ready prepared
  chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_gene_tasks.sh
  /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_gene_tasks.sh notch notch1 /home/ucbtlcr/Mutein/
+
+ # This is a single pdb prep for background
+ chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_pdb_background_prep.sh
+ /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_pdb_background_prep.sh 7w7g /home/ucbtlcr/Mutein/
+ 
+ chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_pdb_background.sh
+ /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_pdb_background.sh 7w7g /home/ucbtlcr/Mutein/
  
  
  ## notch smaller test set

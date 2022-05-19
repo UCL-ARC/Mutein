@@ -36,42 +36,23 @@ def run_pipeline(args):
     sys.path.append(install_dir + "/Pipelines/libs")
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
-    dataset_path = Paths.Paths(data_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset)
+    gene = argus.arg("gene")
+    pdb = argus.arg("pdb")
+    dataset_path = Paths.Paths(data_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset,gene=gene,pdb=pdb)
+                    
+    import Pipelines.geneanalysis.python.ga_3_pdbbackparams as pplc
+    print("Back params for", pdb)
+    exists = pplc.run_pipeline(args)
     
-    import Pipelines.geneanalysis.python.ga_1_genestogene as ppla
-    ppla.run_pipeline(args)
-
-    # load the list of the genes
-    genes_fd = FileDf.FileDf(dataset_path.dataset_inputs + "genes_list.csv")    
-    genes_csv = genes_fd.openDataFrame()
-    print(genes_csv)
-    for g in range(len(genes_csv.index)):
-        gn = genes_csv["gene"][g]
-        argsgn = args
-        arglist = args[1]
-        arglist += "@gene=" + gn
-        argsgn[1] = arglist
-        
-        import Pipelines.geneanalysis.python.ga_2_genetoproteins as pplb
-        print("Extracting pdbs for", gn)
-        pplb.run_pipeline(argsgn)
-
-        import Pipelines.geneanalysis.python.ga_2_genebackparams as pplc
-        print("Extracting pdbs for", gn)
-        pplc.run_pipeline(argsgn)
-
-        import Pipelines.geneanalysis.python.ga_2_genevarparams as ppld
-        print("Extracting pdbs for", gn)
-        ppld.run_pipeline(argsgn)
-
-     
-                            
-    print("### COMPLETED dataset preparation ###")
+    import Pipelines.geneanalysis.python.ga_3_pdbvarparams as ppld
+    print("Variant params for", pdb)
+    ppld.run_pipeline(args)
+                                     
+    print("### COMPLETED pdb preparation ###")
     print("MUTEIN SCRIPT ENDED")
 
 
 ##########################################################################################
 if __name__ == "__main__":
     import sys
-
     globals()["run_pipeline"](sys.argv)
