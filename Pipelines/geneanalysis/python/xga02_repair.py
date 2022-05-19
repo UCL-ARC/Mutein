@@ -44,12 +44,14 @@ def run_pipeline01(args):
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
+    pdbcode = argus.arg("pdb","").lower()
     
     gene_path = Paths.Paths(        
         data_dir,
         install_dir + "Pipelines/geneanalysis",
         dataset=dataset,
         gene=gene,        
+        pdb=pdb,
     )
     pdbtasks = gene_path.gene_outputs + "pdb_tasklist.csv"
     fio = FileDf.FileDf(pdbtasks)

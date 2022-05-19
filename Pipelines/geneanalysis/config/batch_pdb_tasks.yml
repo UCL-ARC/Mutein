@@ -2,7 +2,7 @@
 id: 'REP'
 qsub_id: 'repair5'
 pipe_dir: 'Pipelines/geneanalysis/python/'
-script: 'ga02_repair'
+script: 'ga_3_proteinrepair'
 time: '15:00:0'
 dependency: '-1'
 array: -1
