@@ -53,7 +53,7 @@ def run_pipeline03(args):
         gene=gene,        
     )    
     all_tasks = gene_path.gene_thruputs +  "params_background.txt"
-    fio = FileDf.FileDf(all_tasks, sep=" ", cols=["pdb", "mut", "task"], header=False)
+    fio = FileDf.FileDf(all_tasks, sep=" ", header=True)
     df = fio.openDataFrame()
     
     if task <= len(df.index):
