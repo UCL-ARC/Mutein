@@ -1,6 +1,6 @@
 ---
 id: 'REP'
-qsub_id: 'repair'
+qsub_id: 'repair5'
 pipe_dir: 'Pipelines/geneanalysis/python/'
 script: 'ga02_repair'
 time: '15:00:0'
