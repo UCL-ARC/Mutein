@@ -79,12 +79,12 @@ def run_pipeline03(args):
             if task == "all":
                 for i in range(len(df.index)):
                     mutation = df["mutation"][i]
-                    row = df["task"][i]
+                    row = df["row"][i]
                     mutations.append([mutation, row])
             else:
                 if int(task) <= len(df.index):
                     mutation = df["mutation"][int(task) - 1]
-                    row = df["task"][int(task) - 1]
+                    row = df["row"][int(task) - 1]
                     mutations.append([mutation, row])
         else:
             # we have specified a mutation and row from the file
