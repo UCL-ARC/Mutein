@@ -47,6 +47,9 @@ def run_pipeline(args):
         gene=gene,        
     )
     pdbtasks = gene_path.gene_outputs + "pdb_tasklist.csv"
+    if not exists(pdbtasks):
+        return False
+        
     fio = FileDf.FileDf(pdbtasks)
     df = fio.openDataFrame()
 
