@@ -91,17 +91,17 @@ def pipeline_qsubber(args):
     params_tasks = 0
     vparams_tasks = 0
     path = Paths.Paths(working_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset,gene=gene,pdb=pdb)
-    pdb_tasks_file = path.gene_outputs + "pdb_tasklist.csv"
+    pdb_tasks_file = path.outputs + "pdb_tasklist.csv"
     if exists(pdb_tasks_file):
         with open(pdb_tasks_file) as fr:
             lines = fr.readlines()
             pdb_tasks = len(lines)-1
-    params_tasks_file = path.gene_thruputs + "params_background.txt"
+    params_tasks_file = path.thruputs + "params_background.txt"
     if exists(params_tasks_file):
         with open(params_tasks_file) as fr:
             lines = fr.readlines()
             params_tasks = len(lines)-1
-    vparams_tasks_file = path.gene_thruputs + "params_variants.txt"
+    vparams_tasks_file = path.thruputs + "params_variants.txt"
     if exists(vparams_tasks_file):
         with open(vparams_tasks_file) as fr:
             lines = fr.readlines()

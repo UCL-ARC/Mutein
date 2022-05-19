@@ -36,7 +36,7 @@ def test_pipeline(method, batch_file,dataset,gene,pdb):
         method,
         dataset,
         gene,
-        ""
+        pdb
     ]
     pipe.pipeline_qsubber(args)
 

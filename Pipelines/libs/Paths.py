@@ -14,6 +14,11 @@ import os
 class Paths:
     def __init__(self, data_dir, pipe_path, dataset="", gene="", pdb=""):
         # Depending on the levels we will ensure the correct paths are present for inputs and ouputs
+        
+        self.inputs = ""
+        self.thruputs = ""
+        self.outputs = ""
+
         self.dataset_inputs = ""
         self.dataset_thruputs = ""
         self.dataset_outputs = ""
@@ -52,13 +57,22 @@ class Paths:
         if "dataset" == level:
             # clean up first?
             self.get_make_paths_dataset(dataset)
+            self.inputs = self.dataset_inputs
+            self.outputs = self.dataset_outputs
+            self.thruputs = self.dataset_thruputs
         # Create the geneprot paths
         elif "gene" == level:
             # clean up first?
             self.get_make_paths_gene(dataset, gene)
+            self.inputs = self.gene_inputs
+            self.outputs = self.gene_outputs
+            self.thruputs = self.gene_thruputs
         elif "pdb" == level:
             # clean up first?
             self.get_make_paths_pdb(dataset, gene, pdb)
+            self.inputs = self.pdb_inputs
+            self.outputs = self.pdb_outputs
+            self.thruputs = self.pdb_thruputs
 
         # Create the foldx paths (which may be unique for a method)
 
