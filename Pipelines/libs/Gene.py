@@ -66,6 +66,26 @@ class Gene:
         pdbs_df = pd.DataFrame.from_dict(dic_variants)
         pdbs_df = pdbs_df.sort_values(by="residue", ascending=True)
         return pdbs_df
+    
+    def getVariantsDataFrame(self):
+        dic_variants = {}
+        dic_variants["gene"] = []
+        dic_variants["accession"] = []
+        dic_variants["variant"] = []
+        dic_variants["gene_no"] = []
+        dic_variants["bases"] = []
+        
+        for vrcod, vr in self.variants.items():            
+            dic_variants["gene"].append(self.gene)
+            dic_variants["accession"].append(self.accession)            
+            dic_variants["variant"].append(vr.variant)
+            dic_variants["gene_no"].append(vr.residue)                                    
+            dic_variants["bases"].append(vr.bases)        
+
+        vars_df = pd.DataFrame.from_dict(dic_variants)
+        vars_df = vars_df.sort_values(by="gene_no", ascending=True)
+        return vars_df
+
 
     def getPdbCoverageDataFrame(self):
         dic_coverage = {}

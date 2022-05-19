@@ -39,6 +39,11 @@ module load python3/recommended
 - - notch_NOTCH1_stitch aggregates the separate structures together
 - - - (only not a dependent script due to multiple dependencies at the moment)
 ```
+ ## first prepare the data
+ chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_dataset_prep.sh
+ /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_dataset_prep.sh notch /home/ucbtlcr/Mutein/
+ 
+ 
  ## notch smaller test set
 
  chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_notch.sh

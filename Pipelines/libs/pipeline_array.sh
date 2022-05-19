@@ -33,5 +33,5 @@ module load python3/recommended
 module load foldx
 echo "~~~~~~~~~~~~~~~~~~ Call python script ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 python "$pyscript" "$inputs@task=$SGE_TASK_ID"
-echo "MUTEIN SCRIPT ENDED"
+
 

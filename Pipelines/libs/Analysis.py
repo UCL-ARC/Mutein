@@ -25,6 +25,7 @@ class Analysis:
         xax="pdb_rid",
         dropnagene=False,
     ):
+        self.clearPlots()
         # And save something visual as a starting point for some analysis
         df = self.data
         df["ddg"] = pd.to_numeric(self.data["ddg"])
@@ -109,6 +110,7 @@ class Analysis:
         xax="gene_no",
         dropnagene=True,
     ):
+        self.clearPlots()
         # And save something visual as a starting point for some analysis
         df = self.data
         df["ddg"] = pd.to_numeric(self.data["ddg"])

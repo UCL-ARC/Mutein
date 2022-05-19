@@ -7,5 +7,4 @@ echo "EXE PATH=$install_dir"
 echo "CURRENT=$PWD"
 echo "~~~~~~~~~~~~~~~~~~ Call python script ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 python ${script} $install_dir $PWD ${config} $run NOTCH1 NOTCH1
-echo "MUTEIN SCRIPT ENDED"
-echo "MUTEIN SCRIPT ENDED"
+

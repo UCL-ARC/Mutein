@@ -8,6 +8,6 @@ echo "CURRENT=$PWD"
 
 echo "~~~~~~~~~~~~~~~~~~ Call python script ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 python ${script} $install_dir $PWD ${config} $run shearwater "" ""
-echo "MUTEIN SCRIPT ENDED"
+
 
 

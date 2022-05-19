@@ -33,5 +33,5 @@ module load python3/recommended
 module load foldx
 echo "~~~~~~~~~~~~~~~~~~ Call python script ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 python "$pyscript" $inputs
-echo "MUTEIN SCRIPT ENDED"
+
 
