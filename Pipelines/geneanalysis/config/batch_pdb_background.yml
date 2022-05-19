@@ -1,5 +1,5 @@
 ---
-id: '1'
+id: 'Bg1'
 qsub_id: 'prep'
 pipe_dir: 'Pipelines/geneanalysis/python/'
 script: 'ga_3_pdbbackparams'
@@ -9,32 +9,32 @@ array: 0
 inputs: "split=100"
 active: 'N'
 ---
-id: '2'
+id: 'Bg2'
 qsub_id: 'repair'
 pipe_dir: 'Pipelines/geneanalysis/python/'
 script: 'ga_3_proteinrepair'
 time: '5:00:0'
-dependency: '1'
+dependency: 'Bg2'
 array: 0
 inputs: "repairs=1"
 active: 'Y'
 ---
-id: '3'
+id: 'Bg3'
 qsub_id: 'foldx_posscan'
 pipe_dir: 'Pipelines/geneanalysis/python/'
 script: 'ga04a_posscan'
 time: '10:00:0'
-dependency: '2'
+dependency: 'Bg2'
 array: 100
 inputs: "repairs=1"
 active: 'Y'
 ---
-id: '4'
+id: 'Bg4'
 qsub_id: 'foldx_agg'
 pipe_dir: 'Pipelines/geneanalysis/python/'
 script: 'ga05a_aggddg'
 time: '1:00:0'
-dependency: '3'
+dependency: 'Bg3'
 array: 0
 inputs: "repairs=1"
 active: 'Y'
