@@ -157,6 +157,7 @@ def run_pipeline03(args):
                 #df_file = row_path + "ddg_buildmodel.csv"  
                 df_file = pdb_path.pdb_thruputs+"vagg/"+str(row) + "_ddg_buildmodel.csv"              
                 fx_runner.createBuildCsv(row_path, pdb, pdb_muts, gene_muts, cov_df, ddg_files,df_file)
+    print("MUTEIN SCRIPT ENDED")
 
 
 ##########################################################################################

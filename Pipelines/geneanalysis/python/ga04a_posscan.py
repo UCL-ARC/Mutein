@@ -121,6 +121,7 @@ def run_pipeline03(args):
             ddg_file = row_path + "PS_" + pdb + "_scanning_output.txt"
             df_file = pdb_path.pdb_thruputs+"agg/"+str(row) + "_ddg_background.csv"        
             fx_runner.createPosscanCsv(row_path, pdb, mut.split(","), [], cov_df, ddg_file,df_file)
+    print("MUTEIN SCRIPT ENDED")
             
 
 
