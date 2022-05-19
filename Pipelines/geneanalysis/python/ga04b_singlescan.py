@@ -44,6 +44,7 @@ def run_pipeline03(args):
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
+    pdb=argus.arg("pdb","")
 
     task = int(argus.arg("task"))
 
@@ -52,8 +53,9 @@ def run_pipeline03(args):
         install_dir + "Pipelines/geneanalysis",
         dataset=dataset,
         gene=gene,        
+        pdb=pdb,        
     )    
-    all_tasks = gene_path.gene_thruputs + "params_variants.txt"    
+    all_tasks = gene_path.thruputs + "params_variants.txt"    
     fio = FileDf.FileDf(all_tasks, sep=" ", header=True)
     df = fio.openDataFrame()
     

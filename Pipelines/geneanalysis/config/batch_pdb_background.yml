@@ -7,16 +7,16 @@ time: '1:00:0'
 dependency: '-1'
 array: 0
 inputs: "split=100"
-active: 'Y'
+active: 'N'
 ---
 id: '2'
 qsub_id: 'repair'
 pipe_dir: 'Pipelines/geneanalysis/python/'
 script: 'ga_3_proteinrepair'
-time: '1:00:0'
+time: '5:00:0'
 dependency: '1'
 array: 0
-inputs: "repairs=5"
+inputs: "repairs=1"
 active: 'Y'
 ---
 id: '3'
@@ -26,7 +26,7 @@ script: 'ga04a_posscan'
 time: '10:00:0'
 dependency: '2'
 array: 100
-inputs: "repairs=5"
+inputs: "repairs=1"
 active: 'Y'
 ---
 id: '4'
@@ -36,6 +36,6 @@ script: 'ga05a_aggddg'
 time: '1:00:0'
 dependency: '3'
 array: 0
-inputs: "repairs=5"
+inputs: "repairs=1"
 active: 'Y'
 ---
