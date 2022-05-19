@@ -66,7 +66,7 @@ def run_pipeline(args):
         argus.params["work_path"] = work_path
         pdb_path.goto_job_dir(argus.arg("work_path"), args, argus.params, "_inputs05b")
         ############################################
-        params_file = gene_path.gene_outputs + "params_variants.txt"
+        params_file = gene_path.gene_thruputs + "params_variants.txt"
         fdfp = FileDf.FileDf(params_file, sep=" ", header=True)
         pm_df = fdfp.openDataFrame()
         

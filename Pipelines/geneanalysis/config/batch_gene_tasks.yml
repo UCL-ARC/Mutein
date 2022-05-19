@@ -33,7 +33,7 @@ inputs: "repairs=1@variant=*"
 active: 'N'
 ---
 id: 'STITCHA'
-qsub_id: 'foldx_varscan'
+qsub_id: 'stitch'
 pipe_dir: 'Pipelines/geneanalysis/python/'
 script: 'ga_2_genestitch'
 time: '1:00:0'
@@ -43,7 +43,7 @@ inputs: "repairs=1@variant=*"
 active: 'Y'
 ---
 id: 'STITCHB'
-qsub_id: 'foldx_varscan'
+qsub_id: 'stitchv'
 pipe_dir: 'Pipelines/geneanalysis/python/'
 script: 'ga_2_genestitch'
 time: '1:00:0'
