@@ -3,11 +3,11 @@ id: 'REP'
 qsub_id: 'repair'
 pipe_dir: 'Pipelines/geneanalysis/python/'
 script: 'ga02_repair'
-time: '3:00:0'
+time: '15:00:0'
 dependency: '-1'
 array: -1
 arrayfile: "pdbs"
-inputs: "repairs=1"
+inputs: "repairs=5"
 active: 'Y'
 ---
 id: 'TASKS'
@@ -18,7 +18,7 @@ time: '10:00:0'
 dependency: 'REP'
 array: -1
 arrayfile: "params"
-inputs: "repairs=1"
+inputs: "repairs=5"
 active: 'Y'
 ---
 id: 'VTASKS'
@@ -29,8 +29,8 @@ time: '10:00:0'
 dependency: 'REP'
 array: -1
 arrayfile: "vparams"
-inputs: "repairs=1@variant=*"
-active: 'Y'
+inputs: "repairs=5@variant=*"
+active: 'N'
 ---
 id: 'AGG'
 qsub_id: 'foldx_agg'
@@ -39,7 +39,7 @@ script: 'ga05a_aggddg'
 time: '1:00:0'
 dependency: 'TASKS'
 array: 0
-inputs: "repairs=1"
+inputs: "repairs=5"
 active: 'Y'
 ---
 id: 'VAGG'
@@ -49,6 +49,6 @@ script: 'ga05b_singlesagg'
 time: '1:00:0'
 dependency: 'VTASKS'
 array: 0
-inputs: "repairs=1@variant=*"
-active: 'Y'
+inputs: "repairs=5@variant=*"
+active: 'N'
 ---
