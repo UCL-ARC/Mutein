@@ -78,12 +78,12 @@ def run_pipeline03(args):
         if mutation_string == "none":                        
             if task == "all":
                 for i in range(len(df.index)):
-                    mutation = df["mut"][i]
+                    mutation = df["mutation"][i]
                     row = df["task"][i]
                     mutations.append([mutation, row])
             else:
                 if int(task) <= len(df.index):
-                    mutation = df["mut"][int(task) - 1]
+                    mutation = df["mutation"][int(task) - 1]
                     row = df["task"][int(task) - 1]
                     mutations.append([mutation, row])
         else:
@@ -127,5 +127,4 @@ def run_pipeline03(args):
 ##########################################################################################
 if __name__ == "__main__":
     import sys
-
     globals()["run_pipeline03"](sys.argv)
