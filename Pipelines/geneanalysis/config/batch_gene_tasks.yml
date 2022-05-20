@@ -8,7 +8,7 @@ dependency: '-1'
 array: -1
 arrayfile: "pdbs"
 inputs: "repairs=5"
-active: 'N'
+active: 'Y'
 ---
 id: 'TASKS'
 qsub_id: 'foldx_posscan'
