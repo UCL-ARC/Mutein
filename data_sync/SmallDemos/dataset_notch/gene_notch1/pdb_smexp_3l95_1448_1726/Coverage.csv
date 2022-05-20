@@ -1,3 +1,0 @@
-source,gene,accession,pdb,method,resolution,chain,pdb_start,pdb_end,gene_start,gene_end,coverage,score
-SMEXP,NOTCH1,P46531,smexp_3l95_1448_1726,x-ray diffraction,2.19,C,197,233,1690,1726,0.0145,1.0
-SMEXP,NOTCH1,P46531,smexp_3l95_1448_1726,x-ray diffraction,2.19,E,15,77,1460,1522,0.0247,1.0

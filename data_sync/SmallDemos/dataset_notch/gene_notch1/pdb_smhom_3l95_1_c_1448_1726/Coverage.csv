@@ -1,2 +1,0 @@
-source,gene,accession,pdb,method,resolution,chain,pdb_start,pdb_end,gene_start,gene_end,coverage,score
-SMHOM,NOTCH1,P46531,smhom_3l95_1_c_1448_1726,,,C,1448,1726,1448,1726,0.1092,0.6302781701087952

@@ -1,2 +1,0 @@
-source,gene,accession,pdb,method,resolution,chain,pdb_start,pdb_end,gene_start,gene_end,coverage,score
-EXP,NOTCH1,P46531,1toz,solution nmr,,A,411,526,411,526,0.0454,1.0

@@ -1,2 +1,0 @@
-source,gene,accession,pdb,method,resolution,chain,pdb_start,pdb_end,gene_start,gene_end,coverage,score
-EXP,NOTCH1,P46531,5fma,x-ray diffraction,2.46,B,142,157,142,157,0.0063,1.0

@@ -1,3 +1,0 @@
-source,gene,accession,pdb,method,resolution,chain,pdb_start,pdb_end,gene_start,gene_end,coverage,score
-AF,NOTCH1,P46531,af-p46531-f1-model_v2,unknown,,A,1,1155,1,1155,0.4521,1.0
-AF,NOTCH1,P46531,af-p46531-f1-model_v2,unknown,,A,1156,2555,1156,2555,0.5479,1.0

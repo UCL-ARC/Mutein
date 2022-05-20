@@ -1,2 +1,0 @@
-source,gene,accession,pdb,method,resolution,chain,pdb_start,pdb_end,gene_start,gene_end,coverage,score
-SMEXP,NOTCH1,P46531,smexp_1pb5_1446_1480,solution nmr,,A,1,35,1446,1480,0.0137,1.0

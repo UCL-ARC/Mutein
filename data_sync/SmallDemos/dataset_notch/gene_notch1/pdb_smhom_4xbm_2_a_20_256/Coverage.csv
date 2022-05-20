@@ -1,2 +1,0 @@
-source,gene,accession,pdb,method,resolution,chain,pdb_start,pdb_end,gene_start,gene_end,coverage,score
-SMHOM,NOTCH1,P46531,smhom_4xbm_2_a_20_256,,,A,20,256,20,256,0.0928,0.4371660351753235
