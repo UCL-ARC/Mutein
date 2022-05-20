@@ -39,6 +39,22 @@ module load python3/recommended
 - - notch_NOTCH1_stitch aggregates the separate structures together
 - - - (only not a dependent script due to multiple dependencies at the moment)
 ```
+##### TEST DATA SETS #######
+# They are in DataSync/SmallDemos in github #####
+#### This is a single pdb, with a quick python script first #####
+chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_pdb_prep.sh
+chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_pdb_tasks.sh
+-- A python script
+/home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_pdb_prep.sh 1pb5 /home/ucbtlcr/Mutein/
+-- a qsub script
+/home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_pdb_tasks.sh 1pb5 /home/ucbtlcr/Mutein/
+
+#### This is a small dataset #########
+chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_dataset_prep.sh
+/home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_dataset_prep.sh cutdown /home/ucbtlcr/Mutein/
+-- The above automatically creates the next script which then needs to be run
+/home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_cutdown_tasks.sh /home/ucbtlcr/Mutein/
+
  ## first prepare the data
  chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_dataset_prep.sh
  /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_dataset_prep.sh notch /home/ucbtlcr/Mutein/

@@ -1,0 +1,2 @@
+source,gene,accession,pdb,method,resolution,chain,pdb_start,pdb_end,gene_start,gene_end,coverage,score
+SMEXP,NOTCH1,P46531,smexp_5l0r_452_491,x-ray diffraction,1.5,B,4,42,453,491,0.0153,1.0

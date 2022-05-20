@@ -1,0 +1,4 @@
+source,gene,accession,pdb,method,resolution,chain,pdb_start,pdb_end,gene_start,gene_end,coverage,score
+EXP,NOTCH1,P46531,2f8x,x-ray diffraction,3.25,K,1884,1892,1883,1891,0.0035,1.0
+EXP,NOTCH1,P46531,2f8x,x-ray diffraction,3.25,K,1909,1916,1908,1915,0.0031,1.0
+EXP,NOTCH1,P46531,2f8x,x-ray diffraction,3.25,K,1920,2120,1919,2119,0.0787,1.0
