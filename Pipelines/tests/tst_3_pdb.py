@@ -84,14 +84,14 @@ split=10000
 vsplit=2000
 
 # whhich steps of the pipeline to run
-prepareA = False
-prepareB = False
-repair = False
-tasks = False
-vtasks = False
-agg = False
-vagg = False
-doubleagg = True
+prepareA = 0
+prepareB = 0
+repair = 0
+tasks = 1
+vtasks = 0
+agg = 0
+vagg = 0
+doubleagg = 0
 
 if prepareA:
     # @@@@ - PREPARE A - @@@@

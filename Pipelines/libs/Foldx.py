@@ -142,8 +142,10 @@ class Foldx:
         
         fdf = FileDf.FileDf(ddg_file, sep="\t", header=False, cols=["mut", "ddg"])
         df = fdf.openDataFrame()
-        score = coverage["score"][0]
-        source = coverage["source"][0]   
+        score,source=0,""
+        if len(coverage["score"]) > 0:
+            score = coverage["score"][0]
+            source = coverage["source"][0]   
         for i in range(len(df.index)):
             pdb_mut = df["mut"][i]            
             ddg = df["ddg"][i]                        

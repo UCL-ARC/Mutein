@@ -15,6 +15,7 @@ N.b this file may be run on the myriad clusters or on a local machine
 import os
 import pandas as pd
 from shutil import copyfile
+from os.path import exists
 
 # import from the shared library in Mutein/Pipelines/shared/lib
 import sys
@@ -111,16 +112,21 @@ def run_pipeline(args):
 
             fx_runner = Foldx.Foldx(argus.arg("foldxe"))
             ###########################################################################
-            fx_runner.runPosscan(pdbfile, mut)
+            #fx_runner.runPosscan(pdbfile, mut)
             ###########################################################################
             pdb = pdbcode + "_rep" + str(argus.arg("repairs"))
             # pass in the coverage to annotate the csv file
             filename = pdb_path.pdb_inputs + "Coverage.csv"
-            fdfp = FileDf.FileDf(filename)
-            cov_df = fdfp.openDataFrame()
             ddg_file = row_path + "PS_" + pdb + "_scanning_output.txt"
             df_file = pdb_path.pdb_thruputs+"agg/"+str(row) + "_ddg_background.csv"        
-            fx_runner.createPosscanCsv(row_path, pdb, mut.split(","), [], cov_df, ddg_file,df_file)
+            if exists(filename):
+                fdfp = FileDf.FileDf(filename)
+                cov_df = fdfp.openDataFrame()
+                fx_runner.createPosscanCsv(row_path, pdb, mut.split(","), [], cov_df, ddg_file,df_file)
+            else:                
+                empty_dic = {"source":[],"gene":[],"accession":[],"pdb":[],"method":[],"resolution":[],"chain":[],"pdb_start":[],"pdb_end":[],"gene_start":[],"gene_end":[],"coverage":[],"score":[]}
+                df = pd.DataFrame.from_dict(empty_dic)
+                fx_runner.createPosscanCsv(row_path, pdb, mut.split(","), [], df, ddg_file,df_file)
         print("MUTEIN SCRIPT ENDED")
     
             
