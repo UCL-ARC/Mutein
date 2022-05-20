@@ -1,6 +1,6 @@
 """
 RSA: 19/5/22
-This CI test script runs from the dataset level
+This CI test script runs from the pdb level
 It enables debugging of the scripts as if run from a batch
 
 """
@@ -26,12 +26,6 @@ def test_proteinprep(inputs):
     args = ["", inputs]
     ppl.run_pipeline(args)
 
-def test_proteinrepair(inputs):
-    inputs = addpath(inputs)
-    import ga_3_proteinrepair as ppl
-    args = ["", inputs]
-    ppl.run_pipeline(args)
-
 def test_proteinsplit(inputs):
     inputs = addpath(inputs)
     import ga_3_pdbbackparams as ppl
@@ -44,21 +38,83 @@ def test_proteinvsplit(inputs):
     args = ["", inputs]
     ppl.run_pipeline(args)
 
+def test_proteinrepair(inputs):
+    inputs = addpath(inputs)
+    import ga_3_proteinrepair as ppl
+    args = ["", inputs]
+    ppl.run_pipeline(args)
 
+def test_proteintasks(inputs):
+    inputs = addpath(inputs)
+    import ga04a_posscan as ppl
+    args = ["", inputs]
+    ppl.run_pipeline(args)
+
+def test_proteinvtasks(inputs):
+    inputs = addpath(inputs)
+    import ga04b_singlescan as ppl
+    args = ["", inputs]
+    ppl.run_pipeline(args)
+
+def test_proteinagg(inputs):
+    inputs = addpath(inputs)
+    import ga05a_aggddg as ppl
+    args = ["", inputs]
+    ppl.run_pipeline(args)
+
+def test_proteinvagg(inputs):
+    inputs = addpath(inputs)
+    import ga05b_singlesagg as ppl
+    args = ["", inputs]
+    ppl.run_pipeline(args)
+
+def test_proteindblagg(inputs):
+    inputs = addpath(inputs)
+    import ga_2_genestitch as ppl
+    args = ["", inputs]
+    ppl.run_pipeline(args)
 ######################################################################
 ### INPUTS
 dataset=""
 gene=""
-pdb="7w7g"
+pdb="1pb5"
 
 repairs=1
-split=100
-vsplit=20
+split=10000
+vsplit=2000
 
-#test_proteinprep("dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@split="+str(split)+"@vsplit="+str(vsplit))
+# whhich steps of the pipeline to run
+prepareA = False
+prepareB = False
+repair = False
+tasks = False
+vtasks = False
+agg = False
+vagg = False
+doubleagg = True
 
-#test_proteinrepair("dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@repairs="+str(repairs))
-
-test_proteinsplit("dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@split="+str(split))
-
-#test_proteinvsplit("variant=*@dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@vsplit="+str(vsplit))
+if prepareA:
+    # @@@@ - PREPARE A - @@@@
+    test_proteinprep("variant=*@dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@split="+str(split)+"@vsplit="+str(vsplit))
+if prepareB:
+    # @@@@ - PREPARE B - @@@@
+    test_proteinsplit("dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@split="+str(split))
+    test_proteinvsplit("variant=*@dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@vsplit="+str(vsplit))
+if repair:
+    # @@@@ - REPAIR - @@@@
+    test_proteinrepair("dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@repairs="+str(repairs))
+if tasks:
+    # @@@@ - TASKS - @@@@
+    test_proteintasks("dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@repairs="+str(repairs)+"@task=1")
+if vtasks:
+    # @@@@ - Variant TASKS - @@@@
+    test_proteinvtasks("dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@repairs="+str(repairs)+"@task=1")
+if agg:
+    # @@@@ - AGG - @@@@
+    test_proteinagg("dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@repairs="+str(repairs))
+if vagg:
+    # @@@@ - Variant AGG - @@@@
+    test_proteinvagg("dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@repairs="+str(repairs))
+if doubleagg:
+    # @@@@ - Variant AGG - @@@@
+    test_proteindblagg("dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@repairs="+str(repairs))

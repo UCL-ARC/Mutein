@@ -38,20 +38,28 @@ def run_pipeline(args):
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
+    pdbcode = argus.arg("pdb","").lower()
 
     gene_path = Paths.Paths(        
         data_dir,
         install_dir + "Pipelines/geneanalysis",
         dataset=dataset,
         gene=gene,        
+        pdb=pdbcode,        
     )
-    pdbtasks = gene_path.gene_outputs + "pdb_tasklist.csv"
-    fio = FileDf.FileDf(pdbtasks)
-    df = fio.openDataFrame()
+    pdb_list = []
+    if pdbcode != "":
+        pdb_list.append(pdbcode)
+    else:
+        pdbtasks = gene_path.gene_outputs + "pdb_tasklist.csv"
+        fio = FileDf.FileDf(pdbtasks)
+        df = fio.openDataFrame()
     
-    for t in range(len(df.index)):
-        pdbcode = df["pdb"][t].lower()
+        for t in range(len(df.index)):
+            pdbcode = df["pdb"][t].lower()
+            pdb_list.append(pdbcode)
         
+    for pdbcode in pdb_list:
         pdb_path = Paths.Paths(        
             data_dir,
             install_dir + "Pipelines/geneanalysis",
@@ -66,7 +74,7 @@ def run_pipeline(args):
         argus.params["work_path"] = work_path
         pdb_path.goto_job_dir(argus.arg("work_path"), args, argus.params, "_inputs05a")
         ############################################
-        params_file = gene_path.gene_thruputs +  "params_background.txt"
+        params_file = gene_path.thruputs +  "params_background.txt"
         fdfp = FileDf.FileDf(
             params_file, sep=" ", cols=["pdb", "mut", "task"], header=False
         )

@@ -57,9 +57,9 @@ class Arguments:
             else:
                 params = self.addlinetoparams(arg, params)
         if "pdb" not in params:
-            params["pdb"] = "6vxx"
-        if "configfile" not in params:
-            params["configfile"] = "../inputs/" + params["pdb"] + "/config.cfg"
+            params["pdb"] = ""
+        #if "configfile" not in params:
+        #    params["configfile"] = "../inputs/" + params["pdb"] + "/config.cfg"
         return params
 
     def spacedparams(self, argvs):
@@ -70,9 +70,9 @@ class Arguments:
                 arg = argvss[i]
                 params = self.addlinetoparams(arg, params)
         if "pdb" not in params:
-            params["pdb"] = "6vxx"
-        if "configfile" not in params:
-            params["configfile"] = "../inputs/" + params["pdb"] + "/config.cfg"
+            params["pdb"] = ""
+        #if "configfile" not in params:
+        #    params["configfile"] = "../inputs/" + params["pdb"] + "/config.cfg"
         return params
 
     def addlinetoparams(self, arg, params):

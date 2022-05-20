@@ -1,6 +1,6 @@
 """
-RSA: 19/5/22
-This CI test script runs from the dataset level
+RSA: 20/5/22
+This CI test script runs from the gene level
 It enables debugging of the scripts as if run from a batch
 
 """
@@ -20,9 +20,21 @@ def addpath(inputs):
     return inputs
 
 ######################################################################
-def test_geneproteins(inputs):
+def test_geneprep(inputs):
     inputs = addpath(inputs)
-    import ga_2_genetoproteins as ppl
+    import ga_2_0_geneprep as ppl
+    args = ["", inputs]
+    ppl.run_pipeline(args)
+
+def test_genesplit(inputs):
+    inputs = addpath(inputs)
+    import ga_2_genebackparams as ppl
+    args = ["", inputs]
+    ppl.run_pipeline(args)
+
+def test_genevsplit(inputs):
+    inputs = addpath(inputs)
+    import ga_2_genevarparams as ppl
     args = ["", inputs]
     ppl.run_pipeline(args)
 
@@ -32,31 +44,56 @@ def test_generepair(inputs):
     args = ["", inputs]
     ppl.run_pipeline(args)
 
-def test_makeparams(inputs):
+def test_genetasks(inputs):
     inputs = addpath(inputs)
-    import ga_2_genebackparams as ppl
+    import ga04a_posscan as ppl
     args = ["", inputs]
     ppl.run_pipeline(args)
 
-def test_makevparams(inputs):
+def test_genevtasks(inputs):
     inputs = addpath(inputs)
-    import ga_2_genevarparams as ppl
+    import ga04b_singlescan as ppl
     args = ["", inputs]
     ppl.run_pipeline(args)
 
-
+def test_genedblagg(inputs):
+    inputs = addpath(inputs)
+    import ga_2_genestitch as ppl
+    args = ["", inputs]
+    ppl.run_pipeline(args)
 ######################################################################
 ### INPUTS
 dataset=""
 gene="notch1"
-#test_geneproteins("dataset="+dataset+"@gene="+gene)
 
 repairs=1
-task=1
-#test_generepair("dataset="+dataset+"@gene="+gene+"@repairs="+str(repairs)+"@task="+str(task))
+split=10000
+vsplit=2000
 
-split=100
-test_makeparams("dataset="+dataset+"@gene="+gene+"@split="+str(split))
+# whhich steps of the pipeline to run
+prepareA = 0
+prepareB = 0
+repair = 0
+tasks = 0
+vtasks = 0
+doubleagg = 1
 
-vsplit=20
-test_makevparams("dataset="+dataset+"@gene="+gene+"@vsplit="+str(vsplit))
+if prepareA:
+    # @@@@ - PREPARE A - @@@@
+    test_geneprep("variant=*@dataset="+dataset+"@gene="+gene+"@split="+str(split)+"@vsplit="+str(vsplit))
+if prepareB:
+    # @@@@ - PREPARE B - @@@@
+    test_genesplit("dataset="+dataset+"@gene="+gene+"@split="+str(split))
+    test_genevsplit("variant=*@dataset="+dataset+"@gene="+gene+"@vsplit="+str(vsplit))
+if repair:
+    # @@@@ - REPAIR - @@@@
+    test_generepair("dataset="+dataset+"@gene="+gene+"@repairs="+str(repairs)+"@task=2")
+if tasks:
+    # @@@@ - TASKS - @@@@
+    test_genetasks("dataset="+dataset+"@gene="+gene+"@repairs="+str(repairs)+"@task=2636")
+if vtasks:
+    # @@@@ - Variant TASKS - @@@@
+    test_genevtasks("dataset="+dataset+"@gene="+gene+"@repairs="+str(repairs)+"@task=1150")
+if doubleagg:
+    # @@@@ - Variant AGG - @@@@
+    test_genedblagg("dataset="+dataset+"@gene="+gene+"@repairs="+str(repairs))

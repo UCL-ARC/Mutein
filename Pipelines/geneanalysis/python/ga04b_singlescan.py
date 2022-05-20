@@ -33,7 +33,7 @@ import FileDf
 # The inputs to this function are the pdbfile and the chain id (might optionally consider the positionscan mutation type)
 
 
-def run_pipeline03(args):
+def run_pipeline(args):
     print("### FoldX position scan job ###")
     print(args)
     argus = Arguments.Arguments(args)
@@ -164,4 +164,4 @@ def run_pipeline03(args):
 if __name__ == "__main__":
     import sys
 
-    globals()["run_pipeline03"](sys.argv)
+    globals()["run_pipeline"](sys.argv)

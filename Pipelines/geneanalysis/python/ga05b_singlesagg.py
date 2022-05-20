@@ -38,19 +38,29 @@ def run_pipeline(args):
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
+    pdbcode = argus.arg("pdb","").lower()
 
     gene_path = Paths.Paths(        
         data_dir,
         install_dir + "Pipelines/geneanalysis",
         dataset=dataset,
         gene=gene,        
+        pdb=pdbcode,    
     )
-    pdbtasks = gene_path.gene_outputs + "pdb_tasklist.csv"
-    fio = FileDf.FileDf(pdbtasks)
-    df = fio.openDataFrame()
     
-    for t in range(len(df.index)):
-        pdbcode = df["pdb"][t].lower()
+    pdb_list = []
+    if pdbcode != "":
+        pdb_list.append(pdbcode)
+    else:
+        pdbtasks = gene_path.gene_outputs + "pdb_tasklist.csv"
+        fio = FileDf.FileDf(pdbtasks)
+        df = fio.openDataFrame()
+    
+        for t in range(len(df.index)):
+            pdbcode = df["pdb"][t].lower()
+            pdb_list.append(pdbcode)
+        
+    for pdbcode in pdb_list:
         
         pdb_path = Paths.Paths(        
             data_dir,
@@ -66,7 +76,7 @@ def run_pipeline(args):
         argus.params["work_path"] = work_path
         pdb_path.goto_job_dir(argus.arg("work_path"), args, argus.params, "_inputs05b")
         ############################################
-        params_file = gene_path.gene_thruputs + "params_variants.txt"
+        params_file = gene_path.thruputs + "params_variants.txt"
         fdfp = FileDf.FileDf(params_file, sep=" ", header=True)
         pm_df = fdfp.openDataFrame()
         
@@ -85,7 +95,7 @@ def run_pipeline(args):
         for in_csv, out_csv, plot_file in analyses: 
             all_df = []
             for i in range(len(pm_df.index)):
-                r = pm_df["task"][i]
+                r = pm_df["row"][i]
                 rpdb = pm_df["pdb"][i]
                 if rpdb == pdbcode:            
                     in_csv_i = work_path+str(r) + "_"+in_csv

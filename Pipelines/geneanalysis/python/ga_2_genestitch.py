@@ -44,20 +44,31 @@ def run_pipeline(args):
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
-    
+    pdbcode = argus.arg("pdb","").lower()
+    gene_stitch = pdbcode == ""
 
     gene_path = Paths.Paths(        
         data_dir,
         install_dir + "Pipelines/geneanalysis",
         dataset=dataset,
         gene=gene,        
+        pdb=pdbcode,        
     )
-    pdbtasks = gene_path.gene_outputs + "pdb_tasklist.csv"
-    fio = FileDf.FileDf(pdbtasks)
-    df = fio.openDataFrame()
+
+    pdb_list = []
+
+    if pdbcode != "":
+        pdb_list.append(pdbcode)
+    else:        
+        pdbtasks = gene_path.gene_outputs + "pdb_tasklist.csv"
+        fio = FileDf.FileDf(pdbtasks)
+        df = fio.openDataFrame()
     
-    for t in range(len(df.index)):    
-        pdbcode = df["pdb"][t].lower()
+        for t in range(len(df.index)):    
+            pdbcode = df["pdb"][t].lower()
+            pdb_list.append(pdbcode)
+
+    for pdbcode in pdb_list:
         argsgn = args
         arglist = args[1]
         arglist += "@pdb=" + pdbcode
@@ -69,9 +80,13 @@ def run_pipeline(args):
         print("Aggregating variants pdb", pdbcode)
         pplb.run_pipeline(argsgn)
                         
-    import Pipelines.geneanalysis.python.ga06_genestitch as pplc
-    print("Stitching gene", gene)
-    pplc.run_pipeline(args)
+    if gene_stitch:
+        print("Gene stitching...")
+        import Pipelines.geneanalysis.python.ga06_genestitch as pplc
+        print("Stitching gene", gene)
+        pplc.run_pipeline(args)
+    else:
+        print("No gene stitch, pdb only")
     
     print("### COMPLETED FoldX stitch job ###")
     print("MUTEIN SCRIPT ENDED")
