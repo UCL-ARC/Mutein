@@ -35,16 +35,18 @@ def test_datasetprep(inputs):
 
 ######################################################################
 ### INPUTS
-dataset="notch"
+dataset="cutdown"
 split=100
 vsplit=20
 
 #test_genesgene("dataset="+dataset)
 
-import time
-tic = time.perf_counter()
+prep = 1
 
-test_datasetprep("variant=*@dataset="+dataset+"@split="+str(split)+"@vsplit="+str(vsplit))
+if prep:
+    import time
+    tic = time.perf_counter()
+    test_datasetprep("variant=*@dataset="+dataset+"@split="+str(split)+"@vsplit="+str(vsplit))
+    toc = time.perf_counter()
+    print("Prepared the dataset for",dataset,f"in {toc - tic:0.4f} seconds")
 
-toc = time.perf_counter()
-print("Prepared the dataset for",dataset,f"in {toc - tic:0.4f} seconds")
