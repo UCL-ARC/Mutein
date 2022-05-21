@@ -6,7 +6,7 @@ script: 'ga_2_genebackparams'
 time: '1:00:0'
 dependency: '-1'
 array: 0
-inputs: "split=1000"
+inputs: "repairs=5@split=1000"
 active: 'Y'
 ---
 id: 'VRAM'

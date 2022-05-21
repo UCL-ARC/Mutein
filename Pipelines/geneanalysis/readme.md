@@ -52,9 +52,11 @@ chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_pdb_tasks.sh
 #### This is a small dataset #########
 chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_dataset_prep.sh
 /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_dataset_prep.sh notch /home/ucbtlcr/Mutein/
+
 -- The above automatically creates the next script which then needs to be run
-chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_notch_tasks.sh
-/home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_notch_tasks.sh /home/ucbtlcr/Mutein/
+/home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_notch_2_rep.sh /home/ucbtlcr/Mutein/
+/home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_notch_3_prep.sh /home/ucbtlcr/Mutein/
+/home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_notch_4_tasks.sh /home/ucbtlcr/Mutein/
 
  ## first prepare the data
  chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_dataset_prep.sh
