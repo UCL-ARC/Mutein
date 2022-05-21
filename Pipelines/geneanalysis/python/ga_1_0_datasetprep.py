@@ -88,6 +88,8 @@ def run_pipeline(args):
         genes_csv.add("gene",gn)
         tasks_bm.addBatch(dataset, gn)
         prep_bm.addBatch(dataset, gn)
+        pdbs_bm.addBatch(dataset, gn)
+        rep_bm.addBatch(dataset, gn)
 
     genes_csv.saveAsDf()
             
