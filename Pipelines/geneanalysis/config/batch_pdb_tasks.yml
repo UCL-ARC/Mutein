@@ -1,15 +1,4 @@
 ---
-id: 'REP'
-qsub_id: 'repair5'
-pipe_dir: 'Pipelines/geneanalysis/python/'
-script: 'ga_3_proteinrepair'
-time: '15:00:0'
-dependency: '-1'
-array: -1
-arrayfile: "pdbs"
-inputs: "repairs=5"
-active: 'N'
----
 id: 'TASKS'
 qsub_id: 'foldx_posscan'
 pipe_dir: 'Pipelines/geneanalysis/python/'

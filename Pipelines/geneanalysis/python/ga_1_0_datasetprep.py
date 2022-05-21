@@ -41,10 +41,16 @@ def run_pipeline(args):
     import Pipelines.geneanalysis.python.ga_1_genestogene as ppla
     ppla.run_pipeline(args)
 
-    # and we want only 1 batch for the stitching
+    # We want batches for prep and tasks
     script_file = "libs/pipeline_qsubber.py"
-    yaml_file = "geneanalysis/config/batch_gene_tasks.yml"
-    bm = BatchMaker.BatchMaker(script_file, yaml_file)
+    pdbs_yaml_file = "geneanalysis/config/batch_gene_1_pdbs.yml"
+    pdbs_bm = BatchMaker.BatchMaker(script_file, pdbs_yaml_file)    
+    rep_yaml_file = "geneanalysis/config/batch_gene_2_rep.yml"
+    rep_bm = BatchMaker.BatchMaker(script_file, rep_yaml_file)    
+    prep_yaml_file = "geneanalysis/config/batch_gene_3_prep.yml"
+    prep_bm = BatchMaker.BatchMaker(script_file, prep_yaml_file)    
+    tasks_yaml_file = "geneanalysis/config/batch_gene_4_tasks.yml"
+    tasks_bm = BatchMaker.BatchMaker(script_file, tasks_yaml_file)
 
     # load the list of the genes
     genes_fd = FileDf.FileDf(dataset_path.dataset_inputs + "genes_list.csv")    
@@ -76,14 +82,16 @@ def run_pipeline(args):
     for gn in genes:
         genes_csv.add("dataset",dataset)
         genes_csv.add("gene",gn)
-        bm.addBatch(dataset, gn)
+        tasks_bm.addBatch(dataset, gn)
+        prep_bm.addBatch(dataset, gn)
 
     genes_csv.saveAsDf()
             
-    bm.printBatchScript(dataset_path.pipeline_path + "/foldx_"+ dataset + "_tasks.sh")
-
-     
-                            
+    pdbs_bm.printBatchScript(dataset_path.pipeline_path + "/foldx_"+ dataset + "_1_pdbs.sh")
+    rep_bm.printBatchScript(dataset_path.pipeline_path + "/foldx_"+ dataset + "_2_rep.sh")
+    prep_bm.printBatchScript(dataset_path.pipeline_path + "/foldx_"+ dataset + "_3_prep.sh")
+    tasks_bm.printBatchScript(dataset_path.pipeline_path + "/foldx_"+ dataset + "_4_tasks.sh")
+                                 
     print("### COMPLETED dataset preparation ###")
     print("MUTEIN SCRIPT ENDED")
 

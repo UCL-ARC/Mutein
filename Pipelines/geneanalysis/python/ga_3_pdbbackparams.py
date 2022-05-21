@@ -40,6 +40,7 @@ def run_pipeline(args):
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")    
     pdbcode = argus.arg("pdb").lower()
+    reps = str(argus.arg("repairs"))
                                     
     pdb_path = Paths.Paths(        
             data_dir,
@@ -59,10 +60,10 @@ def run_pipeline(args):
     ##########################################################
 
     ##### Open the pdb file ################################
-    pdb_file = pdbcode + ".pdb"        
-    #pdb_file = pdbcode + "_rep" + str(argus.arg("repairs")) + ".pdb"        
-    if exists(pdb_path.pdb_inputs+pdb_file):
-        with open(pdb_path.pdb_inputs + pdb_file) as f:
+    #pdb_file = pdbcode + ".pdb"        
+    pdb_file = pdbcode + "_rep" + reps + ".pdb"        
+    if exists(pdb_path.pdb_thruputs+pdb_file):
+        with open(pdb_path.pdb_thruputs + pdb_file) as f:
             pdbcontent = f.readlines()
 
         ##### Amino acid dictionary to convert between 3 and 1 codes

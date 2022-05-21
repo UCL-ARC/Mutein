@@ -4,7 +4,7 @@ dataset=$1
 gene=$2
 install_dir=$3
 script=${install_dir}Pipelines/libs/pipeline_qsubber.py
-config=${install_dir}Pipelines/geneanalysis/config/batch_gene_tasks.yml
+config=${install_dir}Pipelines/geneanalysis/config/batch_gene_2_rep.yml
 echo "EXE PATH=$install_dir"
 echo "CURRENT=$PWD"
 

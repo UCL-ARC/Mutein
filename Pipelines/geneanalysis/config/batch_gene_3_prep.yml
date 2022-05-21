@@ -1,19 +1,8 @@
 ---
-id: 'REP'
-qsub_id: 'repair5'
-pipe_dir: 'Pipelines/geneanalysis/python/'
-script: 'ga_3_proteinrepair'
-time: '15:00:0'
-dependency: '-1'
-array: -1
-arrayfile: "pdbs"
-inputs: "repairs=5"
-active: 'N'
----
 id: 'PRAM'
 qsub_id: 'pram'
 pipe_dir: 'Pipelines/geneanalysis/python/'
-script: 'ga_3_pdbbackparams'
+script: 'ga_2_genebackparams'
 time: '1:00:0'
 dependency: '-1'
 array: 0
@@ -23,10 +12,10 @@ active: 'Y'
 id: 'VRAM'
 qsub_id: 'vram'
 pipe_dir: 'Pipelines/geneanalysis/python/'
-script: 'ga_3_pdbvarparams'
+script: 'ga_2_genevarparams'
 time: '1:00:0'
 dependency: '-1'
 array: 0
 inputs: "@variant=*@vsplit=50"
-active: 'N'
+active: 'Y'
 ---
