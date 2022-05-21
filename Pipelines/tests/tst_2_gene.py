@@ -63,7 +63,7 @@ def test_genedblagg(inputs):
     ppl.run_pipeline(args)
 ######################################################################
 ### INPUTS
-dataset=""
+dataset="notch"
 gene="notch1"
 
 repairs=1
@@ -73,10 +73,10 @@ vsplit=2000
 # whhich steps of the pipeline to run
 prepareA = 0
 prepareB = 0
-repair = 0
+repair = 1
 tasks = 0
 vtasks = 0
-doubleagg = 1
+doubleagg = 0
 
 if prepareA:
     # @@@@ - PREPARE A - @@@@
