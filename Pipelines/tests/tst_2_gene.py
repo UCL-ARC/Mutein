@@ -22,7 +22,7 @@ def addpath(inputs):
 ######################################################################
 def test_geneprep(inputs):
     inputs = addpath(inputs)
-    import ga_2_0_geneprep as ppl
+    import ga_2_genetoproteins as ppl
     args = ["", inputs]
     ppl.run_pipeline(args)
 
@@ -71,9 +71,9 @@ split=10000
 vsplit=2000
 
 # whhich steps of the pipeline to run
-prepareA = 0
+prepareA = 1
 prepareB = 0
-repair = 1
+repair = 0
 tasks = 0
 vtasks = 0
 doubleagg = 0

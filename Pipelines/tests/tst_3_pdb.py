@@ -77,22 +77,25 @@ def test_proteindblagg(inputs):
 ### INPUTS
 dataset=""
 gene=""
-pdb="1pb5"
+pdb="4cud"
 
 repairs=1
 split=10000
 vsplit=2000
 
 # whhich steps of the pipeline to run
-prepareA = 0
+prepareA = 1
 prepareB = 0
 repair = 0
-tasks = 1
+tasks = 0
 vtasks = 0
 agg = 0
 vagg = 0
 doubleagg = 0
 
+if repair:
+    # @@@@ - REPAIR - @@@@
+    test_proteinrepair("dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@repairs="+str(repairs))
 if prepareA:
     # @@@@ - PREPARE A - @@@@
     test_proteinprep("variant=*@dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@split="+str(split)+"@vsplit="+str(vsplit))
@@ -100,9 +103,6 @@ if prepareB:
     # @@@@ - PREPARE B - @@@@
     test_proteinsplit("dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@split="+str(split))
     test_proteinvsplit("variant=*@dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@vsplit="+str(vsplit))
-if repair:
-    # @@@@ - REPAIR - @@@@
-    test_proteinrepair("dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@repairs="+str(repairs))
 if tasks:
     # @@@@ - TASKS - @@@@
     test_proteintasks("dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@repairs="+str(repairs)+"@task=1")

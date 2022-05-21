@@ -18,7 +18,7 @@ class PdbCoverage:
         self.seq = seq
     
     def getCoverage(self,minfrag=-1):
-        minfrag = -1 #no matter what is passed in, it only works with whole fragments at the moment
+        minfrag = 50 #no matter what is passed in, it only works with whole fragments at the moment
         # PPBuilder is C-N and CAPPBuilder is CA-CA
         ppb = bio.CaPPBuilder()                        
         has_match = False
@@ -30,9 +30,17 @@ class PdbCoverage:
         
         # we will return a tuple that has chain, pdb start, pdb end, gene start, gene end
         segments = []
-
+        
         for pp in peptides:
-            seq_one = str(pp.get_sequence())            
+            seq_one = str(pp.get_sequence()) 
+            pos_rid = {}
+            # make a dictionary of pos to rid            
+            for s in range(0,len(seq_one)):
+                rid = pp.get_ca_list()[s].get_full_id()[3][1]
+                pos_rid[s] = int(rid)
+
+            #print(pos_rid)
+
             resis = pp.get_ca_list()[0]
             chain = resis.parent.get_parent().id
             # https://biopython.org/docs/1.75/api/Bio.PDB.Atom.html
@@ -69,9 +77,9 @@ class PdbCoverage:
                             end -=1   
                             seq_frag = seq_frag[:-1]                                                         
                 if a_match:
-                    resis = pp.get_ca_list()[start]
-                    residue_num = pp.get_ca_list()[start].get_full_id()[3][1]            
-                    chain = resis.parent.get_parent().id
+                    #resis = pp.get_ca_list()[start]
+                    residue_num = pos_rid[start]
+                    #chain = resis.parent.get_parent().id
                     #residue_num += start
                     residue_end = residue_num + len(seq_frag)-1
                     gene_end = gene_start + len(seq_frag)-1
