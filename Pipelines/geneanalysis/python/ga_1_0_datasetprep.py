@@ -57,6 +57,7 @@ def run_pipeline(args):
     genes_csv = genes_fd.openDataFrame()
     genes = []
     print(genes_csv)
+    
     for g in range(len(genes_csv.index)):
         gn = genes_csv["gene"][g]
         argsgn = args
@@ -66,8 +67,10 @@ def run_pipeline(args):
         
         import Pipelines.geneanalysis.python.ga_2_genetoproteins as pplb
         print("Extracting pdbs for", gn)
-        pplb.run_pipeline(argsgn)
-
+        pdbs = pplb.run_pipeline(argsgn)
+        if pdbs > 0:
+            genes.append(gn)
+        """
         import Pipelines.geneanalysis.python.ga_2_genebackparams as pplc
         print("Extracting pdbs for", gn)
         exists = pplc.run_pipeline(argsgn)
@@ -78,6 +81,7 @@ def run_pipeline(args):
             print("Extracting pdbs for", gn)
             ppld.run_pipeline(argsgn)
 
+        """
     genes_csv = FileDf.FileDic(dataset_path.dataset_inputs + "genes_pdb_list.csv",{})    
     for gn in genes:
         genes_csv.add("dataset",dataset)

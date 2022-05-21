@@ -35,7 +35,8 @@ def run_pipeline(args):
     sys.path.append(install_dir + "/Pipelines/libs")
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset","")
-    gene = argus.arg("gene")                       
+    gene = argus.arg("gene")
+    pdbs = 0           
     for gene in [gene]:        
         gene_path = Paths.Paths(data_dir,install_dir + "Pipelines/geneanalysis",dataset=dataset,gene=gene)
         accession = genetoprotein.accession_from_bioservices(gene.upper())
@@ -75,6 +76,7 @@ def run_pipeline(args):
                 dfp.to_csv(pdb_path.pdb_inputs + "/variants.csv", index=False)
                 #bm.addBatch(dataset, gn.gene, pdb.pdbcode)
                 gn.addPdb(pdb)
+                pdbs += 1
                         
             dfpdb = gn.getPdbTaskList()
             dfpdb.to_csv(gene_path.gene_outputs + "/pdb_tasklist.csv", index=False)
@@ -87,6 +89,7 @@ def run_pipeline(args):
                                                         
     print("### COMPLETED gene to proteins pipeline ###")
     print("MUTEIN SCRIPT ENDED")
+    return pdbs
 
 
 ##########################################################################################
