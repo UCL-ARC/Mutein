@@ -76,11 +76,15 @@ def test_proteindblagg(inputs):
 ######################################################################
 ### INPUTS
 dataset="shearwater"
-gene="CR2"
-#pdb="2gsx"
-pdb="1ly2"
 
-repairs=5
+#gene="CR2"
+#pdb="2gsx"
+#pdb="1ly2"
+
+gene="notch1"
+pdb="1pb5"
+
+repairs=8
 split=10000
 vsplit=2000
 

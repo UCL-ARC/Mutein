@@ -16,6 +16,7 @@ N.b this file may be run on the myriad clusters or on a local machine
 """
 import os
 from shutil import copyfile
+from os.path import exists
 
 
 # import from the shared library in Mutein/Pipelines/shared/lib
@@ -61,28 +62,45 @@ def run_pipeline(args):
     pdbfile = pdbcode + ".pdb"
     # Set up files (retain copy of original)
     numRepairs = int(argus.arg("repairs"))
+    repair_alreadynames = []
+    found = False
+    startRep = numRepairs
+    base_pdbfile = pdb_path.pdb_inputs + "/" + pdbfile
+    while not found and startRep > 0:
+        startRep -=1
+        name = pdb_path.pdb_inputs + "/" + pdbcode + "_rep" + str(startRep) + ".pdb"
+        if exists(name):
+            found = True
+            base_pdbfile = name
+        
+        
     repairinnames = []
-    repairoutnames = []
+    repairoutnames = []    
     for r in range(numRepairs + 1):
         repairinnames.append(pdbcode + "_" + str(r) + ".pdb")
         repairoutnames.append(pdbcode + "_" + str(r) + "_Repair.pdb")
+        
     repairinnames[numRepairs] = pdbcode + "_rep" + str(numRepairs) + ".pdb"
     #### there are 2 files we need in the interim directory, pdb file rotabase, but rotabase is only needed for foldx4 and NOT needed for foldx5
     print(
         "### foldx03: ... copying file",
-        pdbfile,
-        pdb_path.pdb_inputs + "/" + repairinnames[0],
+        base_pdbfile,
+        pdb_path.pdb_inputs + "/" + repairinnames[startRep],
         "... ###",
     )
+    
+    # first establish which we are currently on
+
+    
     copyfile(
-        pdb_path.pdb_inputs + "/" + pdbfile,
-        repair_path + repairinnames[0],
+        base_pdbfile,
+        repair_path + repairinnames[startRep],
     )
 
     # Create Foldx class
     fx_runner = Foldx.Foldx(argus.arg("foldxe"))
     # Run desired number of repairs
-    for r in range(numRepairs):
+    for r in range(startRep,numRepairs):
         pdb = repairinnames[r]
         output_file = "repair_" + str(r) + ".txt"
         fx_runner.runRepair(pdb, output_file)
@@ -103,6 +121,15 @@ def run_pipeline(args):
     copyfile(
         argus.arg("repair_path") + repairinnames[numRepairs],
         pdb_path.pdb_thruputs + "/" + repairinnames[numRepairs].lower(),
+    )
+    print(
+        "### ... copying file",
+        pdb_path.pdb_thruputs + "/" + repairinnames[numRepairs].lower(),
+        pdb_path.pdb_inputs + "/" + repairinnames[numRepairs].lower()
+    )
+    copyfile(
+        pdb_path.pdb_thruputs + "/" + repairinnames[numRepairs].lower(),        
+        pdb_path.pdb_inputs + "/" + repairinnames[numRepairs].lower()
     )
     
 
