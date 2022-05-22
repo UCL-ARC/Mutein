@@ -6,6 +6,6 @@ script: 'ga_3_proteinrepair'
 time: '15:00:0'
 dependency: '-1'
 array: 0
-inputs: "repairs=5"
+inputs: "repairs=10"
 active: 'Y'
 ---
