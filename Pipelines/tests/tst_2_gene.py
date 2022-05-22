@@ -63,31 +63,31 @@ def test_genedblagg(inputs):
     ppl.run_pipeline(args)
 ######################################################################
 ### INPUTS
-dataset="notch"
-gene="notch1"
+dataset="shearwater"
+gene="aurka"
 
 repairs=1
 split=10000
 vsplit=2000
 
 # whhich steps of the pipeline to run
-prepareA = 1
-prepareB = 0
 repair = 0
+prepareA = 0
+prepareB = 1
 tasks = 0
 vtasks = 0
 doubleagg = 0
 
-if prepareA:
-    # @@@@ - PREPARE A - @@@@
-    test_geneprep("variant=*@dataset="+dataset+"@gene="+gene+"@split="+str(split)+"@vsplit="+str(vsplit))
-if prepareB:
-    # @@@@ - PREPARE B - @@@@
-    test_genesplit("dataset="+dataset+"@gene="+gene+"@split="+str(split))
-    test_genevsplit("variant=*@dataset="+dataset+"@gene="+gene+"@vsplit="+str(vsplit))
 if repair:
     # @@@@ - REPAIR - @@@@
     test_generepair("dataset="+dataset+"@gene="+gene+"@repairs="+str(repairs)+"@task=2")
+if prepareA:
+    # @@@@ - PREPARE A - @@@@
+    test_geneprep("variant=*@dataset="+dataset+"@gene="+gene+"@split="+str(split)+"@vsplit="+str(vsplit)+"@repairs="+str(repairs))
+if prepareB:
+    # @@@@ - PREPARE B - @@@@
+    test_genesplit("dataset="+dataset+"@gene="+gene+"@split="+str(split)+"@repairs="+str(repairs))
+    #test_genevsplit("variant=*@dataset="+dataset+"@gene="+gene+"@vsplit="+str(vsplit))
 if tasks:
     # @@@@ - TASKS - @@@@
     test_genetasks("dataset="+dataset+"@gene="+gene+"@repairs="+str(repairs)+"@task=2636")

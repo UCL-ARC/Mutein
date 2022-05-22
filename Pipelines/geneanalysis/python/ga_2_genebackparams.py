@@ -61,7 +61,7 @@ def run_pipeline(args):
     # There is a 100,000 limit on number of tasks, so if the pdbs make more than that, reduce number of tasks
     # This could be a problem fir gene AURKA which has many pdbs
     if numpdbs * split > 100000:
-        tasks = int(100000/numpdbs)-1
+        split = int(100000/numpdbs)-1
         args[1]+="@split="+str(split)
 
 
