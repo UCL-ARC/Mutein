@@ -75,18 +75,19 @@ def test_proteindblagg(inputs):
     ppl.run_pipeline(args)
 ######################################################################
 ### INPUTS
-dataset=""
-gene=""
-pdb="4cud"
+dataset="shearwater"
+gene="CR2"
+#pdb="2gsx"
+pdb="1ly2"
 
-repairs=1
+repairs=5
 split=10000
 vsplit=2000
 
 # whhich steps of the pipeline to run
-prepareA = 1
+repair = 1
+prepareA = 0
 prepareB = 0
-repair = 0
 tasks = 0
 vtasks = 0
 agg = 0

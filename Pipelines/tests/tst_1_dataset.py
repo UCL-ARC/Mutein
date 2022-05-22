@@ -35,9 +35,9 @@ def test_datasetprep(inputs):
 
 ######################################################################
 ### INPUTS
-dataset="cutdown"
-split=100
-vsplit=20
+dataset="shearwater"
+split=1000
+vsplit=200
 
 #test_genesgene("dataset="+dataset)
 

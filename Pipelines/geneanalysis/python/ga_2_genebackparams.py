@@ -39,6 +39,7 @@ def run_pipeline(args):
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
+    tasks = argus.arg("tasks")
 
     gene_path = Paths.Paths(        
         data_dir,
@@ -55,6 +56,14 @@ def run_pipeline(args):
     df = fio.openDataFrame()
 
     all_params = []
+
+    numpdbs = len(df.index)    
+    # There is a 100,000 limit on number of tasks, so if the pdbs make more than that, reduce number of tasks
+    # This could be a problem fir gene AURKA which has many pdbs
+    if numpdbs * tasks > 100000:
+        tasks = int(100000/numpdbs)-1
+        args[1]+="@tasks="+str(tasks)
+
 
     for t in range(len(df.index)):
         pdbcode = df["pdb"][t].lower()                                    
