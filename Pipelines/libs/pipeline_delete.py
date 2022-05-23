@@ -97,8 +97,11 @@ def run_pipeline(args):
                         # but if it is an array job we only want to run the single task
                         args = cmd.split(" ")
                         if "pipeline_array" in cmd:
+                            script = args[-5]
                             #cmd = cmd.replace("pipeline_array","pipeline_single")
-                            cmd.replace("pipeline_array","pipeline_single")
+                            script = script[:-8]
+                            script += "single.sh"
+                            args[-5]= script
                             task=number.split(".")[1]
                             args[-3] += "@task=" + task
                             args = args[2:]
