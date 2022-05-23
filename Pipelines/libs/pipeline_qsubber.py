@@ -87,21 +87,31 @@ def pipeline_qsubber(args):
     names_and_ids = []
 
     # There are 3 files that can control the number of tasks to be run. If those files exists we load up those numbers now.
-    gene_tasks = [gene]
+    gene_tasks = []
     pdb_tasks = 0
     params_tasks = 0
     vparams_tasks = 0
     
-    if gene == "ALL":        
+    if gene == "ALL":                
         gene = ""
-        path = Paths.Paths(working_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset,gene=gene,pdb=pdb)
-        gene_tasks = [""]
+        path = Paths.Paths(working_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset,gene=gene,pdb=pdb)        
         gene_tasks_file = path.inputs + "genes_pdb_list.csv"    
         if exists(gene_tasks_file):
             with open(gene_tasks_file) as fr:
                 lines = fr.readlines()
-                gene_tasks = lines
+                for l in range(1,len(lines)):
+                    line = lines[l]
+                    if "," in line:
+                        gene = line.split(",")[1]
+                        gene_tasks.append(gene)
+        else:
+            gene_tasks = [""]
+    else:
+           gene_tasks = [gene]
+    
+    
     for gene in gene_tasks:
+        print("Creating for gene=",gene)
         path = Paths.Paths(working_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset,gene=gene,pdb=pdb)
         pdb_tasks_file = path.outputs + "pdb_tasklist.csv"
         if exists(pdb_tasks_file):
