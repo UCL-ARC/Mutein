@@ -63,14 +63,24 @@ def test_genedblagg(inputs):
     ppl.run_pipeline(args)
 ######################################################################
 ### INPUTS
-dataset="shearwater"
-gene="aurka"
+dataset="notch"
+gene="notch1"
+pdb=""
 
 repairs=1
 split=10000
 vsplit=2000
 
 # whhich steps of the pipeline to run
+def runPPL(inputs):
+    inputs = addpath(inputs)
+    import ga__runner as ppl
+    args = ["", inputs]
+    ppl.run_pipeline(args)
+runs = "i"
+runPPL("runs="+runs+"@dataset="+dataset+"@gene="+gene+"@repairs="+str(repairs)+"@task=2"+"@split="+str(split)+"@variant=*@vsplit="+str(vsplit))
+
+"""
 repair = 0
 prepareA = 0
 prepareB = 1
@@ -97,3 +107,4 @@ if vtasks:
 if doubleagg:
     # @@@@ - Variant AGG - @@@@
     test_genedblagg("dataset="+dataset+"@gene="+gene+"@repairs="+str(repairs))
+"""

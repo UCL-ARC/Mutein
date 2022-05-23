@@ -40,16 +40,16 @@ def run_pipeline(args):
     gene_path = Paths.Paths(data_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset,gene=gene)
             
             
-    import Pipelines.geneanalysis.python.ga_2_genetoproteins as pplb
+    import Pipelines.geneanalysis.python.mod_genetoproteins as pplb
     print("Extracting pdbs for", gene)
     pplb.run_pipeline(args)
 
-    import Pipelines.geneanalysis.python.ga_2_genebackparams as pplc
+    import Pipelines.geneanalysis.python.mod_geneparams as pplc
     print("Extracting pdbs for", gene)
     exists = pplc.run_pipeline(args)
 
     if exists:        
-        import Pipelines.geneanalysis.python.ga_2_genevarparams as ppld
+        import Pipelines.geneanalysis.python.mod_genevparams as ppld
         print("Extracting pdbs for", gene)
         ppld.run_pipeline(args)
                                             

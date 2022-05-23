@@ -1,16 +1,18 @@
 """
 -----------------------------
-RSA 23/03/2022
+RSA 15/03/2022
 -----------------------------
-This file takes a pdb code (the data must be in inputs)
+This file takes a pdb code (file must be located in the same directory in the format 1xyz.pdb)
 It formats the pdb file into a parameter file suitable for foldx PositionScan
+The output is in the same directory with the name
+scanparams_1xyz.txt
 -----------------------------
 N.b this file may be run on the myriad clusters or on a local machine
 -----------------------------
 """
+# import sys
 import os
 import pandas as pd
-from shutil import copyfile
 from os.path import exists
 
 # import from the shared library in Mutein/Pipelines/shared/lib
@@ -24,14 +26,11 @@ import Arguments
 import Config
 import FileDf
 
-
 ##### INPUTS #############################################
 # The inputs to this function are the pdbfile and the chain id (might optionally consider the positionscan mutation type)
-# This version of the script does not do commbinations only the mutations
 def run_pipeline(args):
-    print("### FoldX make variant params job ###")
+    print("### FoldX make params job ###")
     print(args)
-    ##############################################
     argus = Arguments.Arguments(args)
     install_dir = argus.arg("install_dir")
     sys.path.append(install_dir)
@@ -40,6 +39,7 @@ def run_pipeline(args):
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
+    split = int(argus.arg("split"))
 
     gene_path = Paths.Paths(        
         data_dir,
@@ -48,14 +48,25 @@ def run_pipeline(args):
         gene=gene,        
     )
     pdbtasks = gene_path.gene_outputs + "pdb_tasklist.csv"
+    if not exists(pdbtasks):
+        print("MUTEIN SCRIPT ENDED")
+        return False
+        
     fio = FileDf.FileDf(pdbtasks)
     df = fio.openDataFrame()
-    
+
     all_params = []
 
+    numpdbs = len(df.index)    
+    # There is a 100,000 limit on number of tasks, so if the pdbs make more than that, reduce number of tasks
+    # This could be a problem fir gene AURKA which has many pdbs
+    if numpdbs * split > 100000:
+        split = int(100000/numpdbs)-1
+        args[1]+="@split="+str(split)
+
+
     for t in range(len(df.index)):
-        pdbcode = df["pdb"][t].lower()
-        
+        pdbcode = df["pdb"][t].lower()                                    
         pdb_path = Paths.Paths(        
             data_dir,
             install_dir + "Pipelines/geneanalysis",
@@ -63,19 +74,20 @@ def run_pipeline(args):
             gene=gene,
             pdb=pdbcode,
         )
+
         argsgn = args
         arglist = args[1]
         arglist += "@pdb=" + pdbcode
         argsgn[1] = arglist
-        import ga_3_pdbvarparams as ppl        
+        import Pipelines.geneanalysis.python.mod_pdbparams as ppl        
         ppl.run_pipeline(argsgn)
-        filename = pdb_path.pdb_thruputs + "params_variants.txt"
+        filename = pdb_path.pdb_thruputs + "params_background.txt"
         if exists(filename):#TODO we might want to make it optional to fail if there is a missing file
             fdf = FileDf.FileDf(filename,sep=" ")
             csv = fdf.openDataFrame()            
             all_params.append(csv)
-    
-    all_path = gene_path.gene_thruputs + "params_variants.txt"
+        
+    all_path = gene_path.gene_thruputs +  "params_background.txt"
     if len(all_params)>0:
         all_df = pd.concat(all_params, axis=0)
         all_df.to_csv(all_path,index=False,sep=" ",header=True)

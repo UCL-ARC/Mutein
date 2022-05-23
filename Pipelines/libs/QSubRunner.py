@@ -23,7 +23,7 @@ class QSubRunner:
         homeuser,
         inputs,
         print_only,
-    ):
+    ):        
         inputs += "@install_dir=" + install_dir
         inputs += "@data_dir=" + data_dir
         isarray = int(array) > 0
@@ -64,6 +64,12 @@ class QSubRunner:
             return self.runid
         else:
             # print("### QSub.Run(): working dir", os.getcwd())
+
+            fullcall = ""
+            for arg in self.args:
+                fullcall += arg + " "
+            self.args.append(fullcall)
+
             print("### QSub.Run()", self.args)
             process = subprocess.Popen(
                 args=self.args,

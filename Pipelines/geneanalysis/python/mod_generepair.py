@@ -62,7 +62,7 @@ def run_pipeline(args):
         arglist = args[1]
         arglist += "@pdb=" + pdbcode
         argsgn[1] = arglist
-        import Pipelines.geneanalysis.python.ga_3_proteinrepair as ppl
+        import Pipelines.geneanalysis.python.mod_pdbrepair as ppl
         print("Repairing pdb", pdbcode)
         ppl.run_pipeline(argsgn)
                 

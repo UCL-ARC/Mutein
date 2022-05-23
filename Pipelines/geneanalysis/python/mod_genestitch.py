@@ -73,10 +73,10 @@ def run_pipeline(args):
         arglist = args[1]
         arglist += "@pdb=" + pdbcode
         argsgn[1] = arglist
-        import Pipelines.geneanalysis.python.ga05a_aggddg as ppla
+        import Pipelines.geneanalysis.python.mod_pdbagg as ppla
         print("Aggregating background pdb", pdbcode)
         ppla.run_pipeline(argsgn)
-        import Pipelines.geneanalysis.python.ga05b_singlesagg as pplb
+        import Pipelines.geneanalysis.python.mod_pdbvagg as pplb
         print("Aggregating variants pdb", pdbcode)
         pplb.run_pipeline(argsgn)
                         

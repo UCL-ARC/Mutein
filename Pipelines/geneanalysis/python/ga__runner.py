@@ -42,44 +42,44 @@ def run_pipeline(args):
 
     runner = None
     if pdb != "":
-        runner = PdbRunner.PdbRunner()
+        import Pipelines.geneanalysis.python.ga_pdb_runner as runner        
     elif gene != "":
-        runner = GeneRunner.GeneRunner()
+        import Pipelines.geneanalysis.python.ga_gene_runner as runner
     else:
-        runner = DatasetRunner.DatasetRunner()
+        import Pipelines.geneanalysis.python.ga_dataset_runner as runner
 
     if "a" in runs:
-        runner.prepareGenes()
+        print("Mutein: Preparing genes")
+        runner.prepareGenes(args)
     if "b" in runs:
-        runner.preparePdbs()
+        print("Mutein: Preparing pdbs")
+        runner.preparePdbs(args)
     if "c" in runs:
-        runner.repairPdbs()
+        print("Mutein: Repairing pdbs")
+        runner.repairPdbs(args)
     if "d" in runs:
-        runner.makeParams()
+        print("Mutein: Making background param file")
+        runner.makeParams(args)
     if "e" in runs:
-        runner.makeVparams()
+        print("Mutein: Making variant param file")
+        runner.makeVparams(args)
     if "f" in runs:
-        runner.runTasks()
+        print("Mutein: Running background tasks")
+        runner.runTasks(args)
     if "g" in runs:
-        runner.runVtasks()
+        print("Mutein: Running variant tasks")
+        runner.runVtasks(args)
     if "h" in runs:
-        runner.aggTasks()
+        print("Mutein: Aggregating background tasks")
+        runner.aggTasks(args)
     if "i" in runs:
-        runner.aggVtasks()
+        print("Mutein: Aggregating variant tasks")
+        runner.aggVtasks(args)    
     if "j" in runs:
-        runner.aggTasks()
-    if "k" in runs:
-        runner.aggGene()
-
-    
-
-    
-    
-    
-            
-    
-                                 
-    print("### COMPLETED dataset preparation ###")
+        print("Mutein: Aggregating gene tasks")
+        runner.aggGene(args)
+                                                                 
+    print("### COMPLETED Mutein script ###")
     print("MUTEIN SCRIPT ENDED")
 
 

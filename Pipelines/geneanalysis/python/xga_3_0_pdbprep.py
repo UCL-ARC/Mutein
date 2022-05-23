@@ -40,11 +40,11 @@ def run_pipeline(args):
     pdb = argus.arg("pdb")
     dataset_path = Paths.Paths(data_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset,gene=gene,pdb=pdb)
                     
-    import Pipelines.geneanalysis.python.ga_3_pdbbackparams as pplc
+    import Pipelines.geneanalysis.python.mod_pdbparams as pplc
     print("Back params for", pdb)
     exists = pplc.run_pipeline(args)
     
-    import Pipelines.geneanalysis.python.ga_3_pdbvarparams as ppld
+    import Pipelines.geneanalysis.python.mod_pdbvparams as ppld
     print("Variant params for", pdb)
     ppld.run_pipeline(args)
                                      

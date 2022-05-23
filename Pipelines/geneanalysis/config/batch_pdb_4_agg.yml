@@ -1,11 +1,11 @@
 ---
-id: 'PRAM'
-qsub_id: 'pram'
+id: 'AGG'
+qsub_id: 'foldx_varagg'
 pipe_dir: 'Pipelines/geneanalysis/python/'
-script: 'ga__runner'
+script: 'ga05b_singlesagg'
 time: '1:00:0'
 dependency: '-1'
 array: 0
-inputs: "runs=de@repairs=5@split=100@vsplit=20"
+inputs: "runs=hi@repairs=5@variant=*"
 active: 'Y'
 ---

@@ -37,10 +37,7 @@ def run_pipeline(args):
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
     dataset_path = Paths.Paths(data_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset)
-    
-    import Pipelines.geneanalysis.python.ga_1_genestogene as ppla
-    ppla.run_pipeline(args)
-
+        
     # We want batches for prep and tasks
     script_file = "libs/pipeline_qsubber.py"
     pdbs_yaml_file = "geneanalysis/config/batch_gene_1_pdbs.yml"
@@ -65,7 +62,7 @@ def run_pipeline(args):
         arglist += "@gene=" + gn
         argsgn[1] = arglist
         
-        import Pipelines.geneanalysis.python.ga_2_genetoproteins as pplb
+        import Pipelines.geneanalysis.python.mod_genetoproteins as pplb
         print("Extracting pdbs for", gn)
         pdbs = pplb.run_pipeline(argsgn)
         if pdbs > 0:

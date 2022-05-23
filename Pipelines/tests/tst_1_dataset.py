@@ -22,13 +22,13 @@ def addpath(inputs):
 ######################################################################
 def test_genesgene(inputs):
     inputs = addpath(inputs)
-    import ga_genestogene as ppl
+    import ga_1_datasetgenes as ppl
     args = ["", inputs]
     ppl.run_pipeline(args)
 
 def test_datasetprep(inputs):
     inputs = addpath(inputs)
-    import ga_1_0_datasetprep as ppl
+    import ga_1_datasetpdbs as ppl
     args = ["", inputs]
     ppl.run_pipeline(args)
 
@@ -39,8 +39,30 @@ dataset="shearwater"
 split=1000
 vsplit=200
 
-#test_genesgene("dataset="+dataset)
+"""
+    if "a" in runs:        print("Mutein: Preparing genes")        
+    if "b" in runs:        print("Mutein: Preparing pdbs")        
+    if "c" in runs:        print("Mutein: Repairing pdbs")        
+    if "d" in runs:        print("Mutein: Making background param file")        
+    if "e" in runs:        print("Mutein: Making variant param file")        
+    if "f" in runs:        print("Mutein: Running background tasks")        
+    if "g" in runs:        print("Mutein: Running variant tasks")        
+    if "h" in runs:        print("Mutein: Aggregating background tasks")        
+    if "i" in runs:        print("Mutein: Aggregating variant tasks")        
+    if "j" in runs:        print("Mutein: Aggregating gene tasks")        
+"""
 
+# which steps of the pipeline to run
+def runPPL(inputs):
+    inputs = addpath(inputs)
+    import ga__runner as ppl
+    args = ["", inputs]
+    ppl.run_pipeline(args)
+runs = "a"
+runPPL("runs="+runs+"@dataset="+dataset)
+
+
+"""
 prep = 1
 
 if prep:
@@ -50,3 +72,4 @@ if prep:
     toc = time.perf_counter()
     print("Prepared the dataset for",dataset,f"in {toc - tic:0.4f} seconds")
 
+"""

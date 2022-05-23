@@ -88,6 +88,30 @@ repairs=8
 split=10000
 vsplit=2000
 
+"""
+    if "a" in runs:        print("Mutein: Preparing genes")        
+    if "b" in runs:        print("Mutein: Preparing pdbs")        
+    if "c" in runs:        print("Mutein: Repairing pdbs")        
+    if "d" in runs:        print("Mutein: Making background param file")        
+    if "e" in runs:        print("Mutein: Making variant param file")        
+    if "f" in runs:        print("Mutein: Running background tasks")        
+    if "g" in runs:        print("Mutein: Running variant tasks")        
+    if "h" in runs:        print("Mutein: Aggregating background tasks")        
+    if "i" in runs:        print("Mutein: Aggregating variant tasks")        
+    if "j" in runs:        print("Mutein: Aggregating gene tasks")        
+"""
+
+# which steps of the pipeline to run
+def runPPL(inputs):
+    inputs = addpath(inputs)
+    import ga__runner as ppl
+    args = ["", inputs]
+    ppl.run_pipeline(args)
+runs = "c"
+runPPL("runs="+runs+"@dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@repairs="+str(repairs)+"@task=2"+"@split="+str(split)+"@variant=*@vsplit="+str(vsplit))
+
+
+"""
 # whhich steps of the pipeline to run
 repair = 1
 prepareA = 0
@@ -123,3 +147,4 @@ if vagg:
 if doubleagg:
     # @@@@ - Variant AGG - @@@@
     test_proteindblagg("dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@repairs="+str(repairs))
+"""

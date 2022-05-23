@@ -73,6 +73,7 @@ chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_dataset_prep.sh
  # This is a single pdb, with a quick python script first
 chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_pdb_prep.sh
 chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_pdb_tasks.sh
+/home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_pdb_1_rep.sh 7w7g /home/ucbtlcr/Mutein/
 /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_pdb_prep.sh 7w7g /home/ucbtlcr/Mutein/
 /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_pdb_tasks.sh 7w7g /home/ucbtlcr/Mutein/
  
