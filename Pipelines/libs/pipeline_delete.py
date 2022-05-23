@@ -102,6 +102,7 @@ def run_pipeline(args):
                             args[-3] += "@task=" + task
                             args = args[2:]
                             args[0] = "qsub"
+                            print(number, name,"rerunning as single task:",args)
 
                         
                         process = subprocess.Popen(args=args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
