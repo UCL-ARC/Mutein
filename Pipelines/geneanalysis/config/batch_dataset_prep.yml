@@ -1,11 +1,22 @@
 ---
-id: '1'
-qsub_id: 'prep'
+id: 'GE'
+qsub_id: 'genes'
 pipe_dir: 'Pipelines/geneanalysis/python/'
 script: 'ga__runner'
 time: '1:00:0'
 dependency: '-1'
 array: 0
 inputs: "runs=ab"
+active: 'Y'
+---
+---
+id: 'PD'
+qsub_id: 'pdbs'
+pipe_dir: 'Pipelines/geneanalysis/python/'
+script: 'ga__runner'
+time: '1:00:0'
+dependency: 'GE'
+array: 0
+inputs: "runs=b"
 active: 'Y'
 ---
