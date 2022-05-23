@@ -13,6 +13,7 @@ import pwd
 import pandas as pd
 from shutil import copyfile
 from os.path import exists
+import subprocess
 
 # import from the shared library in Mutein/Pipelines/shared/lib
 import sys
@@ -71,9 +72,35 @@ def run_pipeline(args):
                     print("Errors",number,name)                
             else:
                 print("Missing files",number,name)
-        
-                                                
-                            
+    
+    elif mode == "RERUN":
+        file_numbers = {}
+        for file in onlyfiles:
+            name = file.split(".")[0]
+            number = file.split(".")[1][1:]
+            if len(file.split(".")) > 2:
+                number+= "." + file.split(".")[2]
+            
+            if number not in file_numbers:
+                file_numbers[number] = name
+
+        for number,name in file_numbers.items():
+            error_file = scratch_dir+name +".e" + str(number)
+            out_file = scratch_dir+name +".o" + str(number)
+            if exists(out_file):                        
+                with open(out_file) as fr:
+                    lines_out = fr.readlines()
+                if len(lines_out) > 1:
+                    cmd = lines_out[1].strip()
+                    if len(cmd)>3:
+                        print("Rerunning cmd:",cmd)
+                        args = cmd.split(" ")
+                        process = subprocess.Popen(args=args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                        result = process.communicate()
+                        print(result)                    
+                    else:
+                        print("Can't re-run as manually started:",out_file)
+                                                                                                                                            
     print("### COMPLETED CLEAN UP job ###")
     print("MUTEIN SCRIPT ENDED")
 
