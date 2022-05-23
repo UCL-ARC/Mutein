@@ -101,7 +101,7 @@ def run_pipeline(args):
                             #cmd = cmd.replace("pipeline_array","pipeline_single")
                             script = script[:-8]
                             script += "single.sh"
-                            args[-5]= script
+                            args[-4]= script
                             task=number.split(".")[1]
                             args[-3] += "@task=" + task
                             args = args[2:]
