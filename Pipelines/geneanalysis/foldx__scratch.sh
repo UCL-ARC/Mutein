@@ -3,10 +3,10 @@ run=qsub
 install_dir=$1
 script=${install_dir}Pipelines/libs/pipeline_qsubber.py
 
-#config=${install_dir}Pipelines/geneanalysis/config/batch_dataset_prep.yml
+config=${install_dir}Pipelines/geneanalysis/config/batch_dataset_prep.yml
 
 #config=${install_dir}Pipelines/geneanalysis/config/batch_gene_1_pdbs.yml
-config=${install_dir}Pipelines/geneanalysis/config/batch_gene_2_rep.yml
+#config=${install_dir}Pipelines/geneanalysis/config/batch_gene_2_rep.yml
 #config=${install_dir}Pipelines/geneanalysis/config/batch_gene_3_prep.yml
 #config=${install_dir}Pipelines/geneanalysis/config/batch_gene_4_tasks.yml
 #config=${install_dir}Pipelines/geneanalysis/config/batch_gene_5_agg.yml
@@ -21,4 +21,5 @@ echo "CURRENT=$PWD"
 echo "~~~~~~~~~~~~~~~~~~ Call python script ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 #python ${script} $install_dir $PWD ${config} $run "" "" 7w7g
 #python ${script} $install_dir $PWD ${config} $run notch ALL ""
-python ${script} $install_dir $PWD ${config} $run "shearwater" "NOTCH1" 1pb5
+#python ${script} $install_dir $PWD ${config} $run "shearwater" "NOTCH1" 1pb5
+python ${script} $install_dir $PWD ${config} $run "sheartop" "" ""
