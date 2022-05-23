@@ -87,145 +87,162 @@ def pipeline_qsubber(args):
     names_and_ids = []
 
     # There are 3 files that can control the number of tasks to be run. If those files exists we load up those numbers now.
+    gene_tasks = [gene]
     pdb_tasks = 0
     params_tasks = 0
     vparams_tasks = 0
-    path = Paths.Paths(working_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset,gene=gene,pdb=pdb)
-    pdb_tasks_file = path.outputs + "pdb_tasklist.csv"
-    if exists(pdb_tasks_file):
-        with open(pdb_tasks_file) as fr:
-            lines = fr.readlines()
-            pdb_tasks = len(lines)-1
-    params_tasks_file = path.thruputs + "params_background.txt"
-    if exists(params_tasks_file):
-        with open(params_tasks_file) as fr:
-            lines = fr.readlines()
-            params_tasks = len(lines)-1
-    vparams_tasks_file = path.thruputs + "params_variants.txt"
-    if exists(vparams_tasks_file):
-        with open(vparams_tasks_file) as fr:
-            lines = fr.readlines()
-            vparams_tasks = len(lines)-1
+    
+    if gene == "ALL":        
+        gene = ""
+        path = Paths.Paths(working_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset,gene=gene,pdb=pdb)
+        gene_tasks = [""]
+        gene_tasks_file = path.inputs + "genes_pdb_list.csv"    
+        if exists(pdb_tasks_file):
+            with open(gene_tasks_file) as fr:
+                lines = fr.readlines()
+                gene_tasks = lines
+    for gene in gene_tasks:
+        path = Paths.Paths(working_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset,gene=gene,pdb=pdb)
+        pdb_tasks_file = path.outputs + "pdb_tasklist.csv"
+        if exists(pdb_tasks_file):
+            with open(pdb_tasks_file) as fr:
+                lines = fr.readlines()
+                pdb_tasks = len(lines)-1
+        pdb_tasks_file = path.outputs + "pdb_tasklist.csv"
+        if exists(pdb_tasks_file):
+            with open(pdb_tasks_file) as fr:
+                lines = fr.readlines()
+                pdb_tasks = len(lines)-1
+        params_tasks_file = path.thruputs + "params_background.txt"
+        if exists(params_tasks_file):
+            with open(params_tasks_file) as fr:
+                lines = fr.readlines()
+                params_tasks = len(lines)-1
+        vparams_tasks_file = path.thruputs + "params_variants.txt"
+        if exists(vparams_tasks_file):
+            with open(vparams_tasks_file) as fr:
+                lines = fr.readlines()
+                vparams_tasks = len(lines)-1
 
 
-    # We want the user
-    homeuser = pwd.getpwuid(os.getuid())[0]
-    print("HomeUser=", homeuser)
-    print("Running", yaml_file, " for user=", homeuser)
-    # We want to be in the script directory
-    # script_path = os.path.dirname(os.path.realpath(__file__))
-    dir_path = install_dir + "Pipelines/"
-    # print("# overall pipeline: changing directory to", dir_path)
-    # os.chdir(dir_path)
+        # We want the user
+        homeuser = pwd.getpwuid(os.getuid())[0]
+        print("HomeUser=", homeuser)
+        print("Running", yaml_file, " for user=", homeuser)
+        # We want to be in the script directory
+        # script_path = os.path.dirname(os.path.realpath(__file__))
+        dir_path = install_dir + "Pipelines/"
+        # print("# overall pipeline: changing directory to", dir_path)
+        # os.chdir(dir_path)
 
-    # Load in the batch yaml file, which contains ONLY batch related parameters
-    # apart from the final line inputs which are space delim inputs for the script
-    batch_dic = {}
-    batch_list = []
-    with open(yaml_file, "r") as fr:
-        pipes = yaml.safe_load_all(fr)
-        for pipe in pipes:
-            if pipe != None:
-                print("### yaml load|", pipe)
-                id = pipe["id"]
-                qsubid = pipe["qsub_id"]
-                pipe_dir = pipe["pipe_dir"].strip()
-                script = pipe["script"].strip()
-                time = pipe["time"].strip()
-                dependency = pipe["dependency"].strip()
-                array = pipe["array"]
-                if int(array) == -1:
-                    arrayfile = pipe["arrayfile"].strip()
-                    if arrayfile == "pdbs":
-                        array=pdb_tasks
-                    if arrayfile == "params":
-                        array=params_tasks
-                    if arrayfile == "vparams":
-                        array=vparams_tasks
+        # Load in the batch yaml file, which contains ONLY batch related parameters
+        # apart from the final line inputs which are space delim inputs for the script
+        batch_dic = {}
+        batch_list = []
+        with open(yaml_file, "r") as fr:
+            pipes = yaml.safe_load_all(fr)
+            for pipe in pipes:
+                if pipe != None:
+                    print("### yaml load|", pipe)
+                    id = pipe["id"]
+                    qsubid = pipe["qsub_id"]
+                    pipe_dir = pipe["pipe_dir"].strip()
+                    script = pipe["script"].strip()
+                    time = pipe["time"].strip()
+                    dependency = pipe["dependency"].strip()
+                    array = pipe["array"]
+                    if int(array) == -1:
+                        arrayfile = pipe["arrayfile"].strip()
+                        if arrayfile == "pdbs":
+                            array=pdb_tasks
+                        if arrayfile == "params":
+                            array=params_tasks
+                        if arrayfile == "vparams":
+                            array=vparams_tasks
 
-                inputs = pipe["inputs"].strip()
-                active = pipe["active"].strip() == "Y"
-                # add the dataset, gene and pdb onto inputs
-                if len(inputs) > 0:
-                    inputs += "@"
-                inputs += "install_dir=" + install_dir
-                inputs += "@data_dir=" + working_dir
-                inputs += "@dataset=" + dataset
-                inputs += "@gene=" + gene
-                inputs += "@pdb=" + pdb
-                # inputs += "@chain=" + chain
-                if active:
-                    batch_dic[str(id)] = (
-                        qsubid,
-                        pipe_dir,
-                        script,
-                        time,
-                        dependency,
-                        array,
-                        inputs,
-                    )
-                    batch_list.append(str(id))
+                    inputs = pipe["inputs"].strip()
+                    active = pipe["active"].strip() == "Y"
+                    # add the dataset, gene and pdb onto inputs
+                    if len(inputs) > 0:
+                        inputs += "@"
+                    inputs += "install_dir=" + install_dir
+                    inputs += "@data_dir=" + working_dir
+                    inputs += "@dataset=" + dataset
+                    inputs += "@gene=" + gene
+                    inputs += "@pdb=" + pdb
+                    # inputs += "@chain=" + chain
+                    if active:
+                        batch_dic[str(id)] = (
+                            qsubid,
+                            pipe_dir,
+                            script,
+                            time,
+                            dependency,
+                            array,
+                            inputs,
+                        )
+                        batch_list.append(str(id))
 
-    dependencies = {}
-    for id in batch_list:        
-        qsubid, pipe_dir, script, time, dependency, array, inputs = batch_dic[id]
-        isarray = int(array) > 0
-        # print("# overall pipeline script:",id,qsubid,pipe_dir,script, time, dependency, array, inputs)
-        if "qsub" in py_or_sh:
-            dep = -1
-            if str(dependency) != "-1":
-                if dependency in dependencies:
-                    dep = dependencies[dependency]
+        dependencies = {}
+        for id in batch_list:        
+            qsubid, pipe_dir, script, time, dependency, array, inputs = batch_dic[id]
+            isarray = int(array) > 0
+            # print("# overall pipeline script:",id,qsubid,pipe_dir,script, time, dependency, array, inputs)
+            if "qsub" in py_or_sh:
+                dep = -1
+                if str(dependency) != "-1":
+                    if dependency in dependencies:
+                        dep = dependencies[dependency]
+                    else:
+                        dep = -1
+                runner = qsub.QSubRunner(
+                    id,
+                    qsubid,
+                    script,
+                    install_dir,
+                    working_dir,
+                    pipe_dir,
+                    dep,
+                    time,
+                    array,
+                    homeuser,
+                    inputs,
+                    py_or_sh != "qsub",
+                )
+                dep = runner.run()
+                if dep == "x":
+                    print("!!!Abandoning submissions!!!")
+                    return "x"
                 else:
-                    dep = -1
-            runner = qsub.QSubRunner(
-                id,
-                qsubid,
-                script,
-                install_dir,
-                working_dir,
-                pipe_dir,
-                dep,
-                time,
-                array,
-                homeuser,
-                inputs,
-                py_or_sh != "qsub",
-            )
-            dep = runner.run()
-            if dep == "x":
-                print("!!!Abandoning submissions!!!")
-                return "x"
-            else:
-                count +=1              
-                dependencies[id] = dep
-                names_and_ids.append([qsubid,dep])
-        elif py_or_sh == "py":
-            runner = sub.SubRunner(
-                argus.arg("pythonexe"),
-                install_dir,
-                working_dir,
-                pipe_dir,
-                script,
-                ".py",
-                inputs,
-                isarray,
-            )
-            dep = runner.run()
-        elif (
-            py_or_sh == "sh"
-        ):  # TODO make this go simply straight through passing all inputs
-            runner = sub.SubRunner(
-                "bash",
-                install_dir,
-                working_dir,
-                pipe_dir,
-                script,
-                ".sh",
-                inputs,
-                isarray,
-            )
-            dep = runner.run()
+                    count +=1              
+                    dependencies[id] = dep
+                    names_and_ids.append([qsubid,dep])
+            elif py_or_sh == "py":
+                runner = sub.SubRunner(
+                    argus.arg("pythonexe"),
+                    install_dir,
+                    working_dir,
+                    pipe_dir,
+                    script,
+                    ".py",
+                    inputs,
+                    isarray,
+                )
+                dep = runner.run()
+            elif (
+                py_or_sh == "sh"
+            ):  # TODO make this go simply straight through passing all inputs
+                runner = sub.SubRunner(
+                    "bash",
+                    install_dir,
+                    working_dir,
+                    pipe_dir,
+                    script,
+                    ".sh",
+                    inputs,
+                    isarray,
+                )
+                dep = runner.run()
 
     return str(count)
         

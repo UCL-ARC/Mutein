@@ -14,7 +14,7 @@ The scripts structure is:
             [ARRAY JOBS]    [Per PDB]:04a:POS_SCAN       04b:SINGLE_SCAN
                                         |                |
                             [Per PDB]:05a:AGGREGATE     05b:VARIANT AGGREGATE
-                                                         |
+                                                    |
                             [PDBs->GENE]:SCRIPT 06: Structures->Gene under selection 
  ```
 -----------------------------------------------------------------------
