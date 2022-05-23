@@ -94,8 +94,9 @@ def pipeline_qsubber(args):
     
     if gene == "ALL":                
         gene = ""
-        path = Paths.Paths(working_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset,gene=gene,pdb=pdb)        
-        gene_tasks_file = path.inputs + "genes_pdb_list.csv"    
+        path = Paths.Paths(working_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset)        
+        gene_tasks_file = path.inputs + "genes_pdb_list.csv"
+        print("Gene file=",gene_tasks_file)
         if exists(gene_tasks_file):
             with open(gene_tasks_file) as fr:
                 lines = fr.readlines()
