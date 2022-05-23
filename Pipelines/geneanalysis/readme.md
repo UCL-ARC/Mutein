@@ -38,79 +38,50 @@ module load python3/recommended
 - - notch_NOTCH1 runs the pdb files for the chosen gene
 - - notch_NOTCH1_stitch aggregates the separate structures together
 - - - (only not a dependent script due to multiple dependencies at the moment)
-```
-##### TEST DATA SETS #######
+
+### TEST DATA SETS 
 # Amend this file for testing
-/home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx__scratch.sh /home/ucbtlcr/Mutein/
-
-
-# They are in DataSync/SmallDemos in github #####
-#### This is a single pdb, with a quick python script first #####
-chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_pdb_prep.sh
-chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_pdb_tasks.sh
--- A python script
-/home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_pdb_prep.sh 1pb5 /home/ucbtlcr/Mutein/
--- a qsub script
-/home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_pdb_tasks.sh 1pb5 /home/ucbtlcr/Mutein/
-
-#### This is a small dataset #########
-chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_dataset_prep.sh
-/home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_dataset_prep.sh notch /home/ucbtlcr/Mutein/
-
--- The above automatically creates the next script which then needs to be run
-/home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_notch_2_rep.sh /home/ucbtlcr/Mutein/
-/home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_notch_3_prep.sh /home/ucbtlcr/Mutein/
-/home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_notch_4_tasks.sh /home/ucbtlcr/Mutein/
-
- ## first prepare the data
- chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_dataset_prep.sh
- /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_dataset_prep.sh notch /home/ucbtlcr/Mutein/
-
- # These are on a gene by gene basis, having all ready prepared
- chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_gene_tasks.sh
- /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_gene_tasks.sh notch notch1 /home/ucbtlcr/Mutein/
-
- OR the whole dataset can be run
- chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_notch_tasks.sh
- /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_notch_tasks.sh /home/ucbtlcr/Mutein/
-
- # This is a single pdb, with a quick python script first
-chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_pdb_prep.sh
-chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_pdb_tasks.sh
-/home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_pdb_1_rep.sh 7w7g /home/ucbtlcr/Mutein/
-/home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_pdb_prep.sh 7w7g /home/ucbtlcr/Mutein/
-/home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_pdb_tasks.sh 7w7g /home/ucbtlcr/Mutein/
- 
- 
- ## notch smaller test set
-
- chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_notch.sh
- chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_notch_NOTCH1.sh
- chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_notch_NOTCH1_stitch.sh
- 
- /home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_notch.sh /home/ucbtlcr/Mutein/
- /home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_notch_NOTCH1.sh /home/ucbtlcr/Mutein/
- /home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_notch_NOTCH1_stitch.sh /home/ucbtlcr/Mutein/
-  
-## shearwater
-chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_shearwater.sh
-chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_shearwater_all.sh
-chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_shearwater_all_stitch.sh
-
-/home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_shearwater.sh /home/ucbtlcr/Mutein/
-/home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_shearwater_all.sh /home/ucbtlcr/Mutein/
-/home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_shearwater_all_stitch.sh /home/ucbtlcr/Mutein/
-
-## Clean or rerun up at the end to remove successful logs leaving only errors
-chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_cleanup_and_report.sh
-/home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_cleanup_and_report.sh ALL /home/ucbtlcr/Mutein/
-/home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_cleanup_and_report.sh CLEAN /home/ucbtlcr/Mutein/
-/home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_cleanup_and_report.sh RERUN /home/ucbtlcr/Mutein/
 ```
-- It assumes you have gone to your working directory
-- You need the full path to the executable script
-- which also needs the executable directory passed o it
-- - these will be set up as environment variables
+/home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx__scratch.sh /home/ucbtlcr/Mutein/
+```
+### This is a small dataset 
+```
+python ${script} $install_dir $PWD ${config} $run "shearwater" "NOTCH1" 1pb5
+```
+### If the gene is ALL 
+- Then it loops through all the genes in a dataset and kicks of batches for every one (this could be quite a lot!!)
+- To run this in a sensible order, choose the yaml files that are appropriate
+- - DATASET first prepare the data
+```
+config=${install_dir}Pipelines/geneanalysis/config/batch_dataset_prep.yml
+```
+- - GENE only
+```
+config=${install_dir}Pipelines/geneanalysis/config/batch_gene_1_pdbs.yml
+config=${install_dir}Pipelines/geneanalysis/config/batch_gene_2_rep.yml
+config=${install_dir}Pipelines/geneanalysis/config/batch_gene_3_prep.yml
+config=${install_dir}Pipelines/geneanalysis/config/batch_gene_4_tasks.yml
+config=${install_dir}Pipelines/geneanalysis/config/batch_gene_5_agg.yml
+```
+- - PDB only
+```
+config=${install_dir}Pipelines/geneanalysis/config/batch_pdb_1_rep.yml
+config=${install_dir}Pipelines/geneanalysis/config/batch_pdb_2_prep.yml
+config=${install_dir}Pipelines/geneanalysis/config/batch_pdb_3_tasks.yml
+config=${install_dir}Pipelines/geneanalysis/config/batch_pdb_4_agg.yml
+config=${install_dir}Pipelines/geneanalysis/config/batch_dataset_prep.yml
+ ```
+#### Clean or rerun up at the end to remove successful logs leaving only errors
+To control errors and log files this in-process script can be run at any time.
+- Identify errors and remove finished happy log files
+-- /home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_cleanup_and_report.sh CLEAN /home/ucbtlcr/Mutein/
+- Rerun failed batches
+-- /home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_cleanup_and_report.sh ALL /home/ucbtlcr/Mutein/
+- Rerun all batches (this would be if evrythong just got disconnected or something, don;t do this if they are still running!)
+-- /home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_cleanup_and_report.sh RERUNERROR /home/ucbtlcr/Mutein/
+- Delete all the log files, no checking, only if you have finished looking at them
+-- /home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_cleanup_and_report.sh RERUNALL /home/ucbtlcr/Mutein/
+
 ### Inputs
 1. A pdb file
 2. A variants file
