@@ -3,6 +3,8 @@ run=qsub
 install_dir=$1
 script=${install_dir}Pipelines/libs/pipeline_qsubber.py
 
+#config=${install_dir}Pipelines/geneanalysis/config/batch_dataset_prep.yml
+
 #config=${install_dir}Pipelines/geneanalysis/config/batch_gene_1_pdbs.yml
 #config=${install_dir}Pipelines/geneanalysis/config/batch_gene_2_rep.yml
 #config=${install_dir}Pipelines/geneanalysis/config/batch_gene_3_prep.yml
