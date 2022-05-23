@@ -2,10 +2,10 @@
 id: '1'
 qsub_id: 'prep'
 pipe_dir: 'Pipelines/geneanalysis/python/'
-script: 'ga_1_0_datasetprep'
+script: 'ga__runner'
 time: '1:00:0'
 dependency: '-1'
 array: 0
-inputs: "variant=*@split=5000@vsplit=200"
+inputs: "runs=ab"
 active: 'Y'
 ---
