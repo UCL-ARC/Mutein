@@ -102,7 +102,7 @@ def pipeline_qsubber(args):
                 for l in range(1,len(lines)):
                     line = lines[l]
                     if "," in line:
-                        gene = line.split(",")[1]
+                        gene = line.split(",")[1].strip()
                         gene_tasks.append(gene)
         else:
             gene_tasks = [""]
@@ -111,7 +111,7 @@ def pipeline_qsubber(args):
     
     
     for gene in gene_tasks:
-        print("Creating for gene=",gene)
+        print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Creating for gene=",gene,"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
         path = Paths.Paths(working_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset,gene=gene,pdb=pdb)
         pdb_tasks_file = path.outputs + "pdb_tasklist.csv"
         if exists(pdb_tasks_file):

@@ -55,7 +55,7 @@ def test_pipeline(method, batch_file,dataset,gene,pdb):
 
 ## Tests for the gene stitch
 #test_pipeline("qsub_tst","batch_gene_tasks.yml","notch","NOTCH1","")
-test_pipeline("py","batch_dataset_prep.yml","notch","","")
+test_pipeline("py","batch_gene_2_rep.yml","notch","ALL","")
 #test_pipeline("py","batch_pdb_agg.yml","","","1pb5")
 
 

@@ -36,6 +36,7 @@ def test_datasetprep(inputs):
 ######################################################################
 ### INPUTS
 dataset="shearwater"
+gene="ALL"
 split=1000
 vsplit=200
 
@@ -59,7 +60,7 @@ def runPPL(inputs):
     args = ["", inputs]
     ppl.run_pipeline(args)
 runs = "a"
-runPPL("runs="+runs+"@dataset="+dataset)
+runPPL("runs="+runs+"@dataset="+dataset+"@gene="+gene)
 
 
 """
