@@ -40,6 +40,10 @@ module load python3/recommended
 - - - (only not a dependent script due to multiple dependencies at the moment)
 ```
 ##### TEST DATA SETS #######
+# Amend this file for testing
+/home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx__scratch.sh /home/ucbtlcr/Mutein/
+
+
 # They are in DataSync/SmallDemos in github #####
 #### This is a single pdb, with a quick python script first #####
 chmod +x /home/ucbtlcr/Mutein/Pipelines/geneanalysis/foldx_pdb_prep.sh
