@@ -94,7 +94,16 @@ def run_pipeline(args):
                     cmd = lines_out[1].strip()
                     if len(cmd)>3:
                         print("Rerunning cmd:",cmd)
+                        # but if it is an array job we only want to run the single task
                         args = cmd.split(" ")
+                        if "pipeline_array" in cmd:
+                            cmd = cmd.replace("pipeline_array","pipeline_single")
+                            task=number.split(".")[1]
+                            args[-3] += "@task=" + task
+                            args = args[2:]
+                            args[0] = "qsub"
+
+                        
                         process = subprocess.Popen(args=args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
                         result = process.communicate()
                         print(result)                    
