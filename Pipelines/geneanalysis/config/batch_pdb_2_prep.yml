@@ -6,6 +6,6 @@ script: 'ga__runner'
 time: '1:00:0'
 dependency: '-1'
 array: 0
-inputs: "runs=d@repairs=10@split=500@vsplit=100@variant=*"
+inputs: "runs=d@repairs=10@split=5000@vsplit=100@variant=*"
 active: 'Y'
 --- 
