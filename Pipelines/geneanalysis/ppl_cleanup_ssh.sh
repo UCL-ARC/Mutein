@@ -8,6 +8,7 @@ cd MuteinData
 
 echo "EXE PATH=$install_dir"
 echo "CURRENT=$PWD"
+echo "SCRIPT=$script"
 
 echo "~~~~~~~~~~~~~~~~~~ Call python script ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 python ${script} "MODE=$mode"
