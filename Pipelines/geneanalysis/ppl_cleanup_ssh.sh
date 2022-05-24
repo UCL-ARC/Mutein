@@ -14,5 +14,14 @@ echo "~~~~~~~~~~~~~~~~~~ Call python script ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 python ${script} "MODE=$mode"
 echo "MUTEIN SCRIPT ENDED"
 
-cd "/home/ucbtlcr/Scratch/workspace/"    
-echo $ls
+
+target="/home/ucbtlcr/Scratch/workspace/"
+let count=0
+for f in "$target"/*
+do
+    echo $(basename $f)
+    let count=count+1
+done
+echo ""
+echo "Count: $count"
+
