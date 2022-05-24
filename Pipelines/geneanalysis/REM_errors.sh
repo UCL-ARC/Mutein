@@ -1,21 +1,13 @@
 #!/bin/bash
 
 ### can be clean or all
-mode=$1
-install_dir=$2
-script=${install_dir}Pipelines/libs/pipeline_delete.py
 
-# assume we are in the home directory and the data is in MuteinData
+module ()
+{
+    eval `/shared/ucl/apps/modules/3.2.6/Modules/$MODULE_VERSION/bin/modulecmd bash $*`
+}
 
 module load python3/recommended
-
-cd MuteinData
-
-#echo "EXE PATH=$install_dir"
-#echo "CURRENT=$PWD"
-#echo "SCRIPT=$script"
-
-#echo "~~~~~~~~~~~~~~~~~~ Call python script ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
 target="/home/ucbtlcr/Scratch/workspace/"
 let count=0
