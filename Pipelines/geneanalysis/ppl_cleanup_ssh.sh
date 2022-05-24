@@ -1,3 +1,5 @@
+#!/bin/bash
+
 ### can be clean or all
 mode=$1
 install_dir=$2
@@ -5,7 +7,7 @@ script=${install_dir}Pipelines/libs/pipeline_delete.py
 
 # assume we are in the home directory and the data is in MuteinData
 
-source module load python3/recommended
+module load python3/recommended
 
 cd MuteinData
 
