@@ -43,7 +43,7 @@ def run_pipeline(args):
         if jobid in filename:
             if exists(filename):                     
                 with open(filename) as fr:
-                    lines = filename.readlines()
+                    lines = fr.readlines()
                     for line in lines:                
                         print(line)                
             
