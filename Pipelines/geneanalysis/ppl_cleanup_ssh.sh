@@ -5,8 +5,6 @@ script=${install_dir}Pipelines/libs/pipeline_delete.py
 
 # assume we are in the home directory and the data is in MuteinData
 
-source running.sh
-./running.sh
 module load python3/recommended
 
 cd MuteinData
