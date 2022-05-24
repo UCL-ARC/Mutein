@@ -9,5 +9,5 @@ echo "EXE PATH=$install_dir"
 echo "CURRENT=$PWD"
 
 echo "~~~~~~~~~~~~~~~~~~ Call python script ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-python ${script} "JOBID=$mode"
+python ${script} "JOBID=$jobid"
 
