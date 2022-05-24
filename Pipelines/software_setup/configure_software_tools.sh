@@ -7,6 +7,10 @@
 set -eu
 source ~/.mutein_settings
 
+#am using the most up-to-date miniconda version for pyega3 (4.12.0)
+#rather than the "module" version
+#wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+
 #make conda commands available
 module load ${MUT_CONDA_MODULE}
 echo ". ${MUT_CONDA_SETUP}" >> ~/.bashrc
@@ -39,4 +43,10 @@ conda deactivate
 conda create --yes --name gatk4
 conda activate gatk4
 conda install --yes gatk4
+conda deactivate
+
+#required for pyega3
+conda create --yes --name pyega3
+conda activate pyega3
+conda install --yes pyega3
 conda deactivate
