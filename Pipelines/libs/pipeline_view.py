@@ -27,8 +27,7 @@ from os.path import isfile, join
 import os
 
 
-def run_pipeline(args):
-    print("### Delete unnecessary log files ###")
+def run_pipeline(args):    
     print(args)
     ##############################################    
     argus = Arguments.Arguments(args)    
@@ -41,7 +40,8 @@ def run_pipeline(args):
     for file in onlyfiles:
         filename =scratch_dir+file 
         if jobid in filename:
-            if exists(filename):                     
+            if exists(filename):          
+                print("########### Log File",filename)           
                 with open(filename) as fr:
                     lines = fr.readlines()
                     for line in lines:                
