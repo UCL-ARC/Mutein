@@ -13,3 +13,6 @@ echo "SCRIPT=$script"
 echo "~~~~~~~~~~~~~~~~~~ Call python script ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 python ${script} "MODE=$mode"
 echo "MUTEIN SCRIPT ENDED"
+
+cd "/home/ucbtlcr/Scratch/workspace/"    
+echo $ls
