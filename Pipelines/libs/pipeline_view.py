@@ -41,7 +41,7 @@ def run_pipeline(args):
         filename =scratch_dir+file 
         if jobid in filename:
             if exists(filename):          
-                print("########### Log File",filename)           
+                print("@@@@@@@@@@@@@ Log File",filename,"@@@@@@@@@@@@@")           
                 with open(filename) as fr:
                     lines = fr.readlines()
                     for line in lines:                
