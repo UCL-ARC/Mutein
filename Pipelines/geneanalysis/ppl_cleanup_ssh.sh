@@ -6,14 +6,21 @@ script=${install_dir}Pipelines/libs/pipeline_delete.py
 # assume we are in the home directory and the data is in MuteinData
 cd MuteinData
 
-echo "EXE PATH=$install_dir"
-echo "CURRENT=$PWD"
-echo "SCRIPT=$script"
+#echo "EXE PATH=$install_dir"
+#echo "CURRENT=$PWD"
+#echo "SCRIPT=$script"
 
-echo "~~~~~~~~~~~~~~~~~~ Call python script ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+#echo "~~~~~~~~~~~~~~~~~~ Call python script ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+
+target="/home/ucbtlcr/Scratch/workspace/"
+let count=0
+for f in "$target"/*
+do
+    let count=count+1
+done
+echo "Count: $count"
+
 python ${script} "MODE=$mode"
-echo "MUTEIN SCRIPT ENDED"
-
 
 target="/home/ucbtlcr/Scratch/workspace/"
 let count=0
