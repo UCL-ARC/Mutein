@@ -20,7 +20,8 @@ do
 done
 echo "Count: $count"
 
-python ${script} "MODE=$mode"
+outputString=$(python ${script} "MODE=$mode")
+echo $outputString
 
 target="/home/ucbtlcr/Scratch/workspace/"
 let count=0

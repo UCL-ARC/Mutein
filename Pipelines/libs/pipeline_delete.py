@@ -31,6 +31,7 @@ def run_pipeline(args):
     print("### Delete unnecessary log files ###")
     print(args)
     ##############################################
+    ret = "Actions:"
     argus = Arguments.Arguments(args)    
     mode = argus.arg("MODE")
     homeuser = pwd.getpwuid(os.getuid())[0]
@@ -68,6 +69,7 @@ def run_pipeline(args):
                             os.remove(error_file)                
                             os.remove(out_file)
                             print("...removing",number,name)
+                            ret += ",Clean:"+str(number)
                 else:
                     print("Errors",number,name)                
             else:
@@ -179,6 +181,7 @@ def run_pipeline(args):
 
     print("### COMPLETED CLEAN UP job ###")
     print("MUTEIN SCRIPT ENDED")
+    return ret
 
 
 ##########################################################################################
