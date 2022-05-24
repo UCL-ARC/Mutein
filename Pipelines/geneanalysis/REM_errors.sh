@@ -1,13 +1,19 @@
-#!/bin/bash
-
-### can be clean or all
-
-module ()
-{
-    eval `/shared/ucl/apps/modules/3.2.6/Modules/$MODULE_VERSION/bin/modulecmd bash $*`
-}
+#!/bin/bash -l
 
 module load python3/recommended
+
+mode=$1
+install_dir=$2
+script=${install_dir}Pipelines/libs/pipeline_delete.py
+
+echo "EXE PATH=$install_dir"
+echo "CURRENT=$PWD"
+
+echo "~~~~~~~~~~~~~~~~~~ Call python script ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+python ${script} "MODE=$mode"
+
+
+
 
 target="/home/ucbtlcr/Scratch/workspace/"
 let count=0
