@@ -4,6 +4,9 @@ install_dir=$2
 script=${install_dir}Pipelines/libs/pipeline_delete.py
 
 # assume we are in the home directory and the data is in MuteinData
+
+module load python3/recommended
+
 cd MuteinData
 
 #echo "EXE PATH=$install_dir"
