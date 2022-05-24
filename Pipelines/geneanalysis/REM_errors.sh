@@ -1,5 +1,4 @@
 #!/bin/bash -l
-
 module load python3/recommended
 
 mode=$1
