@@ -47,6 +47,7 @@ def run_pipeline(args):
     gene = argus.arg("gene")
     task = int(argus.arg("task"))
     pdb=argus.arg("pdb","")
+    missing=argus.arg("missing","N")
 
     gene_path = Paths.Paths(        
         data_dir,
@@ -56,6 +57,8 @@ def run_pipeline(args):
         pdb=pdb
     )    
     all_tasks = gene_path.thruputs +  "params_background.txt"
+    if missing.upper() == "Y":
+        all_tasks = gene_path.thruputs +  "params_background_incomplete.txt"
     print("Opening file",all_tasks)
     fio = FileDf.FileDf(all_tasks, sep=" ", header=True)
     df = fio.openDataFrame()

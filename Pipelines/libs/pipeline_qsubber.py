@@ -135,6 +135,11 @@ def pipeline_qsubber(args):
             with open(params_tasks_file) as fr:
                 lines = fr.readlines()
                 params_tasks = len(lines)-1
+        unparams_tasks_file = path.thruputs + "params_background_incomplete.txt"
+        if exists(unparams_tasks_file):
+            with open(unparams_tasks_file) as fr:
+                lines = fr.readlines()
+                unparams_tasks = len(lines)-1
         vparams_tasks_file = path.thruputs + "params_variants.txt"
         if exists(vparams_tasks_file):
             with open(vparams_tasks_file) as fr:
@@ -176,6 +181,8 @@ def pipeline_qsubber(args):
                             array=params_tasks
                         if arrayfile == "vparams":
                             array=vparams_tasks
+                        if arrayfile == "unparams":
+                            array=unparams_tasks
 
                     inputs = pipe["inputs"].strip()
                     active = pipe["active"].strip() == "Y"
