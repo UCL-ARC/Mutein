@@ -9,6 +9,7 @@ N.b this file may be run on the myriad clusters or on a local machine
 -----------------------------
 """
 import os
+import pathlib
 import pwd
 import pandas as pd
 from shutil import copyfile
@@ -78,17 +79,17 @@ def run_pipeline(args):
         filenameB = path.outputs + "ddg_variant_bm.csv"
         filenameC = path.outputs + "ddg_variant_ps.csv"
         if exists(filenameA):
-            timeA = os.path.getmtime(filenameA).strftime("%d-%m-%y@%H.%H.%S")                   
+            timeA = pathlib.Path(filenameA).stat().st_mtime            
             print("DDG Background file was created at",timeA)
         else:
             print("!!!DDG Background file does not exist",filenameB)
         if exists(filenameB):
-            timeB = os.path.getmtime(filenameB).strftime("%d-%m-%y@%H.%H.%S")                   
+            timeB = pathlib.Path(filenameB).stat().st_mtime
             print("Variant buildmodel file was created at",timeB)
         else:
             print("!!!Variant buildmodel file does not exist",filenameB)
         if exists(filenameC):
-            timeC = os.path.getmtime(filenameC).strftime("%d-%m-%y@%H.%H.%S")                   
+            timeC = pathlib.Path(filenameC).stat().st_mtime
             print("Variant posscan file was created at",timeC)
         else:
             print("!!!Variant posscan file does not exist",filenameC)
