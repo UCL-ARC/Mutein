@@ -1,6 +1,8 @@
 #!/bin/bash -l
 module load python3/recommended
 
+run=qsub
+
 dataset=$1
 gene=$2
 pdb=$3
@@ -16,5 +18,7 @@ cd $DataDir
 echo "CURRENT=$PWD"
 
 echo "Submitting ${script} $install_dir $PWD ${config} $run $dataset"
-
+#install_dir, working_dir, yaml_file, py_or_sh, dataset, gene, pdb
 python ${script} $install_dir $PWD ${config} $run $dataset "" ""
+
+
