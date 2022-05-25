@@ -65,6 +65,12 @@ def pipeline_qsubber(args):
     dataset = args[5]  # 3) dataset
     gene = args[6]  # 4) gene    
     pdb = args[7]  # 4) pdb
+    if dataset == "x":
+        dataset = ""
+    if gene == "x":
+        gene = ""
+    if pdb == "x":
+        pdb = ""
     
     #last_stat = args[8]  # 5) the last status or count
     #if last_stat == "x":
