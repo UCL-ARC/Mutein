@@ -36,17 +36,17 @@ def checkResults(ddg,bm,ps):
         timeA = pathlib.Path(ddg).stat().st_mtime            
         print("DDG Background file was created at",datetime.fromtimestamp(timeA).strftime('%d-%m-%y-%H:%M'))
     else:
-        print("!!!DDG Background file does not exist",ddg)
+        print("!!!DDG Background file does not exist")
     if exists(bm):
         timeB = pathlib.Path(bm).stat().st_mtime
         print("Variant buildmodel file was created at",datetime.fromtimestamp(timeB).strftime('%d-%m-%y-%H:%M'))
     else:
-        print("!!!Variant buildmodel file does not exist",bm)
+        print("!!!Variant buildmodel file does not exist")
     if exists(ps):
         timeC = pathlib.Path(ps).stat().st_mtime
         print("Variant posscan file was created at",datetime.fromtimestamp(timeC).strftime('%d-%m-%y-%H:%M'))
     else:
-        print("!!!Variant posscan file does not exist",ps)
+        print("!!!Variant posscan file does not exist")
 
 
 
@@ -84,6 +84,7 @@ def run_pipeline(args):
         path = Paths.Paths(DataDir,PipelineDir,dataset=dataset,gene=gene)
         
         print("Check results files for gene")
+        print(path.outputs)
         filenameA = path.outputs + "ddg_background.csv"
         filenameB = path.outputs + "ddg_variant_bm.csv"
         filenameC = path.outputs + "ddg_variant_ps.csv"
@@ -94,8 +95,9 @@ def run_pipeline(args):
         if exists(filename):
             with open(filename, "r") as fr:
                 lines = fr.readlines()
-                for line in lines:
-                    print(line.strip())
+                for line in lines[1:]:
+                    pdb = line.strip().split[","][1]
+                    print(pdb)
         else:
             print("The pdbs have not been prepared - no pdb list",filename)
     elif mode == "PDB":
@@ -103,6 +105,7 @@ def run_pipeline(args):
         dataset,gene,pdb = dataset_gene_pdb[0],dataset_gene_pdb[1],dataset_gene_pdb[2]
         path = Paths.Paths(DataDir,PipelineDir,dataset=dataset,gene=gene,pdb=pdb)
         print("Check results files for pdb")
+        print(path.outputs)
         filenameA = path.outputs + "ddg_background.csv"
         filenameB = path.outputs + "ddg_variant_bm.csv"
         filenameC = path.outputs + "ddg_variant_ps.csv"
