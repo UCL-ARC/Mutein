@@ -15,4 +15,6 @@ script=${InstallDir}Pipelines/libs/pipeline_qsubber.py
 cd $DataDir
 echo "CURRENT=$PWD"
 
+echo "Submitting ${script} $install_dir $PWD ${config} $run $dataset"
+
 python ${script} $install_dir $PWD ${config} $run $dataset "" ""
