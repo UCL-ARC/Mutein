@@ -55,7 +55,7 @@ def run_pipeline(args):
             with open(filename, "r") as fr:
                 lines = fr.readlines()
                 for line in lines:
-                    print(line)
+                    print(line.strip())
         else:
             print("The dataset has not been prepared - no genes list",filename)
 
