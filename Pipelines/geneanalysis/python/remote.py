@@ -133,18 +133,23 @@ def run_pipeline(args):
         checkResults(filenameA,filenameB,filenameC)
 
         filenameP = path.thruputs + "params_background.txt"
+        filename_incomplete = path.thruputs + "params_background_incomplete.txt"
         count = 0
         if exists(filenameP):
-            with open(filenameP, "r") as fr:
-                lines = fr.readlines()
-                print("The pdb has been split into tasks=",len(lines)-1)
-                print("...Any tasks that have completed are below\n")                
-                for i in range(1,len(lines)):
-                    filenameo = path.thruputs + "agg/" + str(i) + "_ddg_background.csv"
-                    existsfile,time = checkResult(filenameo)
-                    if existsfile:
-                        count += 1
-                        print("Task",str(i),"at",time)
+            with open(filename_incomplete, "w") as fw:
+                with open(filenameP, "r") as fr:
+                    lines = fr.readlines()
+                    filename_incomplete.write(lines[0]+"\n")
+                    print("The pdb has been split into tasks=",len(lines)-1)
+                    print("...Any tasks that have completed are below\n")                
+                    for i in range(1,len(lines)):
+                        filenameo = path.thruputs + "agg/" + str(i) + "_ddg_background.csv"
+                        existsfile,time = checkResult(filenameo)
+                        if existsfile:
+                            count += 1
+                            print("Task",str(i),"at",time)
+                        else:
+                            filename_incomplete.write(lines[i]+"\n")
             print("Completed",count,"out of",len(lines)-1)
                     
         else:
