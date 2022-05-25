@@ -80,17 +80,17 @@ def run_pipeline(args):
         filenameC = path.outputs + "ddg_variant_ps.csv"
         if exists(filenameA):
             timeA = pathlib.Path(filenameA).stat().st_mtime            
-            print("DDG Background file was created at",timeA)
+            print("DDG Background file was created at",datetime.datetime.fromtimestamp(timeA).strftime('%d-%m-%y-%H:%M'))
         else:
             print("!!!DDG Background file does not exist",filenameB)
         if exists(filenameB):
             timeB = pathlib.Path(filenameB).stat().st_mtime
-            print("Variant buildmodel file was created at",timeB)
+            print("Variant buildmodel file was created at",datetime.datetime.fromtimestamp(timeB).strftime('%d-%m-%y-%H:%M'))
         else:
             print("!!!Variant buildmodel file does not exist",filenameB)
         if exists(filenameC):
             timeC = pathlib.Path(filenameC).stat().st_mtime
-            print("Variant posscan file was created at",timeC)
+            print("Variant posscan file was created at",datetime.datetime.fromtimestamp(timeC).strftime('%d-%m-%y-%H:%M'))
         else:
             print("!!!Variant posscan file does not exist",filenameC)
 
