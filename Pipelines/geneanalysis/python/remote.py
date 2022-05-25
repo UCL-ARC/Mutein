@@ -57,7 +57,7 @@ def run_pipeline(args):
                 for line in lines:
                     print(line)
         else:
-            print("The dataset has not been prepared - no genes list")
+            print("The dataset has not been prepared - no genes list",filename)
 
 
 
