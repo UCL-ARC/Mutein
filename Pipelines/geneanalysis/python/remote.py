@@ -31,6 +31,25 @@ from os.path import isfile, join
 import os
 
 
+def checkResults(ddg,bm,ps):
+    if exists(ddg):
+        timeA = pathlib.Path(ddg).stat().st_mtime            
+        print("DDG Background file was created at",datetime.fromtimestamp(timeA).strftime('%d-%m-%y-%H:%M'))
+    else:
+        print("!!!DDG Background file does not exist",ddg)
+    if exists(bm):
+        timeB = pathlib.Path(bm).stat().st_mtime
+        print("Variant buildmodel file was created at",datetime.fromtimestamp(timeB).strftime('%d-%m-%y-%H:%M'))
+    else:
+        print("!!!Variant buildmodel file does not exist",bm)
+    if exists(ps):
+        timeC = pathlib.Path(ps).stat().st_mtime
+        print("Variant posscan file was created at",datetime.fromtimestamp(timeC).strftime('%d-%m-%y-%H:%M'))
+    else:
+        print("!!!Variant posscan file does not exist",ps)
+
+
+
 def run_pipeline(args):    
     now = datetime.now()
     current_time = now.strftime("%d-%m-%y@%H.%H.%S")
@@ -63,6 +82,14 @@ def run_pipeline(args):
         dataset_gene_pdb=pattern.split(":")
         dataset,gene,pdb = dataset_gene_pdb[0],dataset_gene_pdb[1],dataset_gene_pdb[2]
         path = Paths.Paths(DataDir,PipelineDir,dataset=dataset,gene=gene)
+        
+        print("Check results files for gene")
+        filenameA = path.outputs + "ddg_background.csv"
+        filenameB = path.outputs + "ddg_variant_bm.csv"
+        filenameC = path.outputs + "ddg_variant_ps.csv"
+        checkResults(filenameA,filenameB,filenameC)
+
+        print("\nCheck pdb list\n")        
         filename = path.outputs + "pdb_tasklist.csv"
         if exists(filename):
             with open(filename, "r") as fr:
@@ -75,24 +102,12 @@ def run_pipeline(args):
         dataset_gene_pdb=pattern.split(":")
         dataset,gene,pdb = dataset_gene_pdb[0],dataset_gene_pdb[1],dataset_gene_pdb[2]
         path = Paths.Paths(DataDir,PipelineDir,dataset=dataset,gene=gene,pdb=pdb)
+        print("Check results files for pdb")
         filenameA = path.outputs + "ddg_background.csv"
         filenameB = path.outputs + "ddg_variant_bm.csv"
         filenameC = path.outputs + "ddg_variant_ps.csv"
-        if exists(filenameA):
-            timeA = pathlib.Path(filenameA).stat().st_mtime            
-            print("DDG Background file was created at",datetime.fromtimestamp(timeA).strftime('%d-%m-%y-%H:%M'))
-        else:
-            print("!!!DDG Background file does not exist",filenameB)
-        if exists(filenameB):
-            timeB = pathlib.Path(filenameB).stat().st_mtime
-            print("Variant buildmodel file was created at",datetime.fromtimestamp(timeB).strftime('%d-%m-%y-%H:%M'))
-        else:
-            print("!!!Variant buildmodel file does not exist",filenameB)
-        if exists(filenameC):
-            timeC = pathlib.Path(filenameC).stat().st_mtime
-            print("Variant posscan file was created at",datetime.fromtimestamp(timeC).strftime('%d-%m-%y-%H:%M'))
-        else:
-            print("!!!Variant posscan file does not exist",filenameC)
+        checkResults(filenameA,filenameB,filenameC)
+        
 
 
 
