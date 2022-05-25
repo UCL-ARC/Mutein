@@ -70,6 +70,28 @@ def run_pipeline(args):
                     print(line.strip())
         else:
             print("The pdbs have not been prepared - no pdb list",filename)
+    elif mode == "PDB":
+        dataset_gene_pdb=pattern.split(":")
+        dataset,gene,pdb = dataset_gene_pdb[0],dataset_gene_pdb[1],dataset_gene_pdb[2]
+        path = Paths.Paths(DataDir,PipelineDir,dataset=dataset,gene=gene,pdb=pdb)
+        filenameA = path.outputs + "ddg_background.csv"
+        filenameB = path.outputs + "ddg_variant_bm.csv"
+        filenameC = path.outputs + "ddg_variant_ps.csv"
+        if exists(filenameA):
+            timeA = os.path.getmtime(filenameA).strftime("%d-%m-%y@%H.%H.%S")                   
+            print("DDG Background file was created at",timeA)
+        else:
+            print("!!!DDG Background file does not exist",filenameB)
+        if exists(filenameB):
+            timeB = os.path.getmtime(filenameB).strftime("%d-%m-%y@%H.%H.%S")                   
+            print("Variant buildmodel file was created at",timeB)
+        else:
+            print("!!!Variant buildmodel file does not exist",filenameB)
+        if exists(filenameC):
+            timeC = os.path.getmtime(filenameC).strftime("%d-%m-%y@%H.%H.%S")                   
+            print("Variant posscan file was created at",timeC)
+        else:
+            print("!!!Variant posscan file does not exist",filenameC)
 
 
 
