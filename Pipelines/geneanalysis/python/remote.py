@@ -142,7 +142,7 @@ def run_pipeline(args):
                     filenameo = path.thruputs + "agg/" + str(i) + "_ddg_background.csv"
                     existsfile,time = checkResult(filenameo)
                     if existsfile:
-                        print(pdbo,time)
+                        print("agg/" + str(i) + "_ddg_background.csv",time)
                     
         else:
             print("Missing parameters file, the data needs preparation")
