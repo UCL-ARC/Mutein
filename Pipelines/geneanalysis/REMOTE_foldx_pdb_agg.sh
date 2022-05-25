@@ -11,7 +11,7 @@ DataDir=$5			#/home/ucbtlcr/MuteinData/
 InstallDir=$6		#/home/ucbtlcr/Mutein/
 PipelineDir=$7		#/home/ucbtlcr/Mutein/Pipelines/geneanalysis/
 
-config=${PipelineDir}config/batch_gene_4_agg.yml
+config=${PipelineDir}config/batch_pdb_4_agg.yml
 script=${InstallDir}Pipelines/libs/pipeline_qsubber.py
 
 cd $DataDir
