@@ -45,7 +45,7 @@ def run_pipeline(args):
 
     print("Mode=",mode)
     print("Pattern=",pattern)
-
+    print("")
     if mode == "GENES":
         dataset_gene_pdb=pattern.split(":")
         dataset,gene,pdb = dataset_gene_pdb[0],dataset_gene_pdb[1],dataset_gene_pdb[2]
@@ -58,6 +58,20 @@ def run_pipeline(args):
                     print(line.strip())
         else:
             print("The dataset has not been prepared - no genes list",filename)
+    elif mode == "PDBS":
+        dataset_gene_pdb=pattern.split(":")
+        dataset,gene,pdb = dataset_gene_pdb[0],dataset_gene_pdb[1],dataset_gene_pdb[2]
+        path = Paths.Paths(DataDir,PipelineDir,dataset=dataset,gene=gene)
+        filename = path.outputs + "pdb_tasklist.csv"
+        if exists(filename):
+            with open(filename, "r") as fr:
+                lines = fr.readlines()
+                for line in lines:
+                    print(line.strip())
+        else:
+            print("The pdbs have not been prepared - no pdb list",filename)
+
+
 
 
 
