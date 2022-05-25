@@ -133,6 +133,7 @@ def run_pipeline(args):
         checkResults(filenameA,filenameB,filenameC)
 
         filenameP = path.thruputs + "params_background.txt"
+        count = 0
         if exists(filenameP):
             with open(filenameP, "r") as fr:
                 lines = fr.readlines()
@@ -142,7 +143,9 @@ def run_pipeline(args):
                     filenameo = path.thruputs + "agg/" + str(i) + "_ddg_background.csv"
                     existsfile,time = checkResult(filenameo)
                     if existsfile:
-                        print("agg/" + str(i) + "_ddg_background.csv",time)
+                        count += 1
+                        print("Task",str(i),"at",time)
+            print("Completed",count,"out of",len(lines)-1)
                     
         else:
             print("Missing parameters file, the data needs preparation")
