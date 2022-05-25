@@ -17,6 +17,7 @@ script=${InstallDir}Pipelines/libs/pipeline_qsubber.py
 cd $DataDir
 echo "Submitting ${script} $install_dir $PWD ${config} $run $dataset"
 #install_dir, working_dir, yaml_file, py_or_sh, dataset, gene, pdb
-python ${script} $install_dir $WorkDir ${config} $run $dataset "" ""
+python ${script} $install_dir $DataDir ${config} $run $dataset "" ""
 
 
+ 
