@@ -77,6 +77,7 @@ def run_pipeline(args):
         dataset,gene,pdb = dataset_gene_pdb[0],dataset_gene_pdb[1],dataset_gene_pdb[2]
         path = Paths.Paths(DataDir,PipelineDir,dataset=dataset)
         filename = path.inputs + "genes_pdb_list.csv"
+        print("\nCheck genes list\n")      
         if exists(filename):
             with open(filename, "r") as fr:
                 lines = fr.readlines()
@@ -130,6 +131,22 @@ def run_pipeline(args):
         filenameB = path.outputs + "ddg_variant_bm.csv"
         filenameC = path.outputs + "ddg_variant_ps.csv"
         checkResults(filenameA,filenameB,filenameC)
+
+        filenameP = path.thruputs + "params_background.txt"
+        if exists(filenameP):
+            with open(filenameP, "r") as fr:
+                lines = fr.readlines()
+                print("The pdb has been split into tasks=",len(lines)-1)
+                print("...Any tasks that have completed are below\n")                
+                for i in range(1,len(lines)):
+                    filenameo = path.thruputs + "agg/" + str(i) + "_ddg_background.csv"
+                    existsfile,time = checkResult(filenameo)
+                    if existsfile:
+                        print(pdbo,time)
+                    
+        else:
+            print("Missing parameters file, the data needs preparation")
+
         
 
 
