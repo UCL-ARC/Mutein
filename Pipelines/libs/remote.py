@@ -31,7 +31,7 @@ import os
 def run_pipeline(args):    
     now = datetime.now()
     current_time = now.strftime("%d-%m-%y@%H.%H.%S")
-    print("REMOTE script at",current_time)
+    print("Mutein remote script:",current_time)
     
     ##############################################        
     mode = args[1]
@@ -41,12 +41,9 @@ def run_pipeline(args):
     InstallDir = args[5]
     PipelineDir = args[6]
 
-    print(mode)
-    print(pattern)
-    print(WorkDir)
-    print(DataDir)
-    print(InstallDir)
-    print(PipelineDir)
+    print("Mode=",mode)
+    print("Pattern=",pattern)
+    
 
     
 
