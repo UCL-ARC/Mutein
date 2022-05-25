@@ -14,6 +14,7 @@ import pandas as pd
 from shutil import copyfile
 from os.path import exists
 import subprocess
+from datetime import datetime
 
 # import from the shared library in Mutein/Pipelines/shared/lib
 import sys
@@ -28,7 +29,10 @@ import os
 
 
 def run_pipeline(args):    
-    print(args)
+    now = datetime.now()
+    current_time = now.strftime("%d-%m-%y@%H.%H.%S")
+    print("REMOTE script at",current_time)
+    
     ##############################################        
     mode = args[1]
     pattern = args[2]
