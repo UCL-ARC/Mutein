@@ -34,7 +34,7 @@ class Paths:
         self.data_dir = data_dir
         if self.data_dir[-1] != "/":
             self.data_dir += "/"
-        print("Initialising PATH CLASS with datadir=", data_dir)
+        #print("Initialising PATH CLASS with datadir=", data_dir)
         self.pipeline_path = pipe_path
 
         # there are levels of ids as many to 1 is slowly whittled down by dataset, gene, pdb and perhaps method (eg ddg or other)
