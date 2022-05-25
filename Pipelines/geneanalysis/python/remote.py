@@ -105,8 +105,8 @@ def run_pipeline(args):
                     pdbo =ln.strip().split(",")[2]
                     patho = Paths.Paths(DataDir,PipelineDir,dataset=dataset,gene=gene,pdb=pdbo)
                     filenameA = patho.outputs + "ddg_background.csv"
-                    exists,time = checkResult(filenameA)
-                    if exists:
+                    existsfile,time = checkResult(filenameA)
+                    if existsfile:
                         print(pdbo,time)
                     else:
                         print(pdbo,"---")
