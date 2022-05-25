@@ -80,7 +80,7 @@ class Paths:
         # The path structure is relative to the script file (it will be easy to change to a given one)
         basepath = "dataset_" + dataset + "/"
         self.dataset_inputs = "dataset_" + dataset + ""
-        print(self.dataset_inputs)
+        #print(self.dataset_inputs)
         self.dataset_inputs = self.add_remove_path_levels(0, dir=basepath)
                 
         self.dataset_outputs = basepath + "results"
