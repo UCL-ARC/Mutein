@@ -97,7 +97,8 @@ def run_pipeline(args):
                 lines = fr.readlines()
                 for line in lines[1:]:
                     pdb = line.strip().split(",")[1]
-                    print(pdb)
+                    print(line,pdb)
+                    
         else:
             print("The pdbs have not been prepared - no pdb list",filename)
     elif mode == "PDB":
