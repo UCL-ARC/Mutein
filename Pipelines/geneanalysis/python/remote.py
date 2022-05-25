@@ -81,7 +81,7 @@ def run_pipeline(args):
             with open(filename, "r") as fr:
                 lines = fr.readlines()
                 for line in lines[1:]:                    
-                    geneo =ln.strip().split(",")[1]
+                    geneo =line.strip().split(",")[1]
                     patho = Paths.Paths(DataDir,PipelineDir,dataset=dataset,gene=geneo)
                     filenameA = patho.outputs + "ddg_background.csv"
                     existsfile,time = checkResult(filenameA)
