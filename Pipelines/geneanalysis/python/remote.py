@@ -139,7 +139,7 @@ def run_pipeline(args):
             with open(filename_incomplete, "w") as fw:
                 with open(filenameP, "r") as fr:
                     lines = fr.readlines()
-                    filename_incomplete.write(lines[0]+"\n")
+                    fw.write(lines[0]+"\n")
                     print("The pdb has been split into tasks=",len(lines)-1)
                     print("...Any tasks that have completed are below\n")                
                     for i in range(1,len(lines)):
@@ -149,7 +149,7 @@ def run_pipeline(args):
                             count += 1
                             print("Task",str(i),"at",time)
                         else:
-                            filename_incomplete.write(lines[i]+"\n")
+                            fw.write(lines[i]+"\n")
             print("Completed",count,"out of",len(lines)-1)
                     
         else:
