@@ -15,7 +15,7 @@ config=${PipelineDir}config/batch_gene_5_agg.yml
 script=${InstallDir}Pipelines/libs/pipeline_qsubber.py
 
 cd $DataDir
-echo "Submitting ${script} $install_dir $PWD ${config} $run $dataset"
+echo "Submitting ${script} $InstallDir $PWD ${config} $run $dataset"
 #install_dir, working_dir, yaml_file, py_or_sh, dataset, gene, pdb
 python ${script} $InstallDir $DataDir ${config} $run $dataset "" ""
 
