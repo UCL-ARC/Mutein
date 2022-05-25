@@ -47,7 +47,7 @@ def run_pipeline(args):
     print("Pattern=",pattern)
 
     if mode == "GENES":
-        dataset_gene_pdb=pattern.spit(":")
+        dataset_gene_pdb=pattern.split(":")
         dataset,gene,pdb = dataset_gene_pdb[0],dataset_gene_pdb[1],dataset_gene_pdb[2]
         path = Paths.Paths(DataDir,PipelineDir,dataset=dataset,gene=gene,pdb=pdb)
         filename = path.inputs + "genes_pdb_list.csv"
