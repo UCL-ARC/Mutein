@@ -3,7 +3,7 @@ id: 'TASKS'
 qsub_id: 'foldx_posscan'
 pipe_dir: 'Pipelines/geneanalysis/python/'
 script: 'ga__runner'
-time: '10:00:0'
+time: '48:00:0'
 dependency: '-1'
 array: -1
 arrayfile: "params"
@@ -14,7 +14,7 @@ id: 'VTASKS'
 qsub_id: 'foldx_varscan'
 pipe_dir: 'Pipelines/geneanalysis/python/'
 script: 'ga__runner'
-time: '10:00:0'
+time: '48:00:0'
 dependency: '-1'
 array: -1
 arrayfile: "vparams"
