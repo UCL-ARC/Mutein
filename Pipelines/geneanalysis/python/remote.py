@@ -31,6 +31,12 @@ from os.path import isfile, join
 import os
 
 
+def checkResult(onefile):
+    if exists(onefile):
+        timeA = pathlib.Path(onefile).stat().st_mtime
+        return True,datetime.fromtimestamp(timeA).strftime('%d-%m-%y-%H:%M')
+    return False,""
+
 def checkResults(ddg,bm,ps):
     if exists(ddg):
         timeA = pathlib.Path(ddg).stat().st_mtime            
@@ -95,8 +101,15 @@ def run_pipeline(args):
         if exists(filename):
             with open(filename, "r") as fr:
                 lines = fr.readlines()
-                for ln in lines[1:]:                    
-                    print(ln)
+                for ln in lines[1:]:
+                    pdbo =ln.strip().split(",")[2]
+                    patho = Paths.Paths(DataDir,PipelineDir,dataset=dataset,gene=gene,pdb=pdbo)
+                    filenameA = patho.outputs + "ddg_background.csv"
+                    exists,time = checkResult(filenameA)
+                    if exists:
+                        print(pdbo,time)
+                    else:
+                        print(pdbo,"---")
                     
         else:
             print("The pdbs have not been prepared - no pdb list",filename)
