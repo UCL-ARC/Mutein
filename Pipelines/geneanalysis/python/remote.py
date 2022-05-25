@@ -95,9 +95,9 @@ def run_pipeline(args):
         if exists(filename):
             with open(filename, "r") as fr:
                 lines = fr.readlines()
-                for line in lines[1:]:
-                    pdb = line.strip().split(",")[1]
-                    print(line,pdb)
+                for ln in lines[1:]:
+                    pdbx = ln.strip().split(",")[1]
+                    print(line,pdbx)
                     
         else:
             print("The pdbs have not been prepared - no pdb list",filename)
