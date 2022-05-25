@@ -19,9 +19,10 @@ from datetime import datetime
 # import from the shared library in Mutein/Pipelines/shared/lib
 import sys
 
-dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-1]
+dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
 retpath = "/".join(dirs) + "/libs"
 sys.path.append(retpath)
+
 import Arguments
 from os import listdir
 from os.path import isfile, join
@@ -43,6 +44,8 @@ def run_pipeline(args):
 
     print("Mode=",mode)
     print("Pattern=",pattern)
+
+    
     
 
     

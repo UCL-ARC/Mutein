@@ -8,6 +8,6 @@ DataDir=$4			#/home/ucbtlcr/MuteinData/
 InstallDir=$5		#/home/ucbtlcr/Mutein/
 PipelineDir=$6		#/home/ucbtlcr/Mutein/Pipelines/geneanalysis/
 
-script=${InstallDir}Pipelines/libs/remote.py
+script=${PipelineDir}python/remote.py
 python ${script} $mode $pattern $WorkDir $DataDir $InstallDir $PipelineDir
 
