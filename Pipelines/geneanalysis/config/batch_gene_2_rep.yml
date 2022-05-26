@@ -4,7 +4,7 @@ qsub_id: 'repair'
 pipe_dir: 'Pipelines/geneanalysis/python/'
 script: 'ga__runner'
 time: '5:00:0'
-cores: "5"
+cores: "8"
 dependency: '-1'
 array: -1
 arrayfile: "pdbs"

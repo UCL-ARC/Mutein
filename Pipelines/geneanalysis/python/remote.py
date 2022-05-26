@@ -190,7 +190,7 @@ def run_pipeline(args):
         filename = path.outputs + "ddg_background.csv"
         filenameB = path.outputs + "ddg_buildmodel.csv"
         filenameC = path.outputs + "ddg_posscan.csv"
-        exists, time = checkResult(filenameA)
+        exists, time = checkResult(filename)
         if exists:
             with open(filename, "r") as fr:
                 lines = fr.readlines()
