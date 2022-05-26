@@ -42,6 +42,10 @@ class QSubRunner:
         if int(array) > 0:
             self.args.append("-t")
             self.args.append("1-" + str(array))
+        # ask for 10 threads
+        self.args.append("-pe")
+        self.args.append("smp")
+        self.args.append("10")
         if script == "cleanup": #redirect the ogs as we don't care about them
             self.args.append("-o")
             self.args.append("clean_out.txt")
