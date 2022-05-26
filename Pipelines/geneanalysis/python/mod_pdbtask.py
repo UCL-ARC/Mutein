@@ -45,7 +45,7 @@ def run_pipeline(args):
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
-    task = int(argus.arg("task"),"0")
+    task = int(argus.arg("task","0"))
     pdb=argus.arg("pdb","")
     missing=argus.arg("missing","N")
 
