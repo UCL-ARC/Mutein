@@ -188,6 +188,7 @@ def run_pipeline(args):
         dataset,gene,pdb = dataset_gene_pdb[0],dataset_gene_pdb[1],dataset_gene_pdb[2]
         path = Paths.Paths(DataDir,PipelineDir,dataset=dataset,gene=gene,pdb=pdb)        
         filename = path.outputs + "ddg_background.csv"        
+        print(filename)
         mexists, time = checkResult(filename)
         if mexists:
             print("DATAFRAME_START")
@@ -203,6 +204,7 @@ def run_pipeline(args):
         filename = path.outputs + "ddg_buildmodel.csv"        
         if pdb == "":
             filename = path.outputs + "ddg_variant_bm.csv"
+        print(filename)
         mexists, time = checkResult(filename)
         if mexists:
             print("DATAFRAME_START")
@@ -215,9 +217,10 @@ def run_pipeline(args):
         dataset_gene_pdb=pattern.split(":")
         dataset,gene,pdb = dataset_gene_pdb[0],dataset_gene_pdb[1],dataset_gene_pdb[2]
         path = Paths.Paths(DataDir,PipelineDir,dataset=dataset,gene=gene,pdb=pdb)                
-        filename = path.outputs + "ddg_posscan.csv"
+        filename = path.outputs + "ddg_posscan.csv"        
         if pdb == "":
             filename = path.outputs + "ddg_variant_ps.csv"
+            print(filename)
         mexists, time = checkResult(filename)
         if mexists:
             print("DATAFRAME_START")
