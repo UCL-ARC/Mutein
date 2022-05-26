@@ -201,6 +201,8 @@ def run_pipeline(args):
         dataset,gene,pdb = dataset_gene_pdb[0],dataset_gene_pdb[1],dataset_gene_pdb[2]
         path = Paths.Paths(DataDir,PipelineDir,dataset=dataset,gene=gene,pdb=pdb)                
         filename = path.outputs + "ddg_buildmodel.csv"        
+        if pdb == "":
+            filename = path.outputs + "ddg_variant_bm.csv"
         mexists, time = checkResult(filename)
         if mexists:
             print("DATAFRAME_START")
@@ -214,6 +216,21 @@ def run_pipeline(args):
         dataset,gene,pdb = dataset_gene_pdb[0],dataset_gene_pdb[1],dataset_gene_pdb[2]
         path = Paths.Paths(DataDir,PipelineDir,dataset=dataset,gene=gene,pdb=pdb)                
         filename = path.outputs + "ddg_posscan.csv"
+        if pdb == "":
+            filename = path.outputs + "ddg_variant_ps.csv"
+        mexists, time = checkResult(filename)
+        if mexists:
+            print("DATAFRAME_START")
+            with open(filename, "r") as fr:
+                lines = fr.readlines()
+                for line in lines:                
+                    print(line)
+            print("DATAFRAME_END")
+    elif mode == "COVERAGE":
+        dataset_gene_pdb=pattern.split(":")
+        dataset,gene,pdb = dataset_gene_pdb[0],dataset_gene_pdb[1],dataset_gene_pdb[2]
+        path = Paths.Paths(DataDir,PipelineDir,dataset=dataset,gene=gene)                
+        filename = path.outputs + "Coverage_all.csv"
         mexists, time = checkResult(filename)
         if mexists:
             print("DATAFRAME_START")
