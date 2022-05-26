@@ -128,8 +128,8 @@ def run_pipeline(args):
         print("Check results files for pdb")
         print(path.outputs)
         filenameA = path.outputs + "ddg_background.csv"
-        filenameB = path.outputs + "ddg_variant_bm.csv"
-        filenameC = path.outputs + "ddg_variant_ps.csv"
+        filenameB = path.outputs + "ddg_buildmodel.csv"
+        filenameC = path.outputs + "ddg_posscan.csv"
         checkResults(filenameA,filenameB,filenameC)
 
         # Check the background
