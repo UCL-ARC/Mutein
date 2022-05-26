@@ -187,15 +187,41 @@ def run_pipeline(args):
         dataset_gene_pdb=pattern.split(":")
         dataset,gene,pdb = dataset_gene_pdb[0],dataset_gene_pdb[1],dataset_gene_pdb[2]
         path = Paths.Paths(DataDir,PipelineDir,dataset=dataset,gene=gene,pdb=pdb)        
-        filename = path.outputs + "ddg_background.csv"
-        filenameB = path.outputs + "ddg_buildmodel.csv"
-        filenameC = path.outputs + "ddg_posscan.csv"
+        filename = path.outputs + "ddg_background.csv"        
         exists, time = checkResult(filename)
         if exists:
+            print("DATAFRAME_START")
             with open(filename, "r") as fr:
                 lines = fr.readlines()
                 for line in lines:                
                     print(line)
+            print("DATAFRAME_END")
+    elif mode == "PDB_BM":
+        dataset_gene_pdb=pattern.split(":")
+        dataset,gene,pdb = dataset_gene_pdb[0],dataset_gene_pdb[1],dataset_gene_pdb[2]
+        path = Paths.Paths(DataDir,PipelineDir,dataset=dataset,gene=gene,pdb=pdb)                
+        filename = path.outputs + "ddg_buildmodel.csv"        
+        exists, time = checkResult(filename)
+        if exists:
+            print("DATAFRAME_START")
+            with open(filename, "r") as fr:
+                lines = fr.readlines()
+                for line in lines:                
+                    print(line)
+            print("DATAFRAME_END")
+    elif mode == "PDB_PS":
+        dataset_gene_pdb=pattern.split(":")
+        dataset,gene,pdb = dataset_gene_pdb[0],dataset_gene_pdb[1],dataset_gene_pdb[2]
+        path = Paths.Paths(DataDir,PipelineDir,dataset=dataset,gene=gene,pdb=pdb)                
+        filename = path.outputs + "ddg_posscan.csv"
+        exists, time = checkResult(filename)
+        if exists:
+            print("DATAFRAME_START")
+            with open(filename, "r") as fr:
+                lines = fr.readlines()
+                for line in lines:                
+                    print(line)
+            print("DATAFRAME_END")
 
 
         
