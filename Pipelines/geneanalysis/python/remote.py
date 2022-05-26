@@ -151,6 +151,7 @@ def run_pipeline(args):
                             count += 1
                             print("Task",str(i),"at",time)
                         else:
+                            print("Task",str(i),"----")
                             fw.write((lines[i]).strip()+"\n")
             print("Completed",count,"out of",len(lines)-1)
                     
@@ -176,6 +177,7 @@ def run_pipeline(args):
                             count += 1
                             print("Task",str(i),"at",time)
                         else:
+                            print("Task",str(i),"----")
                             fw.write((lines[i]).strip()+"\n")
             print("Completed",count,"out of",len(lines)-1)
                     
