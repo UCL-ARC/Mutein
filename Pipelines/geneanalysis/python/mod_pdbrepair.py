@@ -99,6 +99,7 @@ def run_pipeline(args):
 
     # Create Foldx class
     fx_runner = Foldx.Foldx(argus.arg("foldxe"))
+    print("Starting repairs from", startRep, "and creating a repair for",numRepairs)
     # Run desired number of repairs
     for r in range(startRep,numRepairs):
         pdb = repairinnames[r]
