@@ -97,6 +97,8 @@ def pipeline_qsubber(args):
     pdb_tasks = 0
     params_tasks = 0
     vparams_tasks = 0
+    unparams_tasks = 0
+    vunparams_tasks = 0
     
     if gene == "ALL":                
         gene = ""
@@ -145,6 +147,11 @@ def pipeline_qsubber(args):
             with open(vparams_tasks_file) as fr:
                 lines = fr.readlines()
                 vparams_tasks = len(lines)-1
+        vunparams_tasks_file = path.thruputs + "params_variants_incomplete.txt"
+        if exists(vunparams_tasks_file):
+            with open(vunparams_tasks_file) as fr:
+                lines = fr.readlines()
+                vunparams_tasks = len(lines)-1
 
 
         # We want the user
@@ -184,6 +191,8 @@ def pipeline_qsubber(args):
                             array=vparams_tasks
                         if arrayfile == "unparams":
                             array=unparams_tasks
+                        if arrayfile == "vunparams":
+                            array=vunparams_tasks
 
                     inputs = pipe["inputs"].strip()
                     active = pipe["active"].strip() == "Y"
