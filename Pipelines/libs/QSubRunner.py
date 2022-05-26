@@ -22,6 +22,7 @@ class QSubRunner:
         array,
         homeuser,
         inputs,
+        cores,
         print_only,
     ):        
         inputs += "@install_dir=" + install_dir
@@ -42,10 +43,10 @@ class QSubRunner:
         if int(array) > 0:
             self.args.append("-t")
             self.args.append("1-" + str(array))
-        # ask for 10 threads
+        # ask for cores from the config
         self.args.append("-pe")
         self.args.append("smp")
-        self.args.append("10")
+        self.args.append(cores)
         if script == "cleanup": #redirect the ogs as we don't care about them
             self.args.append("-o")
             self.args.append("clean_out.txt")

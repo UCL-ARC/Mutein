@@ -4,6 +4,7 @@ qsub_id: 'foldx_pdbs'
 pipe_dir: 'Pipelines/geneanalysis/python/'
 script: 'ga__runner'
 time: '5:00:0'
+cores: "1"
 dependency: '-1'
 array: 0
 inputs: "runs=b"

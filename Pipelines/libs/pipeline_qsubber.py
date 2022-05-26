@@ -172,6 +172,7 @@ def pipeline_qsubber(args):
                     script = pipe["script"].strip()
                     time = pipe["time"].strip()
                     dependency = pipe["dependency"].strip()
+                    cores = pipe["cores"].strip()
                     array = pipe["array"]
                     if int(array) == -1:
                         arrayfile = pipe["arrayfile"].strip()
@@ -204,12 +205,13 @@ def pipeline_qsubber(args):
                             dependency,
                             array,
                             inputs,
+                            cores,
                         )
                         batch_list.append(str(id))
 
         dependencies = {}
         for id in batch_list:        
-            qsubid, pipe_dir, script, time, dependency, array, inputs = batch_dic[id]
+            qsubid, pipe_dir, script, time, dependency, array, inputs,cores = batch_dic[id]
             isarray = int(array) > 0
             # print("# overall pipeline script:",id,qsubid,pipe_dir,script, time, dependency, array, inputs)
             if "qsub" in py_or_sh:
@@ -231,6 +233,7 @@ def pipeline_qsubber(args):
                     array,
                     homeuser,
                     inputs,
+                    cores,
                     py_or_sh != "qsub",
                 )
                 dep = runner.run()
