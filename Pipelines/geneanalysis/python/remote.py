@@ -132,9 +132,11 @@ def run_pipeline(args):
         filenameC = path.outputs + "ddg_variant_ps.csv"
         checkResults(filenameA,filenameB,filenameC)
 
+        # Check the background
         filenameP = path.thruputs + "params_background.txt"
         filename_incomplete = path.thruputs + "params_background_incomplete.txt"
         count = 0
+        print("\nChecking the background tasks")
         if exists(filenameP):
             with open(filename_incomplete, "w") as fw:
                 with open(filenameP, "r") as fr:
@@ -154,6 +156,31 @@ def run_pipeline(args):
                     
         else:
             print("Missing parameters file, the data needs preparation")
+        
+        # Check the background
+        filenameP = path.thruputs + "params_variants.txt"
+        filename_incomplete = path.thruputs + "params_variants_incomplete.txt"
+        print("\nChecking the variant tasks")
+        count = 0
+        if exists(filenameP):
+            with open(filename_incomplete, "w") as fw:
+                with open(filenameP, "r") as fr:
+                    lines = fr.readlines()
+                    fw.write((lines[0]).strip()+"\n")
+                    print("The variants have been split into tasks=",len(lines)-1)
+                    print("...Any tasks that have completed are below\n")                
+                    for i in range(1,len(lines)):
+                        filenameo = path.thruputs + "vagg/" + str(i) + "_ddg_buildmodel.csv"
+                        existsfile,time = checkResult(filenameo)
+                        if existsfile:
+                            count += 1
+                            print("Task",str(i),"at",time)
+                        else:
+                            fw.write((lines[i]).strip()+"\n")
+            print("Completed",count,"out of",len(lines)-1)
+                    
+        else:
+            print("Missing variants file, the data needs preparation, or there are none")
 
         
 
