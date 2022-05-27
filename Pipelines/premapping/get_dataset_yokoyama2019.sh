@@ -23,7 +23,7 @@ cd "${DATA_DIR}"
 
 for x in $(cat "${ACC_FILE}")
 do
-    pyega3 fetch ${x}
+    pyega3 -ms 100000000000 fetch ${x}
 done \
 > download-${TIMESTAMP}.stdout \
 2> download-${TIMESTAMP}.stderr
