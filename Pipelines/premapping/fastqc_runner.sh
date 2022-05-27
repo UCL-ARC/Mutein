@@ -13,7 +13,7 @@
 
 set -eu
 source ~/.mutein_settings
-module load ${MUT_CONDA_MODULE}
-conda activate trim-galore
+conda activate ${MUT_PREFIX}trim-galore
+JOBLIST=$1
 
-head -n ${SGE_TASK_ID} fastqc_joblist | tail -n 1 | bash
+head -n ${SGE_TASK_ID} ${JOBLIST} | tail -n 1 | bash

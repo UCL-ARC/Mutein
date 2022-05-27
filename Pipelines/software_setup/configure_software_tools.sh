@@ -24,6 +24,7 @@ conda config --add channels conda-forge
 #required for enaDataGet command
 conda create --yes --name ${MUT_PREFIX}enabrowsertools
 conda activate ${MUT_PREFIX}enabrowsertools
+conda install --yes entrez-direct
 conda install --yes "enabrowsertools>=1.5.4"
 conda deactivate
 

@@ -13,8 +13,7 @@
 
 set -eu
 source ~/.mutein_settings
-module load ${MUT_CONDA_MODULE}
-conda activate gatk4
+conda activate ${MUT_PREFIX}gatk4
 
 JOBLIST=$1
 

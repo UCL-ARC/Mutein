@@ -13,8 +13,7 @@
 
 set -eu
 source ~/.mutein_settings
-module load ${MUT_CONDA_MODULE}
-conda activate bwa
+conda activate ${MUT_PREFIX}bwa
 
 #extract gzipped file
 gunzip reference/${MUT_REFERENCE}
@@ -27,3 +26,11 @@ samtools faidx reference/${MUT_REFERENCE}
 
 #run time approx 1 hour
 bwa index -a bwtsw reference/${MUT_REFERENCE}
+conda deactivate ${MUT_PREFIX}bwa
+
+conda activate ${MUT_PREFIX}gatk4
+
+rm -f reference/${MUT_REFERENCE}.dict
+gatk CreateSequenceDictionary -R reference/${MUT_REFERENCE}
+
+conda deactivate ${MUT_PREFIX}gatk4

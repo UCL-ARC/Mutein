@@ -13,8 +13,7 @@
 
 set -eu
 source ~/.mutein_settings
-module load ${MUT_CONDA_MODULE}
-conda activate bwa
+conda activate ${MUT_PREFIX}bwa
 
 JOBLIST=$1
 
