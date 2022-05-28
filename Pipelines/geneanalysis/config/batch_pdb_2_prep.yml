@@ -7,7 +7,7 @@ time: '1:00:0'
 cores: "1"
 dependency: '-1'
 array: 0
-inputs: "runs=d@repairs=10@split=1000@vsplit=200@variant=*"
+inputs: "runs=d@repairs=10@split=500@vsplit=100@variant=*"
 active: 'Y'
 ---
 id: 'VPRAM'
@@ -18,6 +18,6 @@ time: '1:00:0'
 cores: "1"
 dependency: '-1'
 array: 0
-inputs: "runs=e@repairs=10@split=1000@vsplit=200@variant=*"
+inputs: "runs=e@repairs=10@split=500@vsplit=100@variant=*"
 active: 'Y'
 --- 
