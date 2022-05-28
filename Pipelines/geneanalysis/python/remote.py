@@ -249,7 +249,7 @@ def run_pipeline(args):
             with open(filename, "r") as fr:
                 lines = fr.readlines()
                 for line in lines:                
-                    print(line)
+                    print(line.strip())
             print("DATAFRAME_END")
     elif mode == "PDB_BM":
         dataset_gene_pdb=pattern.split(":")
@@ -265,7 +265,7 @@ def run_pipeline(args):
             with open(filename, "r") as fr:
                 lines = fr.readlines()
                 for line in lines:                
-                    print(line)
+                    print(line.strip())
             print("DATAFRAME_END")
     elif mode == "PDB_PS":
         dataset_gene_pdb=pattern.split(":")
@@ -281,7 +281,7 @@ def run_pipeline(args):
             with open(filename, "r") as fr:
                 lines = fr.readlines()
                 for line in lines:                
-                    print(line)
+                    print(line.strip())
             print("DATAFRAME_END")
     elif mode == "COVERAGE":
         dataset_gene_pdb=pattern.split(":")
@@ -294,7 +294,7 @@ def run_pipeline(args):
             with open(filename, "r") as fr:
                 lines = fr.readlines()
                 for line in lines:                
-                    print(line)
+                    print(line.strip())
             print("DATAFRAME_END")
 
 
