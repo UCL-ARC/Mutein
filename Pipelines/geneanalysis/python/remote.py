@@ -133,6 +133,59 @@ def run_pipeline(args):
         checkResults(filenameA,filenameB,filenameC)
 
         # Check the background
+        filenameP = path.thruputs + "params_background.txt"        
+        count = 0
+        print("\nChecking the background tasks")
+        if exists(filenameP):            
+            with open(filenameP, "r") as fr:
+                lines = fr.readlines()                
+                print("The pdb has been split into tasks=",len(lines)-1)
+                print("...Any tasks that have completed are below\n")                
+                for i in range(1,len(lines)):
+                    filenameo = path.thruputs + "agg/" + str(i) + "_ddg_background.csv"
+                    existsfile,time = checkResult(filenameo)
+                    if existsfile:
+                        count += 1
+                        print("Task",str(i),"at",time)
+                    else:
+                        print("Task",str(i),"----")            
+            print("Completed",count,"out of",len(lines)-1)
+                    
+        else:
+            print("Missing parameters file, the data needs preparation")
+        
+        # Check the background
+        filenameP = path.thruputs + "params_variants.txt"        
+        print("\nChecking the variant tasks")
+        count = 0
+        if exists(filenameP):            
+            with open(filenameP, "r") as fr:
+                lines = fr.readlines()                    
+                print("The variants have been split into tasks=",len(lines)-1)
+                print("...Any tasks that have completed are below\n")                
+                for i in range(1,len(lines)):
+                    filenameo = path.thruputs + "vagg/" + str(i) + "_ddg_buildmodel.csv"
+                    existsfile,time = checkResult(filenameo)
+                    if existsfile:
+                        count += 1
+                        print("Task",str(i),"at",time)
+                    else:
+                        print("Task",str(i),"----")                        
+            print("Completed",count,"out of",len(lines)-1)                    
+        else:
+            print("Missing variants file, the data needs preparation, or there are none")
+    elif mode == "PDB" or "PDBINCOMPLETE":
+        dataset_gene_pdb=pattern.split(":")
+        dataset,gene,pdb = dataset_gene_pdb[0],dataset_gene_pdb[1],dataset_gene_pdb[2]
+        path = Paths.Paths(DataDir,PipelineDir,dataset=dataset,gene=gene,pdb=pdb)
+        print("Check results files for pdb")
+        print(path.outputs)
+        filenameA = path.outputs + "ddg_background.csv"
+        filenameB = path.outputs + "ddg_buildmodel.csv"
+        filenameC = path.outputs + "ddg_posscan.csv"
+        checkResults(filenameA,filenameB,filenameC)
+
+        # Check the background
         filenameP = path.thruputs + "params_background.txt"
         filename_incomplete = path.thruputs + "params_background_incomplete.txt"
         count = 0
