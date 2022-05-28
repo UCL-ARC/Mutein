@@ -174,10 +174,11 @@ def run_pipeline(args):
             print("Completed",count,"out of",len(lines)-1)                    
         else:
             print("Missing variants file, the data needs preparation, or there are none")
-    elif mode == "PDB" or "PDBINCOMPLETE":
+    elif mode == "PDBINCOMPLETE":
         dataset_gene_pdb=pattern.split(":")
         dataset,gene,pdb = dataset_gene_pdb[0],dataset_gene_pdb[1],dataset_gene_pdb[2]
         path = Paths.Paths(DataDir,PipelineDir,dataset=dataset,gene=gene,pdb=pdb)
+        print("RECREATING TASK FILE with missing tasks\n")
         print("Check results files for pdb")
         print(path.outputs)
         filenameA = path.outputs + "ddg_background.csv"
