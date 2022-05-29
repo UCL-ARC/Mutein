@@ -120,17 +120,17 @@ def run_pipeline(args):
                     existsfilePdb,timePdb = checkResult(filenamePdb)
                     msg = pdbo + "\t"
                     if existsfileRes:
-                        msg += "Results ready at " + str(timeRes) + "\t"
+                        msg += "Results@" + str(timeRes) + "\t"
                     else:
-                        msg += "---\t"                        
+                        msg += "No results\t"                        
                     if existsfileSplit:
-                        msg += "Split prepped at " + str(timeSplit) + "\t"
+                        msg += "Split@" + str(timeSplit) + "\t"
                     else:
-                        msg += "---\t"                        
+                        msg += "No split\t"                        
                     if existsfilePdb:
-                        msg += "Pdb (10) repaired at " + str(timePdb)
+                        msg += "Pdb(10)@" + str(timePdb)
                     else:
-                        msg += "---"                        
+                        msg += "No pdb"                        
                     
                     print(msg)
                     
