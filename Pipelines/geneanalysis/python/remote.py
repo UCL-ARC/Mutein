@@ -117,11 +117,9 @@ def run_pipeline(args):
                     existsfile,time = checkResult(filenameA)
                     existsfilePdb,timePdb = checkResult(filenamePdb)
                     if existsfile and existsfilePdb:
-                        print(pdbo,"\tPdb ready at", timePdb, "\tSplit ready at", time)
-                        print(filenamePdb)
+                        print(pdbo,"\tPdb ready at", timePdb, "\tSplit ready at", time)                        
                     elif existsfile:
-                        print(pdbo,"\tPdb not ready ---\tSplit ready at", time)
-                        print(filenamePdb)
+                        print(pdbo,"\tPdb not ready ---\tSplit ready at", time)                        
                     elif existsfilePdb:
                         print(pdbo,"\tPdb ready at", timePdb, "\tSplit not ready ---")
                     else:
