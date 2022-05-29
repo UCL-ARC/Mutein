@@ -141,8 +141,11 @@ def run_pipeline(args):
         # check the pdb
         filenamePdb = path.inputs + pdb + "_rep10.pdb"        
         existsPdb,time = checkResult(filenamePdb)
+        print("\nChecking the pdb repair")
         if existsPdb:
-            print("PDB 10 repair at",time)       
+            print("\nPDB 10 repair at",time)       
+        else:
+            print("\nPDB 10 repair has not been done")       
         # Check the background        
         filenameP = path.thruputs + "params_background.txt"        
         existsP,time = checkResult(filenameP)
