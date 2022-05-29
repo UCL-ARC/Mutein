@@ -112,7 +112,7 @@ def run_pipeline(args):
                 for ln in lines[1:]:
                     pdbo =ln.strip().split(",")[2]
                     patho = Paths.Paths(DataDir,PipelineDir,dataset=dataset,gene=gene,pdb=pdbo)
-                    filenameA = patho.outputs + "ddg_background.csv"
+                    filenameA = patho.thruputs + "ddg_background.csv"
                     filenamePdb = patho.inputs + pdbo.lower()+"_rep10.pdb"
                     existsfile,time = checkResult(filenameA)
                     existsfilePdb,timePdb = checkResult(filenamePdb)
@@ -121,7 +121,7 @@ def run_pipeline(args):
                     elif existsfile:
                         print(pdbo,"\tPdb not ready ---\tSplit ready at", time)                        
                     elif existsfilePdb:
-                        print(pdbo,"\tPdb ready at", timePdb, "\tSplit not ready ---")
+                        print(pdbo,"\tPdb ready at", timePdb, "\tSplit not ready ---")                        
                     else:
                         print(pdbo,"--- --- --- ---")
                     
