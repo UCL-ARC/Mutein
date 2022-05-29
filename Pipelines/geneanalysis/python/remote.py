@@ -113,11 +113,17 @@ def run_pipeline(args):
                     pdbo =ln.strip().split(",")[2]
                     patho = Paths.Paths(DataDir,PipelineDir,dataset=dataset,gene=gene,pdb=pdbo)
                     filenameA = patho.outputs + "ddg_background.csv"
+                    filenamePdb = patho.inputs + pdb+"_rep10.pdb"
                     existsfile,time = checkResult(filenameA)
-                    if existsfile:
-                        print(pdbo,time)
+                    existsfilePdb,timePdb = checkResult(filenamePdb)
+                    if existsfile and existsfilePdb:
+                        print(pdbo,"\tPdb ready at", timePdb, "\tSplit ready at", time)
+                    elif existsfile:
+                        print(pdbo,"\tPdb not ready ---\tSplit ready at", time)
+                    elif existsfilePdb:
+                        print(pdbo,"\tPdb ready at", timePdb, "\tSplit not ready ---")
                     else:
-                        print(pdbo,"---")
+                        print(pdbo,"--- --- --- ---")
                     
         else:
             print("The pdbs have not been prepared - no pdb list",filename)
@@ -132,11 +138,18 @@ def run_pipeline(args):
         filenameC = path.outputs + "ddg_posscan.csv"
         checkResults(filenameA,filenameB,filenameC)
 
-        # Check the background
+        # check the pdb
+        filenamePdb = path.inputs + pdb + "_rep10.pdb"        
+        existsPdb,time = checkResult(filenamePdb)
+        if existsPdb:
+            print("PDB 10 repair at",time)       
+        # Check the background        
         filenameP = path.thruputs + "params_background.txt"        
+        existsP,time = checkResult(filenameP)
         count = 0
         print("\nChecking the background tasks")
-        if exists(filenameP):            
+        if existsP:     
+            print("Params background at",time)       
             with open(filenameP, "r") as fr:
                 lines = fr.readlines()                
                 print("The pdb has been split into tasks=",len(lines)-1)
