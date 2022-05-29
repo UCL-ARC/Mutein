@@ -113,7 +113,7 @@ def run_pipeline(args):
                     pdbo =ln.strip().split(",")[2]
                     patho = Paths.Paths(DataDir,PipelineDir,dataset=dataset,gene=gene,pdb=pdbo)
                     filenameA = patho.outputs + "ddg_background.csv"
-                    filenamePdb = patho.inputs + pdb.lower()+"_rep10.pdb"
+                    filenamePdb = patho.inputs + pdbo.lower()+"_rep10.pdb"
                     existsfile,time = checkResult(filenameA)
                     existsfilePdb,timePdb = checkResult(filenamePdb)
                     if existsfile and existsfilePdb:
