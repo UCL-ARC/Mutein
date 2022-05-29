@@ -120,6 +120,7 @@ def run_pipeline(args):
                         print(pdbo,"\tPdb ready at", timePdb, "\tSplit ready at", time)
                     elif existsfile:
                         print(pdbo,"\tPdb not ready ---\tSplit ready at", time)
+                        print(filenamePdb)
                     elif existsfilePdb:
                         print(pdbo,"\tPdb ready at", timePdb, "\tSplit not ready ---")
                     else:
