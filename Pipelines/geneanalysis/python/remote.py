@@ -143,19 +143,19 @@ def run_pipeline(args):
         existsPdb,time = checkResult(filenamePdb)
         print("\nChecking the pdb repair")
         if existsPdb:
-            print("\nPDB 10 repair at",time)       
+            print("...PDB 10 repair at",time)       
         else:
-            print("\nPDB 10 repair has not been done")       
+            print("...PDB 10 repair has not been done")       
         # Check the background        
         filenameP = path.thruputs + "params_background.txt"        
         existsP,time = checkResult(filenameP)
         count = 0
         print("\nChecking the background tasks")
         if existsP:     
-            print("Params background at",time)       
+            print("...Params background at",time)       
             with open(filenameP, "r") as fr:
                 lines = fr.readlines()                
-                print("The pdb has been split into tasks=",len(lines)-1)
+                print("\nThe pdb has been split into tasks=",len(lines)-1)
                 print("...Any tasks that have completed are below\n")                
                 for i in range(1,len(lines)):
                     filenameo = path.thruputs + "agg/" + str(i) + "_ddg_background.csv"
