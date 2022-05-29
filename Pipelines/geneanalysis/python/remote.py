@@ -141,7 +141,7 @@ def run_pipeline(args):
         # check the pdb
         filenamePdb = path.inputs + pdb + "_rep10.pdb"        
         existsPdb,time = checkResult(filenamePdb)
-        print("\nChecking the pdb repair")
+        print("\nChecking the pdb repair", filenamePdb)
         if existsPdb:
             print("...PDB 10 repair at",time)       
         else:
@@ -150,7 +150,7 @@ def run_pipeline(args):
         filenameP = path.thruputs + "params_background.txt"        
         existsP,time = checkResult(filenameP)
         count = 0
-        print("\nChecking the background tasks")
+        print("\nChecking the background tasks", filenameP)
         if existsP:     
             print("...Params background at",time)       
             with open(filenameP, "r") as fr:
