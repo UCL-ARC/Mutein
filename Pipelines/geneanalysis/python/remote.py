@@ -112,18 +112,27 @@ def run_pipeline(args):
                 for ln in lines[1:]:
                     pdbo =ln.strip().split(",")[2]
                     patho = Paths.Paths(DataDir,PipelineDir,dataset=dataset,gene=gene,pdb=pdbo)
-                    filenameA = patho.thruputs + "ddg_background.csv"
+                    filenameRes = patho.outputs + "ddg_background.csv"
+                    fileNameSplit = patho.thruputs + "params_background.txt"
                     filenamePdb = patho.inputs + pdbo.lower()+"_rep10.pdb"
-                    existsfile,time = checkResult(filenameA)
+                    existsfileRes,timeRes = checkResult(filenameRes)
+                    existsfileSplit,timeSplit = checkResult(fileNameSplit)
                     existsfilePdb,timePdb = checkResult(filenamePdb)
-                    if existsfile and existsfilePdb:
-                        print(pdbo,"\tPdb ready at", timePdb, "\tSplit ready at", time)                        
-                    elif existsfile:
-                        print(pdbo,"\tPdb not ready ---\tSplit ready at", time)                        
-                    elif existsfilePdb:
-                        print(pdbo,"\tPdb ready at", timePdb, "\tSplit not ready ---")                        
+                    msg = pdbo + "\t"
+                    if existsfileRes:
+                        msg += "Results ready at " + str(timeRes) + "\t"
                     else:
-                        print(pdbo,"--- --- --- ---")
+                        msg += "---\t"                        
+                    if existsfileSplit:
+                        msg += "Split prepped at " + str(timeSplit) + "\t"
+                    else:
+                        msg += "---\t"                        
+                    if existsfilePdb:
+                        msg += "Pdb (10) repaired at " + str(timePdb)
+                    else:
+                        msg += "---"                        
+                    
+                    print(msg)
                     
         else:
             print("The pdbs have not been prepared - no pdb list",filename)
