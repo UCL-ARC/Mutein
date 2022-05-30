@@ -94,6 +94,7 @@ def run_pipeline(args):
         
         for in_csv, out_csv, plot_file in analyses: 
             all_df = []
+            exists_all = True
             for i in range(len(pm_df.index)):
                 r = pm_df["row"][i]
                 rpdb = pm_df["pdb"][i]
@@ -102,11 +103,15 @@ def run_pipeline(args):
                     if exists(in_csv_i):
                         fdf = FileDf.FileDf(in_csv_i)
                         all_df.append(fdf.openDataFrame())
-            if len(all_df) > 0:
+                    else:
+                        exists_all = False
+            if len(all_df) > 0 and exists_all:
                 ddg_df = pd.concat(all_df, ignore_index=True)        
                 ddg_df.to_csv(out_csv, index=False)        
                 ana = Analysis.Analysis(ddg_df, argus.arg("pdb"))
                 ana.createDdgResidue(plot_file, "variants", xax="gene_no")
+            else:
+                print("vAgg - not all results present for aggregation")
 
     print("### COMPLETED FoldX aggregate job ###")
     print("MUTEIN SCRIPT ENDED")

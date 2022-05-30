@@ -80,6 +80,7 @@ def run_pipeline(args):
         )
         pm_df = fdfp.openDataFrame()
         all_df = []
+        all_exists = True
         for i in range(len(pm_df.index)):
             r = pm_df["task"][i]
             rpdb = pm_df["pdb"][i]
@@ -89,31 +90,37 @@ def run_pipeline(args):
                 if exists(in_csv_i):
                     fdf = FileDf.FileDf(in_csv_i)
                     all_df.append(fdf.openDataFrame())
-        if len(all_df) > 0:
-            ddg_df = pd.concat(all_df, ignore_index=True)
-            df_file = pdb_path.pdb_outputs + "ddg_background.csv"
-            ddg_df.to_csv(df_file, index=False)
+                else:
+                    all_exists = False
+        
+        if all_exists:
+            if len(all_df) > 0:
+                ddg_df = pd.concat(all_df, ignore_index=True)
+                df_file = pdb_path.pdb_outputs + "ddg_background.csv"
+                ddg_df.to_csv(df_file, index=False)
 
-            plot_file = (
-                pdb_path.pdb_outputs
-                + argus.arg("pdb")
-                + "_"
-                + str(argus.arg("repairs"))
-                + "_background_plot.png"
-            )
-            plot_file_gene = (
-                pdb_path.pdb_outputs
-                + argus.arg("pdb")
-                + "_"
-                + str(argus.arg("repairs"))
-                + "_background_plot_gene.png"
-            )
+                plot_file = (
+                    pdb_path.pdb_outputs
+                    + argus.arg("pdb")
+                    + "_"
+                    + str(argus.arg("repairs"))
+                    + "_background_plot.png"
+                )
+                plot_file_gene = (
+                    pdb_path.pdb_outputs
+                    + argus.arg("pdb")
+                    + "_"
+                    + str(argus.arg("repairs"))
+                    + "_background_plot_gene.png"
+                )
 
-            ana = Analysis.Analysis(ddg_df, argus.arg("pdb"))
-            ana.createDdgResidue(plot_file, "background")
-            ana.createDdgResidue(
-                plot_file_gene, "background muts", dropnagene=True, xax="gene_no"
-            )
+                ana = Analysis.Analysis(ddg_df, argus.arg("pdb"))
+                ana.createDdgResidue(plot_file, "background")
+                ana.createDdgResidue(
+                    plot_file_gene, "background muts", dropnagene=True, xax="gene_no"
+                )
+        else:
+            print("Agg: not all results are present")
 
     print("### COMPLETED FoldX aggregate job ###")
     print("MUTEIN SCRIPT ENDED")

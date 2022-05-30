@@ -82,7 +82,7 @@ def run_pipeline(args):
                         
     if gene_stitch:
         print("Gene stitching...")
-        import Pipelines.geneanalysis.python.ga06_genestitch as pplc
+        import Pipelines.geneanalysis.python.mod_onegenestitch as pplc
         print("Stitching gene", gene)
         pplc.run_pipeline(args)
     else:
