@@ -76,17 +76,18 @@ def run_pipeline(args):
         mutations = variant_df
     print(mutations)
 
+    total_muts = len(mutations.index)
     if splitrows == 0:
         vchunk = int(argus.arg("vchunk"))
         splitrows = int(len(mutations.index)/vchunk)
         print("Split is now",splitrows)
+        chunk = int(total_muts / splitrows)
+        remainder = int(total_muts % splitrows)
     else:
         print("Split is not zero, but",splitrows)
-
-    total_muts = len(mutations.index)
-    chunk = int(total_muts / splitrows)
-    remainder = int(total_muts % splitrows)
-
+        chunk = int(total_muts / splitrows)
+        remainder = int(total_muts % splitrows)
+        
     mut_list = []
     for i in range(len(mutations.index)):
         chain = mutations["chain"][i]
