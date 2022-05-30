@@ -83,6 +83,10 @@ def run_pipeline(args):
     else:
         print("Split is not zero, but",splitrows)
 
+    total_muts = len(mutations.index)
+    chunk = int(total_muts / splitrows)
+    remainder = int(total_muts % splitrows)
+
     mut_list = []
     for i in range(len(mutations.index)):
         chain = mutations["chain"][i]
@@ -91,9 +95,7 @@ def run_pipeline(args):
         mut_list.append([mut, pdb_mut, chain])
 
     ##### Create a dataframe for the paramterfile in the number of chunks specified
-    total_muts = len(mut_list)
-    chunk = int(total_muts / splitrows)
-    remainder = int(total_muts % splitrows)
+    
     # so until we get to the remainer we need chunk +1 on each row
     param_dic = {}
     param_dic["pdb"] = []
