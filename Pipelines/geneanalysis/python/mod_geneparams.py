@@ -39,8 +39,8 @@ def run_pipeline(args):
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
-    split = int(argus.arg("split"))
-
+    split = int(argus.arg("split"),0)
+    
     gene_path = Paths.Paths(        
         data_dir,
         install_dir + "Pipelines/geneanalysis",
@@ -60,6 +60,9 @@ def run_pipeline(args):
     numpdbs = len(df.index)    
     # There is a 100,000 limit on number of tasks, so if the pdbs make more than that, reduce number of tasks
     # This could be a problem fir gene AURKA which has many pdbs
+    if split == 0:
+        chunk = int(argus.arg("chunk"),0)
+        split = int(numpdbs/chunk)
     if numpdbs * split > 100000:
         split = int(100000/numpdbs)-1
         args[1]+="@split="+str(split)
