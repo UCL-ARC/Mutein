@@ -44,13 +44,13 @@ def run_pipeline01(args):
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
-    pdbcode = argus.arg("pdb","").lower()
-    
-    gene_path = Paths.Paths(        
+    pdbcode = argus.arg("pdb", "").lower()
+
+    gene_path = Paths.Paths(
         data_dir,
         install_dir + "Pipelines/geneanalysis",
         dataset=dataset,
-        gene=gene,        
+        gene=gene,
         pdb=pdb,
     )
     pdbtasks = gene_path.gene_outputs + "pdb_tasklist.csv"
@@ -58,9 +58,9 @@ def run_pipeline01(args):
     df = fio.openDataFrame()
     task = int(argus.arg("task", "none"))
     if task <= len(df.index):
-        pdbcode = df["pdb"][task-1].lower()
-                
-        pdb_path = Paths.Paths(        
+        pdbcode = df["pdb"][task - 1].lower()
+
+        pdb_path = Paths.Paths(
             data_dir,
             install_dir + "Pipelines/geneanalysis",
             dataset=dataset,

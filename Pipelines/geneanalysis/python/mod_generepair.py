@@ -45,28 +45,28 @@ def run_pipeline(args):
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
     task = int(argus.arg("task", "none"))
-    
-    gene_path = Paths.Paths(        
+
+    gene_path = Paths.Paths(
         data_dir,
         install_dir + "Pipelines/geneanalysis",
         dataset=dataset,
-        gene=gene,        
+        gene=gene,
     )
     pdbtasks = gene_path.gene_outputs + "pdb_tasklist.csv"
     fio = FileDf.FileDf(pdbtasks)
     df = fio.openDataFrame()
-    
+
     if task <= len(df.index):
-        pdbcode = df["pdb"][task-1].lower()
+        pdbcode = df["pdb"][task - 1].lower()
         argsgn = args
         arglist = args[1]
         arglist += "@pdb=" + pdbcode
         argsgn[1] = arglist
         import Pipelines.geneanalysis.python.mod_pdbrepair as ppl
+
         print("Repairing pdb", pdbcode)
         ppl.run_pipeline(argsgn)
-                
-        
+
     else:
         print("Task beyond the data")
 

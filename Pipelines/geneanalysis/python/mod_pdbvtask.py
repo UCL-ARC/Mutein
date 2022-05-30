@@ -44,25 +44,25 @@ def run_pipeline(args):
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
-    pdb=argus.arg("pdb","")
+    pdb = argus.arg("pdb", "")
 
     task = int(argus.arg("task"))
 
-    gene_path = Paths.Paths(        
+    gene_path = Paths.Paths(
         data_dir,
         install_dir + "Pipelines/geneanalysis",
         dataset=dataset,
-        gene=gene,        
-        pdb=pdb,        
-    )    
-    all_tasks = gene_path.thruputs + "params_variants.txt"    
+        gene=gene,
+        pdb=pdb,
+    )
+    all_tasks = gene_path.thruputs + "params_variants.txt"
     fio = FileDf.FileDf(all_tasks, sep=" ", header=True)
     df = fio.openDataFrame()
-    
+
     if task <= len(df.index):
-        pdbcode = df["pdb"][task-1].lower()    
-        
-        pdb_path = Paths.Paths(        
+        pdbcode = df["pdb"][task - 1].lower()
+
+        pdb_path = Paths.Paths(
             data_dir,
             install_dir + "Pipelines/geneanalysis",
             dataset=dataset,
@@ -77,7 +77,7 @@ def run_pipeline(args):
         pdbfile = pdbcode + "_rep" + str(argus.arg("repairs")) + ".pdb"
         mutations = []
         # task=all means all, task=1:n means an explicit row, row=-1 means the mutation string has been passd in explicitly
-        if mutation_string == "none":            
+        if mutation_string == "none":
             if task == "all":
                 for i in range(len(df.index)):
                     gene_mut = df["gene_mut"][i]
@@ -96,12 +96,7 @@ def run_pipeline(args):
 
         for pdb_mut, gene_mut, row in mutations:
             print(pdb_mut, gene_mut, row)
-            row_path = (
-                pdb_path.pdb_thruputs                
-                + "var_"
-                + str(row)                
-                + "/"
-            )
+            row_path = pdb_path.pdb_thruputs + "var_" + str(row) + "/"
             print("### ... change directory", row_path)
             argus.params["thisrow"] = row
             argus.params["genemut"] = gene_mut
@@ -119,44 +114,52 @@ def run_pipeline(args):
             pdb = pdbcode + "_rep" + str(argus.arg("repairs"))
             filename = pdb_path.pdb_inputs + "Coverage.csv"
             fdfp = FileDf.FileDf(filename)
-            cov_df = fdfp.openDataFrame()        
+            cov_df = fdfp.openDataFrame()
             if gene_mut.lower() == "x" or gene_mut == "":
                 gene_muts = []
             else:
                 gene_muts = gene_mut.split(",")
-            
+
             work_path = pdb_path.pdb_thruputs + "vagg/"
             pdb_path.goto_job_dir(work_path, args, argus.params, "_inputs04b")
             pdb_path.goto_job_dir(row_path, args, argus.params, "_inputs04b")
-            
+
             if True:
-                #~~~~~~~~~~~~~~~~~~~~~~~~~~ POSITION SCAN ~~~~~~~~~~~~~~~~~~~~~~~~#        
+                # ~~~~~~~~~~~~~~~~~~~~~~~~~~ POSITION SCAN ~~~~~~~~~~~~~~~~~~~~~~~~#
                 ################################################################
                 fx_runner.runPosscan(pdbfile, pdb_mut)
-                ################################################################                        
+                ################################################################
                 ddg_file = row_path + "PS_" + pdb + "_scanning_output.txt"
-                #df_file = row_path + "ddg_posscan.csv"        
-                df_file = pdb_path.pdb_thruputs+"vagg/"+str(row) + "_ddg_posscan.csv"              
+                # df_file = row_path + "ddg_posscan.csv"
+                df_file = (
+                    pdb_path.pdb_thruputs + "vagg/" + str(row) + "_ddg_posscan.csv"
+                )
                 pdb_muts = pdb_mut.split(",")
-                fx_runner.createPosscanCsv(row_path, pdb, pdb_muts, gene_muts, cov_df, ddg_file,df_file)
-            
-            if True:            
-                #~~~~~~~~~~~~~~~~~~~~~~~~~~ BUILD MODEL ~~~~~~~~~~~~~~~~~~~~~~~~#                                            
+                fx_runner.createPosscanCsv(
+                    row_path, pdb, pdb_muts, gene_muts, cov_df, ddg_file, df_file
+                )
+
+            if True:
+                # ~~~~~~~~~~~~~~~~~~~~~~~~~~ BUILD MODEL ~~~~~~~~~~~~~~~~~~~~~~~~#
                 ddg_files = []
                 tag = 0
                 pdb_muts = pdb_mut.split(",")
                 for pm in pdb_muts:
-                    tag+=1
-                    ################################################################        
-                    fx_runner.runBuild(pdbfile, pm,tag)
-                    ################################################################                        
-                    ddg_file = row_path + "Dif_" + str(tag) + "_" + pdb + ".fxout"                
-                    ddg_files.append([ddg_file,pm])
-                
-                #create them all into 1 ddg file
-                #df_file = row_path + "ddg_buildmodel.csv"  
-                df_file = pdb_path.pdb_thruputs+"vagg/"+str(row) + "_ddg_buildmodel.csv"              
-                fx_runner.createBuildCsv(row_path, pdb, pdb_muts, gene_muts, cov_df, ddg_files,df_file)
+                    tag += 1
+                    ################################################################
+                    fx_runner.runBuild(pdbfile, pm, tag)
+                    ################################################################
+                    ddg_file = row_path + "Dif_" + str(tag) + "_" + pdb + ".fxout"
+                    ddg_files.append([ddg_file, pm])
+
+                # create them all into 1 ddg file
+                # df_file = row_path + "ddg_buildmodel.csv"
+                df_file = (
+                    pdb_path.pdb_thruputs + "vagg/" + str(row) + "_ddg_buildmodel.csv"
+                )
+                fx_runner.createBuildCsv(
+                    row_path, pdb, pdb_muts, gene_muts, cov_df, ddg_files, df_file
+                )
     print("MUTEIN SCRIPT ENDED")
 
 

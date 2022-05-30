@@ -29,10 +29,10 @@ class Gene:
         else:
             pdb = self.pdbs[pdbcode]
         return pdb
-    
-    def addPdb(self, pdb):        
+
+    def addPdb(self, pdb):
         self.pdbs[pdb.pdbcode] = pdb
-        
+
     def getMatchingVarantPdb(self):
         v_p = []
         for v in self.variants:
@@ -66,7 +66,7 @@ class Gene:
         pdbs_df = pd.DataFrame.from_dict(dic_variants)
         pdbs_df = pdbs_df.sort_values(by="residue", ascending=True)
         return pdbs_df
-    
+
     def getVariantsDataFrame(self):
         dic_variants = {}
         dic_variants["gene"] = []
@@ -74,18 +74,17 @@ class Gene:
         dic_variants["variant"] = []
         dic_variants["gene_no"] = []
         dic_variants["bases"] = []
-        
-        for vrcod, vr in self.variants.items():            
+
+        for vrcod, vr in self.variants.items():
             dic_variants["gene"].append(self.gene)
-            dic_variants["accession"].append(self.accession)            
+            dic_variants["accession"].append(self.accession)
             dic_variants["variant"].append(vr.variant)
-            dic_variants["gene_no"].append(vr.residue)                                    
-            dic_variants["bases"].append(vr.bases)        
+            dic_variants["gene_no"].append(vr.residue)
+            dic_variants["bases"].append(vr.bases)
 
         vars_df = pd.DataFrame.from_dict(dic_variants)
         vars_df = vars_df.sort_values(by="gene_no", ascending=True)
         return vars_df
-
 
     def getPdbCoverageDataFrame(self):
         dic_coverage = {}
@@ -155,12 +154,12 @@ class Gene:
         dic_coverage["variant"] = []
         dic_coverage["chain"] = []
         dic_coverage["gene_no"] = []
-        dic_coverage["gene_mut"] = []        
+        dic_coverage["gene_mut"] = []
         dic_coverage["pdb_residue"] = []
         dic_coverage["pdb_mut"] = []
 
         for vrcod, vr in self.variants.items():
-            included, chain, pdb_residue = vr.includedInRange(pdb.segments)                            
+            included, chain, pdb_residue = vr.includedInRange(pdb.segments)
             if included:
                 dic_coverage["gene"].append(self.gene)
                 dic_coverage["accession"].append(self.accession)
@@ -168,10 +167,9 @@ class Gene:
                 dic_coverage["variant"].append("ANY")
                 dic_coverage["chain"].append(chain)
                 dic_coverage["gene_no"].append(vr.residue)
-                dic_coverage["gene_mut"].append(vrcod)                
+                dic_coverage["gene_mut"].append(vrcod)
                 dic_coverage["pdb_residue"].append(int(pdb_residue))
-                dic_coverage["pdb_mut"].append(vrcod[0]+str(pdb_residue)+vrcod[-1]
-                )
+                dic_coverage["pdb_mut"].append(vrcod[0] + str(pdb_residue) + vrcod[-1])
 
         pdbs_df = pd.DataFrame.from_dict(dic_coverage)
         pdbs_df = pdbs_df.sort_values(by="gene_no", ascending=True)
@@ -201,15 +199,15 @@ class Gene:
         return pdbs_df
 
     def getPdbTaskList(self):
-        dic_coverage = {}        
+        dic_coverage = {}
         dic_coverage["gene"] = []
-        dic_coverage["accession"] = []                
+        dic_coverage["accession"] = []
         dic_coverage["pdb"] = []
 
-        for pdbcod,pdb in self.pdbs.items():            
+        for pdbcod, pdb in self.pdbs.items():
             dic_coverage["gene"].append(self.gene)
             dic_coverage["accession"].append(self.accession)
-            dic_coverage["pdb"].append(pdbcod)                        
+            dic_coverage["pdb"].append(pdbcod)
         pdbs_df = pd.DataFrame.from_dict(dic_coverage)
         return pdbs_df
 

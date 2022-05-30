@@ -14,7 +14,7 @@ import os
 class Paths:
     def __init__(self, data_dir, pipe_path, dataset="", gene="", pdb=""):
         # Depending on the levels we will ensure the correct paths are present for inputs and ouputs
-        
+
         self.inputs = ""
         self.thruputs = ""
         self.outputs = ""
@@ -30,11 +30,11 @@ class Paths:
         self.pdb_inputs = ""
         self.pdb_thruputs = ""
         self.pdb_outputs = ""
-                
+
         self.data_dir = data_dir
         if self.data_dir[-1] != "/":
             self.data_dir += "/"
-        #print("Initialising PATH CLASS with datadir=", data_dir)
+        # print("Initialising PATH CLASS with datadir=", data_dir)
         self.pipeline_path = pipe_path
 
         # there are levels of ids as many to 1 is slowly whittled down by dataset, gene, pdb and perhaps method (eg ddg or other)
@@ -46,9 +46,9 @@ class Paths:
             level = "gene"
             if gene == "":
                 level = "dataset"
-        dataset = dataset.replace(".","_")
-        gene = gene.replace(".","_")
-        pdb = pdb.replace(".","_")
+        dataset = dataset.replace(".", "_")
+        gene = gene.replace(".", "_")
+        pdb = pdb.replace(".", "_")
 
         dataset = dataset.lower()
         gene = gene.lower()
@@ -76,34 +76,35 @@ class Paths:
 
         # Create the foldx paths (which may be unique for a method)
 
-    def get_make_paths_dataset(self, dataset):        
+    def get_make_paths_dataset(self, dataset):
         # The path structure is relative to the script file (it will be easy to change to a given one)
         basepath = "dataset_" + dataset + "/"
         self.dataset_inputs = "dataset_" + dataset + ""
-        #print(self.dataset_inputs)
+        # print(self.dataset_inputs)
         self.dataset_inputs = self.add_remove_path_levels(0, dir=basepath)
-                
+
         self.dataset_outputs = basepath + "results"
         self.dataset_outputs = self.add_remove_path_levels(0, dir=self.dataset_outputs)
-        
-        self.dataset_thruputs = basepath + "thruputs"
-        self.dataset_thruputs = self.add_remove_path_levels(0, dir=self.dataset_thruputs)
-                
 
-    def get_make_paths_gene(self, dataset, gene):        
+        self.dataset_thruputs = basepath + "thruputs"
+        self.dataset_thruputs = self.add_remove_path_levels(
+            0, dir=self.dataset_thruputs
+        )
+
+    def get_make_paths_gene(self, dataset, gene):
         # The path structure is relative to the script file (it will be easy to change to a given one)
         basepath = ""
         if dataset != "":
             self.get_make_paths_dataset(dataset)
             basepath = "dataset_" + dataset
-        
+
         if basepath == "" or basepath[-1] != "/":
             basepath += "/"
-                
+
         self.gene_inputs = basepath + "gene_" + gene + ""
         self.gene_inputs = self.add_remove_path_levels(0, dir=self.gene_inputs)
         basepath = basepath + "gene_" + gene + "/"
-        
+
         self.gene_outputs = basepath + "results"
         self.gene_outputs = self.add_remove_path_levels(0, dir=self.gene_outputs)
 
@@ -112,21 +113,21 @@ class Paths:
 
         self.gene_outpdbs = basepath + "thruputs/pdbs"
         self.gene_outpdbs = self.add_remove_path_levels(0, dir=self.gene_outpdbs)
-                        
+
     def get_make_paths_pdb(self, dataset, gene, pdbcode):
-        # The path structure is relative to the script file (it will be easy to change to a given one)            
+        # The path structure is relative to the script file (it will be easy to change to a given one)
         basepath = ""
         if dataset != "":
             self.get_make_paths_dataset(dataset)
             basepath = basepath = "dataset_" + dataset + "/"
         if gene != "":
-            self.get_make_paths_gene(dataset,gene)
+            self.get_make_paths_gene(dataset, gene)
             basepath += "gene_" + gene + "/"
-                
+
         self.pdb_inputs = basepath + "pdb_" + pdbcode + ""
         self.pdb_inputs = self.add_remove_path_levels(0, dir=self.pdb_inputs)
         basepath = basepath + "pdb_" + pdbcode + "/"
-        
+
         self.pdb_outputs = basepath + "results"
         self.pdb_outputs = self.add_remove_path_levels(0, dir=self.pdb_outputs)
 
@@ -145,10 +146,10 @@ class Paths:
         elif must_exist:
             raise Exception("The folder is missing: " + retpath)
         else:
-            try:                
-                os.mkdir(retpath)            
+            try:
+                os.mkdir(retpath)
             except:
-                pass #this could be a rare case of 2 nodes creating it at the same time
+                pass  # this could be a rare case of 2 nodes creating it at the same time
         return retpath + "/"
 
     def goto_job_dir(self, dir_path, args, params, name):
@@ -156,7 +157,7 @@ class Paths:
             try:
                 os.mkdir(dir_path)
             except:
-                pass #this could be a rare case of 2 nodes creating it at the same time
+                pass  # this could be a rare case of 2 nodes creating it at the same time
         os.chdir(dir_path)
         inputs_file = name + ".log"
         with open(inputs_file, "w") as fw:

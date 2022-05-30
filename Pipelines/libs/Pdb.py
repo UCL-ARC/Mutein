@@ -9,7 +9,8 @@ from urllib.request import urlretrieve
 import Bio.PDB as bio
 import warnings
 from Bio import BiopythonWarning
-warnings.simplefilter('ignore', BiopythonWarning)
+
+warnings.simplefilter("ignore", BiopythonWarning)
 
 
 class Pdb:
@@ -25,12 +26,12 @@ class Pdb:
         self.pdbcode = pdb
         self.segments = []
         # self.chain = chain.upper()
-        #self.segment_starts = []  # [int(segment_start)]
-        #self.segment_ends = []  # [int(segment_end)]
-        #self.segment_offsets = []  # [int(offset)]
-        #self.segment_chains = []  # [chain]
-        #self.method = method.lower()
-        #self.resolution = resolution
+        # self.segment_starts = []  # [int(segment_start)]
+        # self.segment_ends = []  # [int(segment_end)]
+        # self.segment_offsets = []  # [int(offset)]
+        # self.segment_chains = []  # [chain]
+        # self.method = method.lower()
+        # self.resolution = resolution
 
     """
     def addSegment(self, seg_start, seg_end, seg_off, seg_chain):
@@ -44,18 +45,45 @@ class Pdb:
             self.segment_chains.append(seg_chain)
 
     """
+
     def matchesResidue(self, residue):
-        #for s in range(len(self.segment_starts)):
-        for chain,residue_num,residue_end,gene_start,gene_end,coverage in self.segments:                                        
+        # for s in range(len(self.segment_starts)):
+        for (
+            chain,
+            residue_num,
+            residue_end,
+            gene_start,
+            gene_end,
+            coverage,
+        ) in self.segments:
             if int(residue) >= residue_num and int(residue) <= residue_end:
                 return True
         return False
 
     def getSegments(self):
         segs = ""
-        for chain,residue_num,residue_end,gene_start,gene_end,coverage in self.segments:                            
-            segs += chain+":"+residue_num+":"+residue_end+":"+gene_start+":"+gene_end+":"+coverage
-            #segs += seg_start + ":" + seg_end + ":" + seg_off + ":" + seg_chain + " "
+        for (
+            chain,
+            residue_num,
+            residue_end,
+            gene_start,
+            gene_end,
+            coverage,
+        ) in self.segments:
+            segs += (
+                chain
+                + ":"
+                + residue_num
+                + ":"
+                + residue_end
+                + ":"
+                + gene_start
+                + ":"
+                + gene_end
+                + ":"
+                + coverage
+            )
+            # segs += seg_start + ":" + seg_end + ":" + seg_off + ":" + seg_chain + " "
         return segs
 
     def getMethod(self):
@@ -71,7 +99,7 @@ class Pdb:
             return self.method
 
     ### These functions retrieve pdb structures from the web ###
-    
+
     def downloadPdb(self, file_path, location="pdb"):  # pdb, pdbe, af
         if self.getMethod() == "alphafold":
             web_path = self.getAlphaFoldLink()

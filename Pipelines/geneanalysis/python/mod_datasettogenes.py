@@ -37,8 +37,10 @@ def run_pipeline(args):
     sys.path.append(install_dir + "/Pipelines/libs")
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
-    dataset_path = Paths.Paths(data_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset)
-    genes_list = []                
+    dataset_path = Paths.Paths(
+        data_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset
+    )
+    genes_list = []
     """
     "gene_name"	"n_syn"	"n_mis"	"n_non"	"n_spl"	"n_ind"	"wmis_cv"	"wnon_cv"	"wspl_cv"	"wind_cv"	"pmis_cv"	"ptrunc_cv"	"pallsubs_cv"	"pind_cv"	"qmis_cv"	"qtrunc_cv"	"qallsubs_cv"	"pglobal_cv"	"qglobal_cv"
     "NOTCH1"	404	2700	772	360	1208	3.98846230912502	21.7266421919647	21.7266421919647	17.6547328391658	0	0	0	8.07429581976078e-68	0	0	0	0	0
@@ -48,12 +50,12 @@ def run_pipeline(args):
         genes_file = dataset_path.dataset_inputs + "/genes.txt"
         with open(genes_file, "r") as fr:
             lines = fr.readlines()
-            #lines = ["","FAT1"]
+            # lines = ["","FAT1"]
             for l in range(1, len(lines)):
                 # for l in range(1,2):
                 line = lines[l]
                 cols = line.split("\t")
-                gene = cols[0].upper()            
+                gene = cols[0].upper()
                 if gene[0] == '"':
                     gene = gene[1:]
                 if gene[-1] == '"':
@@ -62,10 +64,12 @@ def run_pipeline(args):
 
     # 1.) First prepare the variants file
     genes_variant_file = dataset_path.dataset_inputs + "genes_variants.txt"
-    gene_variant_dic = genestovariants.extractVariantsFromFile(genes_variant_file)            
+    gene_variant_dic = genestovariants.extractVariantsFromFile(genes_variant_file)
     genes = []
-    for gene in genes_list:        
-        gene_path = Paths.Paths(data_dir,install_dir + "Pipelines/geneanalysis",dataset=dataset,gene=gene)
+    for gene in genes_list:
+        gene_path = Paths.Paths(
+            data_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset, gene=gene
+        )
         accession = genetoprotein.accession_from_bioservices(gene.upper())
         if len(accession) > 1:
             seq = genetoprotein.sequence_from_bioservices(accession)
@@ -89,17 +93,17 @@ def run_pipeline(args):
                 vr = vrs["variant"][i]
                 # print(bs,p1,rs,na,vr)
                 vrnt = Variant.Variant(gene, vr, bs)
-                gn.addVariant(vrnt)                                    
+                gn.addVariant(vrnt)
             dfv = gn.getVariantsDataFrame()
             dfv.to_csv(gene_path.gene_inputs + "/variants.csv", index=False)
-    
+
     # make a list of the genes
-    genes_csv = FileDf.FileDic(dataset_path.dataset_inputs + "genes_list.csv",{})    
+    genes_csv = FileDf.FileDic(dataset_path.dataset_inputs + "genes_list.csv", {})
     for gn in genes_list:
-        genes_csv.add("dataset",dataset)
-        genes_csv.add("gene",gn)
+        genes_csv.add("dataset", dataset)
+        genes_csv.add("gene", gn)
     genes_csv.saveAsDf()
-                               
+
     print("### COMPLETED genes to gene ###")
     print("MUTEIN SCRIPT ENDED")
 

@@ -41,22 +41,22 @@ def run_pipeline05(args):
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
 
-    gene_path = Paths.Paths(        
+    gene_path = Paths.Paths(
         data_dir,
         install_dir + "Pipelines/geneanalysis",
         dataset=dataset,
-        gene=gene,        
+        gene=gene,
     )
     pdbtasks = gene_path.gene_outputs + "pdb_tasklist.csv"
     fio = FileDf.FileDf(pdbtasks)
     df = fio.openDataFrame()
-    
+
     all_params = []
 
     for t in range(len(df.index)):
         pdbcode = df["pdb"][t].lower()
-        
-        pdb_path = Paths.Paths(        
+
+        pdb_path = Paths.Paths(
             data_dir,
             install_dir + "Pipelines/geneanalysis",
             dataset=dataset,
@@ -65,13 +65,13 @@ def run_pipeline05(args):
         )
         work_path = pdb_path.pdb_thruputs + "vparams/"
         pdb_path.goto_job_dir(work_path, args, argus.params, "_inputs05")
-        ############################################        
+        ############################################
         variant = argus.arg("variant")
         # chainid = argus.arg("chain")
         splitrows = int(argus.arg("split"))
 
         # variant file is in the pdb inputs
-        pdb_path = Paths.Paths(        
+        pdb_path = Paths.Paths(
             data_dir,
             install_dir + "Pipelines/geneanalysis",
             dataset=dataset,
@@ -141,10 +141,10 @@ def run_pipeline05(args):
         print("### foldx05: ... savig df", filename)
         data_params.to_csv(filename, index=False, sep=" ", header=True)
         all_params.append(data_params)
-    
+
     all_path = gene_path.gene_outputs + "params_variants.txt"
     all_df = pd.concat(all_params, axis=0)
-    all_df.to_csv(all_path,index=False,sep=" ",header=True)
+    all_df.to_csv(all_path, index=False, sep=" ", header=True)
 
 
 ##########################################################################################

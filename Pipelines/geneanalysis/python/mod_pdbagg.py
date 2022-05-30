@@ -38,14 +38,14 @@ def run_pipeline(args):
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
-    pdbcode = argus.arg("pdb","").lower()
+    pdbcode = argus.arg("pdb", "").lower()
 
-    gene_path = Paths.Paths(        
+    gene_path = Paths.Paths(
         data_dir,
         install_dir + "Pipelines/geneanalysis",
         dataset=dataset,
-        gene=gene,        
-        pdb=pdbcode,        
+        gene=gene,
+        pdb=pdbcode,
     )
     pdb_list = []
     if pdbcode != "":
@@ -54,13 +54,13 @@ def run_pipeline(args):
         pdbtasks = gene_path.gene_outputs + "pdb_tasklist.csv"
         fio = FileDf.FileDf(pdbtasks)
         df = fio.openDataFrame()
-    
+
         for t in range(len(df.index)):
             pdbcode = df["pdb"][t].lower()
             pdb_list.append(pdbcode)
-        
+
     for pdbcode in pdb_list:
-        pdb_path = Paths.Paths(        
+        pdb_path = Paths.Paths(
             data_dir,
             install_dir + "Pipelines/geneanalysis",
             dataset=dataset,
@@ -74,7 +74,7 @@ def run_pipeline(args):
         argus.params["work_path"] = work_path
         pdb_path.goto_job_dir(argus.arg("work_path"), args, argus.params, "_inputs05a")
         ############################################
-        params_file = gene_path.thruputs +  "params_background.txt"
+        params_file = gene_path.thruputs + "params_background.txt"
         fdfp = FileDf.FileDf(
             params_file, sep=" ", cols=["pdb", "mut", "task"], header=False
         )
@@ -84,15 +84,15 @@ def run_pipeline(args):
         for i in range(len(pm_df.index)):
             r = pm_df["task"][i]
             rpdb = pm_df["pdb"][i]
-            if rpdb == pdbcode:            
+            if rpdb == pdbcode:
                 # the file has already been turned into a dataframe called posscan_df.csv
-                in_csv_i = work_path+str(r) + "_ddg_background.csv"                
+                in_csv_i = work_path + str(r) + "_ddg_background.csv"
                 if exists(in_csv_i):
                     fdf = FileDf.FileDf(in_csv_i)
                     all_df.append(fdf.openDataFrame())
                 else:
                     all_exists = False
-        
+
         if all_exists:
             if len(all_df) > 0:
                 ddg_df = pd.concat(all_df, ignore_index=True)

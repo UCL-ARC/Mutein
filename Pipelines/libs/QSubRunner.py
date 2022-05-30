@@ -24,7 +24,7 @@ class QSubRunner:
         inputs,
         cores,
         print_only,
-    ):        
+    ):
         inputs += "@install_dir=" + install_dir
         inputs += "@data_dir=" + data_dir
         isarray = int(array) > 0
@@ -47,7 +47,7 @@ class QSubRunner:
         self.args.append("-pe")
         self.args.append("smp")
         self.args.append(cores)
-        if script == "cleanup": #redirect the ogs as we don't care about them
+        if script == "cleanup":  # redirect the ogs as we don't care about them
             self.args.append("-o")
             self.args.append("clean_out.txt")
             self.args.append("-e")

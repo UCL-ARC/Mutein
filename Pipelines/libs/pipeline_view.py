@@ -27,26 +27,25 @@ from os.path import isfile, join
 import os
 
 
-def run_pipeline(args):    
+def run_pipeline(args):
     print(args)
-    ##############################################    
-    argus = Arguments.Arguments(args)    
+    ##############################################
+    argus = Arguments.Arguments(args)
     jobid = argus.arg("JOBID")
     homeuser = pwd.getpwuid(os.getuid())[0]
-    scratch_dir = "/home/" + homeuser + "/Scratch/workspace/"    
-    print("scratch_dir",scratch_dir)
-    
-    onlyfiles = [f for f in listdir(scratch_dir) if isfile(join(scratch_dir, f))]        
+    scratch_dir = "/home/" + homeuser + "/Scratch/workspace/"
+    print("scratch_dir", scratch_dir)
+
+    onlyfiles = [f for f in listdir(scratch_dir) if isfile(join(scratch_dir, f))]
     for file in onlyfiles:
-        filename =scratch_dir+file 
+        filename = scratch_dir + file
         if jobid in filename:
-            if exists(filename):          
-                print("@@@@@@@@@@@@@ Log File",filename,"@@@@@@@@@@@@@")           
+            if exists(filename):
+                print("@@@@@@@@@@@@@ Log File", filename, "@@@@@@@@@@@@@")
                 with open(filename) as fr:
                     lines = fr.readlines()
-                    for line in lines:                
-                        print(line)                
-            
+                    for line in lines:
+                        print(line)
 
 
 ##########################################################################################

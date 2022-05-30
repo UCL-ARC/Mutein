@@ -34,34 +34,43 @@ import os
 def checkResult(onefile):
     if exists(onefile):
         timeA = pathlib.Path(onefile).stat().st_mtime
-        return True,datetime.fromtimestamp(timeA).strftime('%d-%m-%y-%H:%M')
-    return False,""
+        return True, datetime.fromtimestamp(timeA).strftime("%d-%m-%y-%H:%M")
+    return False, ""
 
-def checkResults(ddg,bm,ps):
+
+def checkResults(ddg, bm, ps):
     if exists(ddg):
-        timeA = pathlib.Path(ddg).stat().st_mtime            
-        print("DDG Background file was created at",datetime.fromtimestamp(timeA).strftime('%d-%m-%y-%H:%M'))
+        timeA = pathlib.Path(ddg).stat().st_mtime
+        print(
+            "DDG Background file was created at",
+            datetime.fromtimestamp(timeA).strftime("%d-%m-%y-%H:%M"),
+        )
     else:
         print("!!!DDG Background file does not exist")
     if exists(bm):
         timeB = pathlib.Path(bm).stat().st_mtime
-        print("Variant buildmodel file was created at",datetime.fromtimestamp(timeB).strftime('%d-%m-%y-%H:%M'))
+        print(
+            "Variant buildmodel file was created at",
+            datetime.fromtimestamp(timeB).strftime("%d-%m-%y-%H:%M"),
+        )
     else:
         print("!!!Variant buildmodel file does not exist")
     if exists(ps):
         timeC = pathlib.Path(ps).stat().st_mtime
-        print("Variant posscan file was created at",datetime.fromtimestamp(timeC).strftime('%d-%m-%y-%H:%M'))
+        print(
+            "Variant posscan file was created at",
+            datetime.fromtimestamp(timeC).strftime("%d-%m-%y-%H:%M"),
+        )
     else:
         print("!!!Variant posscan file does not exist")
 
 
-
-def run_pipeline(args):    
+def run_pipeline(args):
     now = datetime.now()
     current_time = now.strftime("%d-%m-%y@%H.%H.%S")
-    print("Mutein remote script:",current_time)
-    
-    ##############################################        
+    print("Mutein remote script:", current_time)
+
+    ##############################################
     mode = args[1]
     pattern = args[2]
     WorkDir = args[3]
@@ -69,55 +78,67 @@ def run_pipeline(args):
     InstallDir = args[5]
     PipelineDir = args[6]
 
-    print("Mode=",mode)
-    print("Pattern=",pattern)
+    print("Mode=", mode)
+    print("Pattern=", pattern)
     print("")
     if mode == "GENES":
-        dataset_gene_pdb=pattern.split(":")
-        dataset,gene,pdb = dataset_gene_pdb[0],dataset_gene_pdb[1],dataset_gene_pdb[2]
-        path = Paths.Paths(DataDir,PipelineDir,dataset=dataset)
+        dataset_gene_pdb = pattern.split(":")
+        dataset, gene, pdb = (
+            dataset_gene_pdb[0],
+            dataset_gene_pdb[1],
+            dataset_gene_pdb[2],
+        )
+        path = Paths.Paths(DataDir, PipelineDir, dataset=dataset)
         filename = path.inputs + "genes_pdb_list.csv"
-        print("\nCheck genes list\n")      
+        print("\nCheck genes list\n")
         if exists(filename):
             with open(filename, "r") as fr:
                 lines = fr.readlines()
-                for line in lines[1:]:                    
-                    geneo =line.strip().split(",")[1]
-                    patho = Paths.Paths(DataDir,PipelineDir,dataset=dataset,gene=geneo)
+                for line in lines[1:]:
+                    geneo = line.strip().split(",")[1]
+                    patho = Paths.Paths(
+                        DataDir, PipelineDir, dataset=dataset, gene=geneo
+                    )
                     filenameA = patho.outputs + "ddg_background.csv"
-                    existsfile,time = checkResult(filenameA)
+                    existsfile, time = checkResult(filenameA)
                     if existsfile:
-                        print(geneo,time)
+                        print(geneo, time)
                     else:
-                        print(geneo,"---")
+                        print(geneo, "---")
         else:
-            print("The dataset has not been prepared - no genes list",filename)
+            print("The dataset has not been prepared - no genes list", filename)
     elif mode == "PDBS":
-        dataset_gene_pdb=pattern.split(":")
-        dataset,gene,pdb = dataset_gene_pdb[0],dataset_gene_pdb[1],dataset_gene_pdb[2]
-        path = Paths.Paths(DataDir,PipelineDir,dataset=dataset,gene=gene)
-        
+        dataset_gene_pdb = pattern.split(":")
+        dataset, gene, pdb = (
+            dataset_gene_pdb[0],
+            dataset_gene_pdb[1],
+            dataset_gene_pdb[2],
+        )
+        path = Paths.Paths(DataDir, PipelineDir, dataset=dataset, gene=gene)
+
         print("Check results files for gene")
         print(path.outputs)
         filenameA = path.outputs + "ddg_background.csv"
         filenameB = path.outputs + "ddg_variant_bm.csv"
         filenameC = path.outputs + "ddg_variant_ps.csv"
-        checkResults(filenameA,filenameB,filenameC)
+        checkResults(filenameA, filenameB, filenameC)
 
-        print("\nCheck pdb list\n")        
+        print("\nCheck pdb list\n")
         filename = path.outputs + "pdb_tasklist.csv"
         if exists(filename):
             with open(filename, "r") as fr:
                 lines = fr.readlines()
                 for ln in lines[1:]:
-                    pdbo =ln.strip().split(",")[2]
-                    patho = Paths.Paths(DataDir,PipelineDir,dataset=dataset,gene=gene,pdb=pdbo)
+                    pdbo = ln.strip().split(",")[2]
+                    patho = Paths.Paths(
+                        DataDir, PipelineDir, dataset=dataset, gene=gene, pdb=pdbo
+                    )
                     filenameRes = patho.outputs + "ddg_background.csv"
                     fileNameSplit = patho.thruputs + "params_background.txt"
-                    filenamePdb = patho.inputs + pdbo.lower()+"_rep10.pdb"
-                    existsfileRes,timeRes = checkResult(filenameRes)
-                    existsfileSplit,timeSplit = checkResult(fileNameSplit)
-                    existsfilePdb,timePdb = checkResult(filenamePdb)
+                    filenamePdb = patho.inputs + pdbo.lower() + "_rep10.pdb"
+                    existsfileRes, timeRes = checkResult(filenameRes)
+                    existsfileSplit, timeSplit = checkResult(fileNameSplit)
+                    existsfilePdb, timePdb = checkResult(filenamePdb)
                     msg = pdbo
                     while len(msg) < 25:
                         msg += " "
@@ -125,94 +146,104 @@ def run_pipeline(args):
                     if existsfileRes:
                         msg += "Results@" + str(timeRes) + "\t"
                     else:
-                        msg += "No results\t"                        
+                        msg += "No results\t"
                     if existsfileSplit:
                         msg += "Split@" + str(timeSplit) + "\t"
                     else:
-                        msg += "No split\t"                        
+                        msg += "No split\t"
                     if existsfilePdb:
                         msg += "Pdb(10)@" + str(timePdb)
                     else:
-                        msg += "No pdb"                        
-                    
+                        msg += "No pdb"
+
                     print(msg)
-                    
+
         else:
-            print("The pdbs have not been prepared - no pdb list",filename)
+            print("The pdbs have not been prepared - no pdb list", filename)
     elif mode == "PDB":
-        dataset_gene_pdb=pattern.split(":")
-        dataset,gene,pdb = dataset_gene_pdb[0],dataset_gene_pdb[1],dataset_gene_pdb[2]
-        path = Paths.Paths(DataDir,PipelineDir,dataset=dataset,gene=gene,pdb=pdb)
+        dataset_gene_pdb = pattern.split(":")
+        dataset, gene, pdb = (
+            dataset_gene_pdb[0],
+            dataset_gene_pdb[1],
+            dataset_gene_pdb[2],
+        )
+        path = Paths.Paths(DataDir, PipelineDir, dataset=dataset, gene=gene, pdb=pdb)
         print("Check results files for pdb")
         print(path.outputs)
         filenameA = path.outputs + "ddg_background.csv"
         filenameB = path.outputs + "ddg_buildmodel.csv"
         filenameC = path.outputs + "ddg_posscan.csv"
-        checkResults(filenameA,filenameB,filenameC)
+        checkResults(filenameA, filenameB, filenameC)
 
         # check the pdb
-        filenamePdb = path.inputs + pdb + "_rep10.pdb"        
-        existsPdb,time = checkResult(filenamePdb)
+        filenamePdb = path.inputs + pdb + "_rep10.pdb"
+        existsPdb, time = checkResult(filenamePdb)
         print("\nChecking the pdb repair", filenamePdb)
         if existsPdb:
-            print("...PDB 10 repair at",time)       
+            print("...PDB 10 repair at", time)
         else:
-            print("...PDB 10 repair has not been done")       
-        # Check the background        
-        filenameP = path.thruputs + "params_background.txt"        
-        existsP,time = checkResult(filenameP)
+            print("...PDB 10 repair has not been done")
+        # Check the background
+        filenameP = path.thruputs + "params_background.txt"
+        existsP, time = checkResult(filenameP)
         count = 0
         print("\nChecking the background tasks", filenameP)
-        if existsP:     
-            print("...Params background at",time)       
+        if existsP:
+            print("...Params background at", time)
             with open(filenameP, "r") as fr:
-                lines = fr.readlines()                
-                print("\nThe pdb has been split into tasks=",len(lines)-1)
-                print("...Any tasks that have completed are below\n")                
-                for i in range(1,len(lines)):
+                lines = fr.readlines()
+                print("\nThe pdb has been split into tasks=", len(lines) - 1)
+                print("...Any tasks that have completed are below\n")
+                for i in range(1, len(lines)):
                     filenameo = path.thruputs + "agg/" + str(i) + "_ddg_background.csv"
-                    existsfile,time = checkResult(filenameo)
+                    existsfile, time = checkResult(filenameo)
                     if existsfile:
                         count += 1
-                        print("Task",str(i),"at",time)
+                        print("Task", str(i), "at", time)
                     else:
-                        print("Task",str(i),"----")            
-            print("Completed",count,"out of",len(lines)-1)
-                    
+                        print("Task", str(i), "----")
+            print("Completed", count, "out of", len(lines) - 1)
+
         else:
             print("Missing parameters file, the data needs preparation")
-        
+
         # Check the background
-        filenameP = path.thruputs + "params_variants.txt"        
+        filenameP = path.thruputs + "params_variants.txt"
         print("\nChecking the variant tasks")
         count = 0
-        if exists(filenameP):            
+        if exists(filenameP):
             with open(filenameP, "r") as fr:
-                lines = fr.readlines()                    
-                print("The variants have been split into tasks=",len(lines)-1)
-                print("...Any tasks that have completed are below\n")                
-                for i in range(1,len(lines)):
+                lines = fr.readlines()
+                print("The variants have been split into tasks=", len(lines) - 1)
+                print("...Any tasks that have completed are below\n")
+                for i in range(1, len(lines)):
                     filenameo = path.thruputs + "vagg/" + str(i) + "_ddg_buildmodel.csv"
-                    existsfile,time = checkResult(filenameo)
+                    existsfile, time = checkResult(filenameo)
                     if existsfile:
                         count += 1
-                        print("Task",str(i),"at",time)
+                        print("Task", str(i), "at", time)
                     else:
-                        print("Task",str(i),"----")                        
-            print("Completed",count,"out of",len(lines)-1)                    
+                        print("Task", str(i), "----")
+            print("Completed", count, "out of", len(lines) - 1)
         else:
-            print("Missing variants file, the data needs preparation, or there are none")
+            print(
+                "Missing variants file, the data needs preparation, or there are none"
+            )
     elif mode == "PDBINCOMPLETE":
-        dataset_gene_pdb=pattern.split(":")
-        dataset,gene,pdb = dataset_gene_pdb[0],dataset_gene_pdb[1],dataset_gene_pdb[2]
-        path = Paths.Paths(DataDir,PipelineDir,dataset=dataset,gene=gene,pdb=pdb)
+        dataset_gene_pdb = pattern.split(":")
+        dataset, gene, pdb = (
+            dataset_gene_pdb[0],
+            dataset_gene_pdb[1],
+            dataset_gene_pdb[2],
+        )
+        path = Paths.Paths(DataDir, PipelineDir, dataset=dataset, gene=gene, pdb=pdb)
         print("RECREATING TASK FILE with missing tasks\n")
         print("Check results files for pdb")
         print(path.outputs)
         filenameA = path.outputs + "ddg_background.csv"
         filenameB = path.outputs + "ddg_buildmodel.csv"
         filenameC = path.outputs + "ddg_posscan.csv"
-        checkResults(filenameA,filenameB,filenameC)
+        checkResults(filenameA, filenameB, filenameC)
 
         # Check the background
         filenameP = path.thruputs + "params_background.txt"
@@ -223,23 +254,25 @@ def run_pipeline(args):
             with open(filename_incomplete, "w") as fw:
                 with open(filenameP, "r") as fr:
                     lines = fr.readlines()
-                    fw.write((lines[0]).strip()+"\n")
-                    print("The pdb has been split into tasks=",len(lines)-1)
-                    print("...Any tasks that have completed are below\n")                
-                    for i in range(1,len(lines)):
-                        filenameo = path.thruputs + "agg/" + str(i) + "_ddg_background.csv"
-                        existsfile,time = checkResult(filenameo)
+                    fw.write((lines[0]).strip() + "\n")
+                    print("The pdb has been split into tasks=", len(lines) - 1)
+                    print("...Any tasks that have completed are below\n")
+                    for i in range(1, len(lines)):
+                        filenameo = (
+                            path.thruputs + "agg/" + str(i) + "_ddg_background.csv"
+                        )
+                        existsfile, time = checkResult(filenameo)
                         if existsfile:
                             count += 1
-                            print("Task",str(i),"at",time)
+                            print("Task", str(i), "at", time)
                         else:
-                            print("Task",str(i),"----")
-                            fw.write((lines[i]).strip()+"\n")
-            print("Completed",count,"out of",len(lines)-1)
-                    
+                            print("Task", str(i), "----")
+                            fw.write((lines[i]).strip() + "\n")
+            print("Completed", count, "out of", len(lines) - 1)
+
         else:
             print("Missing parameters file, the data needs preparation")
-        
+
         # Check the background
         filenameP = path.thruputs + "params_variants.txt"
         filename_incomplete = path.thruputs + "params_variants_incomplete.txt"
@@ -249,41 +282,53 @@ def run_pipeline(args):
             with open(filename_incomplete, "w") as fw:
                 with open(filenameP, "r") as fr:
                     lines = fr.readlines()
-                    fw.write((lines[0]).strip()+"\n")
-                    print("The variants have been split into tasks=",len(lines)-1)
-                    print("...Any tasks that have completed are below\n")                
-                    for i in range(1,len(lines)):
-                        filenameo = path.thruputs + "vagg/" + str(i) + "_ddg_buildmodel.csv"
-                        existsfile,time = checkResult(filenameo)
+                    fw.write((lines[0]).strip() + "\n")
+                    print("The variants have been split into tasks=", len(lines) - 1)
+                    print("...Any tasks that have completed are below\n")
+                    for i in range(1, len(lines)):
+                        filenameo = (
+                            path.thruputs + "vagg/" + str(i) + "_ddg_buildmodel.csv"
+                        )
+                        existsfile, time = checkResult(filenameo)
                         if existsfile:
                             count += 1
-                            print("Task",str(i),"at",time)
+                            print("Task", str(i), "at", time)
                         else:
-                            print("Task",str(i),"----")
-                            fw.write((lines[i]).strip()+"\n")
-            print("Completed",count,"out of",len(lines)-1)
-                    
+                            print("Task", str(i), "----")
+                            fw.write((lines[i]).strip() + "\n")
+            print("Completed", count, "out of", len(lines) - 1)
+
         else:
-            print("Missing variants file, the data needs preparation, or there are none")
+            print(
+                "Missing variants file, the data needs preparation, or there are none"
+            )
     elif mode == "PDB_BACK":
-        dataset_gene_pdb=pattern.split(":")
-        dataset,gene,pdb = dataset_gene_pdb[0],dataset_gene_pdb[1],dataset_gene_pdb[2]
-        path = Paths.Paths(DataDir,PipelineDir,dataset=dataset,gene=gene,pdb=pdb)        
-        filename = path.outputs + "ddg_background.csv"        
+        dataset_gene_pdb = pattern.split(":")
+        dataset, gene, pdb = (
+            dataset_gene_pdb[0],
+            dataset_gene_pdb[1],
+            dataset_gene_pdb[2],
+        )
+        path = Paths.Paths(DataDir, PipelineDir, dataset=dataset, gene=gene, pdb=pdb)
+        filename = path.outputs + "ddg_background.csv"
         print(filename)
         mexists, time = checkResult(filename)
         if mexists:
             print("DATAFRAME_START")
             with open(filename, "r") as fr:
                 lines = fr.readlines()
-                for line in lines:                
+                for line in lines:
                     print(line.strip())
             print("DATAFRAME_END")
     elif mode == "PDB_BM":
-        dataset_gene_pdb=pattern.split(":")
-        dataset,gene,pdb = dataset_gene_pdb[0],dataset_gene_pdb[1],dataset_gene_pdb[2]
-        path = Paths.Paths(DataDir,PipelineDir,dataset=dataset,gene=gene,pdb=pdb)                
-        filename = path.outputs + "ddg_buildmodel.csv"        
+        dataset_gene_pdb = pattern.split(":")
+        dataset, gene, pdb = (
+            dataset_gene_pdb[0],
+            dataset_gene_pdb[1],
+            dataset_gene_pdb[2],
+        )
+        path = Paths.Paths(DataDir, PipelineDir, dataset=dataset, gene=gene, pdb=pdb)
+        filename = path.outputs + "ddg_buildmodel.csv"
         if pdb == "":
             filename = path.outputs + "ddg_variant_bm.csv"
         print(filename)
@@ -292,14 +337,18 @@ def run_pipeline(args):
             print("DATAFRAME_START")
             with open(filename, "r") as fr:
                 lines = fr.readlines()
-                for line in lines:                
+                for line in lines:
                     print(line.strip())
             print("DATAFRAME_END")
     elif mode == "PDB_PS":
-        dataset_gene_pdb=pattern.split(":")
-        dataset,gene,pdb = dataset_gene_pdb[0],dataset_gene_pdb[1],dataset_gene_pdb[2]
-        path = Paths.Paths(DataDir,PipelineDir,dataset=dataset,gene=gene,pdb=pdb)                
-        filename = path.outputs + "ddg_posscan.csv"        
+        dataset_gene_pdb = pattern.split(":")
+        dataset, gene, pdb = (
+            dataset_gene_pdb[0],
+            dataset_gene_pdb[1],
+            dataset_gene_pdb[2],
+        )
+        path = Paths.Paths(DataDir, PipelineDir, dataset=dataset, gene=gene, pdb=pdb)
+        filename = path.outputs + "ddg_posscan.csv"
         if pdb == "":
             filename = path.outputs + "ddg_variant_ps.csv"
             print(filename)
@@ -308,34 +357,27 @@ def run_pipeline(args):
             print("DATAFRAME_START")
             with open(filename, "r") as fr:
                 lines = fr.readlines()
-                for line in lines:                
+                for line in lines:
                     print(line.strip())
             print("DATAFRAME_END")
     elif mode == "COVERAGE":
-        dataset_gene_pdb=pattern.split(":")
-        dataset,gene,pdb = dataset_gene_pdb[0],dataset_gene_pdb[1],dataset_gene_pdb[2]
-        path = Paths.Paths(DataDir,PipelineDir,dataset=dataset,gene=gene)                
+        dataset_gene_pdb = pattern.split(":")
+        dataset, gene, pdb = (
+            dataset_gene_pdb[0],
+            dataset_gene_pdb[1],
+            dataset_gene_pdb[2],
+        )
+        path = Paths.Paths(DataDir, PipelineDir, dataset=dataset, gene=gene)
         filename = path.outputs + "Coverage_all.csv"
         mexists, time = checkResult(filename)
         if mexists:
             print("DATAFRAME_START")
             with open(filename, "r") as fr:
                 lines = fr.readlines()
-                for line in lines:                
+                for line in lines:
                     print(line.strip())
             print("DATAFRAME_END")
 
-
-        
-
-
-
-
-
-    
-    
-
-    
 
 ##########################################################################################
 if __name__ == "__main__":

@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+
 pd.options.mode.chained_assignment = None  # default='warn'
 
 
@@ -118,9 +119,9 @@ class Analysis:
         if dropnagene:
             df = df.dropna()
         print(df)
-        
+
         count = len(df.index)
-        
+
         fig, ax1 = plt.subplots(1, 1, figsize=(25, 10))
         fig.suptitle(
             self.pdb_gene
@@ -128,11 +129,11 @@ class Analysis:
             + title
             + " ("
             + str(count)
-            + ")\nddg <-1=stabilising >2.5=destabilising"            
+            + ")\nddg <-1=stabilising >2.5=destabilising"
         )
         yax = "pdb"
         hue = "ddg"
-        
+
         ###  third plt ######
         vmin = -2.5  # ddg_df[hue].min() #they have defined >2.5 as destabilising
         vmax = -1 * vmin

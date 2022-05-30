@@ -37,22 +37,26 @@ def run_pipeline(args):
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
-    gene_path = Paths.Paths(data_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset,gene=gene)
-            
-            
+    gene_path = Paths.Paths(
+        data_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset, gene=gene
+    )
+
     import Pipelines.geneanalysis.python.mod_genetoproteins as pplb
+
     print("Extracting pdbs for", gene)
     pplb.run_pipeline(args)
 
     import Pipelines.geneanalysis.python.mod_geneparams as pplc
+
     print("Extracting pdbs for", gene)
     exists = pplc.run_pipeline(args)
 
-    if exists:        
+    if exists:
         import Pipelines.geneanalysis.python.mod_genevparams as ppld
+
         print("Extracting pdbs for", gene)
         ppld.run_pipeline(args)
-                                            
+
     print("### COMPLETED gene preparation ###")
     print("MUTEIN SCRIPT ENDED")
 
@@ -60,4 +64,5 @@ def run_pipeline(args):
 ##########################################################################################
 if __name__ == "__main__":
     import sys
+
     globals()["run_pipeline"](sys.argv)

@@ -39,38 +39,37 @@ def run_pipeline(args):
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
-    split = int(argus.arg("split",0))
-    
-    gene_path = Paths.Paths(        
+    split = int(argus.arg("split", 0))
+
+    gene_path = Paths.Paths(
         data_dir,
         install_dir + "Pipelines/geneanalysis",
         dataset=dataset,
-        gene=gene,        
+        gene=gene,
     )
     pdbtasks = gene_path.gene_outputs + "pdb_tasklist.csv"
     if not exists(pdbtasks):
         print("MUTEIN SCRIPT ENDED")
         return False
-        
+
     fio = FileDf.FileDf(pdbtasks)
     df = fio.openDataFrame()
 
     all_params = []
 
-    numpdbs = len(df.index)    
+    numpdbs = len(df.index)
     # There is a 100,000 limit on number of tasks, so if the pdbs make more than that, reduce number of tasks
     # This could be a problem fir gene AURKA which has many pdbs
     if split == 0:
-        chunk = int(argus.arg("chunk"),0)
-        split = int(numpdbs/chunk)
+        chunk = int(argus.arg("chunk"), 0)
+        split = int(numpdbs / chunk)
     if numpdbs * split > 100000:
-        split = int(100000/numpdbs)-1
-        args[1]+="@split="+str(split)
-
+        split = int(100000 / numpdbs) - 1
+        args[1] += "@split=" + str(split)
 
     for t in range(len(df.index)):
-        pdbcode = df["pdb"][t].lower()                                    
-        pdb_path = Paths.Paths(        
+        pdbcode = df["pdb"][t].lower()
+        pdb_path = Paths.Paths(
             data_dir,
             install_dir + "Pipelines/geneanalysis",
             dataset=dataset,
@@ -82,18 +81,21 @@ def run_pipeline(args):
         arglist = args[1]
         arglist += "@pdb=" + pdbcode
         argsgn[1] = arglist
-        import Pipelines.geneanalysis.python.mod_pdbparams as ppl        
+        import Pipelines.geneanalysis.python.mod_pdbparams as ppl
+
         ppl.run_pipeline(argsgn)
         filename = pdb_path.pdb_thruputs + "params_background.txt"
-        if exists(filename):#TODO we might want to make it optional to fail if there is a missing file
-            fdf = FileDf.FileDf(filename,sep=" ")
-            csv = fdf.openDataFrame()            
+        if exists(
+            filename
+        ):  # TODO we might want to make it optional to fail if there is a missing file
+            fdf = FileDf.FileDf(filename, sep=" ")
+            csv = fdf.openDataFrame()
             all_params.append(csv)
-        
-    all_path = gene_path.gene_thruputs +  "params_background.txt"
-    if len(all_params)>0:
+
+    all_path = gene_path.gene_thruputs + "params_background.txt"
+    if len(all_params) > 0:
         all_df = pd.concat(all_params, axis=0)
-        all_df.to_csv(all_path,index=False,sep=" ",header=True)
+        all_df.to_csv(all_path, index=False, sep=" ", header=True)
         print("MUTEIN SCRIPT ENDED")
         return True
     print("MUTEIN SCRIPT ENDED")
@@ -103,4 +105,5 @@ def run_pipeline(args):
 ##########################################################################################
 if __name__ == "__main__":
     import sys
+
     globals()["run_pipeline"](sys.argv)

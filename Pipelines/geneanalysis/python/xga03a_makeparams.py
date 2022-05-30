@@ -40,11 +40,11 @@ def run_pipeline02(args):
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
 
-    gene_path = Paths.Paths(        
+    gene_path = Paths.Paths(
         data_dir,
         install_dir + "Pipelines/geneanalysis",
         dataset=dataset,
-        gene=gene,        
+        gene=gene,
     )
     pdbtasks = gene_path.gene_outputs + "pdb_tasklist.csv"
     fio = FileDf.FileDf(pdbtasks)
@@ -54,8 +54,8 @@ def run_pipeline02(args):
 
     for t in range(len(df.index)):
         pdbcode = df["pdb"][t].lower()
-                                    
-        pdb_path = Paths.Paths(        
+
+        pdb_path = Paths.Paths(
             data_dir,
             install_dir + "Pipelines/geneanalysis",
             dataset=dataset,
@@ -68,15 +68,15 @@ def run_pipeline02(args):
         work_path = pdb_path.pdb_thruputs + "params" + str(argus.arg("split")) + "/"
         argus.addConfig({"work_path": work_path})
         pdb_path.goto_job_dir(argus.arg("work_path"), args, argus.params, "_inputs02")
-        
+
         # chainid = argus.arg("chain")
         rows = int(argus.arg("split"))
 
         ##########################################################
 
         ##### Open the pdb file ################################
-        pdb_file = pdbcode + "_rep" + str(argus.arg("repairs")) + ".pdb"        
-        if exists(pdb_path.pdb_thruputs+pdb_file):
+        pdb_file = pdbcode + "_rep" + str(argus.arg("repairs")) + ".pdb"
+        if exists(pdb_path.pdb_thruputs + pdb_file):
             with open(pdb_path.pdb_thruputs + pdb_file) as f:
                 pdbcontent = f.readlines()
 
@@ -130,7 +130,10 @@ def run_pipeline02(args):
                             if aaa in aa_dict:
                                 aa = aa_dict[aaa]
                                 mut = (
-                                    aa + linecontents[4].strip() + linecontents[5].strip() + "a"
+                                    aa
+                                    + linecontents[4].strip()
+                                    + linecontents[5].strip()
+                                    + "a"
                                 )  # aa chain rid mutation = mutation string
                                 params_lst.append(mut)
                             else:
@@ -164,7 +167,9 @@ def run_pipeline02(args):
                     row += 1
                     param_dic["row"].append("" + str(row))
                 else:
-                    param_dic["mutation"][row - 1] = param_dic["mutation"][row - 1] + "," + mut
+                    param_dic["mutation"][row - 1] = (
+                        param_dic["mutation"][row - 1] + "," + mut
+                    )
                 row_size += 1
 
                 if row_size == chunk and row > remainder:
@@ -178,10 +183,10 @@ def run_pipeline02(args):
             print("### foldx02: ... savig df", filename)
             data_params.to_csv(filename, index=False, sep=" ", header=False)
             all_params.append(data_params)
-        
-    all_path = gene_path.gene_outputs +  "params_background.txt"
+
+    all_path = gene_path.gene_outputs + "params_background.txt"
     all_df = pd.concat(all_params, axis=0)
-    all_df.to_csv(all_path,index=False,sep=" ",header=False)
+    all_df.to_csv(all_path, index=False, sep=" ", header=False)
 
 
 ##########################################################################################

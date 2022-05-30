@@ -38,16 +38,24 @@ def run_pipeline(args):
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
     pdb = argus.arg("pdb")
-    dataset_path = Paths.Paths(data_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset,gene=gene,pdb=pdb)
-                    
+    dataset_path = Paths.Paths(
+        data_dir,
+        install_dir + "Pipelines/geneanalysis",
+        dataset=dataset,
+        gene=gene,
+        pdb=pdb,
+    )
+
     import Pipelines.geneanalysis.python.mod_pdbparams as pplc
+
     print("Back params for", pdb)
     exists = pplc.run_pipeline(args)
-    
+
     import Pipelines.geneanalysis.python.mod_pdbvparams as ppld
+
     print("Variant params for", pdb)
     ppld.run_pipeline(args)
-                                     
+
     print("### COMPLETED pdb preparation ###")
     print("MUTEIN SCRIPT ENDED")
 
@@ -55,4 +63,5 @@ def run_pipeline(args):
 ##########################################################################################
 if __name__ == "__main__":
     import sys
+
     globals()["run_pipeline"](sys.argv)

@@ -46,15 +46,15 @@ def run_pipeline(args):
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
     pdbcode = argus.arg("pdb").lower()
-        
-    pdb_path = Paths.Paths(        
+
+    pdb_path = Paths.Paths(
         data_dir,
         install_dir + "Pipelines/geneanalysis",
         dataset=dataset,
-        gene=gene,        
-        pdb=pdbcode,        
+        gene=gene,
+        pdb=pdbcode,
     )
-    
+
     repair_path = pdb_path.pdb_thruputs + "repair" + str(argus.arg("repairs")) + "/"
     argus.addConfig({"repair_path": repair_path})
     pdb_path.goto_job_dir(repair_path, args, argus.params, "_inputs01")
@@ -67,19 +67,18 @@ def run_pipeline(args):
     startRep = numRepairs
     base_pdbfile = pdb_path.pdb_inputs + "/" + pdbfile
     while not found and startRep > 0:
-        startRep -=1
+        startRep -= 1
         name = pdb_path.pdb_inputs + "/" + pdbcode + "_rep" + str(startRep) + ".pdb"
         if exists(name):
             found = True
             base_pdbfile = name
-        
-        
+
     repairinnames = []
-    repairoutnames = []    
+    repairoutnames = []
     for r in range(numRepairs + 1):
         repairinnames.append(pdbcode + "_" + str(r) + ".pdb")
         repairoutnames.append(pdbcode + "_" + str(r) + "_Repair.pdb")
-        
+
     repairinnames[numRepairs] = pdbcode + "_rep" + str(numRepairs) + ".pdb"
     #### there are 2 files we need in the interim directory, pdb file rotabase, but rotabase is only needed for foldx4 and NOT needed for foldx5
     print(
@@ -88,10 +87,9 @@ def run_pipeline(args):
         pdb_path.pdb_inputs + "/" + repairinnames[startRep],
         "... ###",
     )
-    
+
     # first establish which we are currently on
 
-    
     copyfile(
         base_pdbfile,
         repair_path + repairinnames[startRep],
@@ -99,9 +97,9 @@ def run_pipeline(args):
 
     # Create Foldx class
     fx_runner = Foldx.Foldx(argus.arg("foldxe"))
-    print("Starting repairs from", startRep, "and creating a repair for",numRepairs)
+    print("Starting repairs from", startRep, "and creating a repair for", numRepairs)
     # Run desired number of repairs
-    for r in range(startRep,numRepairs):
+    for r in range(startRep, numRepairs):
         pdb = repairinnames[r]
         output_file = "repair_" + str(r) + ".txt"
         fx_runner.runRepair(pdb, output_file)
@@ -126,13 +124,12 @@ def run_pipeline(args):
     print(
         "### ... copying file",
         pdb_path.pdb_thruputs + "/" + repairinnames[numRepairs].lower(),
-        pdb_path.pdb_inputs + "/" + repairinnames[numRepairs].lower()
+        pdb_path.pdb_inputs + "/" + repairinnames[numRepairs].lower(),
     )
     copyfile(
-        pdb_path.pdb_thruputs + "/" + repairinnames[numRepairs].lower(),        
-        pdb_path.pdb_inputs + "/" + repairinnames[numRepairs].lower()
+        pdb_path.pdb_thruputs + "/" + repairinnames[numRepairs].lower(),
+        pdb_path.pdb_inputs + "/" + repairinnames[numRepairs].lower(),
     )
-    
 
     print("### COMPLETED FoldX repair job ###")
     print("MUTEIN SCRIPT ENDED")

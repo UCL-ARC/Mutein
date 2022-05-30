@@ -41,8 +41,8 @@ def run_pipeline(args):
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
     pdbcode = argus.arg("pdb").lower()
-            
-    pdb_path = Paths.Paths(        
+
+    pdb_path = Paths.Paths(
         data_dir,
         install_dir + "Pipelines/geneanalysis",
         dataset=dataset,
@@ -51,12 +51,12 @@ def run_pipeline(args):
     )
     work_path = pdb_path.pdb_thruputs + "vparams/"
     pdb_path.goto_job_dir(work_path, args, argus.params, "_inputs05")
-    ############################################        
+    ############################################
     variant = argus.arg("variant")
     # chainid = argus.arg("chain")
-    splitrows = int(argus.arg("vsplit",0))    
+    splitrows = int(argus.arg("vsplit", 0))
     # variant file is in the pdb inputs
-    pdb_path = Paths.Paths(        
+    pdb_path = Paths.Paths(
         data_dir,
         install_dir + "Pipelines/geneanalysis",
         dataset=dataset,
@@ -79,12 +79,11 @@ def run_pipeline(args):
     total_muts = len(mutations.index)
     if splitrows == 0:
         vchunk = int(argus.arg("vchunk"))
-        splitrows = int(total_muts/vchunk)+1
-        print("Split is now",splitrows)
+        splitrows = int(total_muts / vchunk) + 1
+        print("Split is now", splitrows)
     chunk = int(total_muts / splitrows)
     remainder = int(total_muts % splitrows)
-    
-        
+
     mut_list = []
     for i in range(len(mutations.index)):
         chain = mutations["chain"][i]
@@ -93,7 +92,7 @@ def run_pipeline(args):
         mut_list.append([mut, pdb_mut, chain])
 
     ##### Create a dataframe for the paramterfile in the number of chunks specified
-    
+
     # so until we get to the remainer we need chunk +1 on each row
     param_dic = {}
     param_dic["pdb"] = []
@@ -133,12 +132,10 @@ def run_pipeline(args):
     filename = pdb_path.pdb_thruputs + "params_variants.txt"
     print("### foldx05: ... savig df", filename)
     data_params.to_csv(filename, index=False, sep=" ", header=True)
-        
-    
-    
 
 
 ##########################################################################################
 if __name__ == "__main__":
     import sys
+
     globals()["run_pipeline"](sys.argv)

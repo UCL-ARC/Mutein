@@ -49,21 +49,25 @@ def pipeline_qsubber(args):
     # The environment is loaded by arguments by default
     print("ARGS=", args)
     argus = Arguments.Arguments(args, spaced=False)
-        
+
     ## $PWD ${config} $run notch NOTCH1 AF-P46531-F1-model_v2
-    
+
     # There are 7 arguments
-    install_dir = args[1]  # 1) the executable installation directory, the root directory of the peipeline
+    install_dir = args[
+        1
+    ]  # 1) the executable installation directory, the root directory of the peipeline
     sys.path.append(install_dir)
     sys.path.append(install_dir + "/Pipelines")
     sys.path.append(install_dir + "/Pipelines/libs")
-    working_dir = args[2]  # 1) the working dir, the root that the data output and input lives in
+    working_dir = args[
+        2
+    ]  # 1) the working dir, the root that the data output and input lives in
     yaml_file = args[3]  # 2) a yaml file path with the batch definition
     py_or_sh = args[4]  # 3) qsub or py or sh for python or hpc batch or just sh
     # everything is defined in the yaml APART from 3 template inputs
     dataset, gene, pdb = "", "", ""
     dataset = args[5]  # 3) dataset
-    gene = args[6]  # 4) gene    
+    gene = args[6]  # 4) gene
     pdb = args[7]  # 4) pdb
     if dataset == "x":
         dataset = ""
@@ -71,13 +75,13 @@ def pipeline_qsubber(args):
         gene = ""
     if pdb == "x":
         pdb = ""
-    
-    #last_stat = args[8]  # 5) the last status or count
-    #if last_stat == "x":
-    #    print("!!! qsub in fail state, exiting")
-    #    return "x"    
 
-    #count = int(last_stat)
+    # last_stat = args[8]  # 5) the last status or count
+    # if last_stat == "x":
+    #    print("!!! qsub in fail state, exiting")
+    #    return "x"
+
+    # count = int(last_stat)
     count = 0
 
     print(
@@ -87,7 +91,7 @@ def pipeline_qsubber(args):
         yaml_file,
         py_or_sh,
         dataset,
-        gene,        
+        gene,
     )
 
     names_and_ids = []
@@ -99,16 +103,18 @@ def pipeline_qsubber(args):
     vparams_tasks = 0
     unparams_tasks = 0
     vunparams_tasks = 0
-    
-    if gene == "ALL":                
+
+    if gene == "ALL":
         gene = ""
-        path = Paths.Paths(working_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset)        
+        path = Paths.Paths(
+            working_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset
+        )
         gene_tasks_file = path.inputs + "genes_pdb_list.csv"
-        print("Gene file=",gene_tasks_file)
+        print("Gene file=", gene_tasks_file)
         if exists(gene_tasks_file):
             with open(gene_tasks_file) as fr:
                 lines = fr.readlines()
-                for l in range(1,len(lines)):
+                for l in range(1, len(lines)):
                     line = lines[l]
                     if "," in line:
                         gene = line.split(",")[1].strip()
@@ -116,43 +122,51 @@ def pipeline_qsubber(args):
         else:
             gene_tasks = [""]
     else:
-           gene_tasks = [gene]
-    
-    
+        gene_tasks = [gene]
+
     for gene in gene_tasks:
-        print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Creating for gene=",gene,"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-        path = Paths.Paths(working_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset,gene=gene,pdb=pdb)
+        print(
+            "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Creating for gene=",
+            gene,
+            "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@",
+        )
+        path = Paths.Paths(
+            working_dir,
+            install_dir + "Pipelines/geneanalysis",
+            dataset=dataset,
+            gene=gene,
+            pdb=pdb,
+        )
         pdb_tasks_file = path.outputs + "pdb_tasklist.csv"
         if exists(pdb_tasks_file):
             with open(pdb_tasks_file) as fr:
                 lines = fr.readlines()
-                pdb_tasks = len(lines)-1
+                pdb_tasks = len(lines) - 1
         pdb_tasks_file = path.outputs + "pdb_tasklist.csv"
         if exists(pdb_tasks_file):
             with open(pdb_tasks_file) as fr:
                 lines = fr.readlines()
-                pdb_tasks = len(lines)-1
+                pdb_tasks = len(lines) - 1
         params_tasks_file = path.thruputs + "params_background.txt"
         if exists(params_tasks_file):
             with open(params_tasks_file) as fr:
                 lines = fr.readlines()
-                params_tasks = len(lines)-1
+                params_tasks = len(lines) - 1
         unparams_tasks_file = path.thruputs + "params_background_incomplete.txt"
         if exists(unparams_tasks_file):
             with open(unparams_tasks_file) as fr:
                 lines = fr.readlines()
-                unparams_tasks = len(lines)-1
+                unparams_tasks = len(lines) - 1
         vparams_tasks_file = path.thruputs + "params_variants.txt"
         if exists(vparams_tasks_file):
             with open(vparams_tasks_file) as fr:
                 lines = fr.readlines()
-                vparams_tasks = len(lines)-1
+                vparams_tasks = len(lines) - 1
         vunparams_tasks_file = path.thruputs + "params_variants_incomplete.txt"
         if exists(vunparams_tasks_file):
             with open(vunparams_tasks_file) as fr:
                 lines = fr.readlines()
-                vunparams_tasks = len(lines)-1
-
+                vunparams_tasks = len(lines) - 1
 
         # We want the user
         homeuser = pwd.getpwuid(os.getuid())[0]
@@ -184,15 +198,15 @@ def pipeline_qsubber(args):
                     if int(array) == -1:
                         arrayfile = pipe["arrayfile"].strip()
                         if arrayfile == "pdbs":
-                            array=pdb_tasks
+                            array = pdb_tasks
                         if arrayfile == "params":
-                            array=params_tasks
+                            array = params_tasks
                         if arrayfile == "vparams":
-                            array=vparams_tasks
+                            array = vparams_tasks
                         if arrayfile == "unparams":
-                            array=unparams_tasks
+                            array = unparams_tasks
                         if arrayfile == "vunparams":
-                            array=vunparams_tasks
+                            array = vunparams_tasks
 
                     inputs = pipe["inputs"].strip()
                     active = pipe["active"].strip() == "Y"
@@ -219,8 +233,17 @@ def pipeline_qsubber(args):
                         batch_list.append(str(id))
 
         dependencies = {}
-        for id in batch_list:        
-            qsubid, pipe_dir, script, time, dependency, array, inputs,cores = batch_dic[id]
+        for id in batch_list:
+            (
+                qsubid,
+                pipe_dir,
+                script,
+                time,
+                dependency,
+                array,
+                inputs,
+                cores,
+            ) = batch_dic[id]
             isarray = int(array) > 0
             # print("# overall pipeline script:",id,qsubid,pipe_dir,script, time, dependency, array, inputs)
             if "qsub" in py_or_sh:
@@ -250,9 +273,9 @@ def pipeline_qsubber(args):
                     print("!!!Abandoning submissions!!!")
                     return "x"
                 else:
-                    count +=1              
+                    count += 1
                     dependencies[id] = dep
-                    names_and_ids.append([qsubid,dep])
+                    names_and_ids.append([qsubid, dep])
             elif py_or_sh == "py":
                 runner = sub.SubRunner(
                     argus.arg("pythonexe"),
@@ -281,8 +304,10 @@ def pipeline_qsubber(args):
                 dep = runner.run()
 
     return str(count)
-        
+
+
 ####################################################################################################
 if __name__ == "__main__":
     import sys
+
     globals()["pipeline_qsubber"](sys.argv)

@@ -45,31 +45,31 @@ def run_pipeline(args):
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
-    task = int(argus.arg("task","0"))
-    pdb=argus.arg("pdb","")
-    missing=argus.arg("missing","N")
+    task = int(argus.arg("task", "0"))
+    pdb = argus.arg("pdb", "")
+    missing = argus.arg("missing", "N")
 
     if task == 0:
         print("No task entered")
     if task > 0:
 
-        gene_path = Paths.Paths(        
+        gene_path = Paths.Paths(
             data_dir,
             install_dir + "Pipelines/geneanalysis",
             dataset=dataset,
-            gene=gene,        
-            pdb=pdb
-        )    
-        all_tasks = gene_path.thruputs +  "params_background.txt"
+            gene=gene,
+            pdb=pdb,
+        )
+        all_tasks = gene_path.thruputs + "params_background.txt"
         if missing.upper() == "Y":
-            all_tasks = gene_path.thruputs +  "params_background_incomplete.txt"
-        print("Opening file",all_tasks)
+            all_tasks = gene_path.thruputs + "params_background_incomplete.txt"
+        print("Opening file", all_tasks)
         fio = FileDf.FileDf(all_tasks, sep=" ", header=True)
         df = fio.openDataFrame()
-        
+
         if task <= len(df.index):
-            pdbcode = df["pdb"][task-1].lower()    
-            pdb_path = Paths.Paths(        
+            pdbcode = df["pdb"][task - 1].lower()
+            pdb_path = Paths.Paths(
                 data_dir,
                 install_dir + "Pipelines/geneanalysis",
                 dataset=dataset,
@@ -77,13 +77,13 @@ def run_pipeline(args):
                 pdb=pdbcode,
             )
             # pdb_config = Config.Config(pdb_path.pdb_inputs + "/config.yml")
-            # argus.addConfig(pdb_config.params)        
+            # argus.addConfig(pdb_config.params)
             mutation_string = argus.arg("mutation", "none")
             ############################################
             pdbfile = pdbcode + "_rep" + str(argus.arg("repairs")) + ".pdb"
             mutations = []
             # task=all means all, task=1:n means an explicit row, row=-1 means the mutation string has been passd in explicitly
-            if mutation_string == "none":                        
+            if mutation_string == "none":
                 if task == "all":
                     for i in range(len(df.index)):
                         mutation = df["mutation"][i]
@@ -103,9 +103,7 @@ def run_pipeline(args):
             for mut, row in mutations:
                 print(mut, row)
 
-                row_path = (
-                    pdb_path.pdb_thruputs + "back_" + str(row) + "/"
-                )
+                row_path = pdb_path.pdb_thruputs + "back_" + str(row) + "/"
                 print("### ... change directory", row_path)
                 argus.params["thisrow"] = row
                 argus.params["thismut"] = mut
@@ -125,21 +123,40 @@ def run_pipeline(args):
                 # pass in the coverage to annotate the csv file
                 filename = pdb_path.pdb_inputs + "Coverage.csv"
                 ddg_file = row_path + "PS_" + pdb + "_scanning_output.txt"
-                df_file = pdb_path.pdb_thruputs+"agg/"+str(row) + "_ddg_background.csv"        
+                df_file = (
+                    pdb_path.pdb_thruputs + "agg/" + str(row) + "_ddg_background.csv"
+                )
                 if exists(filename):
                     fdfp = FileDf.FileDf(filename)
                     cov_df = fdfp.openDataFrame()
-                    fx_runner.createPosscanCsv(row_path, pdb, mut.split(","), [], cov_df, ddg_file,df_file)
-                else:                
-                    empty_dic = {"source":[],"gene":[],"accession":[],"pdb":[],"method":[],"resolution":[],"chain":[],"pdb_start":[],"pdb_end":[],"gene_start":[],"gene_end":[],"coverage":[],"score":[]}
+                    fx_runner.createPosscanCsv(
+                        row_path, pdb, mut.split(","), [], cov_df, ddg_file, df_file
+                    )
+                else:
+                    empty_dic = {
+                        "source": [],
+                        "gene": [],
+                        "accession": [],
+                        "pdb": [],
+                        "method": [],
+                        "resolution": [],
+                        "chain": [],
+                        "pdb_start": [],
+                        "pdb_end": [],
+                        "gene_start": [],
+                        "gene_end": [],
+                        "coverage": [],
+                        "score": [],
+                    }
                     df = pd.DataFrame.from_dict(empty_dic)
-                    fx_runner.createPosscanCsv(row_path, pdb, mut.split(","), [], df, ddg_file,df_file)
+                    fx_runner.createPosscanCsv(
+                        row_path, pdb, mut.split(","), [], df, ddg_file, df_file
+                    )
         print("MUTEIN SCRIPT ENDED")
-    
-            
 
 
 ##########################################################################################
 if __name__ == "__main__":
     import sys
+
     globals()["run_pipeline"](sys.argv)

@@ -44,31 +44,30 @@ def run_pipeline(args):
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
-    pdbcode = argus.arg("pdb","").lower()
+    pdbcode = argus.arg("pdb", "").lower()
     gene_stitch = pdbcode == ""
 
-    gene_path = Paths.Paths(        
+    gene_path = Paths.Paths(
         data_dir,
         install_dir + "Pipelines/geneanalysis",
         dataset=dataset,
-        gene=gene,        
-        pdb=pdbcode,        
+        gene=gene,
+        pdb=pdbcode,
     )
 
     pdb_list = []
 
     if pdbcode != "":
         pdb_list.append(pdbcode)
-    else:        
+    else:
         pdbtasks = gene_path.gene_outputs + "pdb_tasklist.csv"
-        print("Open file:",pdbtasks)
+        print("Open file:", pdbtasks)
         fio = FileDf.FileDf(pdbtasks)
         df = fio.openDataFrame()
 
-        for t in range(len(df.index)):    
+        for t in range(len(df.index)):
             pdbcode = df["pdb"][t].lower()
             pdb_list.append(pdbcode)
-        
 
     for pdbcode in pdb_list:
         argsgn = args
@@ -76,20 +75,23 @@ def run_pipeline(args):
         arglist += "@pdb=" + pdbcode
         argsgn[1] = arglist
         import Pipelines.geneanalysis.python.mod_pdbagg as ppla
+
         print("Aggregating background pdb", pdbcode)
         ppla.run_pipeline(argsgn)
         import Pipelines.geneanalysis.python.mod_pdbvagg as pplb
+
         print("Aggregating variants pdb", pdbcode)
         pplb.run_pipeline(argsgn)
-                        
+
     if gene_stitch:
         print("Gene stitching...")
         import Pipelines.geneanalysis.python.mod_onegenestitch as pplc
+
         print("Stitching gene", gene)
         pplc.run_pipeline(args)
     else:
         print("No gene stitch, pdb only")
-    
+
     print("### COMPLETED FoldX stitch job ###")
     print("MUTEIN SCRIPT ENDED")
 
@@ -97,4 +99,5 @@ def run_pipeline(args):
 ##########################################################################################
 if __name__ == "__main__":
     import sys
+
     globals()["run_pipeline"](sys.argv)

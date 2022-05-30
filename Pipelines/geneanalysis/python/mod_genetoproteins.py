@@ -34,11 +34,13 @@ def run_pipeline(args):
     sys.path.append(install_dir + "/Pipelines")
     sys.path.append(install_dir + "/Pipelines/libs")
     data_dir = argus.arg("data_dir")
-    dataset = argus.arg("dataset","")
+    dataset = argus.arg("dataset", "")
     gene = argus.arg("gene")
-    pdbs = 0           
-    for gene in [gene]:        
-        gene_path = Paths.Paths(data_dir,install_dir + "Pipelines/geneanalysis",dataset=dataset,gene=gene)
+    pdbs = 0
+    for gene in [gene]:
+        gene_path = Paths.Paths(
+            data_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset, gene=gene
+        )
         accession = genetoprotein.accession_from_bioservices(gene.upper())
         if len(accession) > 1:
             seq = genetoprotein.sequence_from_bioservices(accession)
@@ -47,37 +49,47 @@ def run_pipeline(args):
             for s in range(1, len(seq_lines)):
                 sl = str(seq_lines[s].strip())
                 wholeseq += sl
-            gn = Gene.Gene(gene, accession, wholeseq)            
+            gn = Gene.Gene(gene, accession, wholeseq)
             # Read the variants from intray
-            dfv = pd.read_csv(gene_path.gene_inputs + "/variants.csv")                        
+            dfv = pd.read_csv(gene_path.gene_inputs + "/variants.csv")
             for i in range(len(dfv.index)):
-                bs = dfv["bases"][i]                
-                vr = dfv["variant"][i]                
+                bs = dfv["bases"][i]
+                vr = dfv["variant"][i]
                 vrnt = Variant.Variant(gene, vr, bs)
                 gn.addVariant(vrnt)
-            # CREATE the pdbs for the gene                
-            # both these searches retun a tuple list of the pdb code and the thruput gene file path, ready for pdb inputs            
+            # CREATE the pdbs for the gene
+            # both these searches retun a tuple list of the pdb code and the thruput gene file path, ready for pdb inputs
             frag = -1
             up = UniProt.UniProt(gene.upper())
-            df, pdb_list_up = up.searchForStructures(gene_path.gene_outputs,gene_path.gene_outpdbs,fragment=frag)
+            df, pdb_list_up = up.searchForStructures(
+                gene_path.gene_outputs, gene_path.gene_outpdbs, fragment=frag
+            )
             accession = up.accession
-            sm = SwissModel.SwissModel(gene,accession)
-            dfs, pdb_list_sm = sm.searchForStructures(gene_path.gene_outputs,gene_path.gene_outpdbs,fragment=frag)                
+            sm = SwissModel.SwissModel(gene, accession)
+            dfs, pdb_list_sm = sm.searchForStructures(
+                gene_path.gene_outputs, gene_path.gene_outpdbs, fragment=frag
+            )
             dfs.append(df)
             pdb_list = pdb_list_up + pdb_list_sm
             vc = pd.concat(dfs, axis=0)
-            vc.to_csv(gene_path.gene_outputs + "Coverage_all.csv",index=False)
-            print(vc)                
-            for pdb in pdb_list:                    
-                pdb_path = Paths.Paths(data_dir,install_dir + "Pipelines/geneanalysis",dataset=dataset,gene=gn.gene,pdb=pdb.pdbcode)
+            vc.to_csv(gene_path.gene_outputs + "Coverage_all.csv", index=False)
+            print(vc)
+            for pdb in pdb_list:
+                pdb_path = Paths.Paths(
+                    data_dir,
+                    install_dir + "Pipelines/geneanalysis",
+                    dataset=dataset,
+                    gene=gn.gene,
+                    pdb=pdb.pdbcode,
+                )
                 prun = PdbRunner.PdbRunner(pdb.pdbcode)
-                prun.copyToInput(gene_path.gene_outpdbs, pdb_path.pdb_inputs,vc)
+                prun.copyToInput(gene_path.gene_outpdbs, pdb_path.pdb_inputs, vc)
                 dfp = gn.getPdbVariantCoverageDataFrame(pdb)
                 dfp.to_csv(pdb_path.pdb_inputs + "/variants.csv", index=False)
-                #bm.addBatch(dataset, gn.gene, pdb.pdbcode)
+                # bm.addBatch(dataset, gn.gene, pdb.pdbcode)
                 gn.addPdb(pdb)
                 pdbs += 1
-                        
+
             dfpdb = gn.getPdbTaskList()
             dfpdb.to_csv(gene_path.gene_outputs + "/pdb_tasklist.csv", index=False)
 
@@ -86,7 +98,7 @@ def run_pipeline(args):
             # gene_path = Paths.Paths("geneprot",dataset=dataset,gene=gn.gene)
             dfv = gn.getVariantCandidatesDataFrame()
             dfv.to_csv(gene_path.gene_outputs + "/pdb_candidates.csv", index=False)
-                                                        
+
     print("### COMPLETED gene to proteins pipeline ###")
     print("MUTEIN SCRIPT ENDED")
     return pdbs

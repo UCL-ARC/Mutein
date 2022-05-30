@@ -36,13 +36,13 @@ def run_pipeline(args):
     sys.path.append(install_dir + "/Pipelines/libs")
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
-    gene = argus.arg("gene","")
-    pdb = argus.arg("pdb","")
+    gene = argus.arg("gene", "")
+    pdb = argus.arg("pdb", "")
     runs = argus.arg("runs")
-        
+
     runner = None
     if pdb != "":
-        import Pipelines.geneanalysis.python.ga_pdb_runner as runner        
+        import Pipelines.geneanalysis.python.ga_pdb_runner as runner
     elif gene != "":
         import Pipelines.geneanalysis.python.ga_gene_runner as runner
     else:
@@ -50,6 +50,7 @@ def run_pipeline(args):
 
     if "a" in runs:
         import Pipelines.geneanalysis.python.ga_dataset_runner as runnerd
+
         print("Mutein: Preparing genes")
         runnerd.prepareGenes(args)
     if "b" in runs:
@@ -75,12 +76,13 @@ def run_pipeline(args):
         runner.aggTasks(args)
     if "i" in runs:
         print("Mutein: Aggregating variant tasks")
-        runner.aggVtasks(args)    
+        runner.aggVtasks(args)
     if "j" in runs:
         import Pipelines.geneanalysis.python.ga_gene_runner as runnerj
+
         print("Mutein: Aggregating gene tasks")
         runnerj.aggGene(args)
-                                                                 
+
     print("### COMPLETED Mutein script ###")
     print("MUTEIN SCRIPT ENDED")
 

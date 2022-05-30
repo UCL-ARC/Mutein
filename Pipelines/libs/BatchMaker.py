@@ -23,7 +23,7 @@ class BatchMaker:
         self.batches.append("config=${install_dir}Pipelines/" + yaml_file)
         self.batches.append('echo "EXE PATH=$install_dir"')
         self.batches.append('echo "CURRENT=$PWD"')
-        #self.batches.append("module load python3/recommended")       
+        # self.batches.append("module load python3/recommended")
         self.batches.append(
             'echo "~~~~~~~~~~~~~~~~~~ Call python script ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"'
         )
@@ -32,12 +32,15 @@ class BatchMaker:
         # python ${script} $install_dir $PWD ${config} $run notch NOTCH1 1pb5
         line = (
             "python ${script} $install_dir $PWD ${config} $run "
-            + dataset  + " " + gene + ' ""'
+            + dataset
+            + " "
+            + gene
+            + ' ""'
         )
         self.batches.append(line)
 
     def printBatchScript(self, file_path, sym_link=""):
-        #self.batches.append('echo "MUTEIN SCRIPT ENDED"')
+        # self.batches.append('echo "MUTEIN SCRIPT ENDED"')
         print("BATCH created in", file_path)
         with open(file_path, "w") as fw:
             for line in self.batches:
@@ -47,8 +50,8 @@ class BatchMaker:
         #    self.createSymLink(file_path,sym_link)
         #    self.changeMod(sym_link)
         return file_path
-    
-    def printBatches(self,file_path,batches, script_dir):
+
+    def printBatches(self, file_path, batches, script_dir):
         print("BATCH created in", file_path)
         with open(file_path, "w") as fw:
             for line in batches:

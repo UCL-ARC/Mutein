@@ -38,27 +38,27 @@ def run_pipeline(args):
     sys.path.append(install_dir + "/Pipelines/libs")
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
-    gene = argus.arg("gene")    
+    gene = argus.arg("gene")
     pdbcode = argus.arg("pdb").lower()
     reps = str(argus.arg("repairs"))
-                                    
-    pdb_path = Paths.Paths(        
-            data_dir,
-            install_dir + "Pipelines/geneanalysis",
-            dataset=dataset,
-            gene=gene,
-            pdb=pdbcode,
-        )
-        
+
+    pdb_path = Paths.Paths(
+        data_dir,
+        install_dir + "Pipelines/geneanalysis",
+        dataset=dataset,
+        gene=gene,
+        pdb=pdbcode,
+    )
+
     work_path = pdb_path.pdb_thruputs + "params/"
     argus.addConfig({"work_path": work_path})
     pdb_path.goto_job_dir(argus.arg("work_path"), args, argus.params, "_inputs02")
-        
-    rows = int(argus.arg("split",0))
+
+    rows = int(argus.arg("split", 0))
     ##### Open the pdb file ################################
-    #pdb_file = pdbcode + ".pdb"        
-    pdb_file = pdbcode + "_rep" + reps + ".pdb"        
-    if exists(pdb_path.pdb_thruputs+pdb_file):
+    # pdb_file = pdbcode + ".pdb"
+    pdb_file = pdbcode + "_rep" + reps + ".pdb"
+    if exists(pdb_path.pdb_thruputs + pdb_file):
         with open(pdb_path.pdb_thruputs + pdb_file) as f:
             pdbcontent = f.readlines()
 
@@ -112,7 +112,10 @@ def run_pipeline(args):
                         if aaa in aa_dict:
                             aa = aa_dict[aaa]
                             mut = (
-                                aa + linecontents[4].strip() + linecontents[5].strip() + "a"
+                                aa
+                                + linecontents[4].strip()
+                                + linecontents[5].strip()
+                                + "a"
                             )  # aa chain rid mutation = mutation string
                             params_lst.append(mut)
                         else:
@@ -120,10 +123,10 @@ def run_pipeline(args):
 
         ##### Create a dataframe for the paramterfile in the number of chunks specified
         ##### Open up the coverage file
-        #filename = pdb_path.pdb_inputs + "Coverage.csv"
-        #fdfp = FileDf.FileDf(filename)
-        #cov_df = fdfp.openDataFrame()
-        #print(cov_df)
+        # filename = pdb_path.pdb_inputs + "Coverage.csv"
+        # fdfp = FileDf.FileDf(filename)
+        # cov_df = fdfp.openDataFrame()
+        # print(cov_df)
 
         rows = int(rows)
         param_dic = {}
@@ -134,7 +137,7 @@ def run_pipeline(args):
 
         if rows == 0:
             pchunk = int(argus.arg("chunk"))
-            rows = int(len(params_lst)/pchunk)+1
+            rows = int(len(params_lst) / pchunk) + 1
 
         total_muts = len(params_lst)
         chunk = int(total_muts / rows)
@@ -150,7 +153,9 @@ def run_pipeline(args):
                 row += 1
                 param_dic["row"].append("" + str(row))
             else:
-                param_dic["mutation"][row - 1] = param_dic["mutation"][row - 1] + "," + mut
+                param_dic["mutation"][row - 1] = (
+                    param_dic["mutation"][row - 1] + "," + mut
+                )
             row_size += 1
 
             if row_size == chunk and row > remainder:
@@ -163,11 +168,12 @@ def run_pipeline(args):
         filename = pdb_path.pdb_thruputs + "params_background.txt"
         print("### foldx02: ... savig df", filename)
         data_params.to_csv(filename, index=False, sep=" ", header=True)
-        
+
     print("MUTEIN SCRIPT ENDED")
-                    
+
 
 ##########################################################################################
 if __name__ == "__main__":
     import sys
+
     globals()["run_pipeline"](sys.argv)

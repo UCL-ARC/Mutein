@@ -38,16 +38,16 @@ def run_pipeline(args):
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
-    pdbcode = argus.arg("pdb","").lower()
+    pdbcode = argus.arg("pdb", "").lower()
 
-    gene_path = Paths.Paths(        
+    gene_path = Paths.Paths(
         data_dir,
         install_dir + "Pipelines/geneanalysis",
         dataset=dataset,
-        gene=gene,        
-        pdb=pdbcode,    
+        gene=gene,
+        pdb=pdbcode,
     )
-    
+
     pdb_list = []
     if pdbcode != "":
         pdb_list.append(pdbcode)
@@ -55,14 +55,14 @@ def run_pipeline(args):
         pdbtasks = gene_path.gene_outputs + "pdb_tasklist.csv"
         fio = FileDf.FileDf(pdbtasks)
         df = fio.openDataFrame()
-    
+
         for t in range(len(df.index)):
             pdbcode = df["pdb"][t].lower()
             pdb_list.append(pdbcode)
-        
+
     for pdbcode in pdb_list:
-        
-        pdb_path = Paths.Paths(        
+
+        pdb_path = Paths.Paths(
             data_dir,
             install_dir + "Pipelines/geneanalysis",
             dataset=dataset,
@@ -79,35 +79,47 @@ def run_pipeline(args):
         params_file = gene_path.thruputs + "params_variants.txt"
         fdfp = FileDf.FileDf(params_file, sep=" ", header=True)
         pm_df = fdfp.openDataFrame()
-        
 
-                    
         analyses = []
-        analyses.append([   "ddg_posscan.csv",
-                            pdb_path.pdb_outputs + "ddg_posscan.csv",                        
-                            pdb_path.pdb_outputs + argus.arg("pdb")+"_ps_"+str(argus.arg("repairs"))+"_variants_plot.png"                        
-                        ])
-        analyses.append([   "ddg_buildmodel.csv",
-                            pdb_path.pdb_outputs + "ddg_buildmodel.csv",                        
-                            pdb_path.pdb_outputs + argus.arg("pdb")+"_bm_"+str(argus.arg("repairs"))+"_variants_plot.png"                        
-                        ])
-        
-        for in_csv, out_csv, plot_file in analyses: 
+        analyses.append(
+            [
+                "ddg_posscan.csv",
+                pdb_path.pdb_outputs + "ddg_posscan.csv",
+                pdb_path.pdb_outputs
+                + argus.arg("pdb")
+                + "_ps_"
+                + str(argus.arg("repairs"))
+                + "_variants_plot.png",
+            ]
+        )
+        analyses.append(
+            [
+                "ddg_buildmodel.csv",
+                pdb_path.pdb_outputs + "ddg_buildmodel.csv",
+                pdb_path.pdb_outputs
+                + argus.arg("pdb")
+                + "_bm_"
+                + str(argus.arg("repairs"))
+                + "_variants_plot.png",
+            ]
+        )
+
+        for in_csv, out_csv, plot_file in analyses:
             all_df = []
             exists_all = True
             for i in range(len(pm_df.index)):
                 r = pm_df["row"][i]
                 rpdb = pm_df["pdb"][i]
-                if rpdb == pdbcode:            
-                    in_csv_i = work_path+str(r) + "_"+in_csv
+                if rpdb == pdbcode:
+                    in_csv_i = work_path + str(r) + "_" + in_csv
                     if exists(in_csv_i):
                         fdf = FileDf.FileDf(in_csv_i)
                         all_df.append(fdf.openDataFrame())
                     else:
                         exists_all = False
             if len(all_df) > 0 and exists_all:
-                ddg_df = pd.concat(all_df, ignore_index=True)        
-                ddg_df.to_csv(out_csv, index=False)        
+                ddg_df = pd.concat(all_df, ignore_index=True)
+                ddg_df.to_csv(out_csv, index=False)
                 ana = Analysis.Analysis(ddg_df, argus.arg("pdb"))
                 ana.createDdgResidue(plot_file, "variants", xax="gene_no")
             else:

@@ -29,9 +29,9 @@ class PathsXXX:
             level = "gene"
             if gene == "":
                 level = "dataset"
-        dataset = dataset.replace(".","_")
-        gene = gene.replace(".","_")
-        pdb = pdb.replace(".","_")
+        dataset = dataset.replace(".", "_")
+        gene = gene.replace(".", "_")
+        pdb = pdb.replace(".", "_")
 
         dataset = dataset.lower()
         gene = gene.lower()
@@ -162,7 +162,7 @@ class PathsXXX:
             try:
                 os.mkdir(retpath)
             except:
-                pass #this could be a rare case of 2 nodes creating it at the same time
+                pass  # this could be a rare case of 2 nodes creating it at the same time
         return retpath
 
     def goto_job_dir(self, dir_path, args, params, name):
@@ -170,7 +170,7 @@ class PathsXXX:
             try:
                 os.mkdir(dir_path)
             except:
-                pass #this could be a rare case of 2 nodes creating it at the same time
+                pass  # this could be a rare case of 2 nodes creating it at the same time
         os.chdir(dir_path)
         inputs_file = name + ".log"
         with open(inputs_file, "w") as fw:
