@@ -55,7 +55,7 @@ def run_pipeline(args):
     pdb_path.goto_job_dir(argus.arg("work_path"), args, argus.params, "_inputs02")
     
     # chainid = argus.arg("chain")
-    rows = int(argus.arg("split"))
+    rows = int(argus.arg("split"),0)
 
     ##########################################################
 
@@ -135,6 +135,10 @@ def run_pipeline(args):
         param_dic["mutation"] = []
         param_dic["row"] = []
         mut_str = ""
+
+        if rows == 0:
+            pchunk = int(argus.arg("chunk",0))
+            rows = int(len(params_lst)/pchunk)
 
         total_muts = len(params_lst)
         chunk = int(total_muts / rows)

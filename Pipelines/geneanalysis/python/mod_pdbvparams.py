@@ -54,8 +54,7 @@ def run_pipeline(args):
     ############################################        
     variant = argus.arg("variant")
     # chainid = argus.arg("chain")
-    splitrows = int(argus.arg("vsplit"))
-
+    splitrows = int(argus.arg("vsplit",0))    
     # variant file is in the pdb inputs
     pdb_path = Paths.Paths(        
         data_dir,
@@ -76,6 +75,11 @@ def run_pipeline(args):
     else:
         mutations = variant_df
     print(mutations)
+
+    if splitrows == 0:
+        vchunk = int(argus.arg("vchunk",0))
+        splitrows = int(len(mutations.index)/vchunk)
+
     mut_list = []
     for i in range(len(mutations.index)):
         chain = mutations["chain"][i]
