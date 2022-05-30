@@ -1,72 +1,44 @@
-##### Owner:Rachel
---------------------------------------------------------------------------
-## HPC FoldX Pipeline for myriad
---------------------------------------------------------------------------
-- When everything is installed and running, the batch scripts are in the main scripts directory as symlinks
-- Navigate to your chosen working directory, from wich the inputs/outputs directory are assumed to be present
-- Then run the approriate batch symlink
-```
->> module load python3/recommended
->> cd ~/MuteinData
->> /home/ucbtlcr/Mutein/Pipelines/geneanalysis/ppl_notch_NOTCH1.sh /home/ucbtlcr/Mutein/
+# Creating a Mutein Installation
 
-(when the environment variables are created it will be simplified to)
->> ppl_notch_NOTCH1.sh
-```
---------------------------------------------------------------------------
-### 1.The data is structured in folders
-```
-scripts/*
-inputs/pdb/*
-thruputs/pdb/*
-results/setname/*
-outputs/setname/*
-(The thruputs, results and outputs are not synced with github)
-```
-### 2.Pipeline inputs
-##### A pdb file
-##### A list of mutations in a file of the form
-```
-Mutation,Variant
-NA501Y,Alpha
-AA570D,Alpha
-TA716I,Alpha
-SA982A,Alpha
-DA1118H,Alpha
-DA614G,Alpha
-```
---------------------------------------------------------------------------
-### 3.To run the pipeline on myriad:
-##### clone the repo
-```
-# Clone the main branch or a branch
->> cd Mutein
-# Get the code
->> git checkout .
->> git pull
-
-# The data directory needs to be set up with inputs
-(this could be a different githun, for now I have a git_sync directory)
-
-```
------------------------------------------------------------------------
-```
-The scripts dependency is:
-                                    [Per Gene]:01_Gene_To_Protein
-                                              |
-                                    [Per PDB]:2:FOLDX REPAIR
-                                        |                |
-                            [Per PDB]:03a:SPLIT         03b:VARIANT SPLIT
-                                        |                |
-            [ARRAY JOBS]    [Per PDB]:04a:POS_SCAN       04b:SINGLE_SCAN
-                                        |                |
-                            [Per PDB]:05a:AGGREGATE     05b:VARIANT AGGREGATE
-                                                         |
-                            [PDBs->GENE]:SCRIPT 06: Structures->Gene under selection 
- ```
------------------------------------------------------------------------
-
-
-
+- log on to the server, e.g.:
+-- ssh -J ucbtlcr@socrates.ucl.ac.uk ucbtlcr@myriad.rc.ucl.ac.uk
+------------------------
+####  If you need to do so, generate an ssh key
+- mkdir .ssh
+- cd .ssh
+- ssh-keygen
+- (press enter all 3 times without typing anything)
+- cat id_rsa.pub
+- You can now copy this file, go to github website
+- In your Settings/SSH and GPG keys, create one and paste it in
+------------------------
+#### Now you can clone the Mutein repo
+- From the home root directory, cd ~ if you need to
+- git clone git@github.com:UCL/Mutein.git
+- cd into Mutein
+- Checkout the correct branch if necessary, e.g.
+-- git checkout rachel/foldxv1
+------------------------
+#### Now prepare the data input for the pipeline
+- cd ~
+- mkdir MuteinData
+###### There is sample data in Mutein/data_sync/SmallDemos/
+- cp -r ~/Mutein/data_sync/SmallDemos/dataset_cutdown/ ~/MuteinData/
+- cp -r ~/Mutein/data_sync/SmallDemos/dataset_notch/ ~/MuteinData/
+- cp -r ~/Mutein/data_sync/SmallDemos/pdb_1pb5/ ~/MuteinData/
+------------------------
+#### You are now ready to run a job!!!
+###### The smallest job is the 1pb5 pdb which is a good test
+- Open the GUI
+- On the config page 
+-- enter your username, password and server
+-- Check the connections
+- On the Pipeline page
+-- delete the dataset and gene, and enter 1pb5 in the pdb box
+-- Click on "submit repair"
+------------------------------
+#### Now monitor your batch
+- On the Monitor tab
+-- Press Refresh QStat and watch the progress
 
 

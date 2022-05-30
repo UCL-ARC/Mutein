@@ -2,7 +2,7 @@
 --------------------------------------------------------------------------
 ## HPC FoldX Pipeline for myriad
 --------------------------------------------------------------------------
-### When everything is installed and running, you just need to do the following to run the pipeline
+### This is a description of the inputs and outputs of the stages of geneanalysis
 
 TODO input output documentation
 
