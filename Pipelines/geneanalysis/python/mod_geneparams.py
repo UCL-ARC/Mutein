@@ -39,7 +39,7 @@ def run_pipeline(args):
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
-    split = int(argus.arg("split"),0)
+    split = int(argus.arg("split",0))
     
     gene_path = Paths.Paths(        
         data_dir,
