@@ -134,7 +134,7 @@ def run_pipeline(args):
 
         if rows == 0:
             pchunk = int(argus.arg("chunk"))
-            rows = int(len(params_lst)/pchunk)
+            rows = int(len(params_lst)/pchunk)+1
 
         total_muts = len(params_lst)
         chunk = int(total_muts / rows)

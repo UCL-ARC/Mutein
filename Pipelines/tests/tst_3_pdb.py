@@ -85,8 +85,8 @@ gene="notch1"
 pdb="1pb5"
 
 repairs=8
-split=10000
-vsplit=2000
+split=20
+vsplit=50
 
 """
     if "a" in runs:        print("Mutein: Preparing genes")        
@@ -107,8 +107,8 @@ def runPPL(inputs):
     import ga__runner as ppl
     args = ["", inputs]
     ppl.run_pipeline(args)
-runs = "c"
-runPPL("runs="+runs+"@dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@repairs="+str(repairs)+"@task=2"+"@split="+str(split)+"@variant=*@vsplit="+str(vsplit))
+runs = "e"
+runPPL("runs="+runs+"@dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@repairs="+str(repairs)+"@task=2"+"@chunk="+str(split)+"@variant=*@vchunk="+str(vsplit))
 
 
 """

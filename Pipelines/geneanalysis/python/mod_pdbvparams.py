@@ -79,15 +79,11 @@ def run_pipeline(args):
     total_muts = len(mutations.index)
     if splitrows == 0:
         vchunk = int(argus.arg("vchunk"))
-        splitrow = int(len(mutations.index)/vchunk)
-        print("Split is now",splitrow)
-        chunk = int(total_muts / splitrow)
-        remainder = int(total_muts % splitrow)
-    else:
-        splitrow = int(splitrows)
-        print("Split is not zero, but",splitrow)
-        chunk = int(total_muts / splitrow)
-        remainder = int(total_muts % splitrow)
+        splitrows = int(total_muts/vchunk)+1
+        print("Split is now",splitrows)
+    chunk = int(total_muts / splitrows)
+    remainder = int(total_muts % splitrows)
+    
         
     mut_list = []
     for i in range(len(mutations.index)):
@@ -131,7 +127,7 @@ def run_pipeline(args):
             row_size = 0
         elif row_size == chunk + 1:
             row_size = 0
-    print(total_muts, splitrow, chunk, row)
+    print(total_muts, splitrows, chunk, row)
     ##### Turn the dictionary into a dataframe
     data_params = pd.DataFrame.from_dict(param_dic)
     filename = pdb_path.pdb_thruputs + "params_variants.txt"
