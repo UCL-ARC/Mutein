@@ -80,6 +80,8 @@ def run_pipeline(args):
         vchunk = int(argus.arg("vchunk"))
         splitrows = int(len(mutations.index)/vchunk)
         print("Split is now",splitrows)
+    else:
+        print("Split is not zero, but",splitrows)
 
     mut_list = []
     for i in range(len(mutations.index)):
