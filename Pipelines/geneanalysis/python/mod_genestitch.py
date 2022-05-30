@@ -61,12 +61,14 @@ def run_pipeline(args):
         pdb_list.append(pdbcode)
     else:        
         pdbtasks = gene_path.gene_outputs + "pdb_tasklist.csv"
+        print("Open file:",pdbtasks)
         fio = FileDf.FileDf(pdbtasks)
         df = fio.openDataFrame()
-    
+
         for t in range(len(df.index)):    
             pdbcode = df["pdb"][t].lower()
             pdb_list.append(pdbcode)
+        
 
     for pdbcode in pdb_list:
         argsgn = args

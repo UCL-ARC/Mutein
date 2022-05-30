@@ -75,14 +75,14 @@ def test_proteindblagg(inputs):
     ppl.run_pipeline(args)
 ######################################################################
 ### INPUTS
-dataset="shearwater"
+dataset="notch"
 
 #gene="CR2"
 #pdb="2gsx"
 #pdb="1ly2"
 
 gene="notch1"
-pdb="1pb5"
+pdb=""
 
 repairs=8
 split=20
