@@ -39,7 +39,7 @@ def run_pipeline(args):
     gene = argus.arg("gene","")
     pdb = argus.arg("pdb","")
     runs = argus.arg("runs")
-
+        
     runner = None
     if pdb != "":
         import Pipelines.geneanalysis.python.ga_pdb_runner as runner        
@@ -49,8 +49,9 @@ def run_pipeline(args):
         import Pipelines.geneanalysis.python.ga_dataset_runner as runner
 
     if "a" in runs:
+        import Pipelines.geneanalysis.python.ga_dataset_runner as runnerd
         print("Mutein: Preparing genes")
-        runner.prepareGenes(args)
+        runnerd.prepareGenes(args)
     if "b" in runs:
         print("Mutein: Preparing pdbs")
         runner.preparePdbs(args)
@@ -76,8 +77,9 @@ def run_pipeline(args):
         print("Mutein: Aggregating variant tasks")
         runner.aggVtasks(args)    
     if "j" in runs:
+        import Pipelines.geneanalysis.python.ga_gene_runner as runnerj
         print("Mutein: Aggregating gene tasks")
-        runner.aggGene(args)
+        runnerj.aggGene(args)
                                                                  
     print("### COMPLETED Mutein script ###")
     print("MUTEIN SCRIPT ENDED")

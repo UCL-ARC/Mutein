@@ -107,7 +107,7 @@ def runPPL(inputs):
     import ga__runner as ppl
     args = ["", inputs]
     ppl.run_pipeline(args)
-runs = "e"
+runs = "j"
 runPPL("runs="+runs+"@dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@repairs="+str(repairs)+"@task=2"+"@chunk="+str(split)+"@variant=*@vchunk="+str(vsplit))
 
 

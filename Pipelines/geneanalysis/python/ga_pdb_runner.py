@@ -12,10 +12,10 @@ retpath = "/".join(dirs) + "/libs"
 sys.path.append(retpath)
     
 def prepareGenes(args):
-    print("!!!ERROR irrelevant")
+    print("!!!ERROR - irrelevant pipeline")
 
 def preparePdbs(args):
-        print("!!!ERROR irrelevant")
+        print("!!!ERROR - irrelevant pipeline")
      
 def repairPdbs(args):
     import Pipelines.geneanalysis.python.mod_pdbrepair as ppb
