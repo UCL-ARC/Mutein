@@ -1,7 +1,7 @@
 #!/bin/bash -l
 module load python3/recommended
 
-run=qsub
+run=py
 
 dataset=$1
 gene=$2
