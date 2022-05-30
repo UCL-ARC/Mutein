@@ -118,7 +118,10 @@ def run_pipeline(args):
                     existsfileRes,timeRes = checkResult(filenameRes)
                     existsfileSplit,timeSplit = checkResult(fileNameSplit)
                     existsfilePdb,timePdb = checkResult(filenamePdb)
-                    msg = pdbo + "\t"
+                    msg = pdbo
+                    while len(msg) < 25:
+                        msg += " "
+                    msg += "\t"
                     if existsfileRes:
                         msg += "Results@" + str(timeRes) + "\t"
                     else:

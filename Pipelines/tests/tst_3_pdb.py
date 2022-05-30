@@ -76,18 +76,14 @@ def test_proteindblagg(inputs):
 ######################################################################
 ### INPUTS
 dataset="notch"
-
-#gene="CR2"
-#pdb="2gsx"
-#pdb="1ly2"
-
 gene="notch1"
-pdb=""
+pdb="2he0"
 
 repairs=8
 split=20
 vsplit=50
 
+runs = "c"
 """
     if "a" in runs:        print("Mutein: Preparing genes")        
     if "b" in runs:        print("Mutein: Preparing pdbs")        
@@ -107,7 +103,6 @@ def runPPL(inputs):
     import ga__runner as ppl
     args = ["", inputs]
     ppl.run_pipeline(args)
-runs = "j"
 runPPL("runs="+runs+"@dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@repairs="+str(repairs)+"@task=2"+"@chunk="+str(split)+"@variant=*@vchunk="+str(vsplit))
 
 
