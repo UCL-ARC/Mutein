@@ -77,7 +77,7 @@ def run_pipeline(args):
     print(mutations)
 
     if splitrows == 0:
-        vchunk = int(argus.arg("vchunk",0))
+        vchunk = int(argus.arg("vchunk"))
         splitrows = int(len(mutations.index)/vchunk)
 
     mut_list = []

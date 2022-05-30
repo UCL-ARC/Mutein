@@ -133,7 +133,7 @@ def run_pipeline(args):
         mut_str = ""
 
         if rows == 0:
-            pchunk = int(argus.arg("chunk",0))
+            pchunk = int(argus.arg("chunk"))
             rows = int(len(params_lst)/pchunk)
 
         total_muts = len(params_lst)
