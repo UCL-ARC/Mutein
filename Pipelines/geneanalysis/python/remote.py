@@ -163,15 +163,6 @@ def run_pipeline(args):
                             msg += "Tasks: " + str(count) + "/" + str(numtasks) + "@" + str(timet) + "\t"
                         else:
                             msg += "No Results\t\t\t"
-
-
-
-
-
-
-
-
-
                     if existsfileSplit:
                         msg += "Split@" + str(timeSplit) + "\t"
                     else:
@@ -180,9 +171,7 @@ def run_pipeline(args):
                         msg += "Pdb(10)@" + str(timePdb)
                     else:
                         msg += "No pdb"
-
                     print(msg)
-
         else:
             print("The pdbs have not been prepared - no pdb list", filename)
     elif mode == "PDB":
