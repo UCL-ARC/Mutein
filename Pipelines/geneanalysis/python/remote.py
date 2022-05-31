@@ -165,7 +165,8 @@ def run_pipeline(args):
                         msg += "Tasks:" + str(count) + "/" + str(numtasks)
                         while len(msg) < 40:
                             msg += " "
-                        msg += "@" + str(lasttime)
+                        if count > 0:
+                            msg += "@" + str(lasttime)
                         #else:
                         #    msg += "No Results"
                     while len(msg) < 55:
