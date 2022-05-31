@@ -19,12 +19,10 @@ class Variant:
         self.variant = variant
         self.bases = bases
 
-    def includedInRange(self, starts, ends, offsets, chains):
-        for s in range(len(starts)):
-            start = int(starts[s])
-            end = int(ends[s])
-            offset = int(offsets[s])
-            chain = chains[s]
-            if self.residue >= int(start) and self.residue <= int(end):
-                return True, offset, chain
+    def includedInRange(self, segments):
+        for chain, residue_num, residue_end, gene_start, gene_end, coverage in segments:
+            if self.residue >= int(gene_start) and self.residue <= int(gene_end):
+                offset = gene_start - residue_num
+                res_start = self.residue - offset
+                return True, chain, res_start
         return False, 0, ""

@@ -1,0 +1,23 @@
+---
+id: 'AGG'
+qsub_id: 'agg'
+pipe_dir: 'Pipelines/geneanalysis/python/'
+script: 'ga__runner'
+time: '1:00:0'
+cores: "1"
+dependency: '-1'
+array: 0
+inputs: "runs=h@repairs=10@variant=*"
+active: 'Y'
+--- 
+id: 'VAGG'
+qsub_id: 'vagg'
+pipe_dir: 'Pipelines/geneanalysis/python/'
+script: 'ga__runner'
+time: '1:00:0'
+cores: "1"
+dependency: '-1'
+array: 0
+inputs: "runs=i@repairs=10@variant=*"
+active: 'Y'
+--- 

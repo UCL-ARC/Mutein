@@ -1,0 +1,13 @@
+---
+id: 'REP'
+qsub_id: 'repair'
+pipe_dir: 'Pipelines/geneanalysis/python/'
+script: 'ga__runner'
+time: '5:00:0'
+cores: "8"
+dependency: '-1'
+array: -1
+arrayfile: "pdbs"
+inputs: "runs=c@repairs=10"
+active: 'Y'
+---

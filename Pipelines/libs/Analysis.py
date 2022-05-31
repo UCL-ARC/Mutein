@@ -9,6 +9,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+pd.options.mode.chained_assignment = None  # default='warn'
+
 
 class Analysis:
     def __init__(self, df, pdb_gene):
@@ -24,6 +26,7 @@ class Analysis:
         xax="pdb_rid",
         dropnagene=False,
     ):
+        self.clearPlots()
         # And save something visual as a starting point for some analysis
         df = self.data
         df["ddg"] = pd.to_numeric(self.data["ddg"])
@@ -96,6 +99,7 @@ class Analysis:
         ax3.set_ylabel("")
         # plt.legend(title=hue,bbox_to_anchor=(1.01, 1), loc=2, borderaxespad=0.,shadow=False,fancybox=False)  # Put the legend out of the figure
         plt.savefig(file_path)
+        self.clearPlots()
         print("### Analysis:OutputDdgResidue to", file_path)
 
     def createPdbSummary(
@@ -107,6 +111,7 @@ class Analysis:
         xax="gene_no",
         dropnagene=True,
     ):
+        self.clearPlots()
         # And save something visual as a starting point for some analysis
         df = self.data
         df["ddg"] = pd.to_numeric(self.data["ddg"])
@@ -114,21 +119,21 @@ class Analysis:
         if dropnagene:
             df = df.dropna()
         print(df)
-        
+
         count = len(df.index)
-        
-        fig, ax1 = plt.subplots(1, 1, figsize=(25, 5))
+
+        fig, ax1 = plt.subplots(1, 1, figsize=(25, 10))
         fig.suptitle(
             self.pdb_gene
             + " "
             + title
             + " ("
             + str(count)
-            + ")\nddg <-1=stabilising >2.5=destabilising"            
+            + ")\nddg <-1=stabilising >2.5=destabilising"
         )
         yax = "pdb"
         hue = "ddg"
-        
+
         ###  third plt ######
         vmin = -2.5  # ddg_df[hue].min() #they have defined >2.5 as destabilising
         vmax = -1 * vmin
@@ -151,4 +156,13 @@ class Analysis:
         ax1.set_ylabel("")
         # plt.legend(title=hue,bbox_to_anchor=(1.01, 1), loc=2, borderaxespad=0.,shadow=False,fancybox=False)  # Put the legend out of the figure
         plt.savefig(file_path)
+        self.clearPlots()
         print("### Analysis:OutputPdbSummary to", file_path)
+
+    def clearPlots(self):
+        # clear all plots from memory
+        fig = plt.figure()
+        plt.figure().clear()
+        plt.close()
+        plt.cla()
+        plt.clf()

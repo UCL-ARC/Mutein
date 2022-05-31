@@ -22,6 +22,7 @@ class QSubRunner:
         array,
         homeuser,
         inputs,
+        cores,
         print_only,
     ):
         inputs += "@install_dir=" + install_dir
@@ -42,6 +43,15 @@ class QSubRunner:
         if int(array) > 0:
             self.args.append("-t")
             self.args.append("1-" + str(array))
+        # ask for cores from the config
+        self.args.append("-pe")
+        self.args.append("smp")
+        self.args.append(cores)
+        if script == "cleanup":  # redirect the ogs as we don't care about them
+            self.args.append("-o")
+            self.args.append("clean_out.txt")
+            self.args.append("-e")
+            self.args.append("clean_error.txt")
         self.args.append("-N")  # $ -N foldx-posscan
         self.args.append(qsubid)  # $
         self.args.append("-l")  # $ -l h_rt=5:00:0
@@ -59,6 +69,12 @@ class QSubRunner:
             return self.runid
         else:
             # print("### QSub.Run(): working dir", os.getcwd())
+
+            fullcall = ""
+            for arg in self.args:
+                fullcall += arg + " "
+            self.args.append(fullcall)
+
             print("### QSub.Run()", self.args)
             process = subprocess.Popen(
                 args=self.args,
@@ -68,12 +84,15 @@ class QSubRunner:
             )
             result = process.communicate()
             print(result)  # e.g. Your job 588483 ("foldx-aggregate") has been submitted
-            results = result[0].split(" ")
-            if len(results) > 1:
-                jobid = results[2]
-                if "." in jobid:
-                    results = jobid.split(".")
-                    jobid = results[0]
+            if "job rejected" in result:
+                return "x"
+            else:
+                results = result[0].split(" ")
+                if len(results) > 1:
+                    jobid = results[2]
+                    if "." in jobid:
+                        results = jobid.split(".")
+                        jobid = results[0]
+                        return jobid
                     return jobid
-                return jobid
-            return -1
+                return "x"

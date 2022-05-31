@@ -20,7 +20,9 @@ script=$0
 inputs=$1
 pyscript=$2
 workspace=$3
+fullcall=$4
 
+echo "$fullcall"
 echo "SCRIPT=$script"
 echo "PYSCRIPT=$pyscript"
 echo "INPUTS=$inputs"
@@ -33,4 +35,6 @@ module load python3/recommended
 module load foldx
 echo "~~~~~~~~~~~~~~~~~~ Call python script ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 python "$pyscript" "$inputs@task=$SGE_TASK_ID"
+echo "MUTEIN SCRIPT ENDED"
+
 

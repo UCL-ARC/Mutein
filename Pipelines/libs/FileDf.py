@@ -40,6 +40,25 @@ class FileDic:
         self.file_path = file_path
         self.dic = dic
 
+    def add(self, key, val, fill_last=[]):
+        if key not in self.dic:
+            self.dic[key] = []
+        self.dic[key].append(val)
+
+    def fillLast(self, fill_last):
+        for key in fill_last:
+            if key in self.dic:
+                self.dic[key].append(self.dic[key][-1])
+
     def saveAsDf(self, sep=",", header=True):
+        len0 = 0
+        for key, val in self.dic.items():
+            if len0 == 0:
+                len0 = len(val)
+            else:
+                if len(val) != len0:
+                    print(len0, key, len(val))
+
         df = pd.DataFrame.from_dict(self.dic)
         df.to_csv(self.file_path, index=False, sep=sep, header=header)
+        return df

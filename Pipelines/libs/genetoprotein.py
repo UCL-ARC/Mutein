@@ -114,7 +114,7 @@ def removePdbStructure(url, pdb, path_name):
     pdb_path = path_name + pdb + ".pdb"
     if os.path.exists(pdb_path):
         os.remove(pdb_path)
-    #if os.path.exists(path_name):
+    # if os.path.exists(path_name):
     #    os.remove(path_name)
 
 
