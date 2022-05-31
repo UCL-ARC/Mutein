@@ -20,7 +20,7 @@ class App():
 
 
         rt = tk.Tk()
-        rt.iconbitmap("C:/UCL/github/MuteinGUI/GUI/icon2.ico")
+        #rt.iconbitmap("C:/UCL/github/MuteinGUI/GUI/icon2.ico")
         rt.config(bg=clr2) 
         rt.title('QStat Viewer for Mutein')
         rt.geometry("1500x800")

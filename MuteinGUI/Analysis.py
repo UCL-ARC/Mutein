@@ -10,131 +10,108 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 pd.options.mode.chained_assignment = None  # default='warn'
 
-
 class Analysis:
     def __init__(self, df):
         self.data = df
+        self.stabilising=-1,
+        self.destabilising=2.5,
         
     def createPdbSummary(self):
         #self.clearPlots()
-        fig, ax = plt.subplots(1, 1, figsize=(15, 8))
+        fig, ax = plt.subplots(1, 1, figsize=(10, 7))
         # And save something visual as a starting point for some analysis
         xax = "gene_no"
         yax = "pdb"
-        hue = "ddg"                
+        hue = "ddg"
         df = self.data
+        
+        #mainpulate dataframe        
         df["ddg"] = pd.to_numeric(df["ddg"])
         df["gene_no"] = pd.to_numeric(df["gene_no"])
+        df['pdb'] = df['pdb'].str.slice(0,-5) #assuming _rep10 on the end of them all :-)                
         df = df.dropna()     
         count = len(df.index)
-                
-        fig.suptitle(            
-            "PDB Coverage"
-            + " ("
-            + str(count)
-            + ")\nddg <-1=stabilising >2.5=destabilising"            
-        )                
+        x_start = df["gene_no"].min()
+        x_end = df["gene_no"].max()        
+        df=df.groupby(['source','pdb','gene_no'])['ddg'].mean()
+        df = df.reset_index()
+        print(df)
+        df['absddg'] = abs(df['ddg'])                
+        fig.suptitle("PDB Gene Coverage\nddg <-1=stabilising >2.5=destabilising")                
         ###  third plt ######
         vmin = -2.5  # ddg_df[hue].min() #they have defined >2.5 as destabilising
-        vmax = -1 * vmin
-        #ddg_df = df.sort_values(by=xax, ascending=False)
-        #ddg_df = df.sort_values(by=yax, ascending=False)
-        ddg_df = df.sort_values(by=[yax,hue], ascending=[False,False])        
-        g = ax.scatter(
-            ddg_df[xax],
-            ddg_df[yax],
-            c=ddg_df[hue],
-            cmap="Spectral",
-            edgecolor="silver",
-            alpha=0.35,
-            linewidth=0.1,
-            s=20,
-            vmin=vmin,
-            vmax=vmax,
-        )
+        vmax = -1 * vmin        
+        #df = df.sort_values(by=[yax,"absddg"], ascending=[False,True])        
+        df = df.sort_values(by=[yax,"gene_no"], ascending=[False,False])        
+        g = ax.scatter(df[xax], df[yax], c=df[hue],cmap="Spectral",edgecolor="silver",alpha=0.35,linewidth=0.1,s=20,vmin=vmin,vmax=vmax)
         cb = plt.colorbar(g, extend="both")
         cb.set_label(hue)
-        ax.set_xlabel(xax)
-        ax.set_ylabel("")          
-        plt.xticks(rotation=90)    
-        plt.show()
+        ax.set_xlabel(xax + "\n("+str(len(df.index))+")")
+        ax.set_ylabel("")                 
+        ax.xaxis.set_ticks(np.arange(0, x_end, 100)) 
+        plt.xticks(rotation=90)   
+        plt.tight_layout() 
 
-    def createDdgBackResidue(self):        
-        stabilising=-1,
-        destabilising=2.5,
-        xax="pdb_rid",                
-        # And save something visual as a starting point for some analysis
+    def createDdgBackRid(self):                
+        xax="pdb_rid"                        
         df = self.data
         df["ddg"] = pd.to_numeric(df["ddg"])
-        df["pdb_rid"] = pd.to_numeric(df["pdb_rid"])
-        
-        df_stab = df.query("ddg <= " + str(stabilising))
-        df_destab = df.query("ddg >= " + str(destabilising))
-
-        count = len(df.index)
-
-        if len(df_stab.index) > 0:
-            str_ratio = "1:" + str(round(len(df_destab.index) / len(df_stab.index)))
-        else:
-            str_ratio = str(round(len(df_destab.index))) + ":0"
-
-        str_ratio = (
-            str(round(len(df_stab.index))) + ":" + str(round(len(df_destab.index)))
-        )
-
-        fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(15, 5))
-        fig.suptitle(
-            self.pdb_gene
-            + " "
-            + "Background"
-            + " ("
-            + str(count)
-            + ")\nddg <-1=stabilising >2.5=destabilising Ratio="
-            + str_ratio
-        )
+        df["pdb_rid"] = pd.to_numeric(df["pdb_rid"])                
+        count = int(len(df.index))
+        fig, (ax1) = plt.subplots(1, 1, figsize=(10, 7))
+        fig.suptitle("Background mutations\nddg <-1=stabilising >2.5=destabilising")
         yax = "mut_to"
         hue = "ddg"
-
-        ###  first plt ######
-        sns.histplot(data=df, x="ddg", palette="tab20", ax=ax1, bins=50)
-        ax1.set_ylabel("")
-
-        ###  second plt ######
-        # Clip it to show stabilising and destabilising mutations
-        capp = 5  # what do we want to cap out the histogram at to see it better
-        # df['a'][df['a'] >= maxVal] = maxVal this returns the annoying copy error
-        np_clipped = np.clip(df["ddg"], a_max=capp, a_min=None)
-        # sns.histplot(data=np_clipped, x="ddg", palette="tab20", ax=ax2, bins=[-5,-2.5,-1,0,1,2.5,5])
-        sns.histplot(
-            data=np_clipped, palette="tab20", ax=ax2, bins=[-5, -2.5, -1, 0, 1, 2.5, 5]
-        )
-        ax2.set_ylabel("")
-        ax2.set_xlabel("ddg max=" + str(capp))
-
-        ###  third plt ######
         vmin = -2.5  # ddg_df[hue].min() #they have defined >2.5 as destabilising
         vmax = -1 * vmin
-        ddg_df = df.sort_values(by=yax, ascending=False)
-        g = ax3.scatter(
-            ddg_df[xax],
-            ddg_df[yax],
-            c=ddg_df[hue],
-            cmap="Spectral",
-            edgecolor="silver",
-            alpha=0.35,
-            linewidth=0.1,
-            s=20,
-            vmin=vmin,
-            vmax=vmax,
-        )
+        df = df.sort_values(by=yax, ascending=False)
+        print(df)
+        #g = ax1.scatter(df["pdb_rid"],df["mut_to"],c=df["ddg"])
+        g = ax1.scatter(df[xax],df[yax],c=df[hue],cmap="Spectral",edgecolor="silver",alpha=0.35,linewidth=0.1,s=20,vmin=vmin,vmax=vmax)
+        cb = plt.colorbar(g, extend="both")
+        cb.set_label(hue)        
+        ax1.set_xlabel(xax + "\n" + str(count))
+        plt.xticks(rotation=90)   
+        ax1.set_ylabel("")
+    
+    def createDdgBackFromTo(self):                
+        xax="mut_from"
+        yax="mut_to"
+        hue = "ddg"
+        df = self.data
+        df["ddg"] = pd.to_numeric(df["ddg"])        
+        count = int(len(df.index))
+        df=df.groupby(['mut_from','mut_to'])['ddg'].mean()
+        df = df.reset_index()        
+        fig, (ax1) = plt.subplots(1, 1, figsize=(10, 7))
+        fig.suptitle("Background mutations\nddg <-1=stabilising >2.5=destabilising")                
+        #vmin,vmax = -2.5, 2.5  # ddg_df[hue].min() #they have defined >2.5 as destabilising
+        vmin,vmax = -10, 10  # but for this plot we want more variation        
+        df = df.sort_values(by=[yax,xax], ascending=[False,True])                
+        g = ax1.scatter(df[xax],df[yax],c=df[hue],cmap="Spectral",edgecolor="silver",alpha=0.85,linewidth=0.1,s=20,vmin=vmin,vmax=vmax)
         cb = plt.colorbar(g, extend="both")
         cb.set_label(hue)
-        ax3.set_xlabel(xax)
-        ax3.set_ylabel("")
-        # plt.legend(title=hue,bbox_to_anchor=(1.01, 1), loc=2, borderaxespad=0.,shadow=False,fancybox=False)  # Put the legend out of the figure
+        plt.xticks(rotation=90)   
+        ax1.set_xlabel(xax + "\n" + str(count))
+        ax1.set_ylabel(yax)
+
+    def histAllBackground(self):
+        xax="ddg"                        
+        df = self.data
+        df["ddg"] = pd.to_numeric(df["ddg"])        
+        count = int(len(df.index))
+        fig, (ax1) = plt.subplots(1, 1, figsize=(10, 7))
+        fig.suptitle("Background mutations\nddg <-1=stabilising >2.5=destabilising")                
+        vmin = -2.5  # ddg_df[hue].min() #they have defined >2.5 as destabilising
+        vmax = -1 * vmin
+        sns.histplot(data=df, x=xax, palette="tab20", ax=ax1, bins=50)
+        ax1.set_ylabel("")                                 
+        ax1.set_xlabel(xax + "\n" + str(count))
+        ax1.set_ylabel("")
+                                    
+    def show(self):
         plt.show()
-                
-    
+
     def clearPlots(self):
         # clear all plots from memory        
         plt.figure().clear()
