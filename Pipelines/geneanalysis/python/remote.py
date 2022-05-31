@@ -59,7 +59,7 @@ def checkResults(ddg, bm, ps):
         timeC = pathlib.Path(ps).stat().st_mtime
         print(
             "Variant posscan file was created at",
-            datetime.fromtimestamp(timeC).strftime("%d-%m-%y-%H:%M"),
+            datetime.fromtimestamp(timeC).strftime("%d%b%y-%H:%M"),
         )
     else:
         print("!!!Variant posscan file does not exist")
@@ -162,7 +162,7 @@ def run_pipeline(args):
                         if count > 0:
                             msg += "Tasks: " + str(count) + "/" + str(numtasks) + "@" + str(timet) + "\t"
                         else:
-                            msg += "No Results\t\t"
+                            msg += "No Results\t\t\t"
 
 
 
