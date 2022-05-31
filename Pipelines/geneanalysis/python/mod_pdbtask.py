@@ -81,6 +81,7 @@ def run_pipeline(args):
             mutation_string = argus.arg("mutation", "none")
             ############################################
             pdbfile = pdbcode + "_rep" + str(argus.arg("repairs")) + ".pdb"
+            pdbname = pdbcode + "_rep" + str(argus.arg("repairs"))
             mutations = []
             # task=all means all, task=1:n means an explicit row, row=-1 means the mutation string has been passd in explicitly
             if mutation_string == "none":
@@ -115,43 +116,53 @@ def run_pipeline(args):
                 )
                 copyfile(pdb_path.pdb_thruputs + pdbfile, row_path + pdbfile)
 
-                fx_runner = Foldx.Foldx(argus.arg("foldxe"))
-                ###########################################################################
-                fx_runner.runPosscan(pdbfile, mut)
-                ###########################################################################
-                pdb = pdbcode + "_rep" + str(argus.arg("repairs"))
-                # pass in the coverage to annotate the csv file
+                fx_runner = Foldx.Foldx(argus.arg("foldxe"))                
                 filename = pdb_path.pdb_inputs + "Coverage.csv"
-                ddg_file = row_path + "PS_" + pdb + "_scanning_output.txt"
-                df_file = (
-                    pdb_path.pdb_thruputs + "agg/" + str(row) + "_ddg_background.csv"
-                )
+                
+                # prepare the coverage dataframe
                 if exists(filename):
                     fdfp = FileDf.FileDf(filename)
-                    cov_df = fdfp.openDataFrame()
-                    fx_runner.createPosscanCsv(
-                        row_path, pdb, mut.split(","), [], cov_df, ddg_file, df_file
-                    )
+                    cov_df = fdfp.openDataFrame()                    
                 else:
-                    empty_dic = {
-                        "source": [],
-                        "gene": [],
-                        "accession": [],
-                        "pdb": [],
-                        "method": [],
-                        "resolution": [],
-                        "chain": [],
-                        "pdb_start": [],
-                        "pdb_end": [],
-                        "gene_start": [],
-                        "gene_end": [],
-                        "coverage": [],
-                        "score": [],
-                    }
-                    df = pd.DataFrame.from_dict(empty_dic)
-                    fx_runner.createPosscanCsv(
-                        row_path, pdb, mut.split(","), [], df, ddg_file, df_file
+                    empty_dic = {"source": [],"gene": [],"accession": [],"pdb": [],"method": [],"resolution": [],"chain": [],"pdb_start": [],"pdb_end": [],"gene_start": [],"gene_end": [],"coverage": [],"score": []}
+                    cov_df = pd.DataFrame.from_dict(empty_dic)
+                
+                buildModel = True
+                if buildModel: #run buildmodel
+
+                    ddg_files = []
+                    tag = 0
+                    pdb_muts = mut.split(",")
+                    for pm in pdb_muts:
+                        tag += 1
+                        ################################################################
+                        fx_runner.runBuild(pdbfile, pm, tag)
+                        ################################################################
+                        ddg_file = row_path + "Dif_" + str(tag) + "_" + pdbname + ".fxout"
+                        ddg_files.append([ddg_file, pm])
+
+                    # create them all into 1 ddg file
+                    # df_file = row_path + "ddg_buildmodel.csv"
+                    df_file = (
+                        pdb_path.pdb_thruputs + "agg/" + str(row) + "_ddg_background.csv"
                     )
+                    
+                    fx_runner.createBuildCsv(
+                        row_path, pdbname, pdb_muts, mut, cov_df, ddg_files, df_file
+                    )
+
+                else:
+                    ###########################################################################
+                    fx_runner.runPosscan(pdbfile, mut)
+                    ###########################################################################
+                    pdb = pdbcode + "_rep" + str(argus.arg("repairs"))
+                    # pass in the coverage to annotate the csv file
+                    filename = pdb_path.pdb_inputs + "Coverage.csv"
+                    ddg_file = row_path + "PS_" + pdb + "_scanning_output.txt"
+                    df_file = (
+                        pdb_path.pdb_thruputs + "agg/" + str(row) + "_ddg_background.csv"
+                    )
+                    fx_runner.createPosscanCsv(row_path, pdb, mut.split(","), [], cov_df, ddg_file, df_file)                    
         print("MUTEIN SCRIPT ENDED")
 
 

@@ -93,7 +93,7 @@ vsplit=20
 pdbtask = 11
 paramtask = 156
 
-pdbcode = "3l95"     
+pdbcode = "1pb5"     
 pdb_add = ""
 if pdbcode != "x":
     pdb_add = "@pdb="+pdbcode

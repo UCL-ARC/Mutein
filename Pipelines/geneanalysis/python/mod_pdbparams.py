@@ -111,13 +111,16 @@ def run_pipeline(args):
                         aaa = linecontents[3].strip()
                         if aaa in aa_dict:
                             aa = aa_dict[aaa]
-                            mut = (
-                                aa
-                                + linecontents[4].strip()
-                                + linecontents[5].strip()
-                                + "a"
-                            )  # aa chain rid mutation = mutation string
-                            params_lst.append(mut)
+                            aas = "ACDEFGHIKLMNPQRSTVWY"
+
+                            for aam in aas:                            
+                                mut = (
+                                    aa
+                                    + linecontents[4].strip()
+                                    + linecontents[5].strip()
+                                    + aam
+                                )  # aa chain rid mutation = mutation string
+                                params_lst.append(mut)
                         else:
                             print("!Error maybe?", aaa)  # TODO think about this
 

@@ -124,7 +124,7 @@ def run_pipeline(args):
             pdb_path.goto_job_dir(work_path, args, argus.params, "_inputs04b")
             pdb_path.goto_job_dir(row_path, args, argus.params, "_inputs04b")
 
-            if True:
+            if False:
                 # ~~~~~~~~~~~~~~~~~~~~~~~~~~ POSITION SCAN ~~~~~~~~~~~~~~~~~~~~~~~~#
                 ################################################################
                 fx_runner.runPosscan(pdbfile, pdb_mut)

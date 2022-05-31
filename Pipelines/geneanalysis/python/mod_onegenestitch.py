@@ -53,7 +53,8 @@ def run_pipeline(args):
     pm_df = fdfp.openDataFrame()
     pdbs = pm_df["pdb"].unique()
 
-    all_back = []
+    all_back_ps = []
+    all_back_bm = []
     all_var_scan = []
     all_var_build = []
 
@@ -70,8 +71,8 @@ def run_pipeline(args):
             pdb=pdb,
         )
         file_var_ps = pdb_path.pdb_outputs + "ddg_posscan.csv"
-        file_var_bm = pdb_path.pdb_outputs + "ddg_buildmodel.csv"
-        file_back = pdb_path.pdb_outputs + "ddg_background.csv"
+        file_var_bm = pdb_path.pdb_outputs + "ddg_buildmodel.csv"        
+        file_back_bm = pdb_path.pdb_outputs + "ddg_background.csv"
         if exists(file_var_ps):
             fdf = FileDf.FileDf(file_var_ps)
             all_var_scan.append(fdf.openDataFrame())
@@ -82,15 +83,22 @@ def run_pipeline(args):
             all_var_build.append(fdf.openDataFrame())
         else:
             exists_all_var = False
-        if exists(file_back):
-            fdf = FileDf.FileDf(file_back)
-            all_back.append(fdf.openDataFrame())
+        if exists(file_back_bm):
+            fdf = FileDf.FileDf(file_back_bm)
+            all_back_bm.append(fdf.openDataFrame())
+        else:
+            exists_all_back = False
+        if exists(file_back_ps):
+            fdf = FileDf.FileDf(file_back_ps)
+            all_back_ps.append(fdf.openDataFrame())
         else:
             exists_all_back = False
 
     if exists_all_back:
-        ddg_df_back = pd.concat(all_back, ignore_index=True)
-        ddg_df_back.to_csv(gene_path.gene_outputs + "ddg_background.csv", index=False)
+        ddg_df_back_ps = pd.concat(all_back_ps, ignore_index=True)
+        ddg_df_back_ps.to_csv(gene_path.gene_outputs + "ddg_ps_background.csv", index=False)
+        ddg_df_back_bm = pd.concat(all_back_bm, ignore_index=True)
+        ddg_df_back_bm.to_csv(gene_path.gene_outputs + "ddg_bm_background.csv", index=False)
         # DB Coverage reports
         plot_file = gene_path.gene_outputs + "ALL_coverage.png"
         anav = Analysis.Analysis(ddg_df_back, gene)
