@@ -133,13 +133,24 @@ def run_pipeline(args):
                     ddg_files = []
                     tag = 0
                     pdb_muts = mut.split(",")
-                    for pm in pdb_muts:
-                        tag += 1
-                        ################################################################
-                        fx_runner.runBuild(pdbfile, pm, tag)
-                        ################################################################
-                        ddg_file = row_path + "Dif_" + str(tag) + "_" + pdbname + ".fxout"
-                        ddg_files.append([ddg_file, pm])
+
+                    allAtOnce=False
+                    if allAtOnce:
+                        muts = []
+                        for pm in pdb_muts:                            
+                            muts.append(pm)
+                            tag = 0
+                            fx_runner.runBuild(pdbfile, [pm], tag)
+                            ddg_file = row_path + "Dif_" + str(tag) + "_" + pdbname + ".fxout"
+                            ddg_files.append([ddg_file, pm])
+                    else:
+                        for pm in pdb_muts:
+                            tag += 1
+                            ################################################################
+                            fx_runner.runBuild(pdbfile, [pm], tag)
+                            ################################################################
+                            ddg_file = row_path + "Dif_" + str(tag) + "_" + pdbname + ".fxout"
+                            ddg_files.append([ddg_file, pm])
 
                     # create them all into 1 ddg file
                     # df_file = row_path + "ddg_buildmodel.csv"

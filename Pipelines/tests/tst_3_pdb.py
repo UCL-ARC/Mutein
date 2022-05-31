@@ -83,7 +83,7 @@ repairs=2
 split=2
 vsplit=2
 task=1
-runs = "hi"
+runs = "fg"
 """ 
     if "a" in runs:        print("Mutein: Preparing genes")        
     if "b" in runs:        print("Mutein: Preparing pdbs")        

@@ -26,7 +26,7 @@ class Foldx:
         self.vdwDesign = 2
         self.pdbHydrogens = False
         self.AA = AA.AA()
-        self.numRuns = 15  # use in BuildModel
+        self.numRuns = 1  # use in BuildModel
 
     def makeDefaultsString(self):
         repairB = " --ionStrength=0.05 --pH=7 --vdwDesign=2 --pdbHydrogens=false"
@@ -49,11 +49,12 @@ class Foldx:
         os.system(foldxcommand)
         print("### ......... FOLDX:Posscan: completed")
 
-    def runBuild(self, pdb, mutation_string, tag):
+    def runBuild(self, pdb, mutation_strings, tag):
         mut_fl = "individual_list_" + str(tag) + ".txt"
         mut_log = "buildmodel_" + str(tag) + ".log"
         with open(mut_fl, "w") as fw:
-            fw.write(mutation_string + ";")
+            for mutation_string in mutation_strings:
+                fw.write(mutation_string + ";")
         # ~/UCL/libs/foldx5/foldx --command=BuildModel --ionStrength=0.05 --pH=7
         #  --water=CRYSTAL --vdwDesign=2 --pdbHydrogens=false --numberOfRuns=15 --mutant-file=mutations.txt
         #  --pdb=6vxx_rep.pdb > buildmodel.log
