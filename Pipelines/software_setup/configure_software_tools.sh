@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 #
 # setup conda environments for the pipeline
@@ -24,7 +24,7 @@ conda config --add channels conda-forge
 #required for enaDataGet command
 conda create --yes --name ${MUT_PREFIX}enabrowsertools
 conda activate ${MUT_PREFIX}enabrowsertools
-conda install --yes entrez-direct
+conda install --yes "entrez-direct>=16.2"
 conda install --yes "enabrowsertools>=1.5.4"
 conda deactivate
 
@@ -44,11 +44,15 @@ conda deactivate
 #required for gatk
 conda create --yes --name ${MUT_PREFIX}gatk4
 conda activate ${MUT_PREFIX}gatk4
-conda install --yes gatk4
+conda install --yes "gatk4>=4.2.6.1"
 conda deactivate
 
 #required for pyega3
 conda create --yes --name ${MUT_PREFIX}pyega3
 conda activate ${MUT_PREFIX}pyega3
-conda install --yes pyega3
+conda install --yes "pyega3>=4.0.3"
 conda deactivate
+#note: I then manually did a python setup.py install from the latest github release
+#from inside the pyega3 conda environment which overwrote the main pyega3 script
+#to try to fix the intermittent md5 errors and timeouts
+#but not sure this actually fixed anything

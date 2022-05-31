@@ -8,7 +8,6 @@
 #$ -V
 #$ -o sge_logs/$JOB_NAME.$JOB_ID.$TASK_ID.out
 #$ -e sge_logs/$JOB_NAME.$JOB_ID.$TASK_ID.err
-#$ -N gendbimp
 ###$ -tc 10
 
 set -eu

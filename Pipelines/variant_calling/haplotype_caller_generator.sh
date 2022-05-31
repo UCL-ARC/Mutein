@@ -7,7 +7,8 @@
 set -eu
 source ~/.mutein_settings
 
-if [ $# -eq 0 ]; then
+if [ $# -eq 0 ]
+then
     JOBLIST_BASE=haplo_joblist
 else
     JOBLIST_BASE=$1
@@ -25,7 +26,7 @@ do
     for SUBSET in $(cat datasets/${DATASET}/active_subsets)
     do
         GDB=datasets/${DATASET}/${SUBSET}/gatk_db
-        FINALVCF=datasets/${DATASET}/${SUBSET}/${DATASET}.vcf
+        FINALVCF=datasets/${DATASET}/${SUBSET}/${DATASET}_${SUBSET}.vcf
 
         #https://gatk.broadinstitute.org/hc/en-us/articles/360035889971
         echo -n "rm -rf ${GDB} && gatk GenomicsDBImport" >> ${JOBLIST2}
@@ -58,6 +59,15 @@ TOTAL_TASKS1=$(cat ${JOBLIST1} | wc --lines)
 TOTAL_TASKS2=$(cat ${JOBLIST2} | wc --lines)
 TOTAL_TASKS3=$(cat ${JOBLIST3} | wc --lines)
 
-echo qsub -t 1-${TOTAL_TASKS1} ${MUT_DIR}/Pipelines/variant_calling/haplotype_caller_runner1.sh ${JOBLIST1}
-echo qsub -t 1-${TOTAL_TASKS2} ${MUT_DIR}/Pipelines/variant_calling/haplotype_caller_runner2.sh ${JOBLIST2}
-echo qsub -t 1-${TOTAL_TASKS3} ${MUT_DIR}/Pipelines/variant_calling/haplotype_caller_runner3.sh ${JOBLIST3}
+JOBNAME1=haplo-step1-$(mutein_random_id)
+JOBNAME2=haplo-step2-$(mutein_random_id)
+JOBNAME3=haplo-step3-$(mutein_random_id)
+
+echo qsub -N ${JOBNAME1} -t 1-${TOTAL_TASKS1} ${MUT_DIR}/Pipelines/variant_calling/haplotype_caller_runner1.sh ${JOBLIST1}
+echo capture_qacct.sh ${JOBNAME1}
+
+echo qsub -N ${JOBNAME2} -t 1-${TOTAL_TASKS2} ${MUT_DIR}/Pipelines/variant_calling/haplotype_caller_runner2.sh ${JOBLIST2}
+echo capture_qacct.sh ${JOBNAME2}
+
+echo qsub -N ${JOBNAME3} -t 1-${TOTAL_TASKS3} ${MUT_DIR}/Pipelines/variant_calling/haplotype_caller_runner3.sh ${JOBLIST3}
+echo capture_qacct.sh ${JOBNAME3}

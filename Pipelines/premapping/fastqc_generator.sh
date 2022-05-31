@@ -4,7 +4,8 @@ set -eu
 
 source ~/.mutein_settings
 
-if [ $# -eq 0 ]; then
+if [ $# -eq 0 ]
+then
     JOBLIST_BASE=fastqc_joblist
 else
     JOBLIST_BASE=$1
@@ -29,4 +30,6 @@ TOTAL_TASKS=$(cat ${JOBLIST_BASE} | wc --lines)
 #but we could call it directly, eg wrapped it in a screen session,
 #use -sync y to catch errors etc
 #eg screen -S fastqc -d -m qsub -sync y...
-echo qsub -t 1-${TOTAL_TASKS} ${MUT_DIR}/Pipelines/premapping/fastqc_runner.sh
+JOBNAME=fastqc-$(mutein_random_id)
+echo qsub -N ${JOBNAME} -t 1-${TOTAL_TASKS} ${MUT_DIR}/Pipelines/premapping/fastqc_runner.sh ${JOBLIST_BASE}
+echo capture_qacct.sh ${JOBNAME}

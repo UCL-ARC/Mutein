@@ -1,6 +1,6 @@
-#!/bin/bash -l
+#!/bin/bash
 
-#$ -l h_rt=3:00:0
+#$ -l h_rt=4:00:0
 #$ -l mem=6G
 #$ -l tmpfs=6G
 ###$ -pe smp 1
@@ -8,7 +8,6 @@
 #$ -V
 #$ -o sge_logs/$JOB_NAME.$JOB_ID.$TASK_ID.out
 #$ -e sge_logs/$JOB_NAME.$JOB_ID.$TASK_ID.err
-#$ -N bwa-index
 ###$ -tc 10
 
 set -eu

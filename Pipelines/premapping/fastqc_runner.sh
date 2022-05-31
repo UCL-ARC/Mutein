@@ -1,4 +1,4 @@
-#!/bin/bash -l
+#!/bin/bash
 
 #$ -l h_rt=0:30:0
 #$ -l mem=1G
@@ -8,7 +8,6 @@
 #$ -V
 #$ -o sge_logs/$JOB_NAME.$JOB_ID.$TASK_ID.out
 #$ -e sge_logs/$JOB_NAME.$JOB_ID.$TASK_ID.err
-#$ -N fastqc
 ###$ -tc 10
 
 set -eu
