@@ -149,7 +149,8 @@ def run_pipeline(args):
                         # then find how many individual tasks have completed
                         filenameo = patho.thruputs + "params_background.txt"
                         existso, timeo = checkResult(filenameo)
-                        count = 0                        
+                        count = 0
+                        lasttime = ""                  
                         if existso:                            
                             with open(filenameo, "r") as fr:
                                 lines = fr.readlines()
@@ -159,18 +160,19 @@ def run_pipeline(args):
                                     existst, timet = checkResult(filenameoo)
                                     if existst:
                                         count += 1
+                                        lasttime = timet
                         if count > 0:                            
-                            msg += "Tasks: " + str(count) + "/" + str(numtasks) + "@" + str(timet)
+                            msg += "Tasks: " + str(count) + "/" + str(numtasks) + "@" + str(lasttime)
                         else:
                             msg += "No Results"
-                    while len(msg) < 50:
+                    while len(msg) < 55:
                         msg += " "
                     msg += "\t"
                     if existsfileSplit:
                         msg += "Split@" + str(timeSplit) + "\t"
                     else:
                         msg += "No split\t\t\t\t"
-                    while len(msg) < 70:
+                    while len(msg) < 75:
                         msg += " "
                     msg += "\t"
                     if existsfilePdb:
