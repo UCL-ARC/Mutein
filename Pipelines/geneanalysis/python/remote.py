@@ -160,13 +160,19 @@ def run_pipeline(args):
                                     if existst:
                                         count += 1
                         if count > 0:                            
-                            msg += "Tasks: " + str(count) + "/" + str(numtasks) + "@" + str(timet) + "\t"
+                            msg += "Tasks: " + str(count) + "/" + str(numtasks) + "@" + str(timet)
                         else:
-                            msg += "No Results\t\t\t\t"
+                            msg += "No Results"
+                    while len(msg) < 50:
+                        msg += " "
+                    msg += "\t"
                     if existsfileSplit:
                         msg += "Split@" + str(timeSplit) + "\t"
                     else:
                         msg += "No split\t\t\t\t"
+                    while len(msg) < 70:
+                        msg += " "
+                    msg += "\t"
                     if existsfilePdb:
                         msg += "Pdb(10)@" + str(timePdb)
                     else:
