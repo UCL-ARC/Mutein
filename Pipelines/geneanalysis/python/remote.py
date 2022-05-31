@@ -160,7 +160,7 @@ def run_pipeline(args):
                                     if existst:
                                         count += 1
                         if count > 0:
-                            msg += "Tasks: " + str(count) + "/" + str(numtasks) + "@" + str(timet) "\t"
+                            msg += "Tasks: " + str(count) + "/" + str(numtasks) + "@" + str(timet) + "\t"
                         else:
                             msg += "No Results\t\t"
 
