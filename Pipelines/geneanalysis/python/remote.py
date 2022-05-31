@@ -163,7 +163,7 @@ def run_pipeline(args):
                                         lasttime = timet
                         if count > 0:                            
                             msg += "Tasks:" + str(count) + "/" + str(numtasks)
-                            while len(msg) < 42:
+                            while len(msg) < 40:
                                 msg += " "
                             msg += "@" + str(lasttime)
                         else:
