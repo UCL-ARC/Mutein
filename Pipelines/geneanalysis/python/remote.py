@@ -162,11 +162,11 @@ def run_pipeline(args):
                         if count > 0:                            
                             msg += "Tasks: " + str(count) + "/" + str(numtasks) + "@" + str(timet) + "\t"
                         else:
-                            msg += "No Results\t\t\t"
+                            msg += "No Results\t\t\t\t"
                     if existsfileSplit:
                         msg += "Split@" + str(timeSplit) + "\t"
                     else:
-                        msg += "No split\t"
+                        msg += "No split\t\t\t\t"
                     if existsfilePdb:
                         msg += "Pdb(10)@" + str(timePdb)
                     else:
