@@ -144,7 +144,7 @@ def run_pipeline(args):
                         msg += " "
                     msg += "\t"
                     if existsfileRes:
-                        msg += "Results@" + str(timeRes) + "\t"
+                        msg += "Results       @" + str(timeRes)
                     else:
                         # then find how many individual tasks have completed
                         filenameo = patho.thruputs + "params_background.txt"
