@@ -34,7 +34,7 @@ import os
 def checkResult(onefile):
     if exists(onefile):
         timeA = pathlib.Path(onefile).stat().st_mtime
-        return True, datetime.fromtimestamp(timeA).strftime("%d-%m-%y-%H:%M")
+        return True, datetime.fromtimestamp(timeA).strftime("%d%b%y-%H:%M")
     return False, ""
 
 
@@ -43,7 +43,7 @@ def checkResults(ddg, bm, ps):
         timeA = pathlib.Path(ddg).stat().st_mtime
         print(
             "DDG Background file was created at",
-            datetime.fromtimestamp(timeA).strftime("%d-%m-%y-%H:%M"),
+            datetime.fromtimestamp(timeA).strftime("%d%b%y-%H:%M"),
         )
     else:
         print("!!!DDG Background file does not exist")
@@ -51,7 +51,7 @@ def checkResults(ddg, bm, ps):
         timeB = pathlib.Path(bm).stat().st_mtime
         print(
             "Variant buildmodel file was created at",
-            datetime.fromtimestamp(timeB).strftime("%d-%m-%y-%H:%M"),
+            datetime.fromtimestamp(timeB).strftime("%d%b%y-%H:%M"),
         )
     else:
         print("!!!Variant buildmodel file does not exist")
@@ -67,7 +67,7 @@ def checkResults(ddg, bm, ps):
 
 def run_pipeline(args):
     now = datetime.now()
-    current_time = now.strftime("%d-%m-%y@%H.%H.%S")
+    current_time = now.strftime("%d%b%y-%H.%H.%S")
     print("Mutein remote script:", current_time)
 
     ##############################################
@@ -159,8 +159,7 @@ def run_pipeline(args):
                                     existst, timet = checkResult(filenameoo)
                                     if existst:
                                         count += 1
-                        if count > 0:
-                            msg += "TEST"
+                        if count > 0:                            
                             msg += "Tasks: " + str(count) + "/" + str(numtasks) + "@" + str(timet) + "\t"
                         else:
                             msg += "No Results\t\t\t"
