@@ -15,6 +15,7 @@ N.b this file may be run on the myriad clusters or on a local machine
 import os
 import pandas as pd
 from shutil import copyfile
+from os.path import exists
 
 # import from the shared library in Mutein/Pipelines/shared/lib
 import sys
@@ -113,8 +114,12 @@ def run_pipeline(args):
             fx_runner = Foldx.Foldx(argus.arg("foldxe"))
             pdb = pdbcode + "_rep" + str(argus.arg("repairs"))
             filename = pdb_path.pdb_inputs + "Coverage.csv"
-            fdfp = FileDf.FileDf(filename)
-            cov_df = fdfp.openDataFrame()
+            if exists(filename):
+                fdfp = FileDf.FileDf(filename)
+                cov_df = fdfp.openDataFrame()                    
+            else:
+                empty_dic = {"source": [],"gene": [],"accession": [],"pdb": [],"method": [],"resolution": [],"chain": [],"pdb_start": [],"pdb_end": [],"gene_start": [],"gene_end": [],"coverage": [],"score": []}
+                cov_df = pd.DataFrame.from_dict(empty_dic)            
             if gene_mut.lower() == "x" or gene_mut == "":
                 gene_muts = []
             else:

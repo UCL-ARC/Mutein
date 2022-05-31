@@ -75,15 +75,15 @@ def test_proteindblagg(inputs):
     ppl.run_pipeline(args)
 ######################################################################
 ### INPUTS
-dataset="notch"
-gene="notch1"
+dataset=""
+gene=""
 pdb="1pb5"
 
 repairs=2
-split=10
-vsplit=10
-task=2
-runs = "h"
+split=2
+vsplit=2
+task=1
+runs = "hi"
 """ 
     if "a" in runs:        print("Mutein: Preparing genes")        
     if "b" in runs:        print("Mutein: Preparing pdbs")        

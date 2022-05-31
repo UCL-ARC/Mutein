@@ -66,12 +66,13 @@ def run_pipeline(args):
     found = False
     startRep = numRepairs
     base_pdbfile = pdb_path.pdb_inputs + "/" + pdbfile
-    while not found and startRep > 0:
-        startRep -= 1
+    while not found and startRep > 0:        
         name = pdb_path.pdb_inputs + "/" + pdbcode + "_rep" + str(startRep) + ".pdb"
         if exists(name):
             found = True
             base_pdbfile = name
+        else:
+            startRep -= 1
 
     repairinnames = []
     repairoutnames = []

@@ -121,8 +121,10 @@ class Foldx:
         # create a list of pdb_muts to ddg
         ### WARNING - there is onyl ONE ddg per build file, unlike posscan where all the ddg are unique
         mut_ddg = []
-        score = coverage["score"][0]
-        source = coverage["source"][0]
+        score, source = 0, "USER"
+        if len(coverage["score"]) > 0:
+            score = coverage["score"][0]
+            source = coverage["source"][0]        
         for ddg_file, mut_string in ddg_files:
             if exists(ddg_file):  # I want it to error if it is missing
                 with open(ddg_file) as fr:
@@ -151,7 +153,7 @@ class Foldx:
 
         fdf = FileDf.FileDf(ddg_file, sep="\t", header=False, cols=["mut", "ddg"])
         df = fdf.openDataFrame()
-        score, source = 0, ""
+        score, source = 0, "USER"
         if len(coverage["score"]) > 0:
             score = coverage["score"][0]
             source = coverage["source"][0]
