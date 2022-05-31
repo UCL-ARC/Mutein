@@ -1,5 +1,12 @@
-# Creating a Mutein Installation
+# Creating a Mutein Gene Analysis (FoldX) Installation
 
+#### First you need to make sure you have been added to the FoldX group.
+- To do this you need to download an academic license from https://foldxsuite.crg.eu/licensing-and-services#academic-license
+- Then you need to email rc-support@ucl.ac.uk and ask to be put in the FoldX groupon myriad, gicing proof of academic license.
+
+When that has been done (a day or two) you can install Mutein Gene Analysis.
+
+#### Steps for installation
 - log on to the server, e.g.:
 -- ssh -J ucbtlcr@socrates.ucl.ac.uk ucbtlcr@myriad.rc.ucl.ac.uk
 ------------------------
