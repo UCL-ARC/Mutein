@@ -146,7 +146,32 @@ def run_pipeline(args):
                     if existsfileRes:
                         msg += "Results@" + str(timeRes) + "\t"
                     else:
-                        msg += "No results\t"
+                        # then find how many individual tasks have completed
+                        filenameo = patho.thruputs + "params_background.txt"
+                        existso, timeo = checkResult(filenameo)
+                        count = 0                        
+                        if existso:                            
+                            with open(filenameo, "r") as fr:
+                                lines = fr.readlines()
+                                numtasks = len(lines) - 1                                                                
+                                for i in range(1, len(lines)):
+                                    filenameoo = patho.thruputs + "agg/" + str(i) + "_ddg_background.csv"
+                                    existst, timet = checkResult(filenameoo)
+                                    if existst:
+                                        count += 1
+                        if count > 0:
+                            msg += "Tasks Complete: " + str(count) + "/" + str(numtasks) + "\t"
+                        else:
+                            "No Results\t"
+
+
+
+
+
+
+
+
+
                     if existsfileSplit:
                         msg += "Split@" + str(timeSplit) + "\t"
                     else:
