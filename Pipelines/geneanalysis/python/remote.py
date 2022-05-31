@@ -162,21 +162,21 @@ def run_pipeline(args):
                                         count += 1
                                         lasttime = timet
                         if count > 0:                            
-                            msg += "Tasks: " + str(count) + "/" + str(numtasks) + "@/t" + str(lasttime)
+                            msg += "Tasks: " + str(count) + "/" + str(numtasks) + "@\t" + str(lasttime)
                         else:
                             msg += "No Results"
                     while len(msg) < 55:
                         msg += " "
                     msg += "\t"
                     if existsfileSplit:
-                        msg += "Split@ " + str(timeSplit) + "\t"
+                        msg += "Split@" + str(timeSplit) + "\t"
                     else:
                         msg += "No split\t\t\t\t"
                     while len(msg) < 75:
                         msg += " "
                     msg += "\t"
                     if existsfilePdb:
-                        msg += "Pdb(10)@ " + str(timePdb)
+                        msg += "Pdb(10)@" + str(timePdb)
                     else:
                         msg += "No pdb"
                     print(msg)
