@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -eu
+source ~/.mutein_settings
+conda activate ${MUT_PREFIX}trim-galore
+JOBLIST=$1
+
+#set threads and accession
+$(vc_extract_params ${JOBLIST})
+
+fastqc -t ${threads} ${accession}/*.fastq.gz
