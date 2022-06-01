@@ -95,6 +95,9 @@ def run_pipeline(args):
             # we have specified a mutation and row from the file
             mutations.append([mutation_string, 0])
 
+        work_path = pdb_path.pdb_thruputs + "vagg/"
+        pdb_path.goto_job_dir(work_path, args, argus.params, "_inputs04b")
+
         for pdb_mut, gene_mut, row in mutations:
             print(pdb_mut, gene_mut, row)
             row_path = pdb_path.pdb_thruputs + "var_" + str(row) + "/"
@@ -102,7 +105,7 @@ def run_pipeline(args):
             argus.params["thisrow"] = row
             argus.params["genemut"] = gene_mut
             argus.params["pdbmut"] = pdb_mut
-            pdb_path.goto_job_dir(row_path, args, argus.params, "_inputs06")
+            pdb_path.goto_job_dir(row_path, args, argus.params, "_inputs06",emptyDirectory=True)
             print(
                 "### foldx06: ... copying file",
                 pdb_path.pdb_thruputs + pdbfile,
@@ -124,11 +127,7 @@ def run_pipeline(args):
                 gene_muts = []
             else:
                 gene_muts = gene_mut.split(",")
-
-            work_path = pdb_path.pdb_thruputs + "vagg/"
-            pdb_path.goto_job_dir(work_path, args, argus.params, "_inputs04b")
-            pdb_path.goto_job_dir(row_path, args, argus.params, "_inputs04b")
-
+                        
             if False:
                 # ~~~~~~~~~~~~~~~~~~~~~~~~~~ POSITION SCAN ~~~~~~~~~~~~~~~~~~~~~~~~#
                 ################################################################
@@ -149,13 +148,25 @@ def run_pipeline(args):
                 ddg_files = []
                 tag = 0
                 pdb_muts = pdb_mut.split(",")
-                for pm in pdb_muts:
-                    tag += 1
-                    ################################################################
-                    fx_runner.runBuild(pdbfile, [pm], tag)
-                    ################################################################
+
+                allAtOnce=True
+                if allAtOnce:
+                    muts = []
+                    tag = 0
                     ddg_file = row_path + "Dif_" + str(tag) + "_" + pdb + ".fxout"
-                    ddg_files.append([ddg_file, pm])
+                    for pm in pdb_muts:                            
+                        muts.append(pm)                        
+                    fx_runner.runBuild(pdbfile, pdb_muts, tag)                        
+                    ddg_files.append([ddg_file, pdb_muts])
+                else:
+                    for pm in pdb_muts:
+                        tag += 1
+                        ################################################################
+                        fx_runner.runBuild(pdbfile, [pm], tag)
+                        ################################################################
+                        ddg_file = row_path + "Dif_" + str(tag) + "_" + pdb + ".fxout"
+                        ddg_files.append([ddg_file, pm])
+
 
                 # create them all into 1 ddg file
                 # df_file = row_path + "ddg_buildmodel.csv"
@@ -163,7 +174,7 @@ def run_pipeline(args):
                     pdb_path.pdb_thruputs + "vagg/" + str(row) + "_ddg_buildmodel.csv"
                 )
                 fx_runner.createBuildCsv(
-                    row_path, pdb, pdb_muts, gene_muts, cov_df, ddg_files, df_file
+                    row_path, pdb, pdb_muts, gene_muts, cov_df, ddg_files, df_file,allAtOnce
                 )
     print("MUTEIN SCRIPT ENDED")
 

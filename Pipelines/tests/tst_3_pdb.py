@@ -20,70 +20,16 @@ def addpath(inputs):
     return inputs
 
 ######################################################################
-def test_proteinprep(inputs):
-    inputs = addpath(inputs)
-    import ga_3_0_pdbprep as ppl
-    args = ["", inputs]
-    ppl.run_pipeline(args)
-
-def test_proteinsplit(inputs):
-    inputs = addpath(inputs)
-    import ga_3_pdbbackparams as ppl
-    args = ["", inputs]
-    ppl.run_pipeline(args)
-
-def test_proteinvsplit(inputs):
-    inputs = addpath(inputs)
-    import ga_3_pdbvarparams as ppl
-    args = ["", inputs]
-    ppl.run_pipeline(args)
-
-def test_proteinrepair(inputs):
-    inputs = addpath(inputs)
-    import ga_3_proteinrepair as ppl
-    args = ["", inputs]
-    ppl.run_pipeline(args)
-
-def test_proteintasks(inputs):
-    inputs = addpath(inputs)
-    import ga04a_posscan as ppl
-    args = ["", inputs]
-    ppl.run_pipeline(args)
-
-def test_proteinvtasks(inputs):
-    inputs = addpath(inputs)
-    import ga04b_singlescan as ppl
-    args = ["", inputs]
-    ppl.run_pipeline(args)
-
-def test_proteinagg(inputs):
-    inputs = addpath(inputs)
-    import ga05a_aggddg as ppl
-    args = ["", inputs]
-    ppl.run_pipeline(args)
-
-def test_proteinvagg(inputs):
-    inputs = addpath(inputs)
-    import ga05b_singlesagg as ppl
-    args = ["", inputs]
-    ppl.run_pipeline(args)
-
-def test_proteindblagg(inputs):
-    inputs = addpath(inputs)
-    import ga_2_genestitch as ppl
-    args = ["", inputs]
-    ppl.run_pipeline(args)
-######################################################################
 ### INPUTS
 dataset=""
 gene=""
 pdb="1pb5"
 
 repairs=2
-split=2
-vsplit=2
-task=1
-runs = "fg"
+split=10
+vsplit=10
+task=2
+runs = "hi"
 """ 
     if "a" in runs:        print("Mutein: Preparing genes")        
     if "b" in runs:        print("Mutein: Preparing pdbs")        
@@ -103,5 +49,6 @@ def runPPL(inputs):
     import ga__runner as ppl
     args = ["", inputs]
     ppl.run_pipeline(args)
+
 runPPL("runs="+runs+"@dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@repairs="+str(repairs)+"@task=" +str(task)+"@chunk="+str(split)+"@variant=*@vchunk="+str(vsplit))
 

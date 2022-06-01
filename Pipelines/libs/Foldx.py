@@ -24,7 +24,7 @@ class Foldx:
         self.ionStrength = 0.05
         self.pH = 7
         self.vdwDesign = 2
-        self.pdbHydrogens = False
+        self.pdbHydroges = False
         self.AA = AA.AA()
         self.numRuns = 1  # use in BuildModel
 
@@ -54,7 +54,7 @@ class Foldx:
         mut_log = "buildmodel_" + str(tag) + ".log"
         with open(mut_fl, "w") as fw:
             for mutation_string in mutation_strings:
-                fw.write(mutation_string + ";")
+                fw.write(mutation_string + ";\n")
         # ~/UCL/libs/foldx5/foldx --command=BuildModel --ionStrength=0.05 --pH=7
         #  --water=CRYSTAL --vdwDesign=2 --pdbHydrogens=false --numberOfRuns=15 --mutant-file=mutations.txt
         #  --pdb=6vxx_rep.pdb > buildmodel.log
@@ -108,6 +108,7 @@ class Foldx:
         fdic.saveAsDf()
         print("### ......... FOLDX:Analysis_Dataframe: completed", fdic)
 
+    
     def createBuildCsv(
         # self, pdb, mutation_string, ddg_file, df_file, tag
         self,
@@ -118,6 +119,76 @@ class Foldx:
         coverage,
         ddg_files,
         df_file,
+        allAtOnce
+    ):
+        if allAtOnce:
+            self.createBuildCsvAllAtOnce(path,pdbfile,pdb_muts,gene_muts,coverage,ddg_files,df_file)
+        else:
+            self.createBuildCsvOneByOne(path,pdbfile,pdb_muts,gene_muts,coverage,ddg_files,df_file)
+    
+    def createBuildCsvAllAtOnce(
+        # self, pdb, mutation_string, ddg_file, df_file, tag
+        self,
+        path,
+        pdbfile,
+        pdb_muts,
+        gene_muts,
+        coverage,
+        ddg_files,
+        df_file        
+    ):
+        # We have a single results file with nRuns lines per mutation        
+        mut_ddg = []
+        score, source = 0, "USER"
+        if len(coverage["score"]) > 0:
+            score = coverage["score"][0]
+            source = coverage["source"][0]        
+        # there is 1 results file and a list of mutations
+        ddg_file = ddg_files[0][0]     
+        muts = ddg_files[0][1]
+        if exists(ddg_file):  # I want it to error if it is missing
+            with open(ddg_file) as fr:
+                jobcontent = fr.readlines()
+                #skip any lines that are not results
+                lines_results = []
+                startres= False
+                for line in jobcontent:
+                    if startres:
+                        lines_results.append(line)
+                    else:
+                        if "Electrostatics" in line:
+                            startres = True
+                startrow = 0
+                for mut_string in muts:                                    
+                    energy_list = []
+                    for linecontents in lines_results[startrow:startrow+self.numRuns]:
+                        line = linecontents.split("\t")
+                        if line[0].endswith(".pdb"):
+                            energy = line[1]
+                            energy_list.append(float(energy))
+                    DDG = statistics.mean(energy_list)
+                    a_from = mut_string[0]
+                    aaa_from = self.AA.convert(a_from)
+                    mut_string = aaa_from + mut_string[1:]
+                    mut_ddg.append([mut_string, DDG])
+                    startrow += self.numRuns
+        else:
+            raise FileNotFoundError("DDG file does not exist " + ddg_file)
+
+        mut_dic = self.makeMutMapDictionary(pdb_muts, gene_muts, coverage)
+        self.createAnaysisCsv(pdbfile, mut_ddg, mut_dic, df_file, score, source)
+
+    
+    def createBuildCsvOneByOne(
+        # self, pdb, mutation_string, ddg_file, df_file, tag
+        self,
+        path,
+        pdbfile,
+        pdb_muts,
+        gene_muts,
+        coverage,
+        ddg_files,
+        df_file        
     ):
         # create a list of pdb_muts to ddg
         ### WARNING - there is onyl ONE ddg per build file, unlike posscan where all the ddg are unique

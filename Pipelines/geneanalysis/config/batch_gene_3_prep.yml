@@ -7,6 +7,6 @@ time: '5:00:0'
 cores: "1"
 dependency: '-1'
 array: 0
-inputs: "runs=de@repairs=10@chunk=100@vchunk=100@variant=*"
+inputs: "runs=de@repairs=10@chunk=200@vchunk=200@variant=*"
 active: 'Y'
 ---

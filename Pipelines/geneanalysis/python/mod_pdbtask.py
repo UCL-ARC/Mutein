@@ -108,7 +108,7 @@ def run_pipeline(args):
                 print("### ... change directory", row_path)
                 argus.params["thisrow"] = row
                 argus.params["thismut"] = mut
-                pdb_path.goto_job_dir(row_path, args, argus.params, "_inputs04a")
+                pdb_path.goto_job_dir(row_path, args, argus.params, "_inputs04a",emptyDirectory=True)
                 print(
                     "### foldx03: ... copying file",
                     pdb_path.pdb_thruputs + pdbfile,
@@ -134,15 +134,15 @@ def run_pipeline(args):
                     tag = 0
                     pdb_muts = mut.split(",")
 
-                    allAtOnce=False
+                    allAtOnce=True
                     if allAtOnce:
                         muts = []
+                        tag = 0
+                        ddg_file = row_path + "Dif_" + str(tag) + "_" + pdbname + ".fxout"
                         for pm in pdb_muts:                            
-                            muts.append(pm)
-                            tag = 0
-                            fx_runner.runBuild(pdbfile, [pm], tag)
-                            ddg_file = row_path + "Dif_" + str(tag) + "_" + pdbname + ".fxout"
-                            ddg_files.append([ddg_file, pm])
+                            muts.append(pm)                        
+                        fx_runner.runBuild(pdbfile, pdb_muts, tag)                        
+                        ddg_files.append([ddg_file, pdb_muts])
                     else:
                         for pm in pdb_muts:
                             tag += 1
@@ -159,7 +159,7 @@ def run_pipeline(args):
                     )
                     
                     fx_runner.createBuildCsv(
-                        row_path, pdbname, pdb_muts, mut, cov_df, ddg_files, df_file
+                        row_path, pdbname, pdb_muts, mut, cov_df, ddg_files, df_file, allAtOnce
                     )
 
                 else:
