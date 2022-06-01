@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 
-import glob
-import os
-
 '''
+refactor of fastqc_generator.sh to use python globbing to determine datasets to process
+rather than bash with simple list files
+
+stuff not yet refactored into python:
 source ~/.mutein_settings
 
 if [ $# -eq 0 ]
@@ -15,6 +16,17 @@ fi
 
 rm -f ${JOBLIST_BASE}
 '''
+
+import glob
+import os
+import re
+import sys
+
+def run_pipeline(args):
+    datadir = args[1]
+
+    for dataset in glob_dirs(datadir,depth=(0,2),include=['yokoyama2019/']):
+        print(dataset)
 
 def list_dirs(path):
     '''
@@ -57,67 +69,101 @@ def generate_lines(filename,sep=None,comment=None,skip=0,strip=True):
 
     f.close()
 
-datadir = os.getcwd()
+
+def exclude_item(item,ops):
+    '''
+    check item against the exclusion and inclusion filters
+    return True to exclude, False to include
+    '''
+
+    #apply exclusion filters
+    for filt in ops["exc"]:
+        if filt.search(item) is not None:
+            #matches an exclusion filter, reject item
+            return True
+
+    #accept item if no inclusion filters provided
+    if len(ops["inc"]) == 0: return False
+
+    for filt in ops["inc"]:
+        if filt.search(item) is not None:
+            #matches an inclusion filter, accept item
+            return False
+
+    #didn't match an inclusion filter, reject item
+    return True
 
 def recursive_filtered_glob(curr_path,curr_depth,ops):
     '''
-    recursive glob
+    recursive glob with filtering
+    use non-recursive iglob call to iterate the current level only
+    then selectively descend into sub folders by calling itself again
+    idea: block enumeration of unwanted folders altogether
+    to allow better scaling to millions of files and folders
     '''
 
-    for item in glob.iglob("**",root_dir=curr_path,recursive=False):
-        new_path = os.path.join(curr_path,item)
+    for item in glob.iglob(os.path.join(curr_path,"*"),recursive=False):
+        #add trailing separator to allow regex matching of directories versus files
+        if os.path.isdir(item): item += os.sep
 
-        #if we need to recurse into subfolders
-        if curr_depth < ops["max"]:
-            if os.path.isdir(new_path):
-                recursive_filtered_glob(new_path,curr_depth+1,min_depth)
+        #descend into subfolders
+        if os.path.isdir(item):
+            if curr_depth < ops["max"]:
+                for subitem in recursive_filtered_glob(item,curr_depth+1,ops):
+                    yield subitem
 
-        #if we need to yield items
-        if curr_depth >= min_depth and curr_depth <= max_depth:
-            if ops["dirs"] and os.path.isdir(new_path):
-                yield new_path
-            elif ops["files"] and os.path.isfile(new_path):
-                yield new_path
-            #if ops["syms"] and os.path.islink(new_path): yield new_path #islink and isdir/isfile can both be true
+        #apply filters
+        if exclude_item(item,ops): continue
 
-def glob_items(path,depth=0,
-               include=[],exclude=[],include_files=[],exclude_files=[],
-               dirs=True,files=True,symlinks=True):
+        #yield the current item
+        if curr_depth >= ops["min"] and curr_depth <= ops["max"]:
+            if ops["dirs"] and os.path.isdir(item):
+                yield item
+            elif ops["files"] and os.path.isfile(item):
+                yield item
+
+def glob_files(path,depth=0,include=[],exclude=[],include_files=[],exclude_files=[]):
+    'convenience wrapper to glob_items returning only files'
+    for item in glob_items(path,depth,False,True,include,exclude,include_files,exclude_files):
+        yield item
+
+def glob_dirs(path,depth=0,include=[],exclude=[],include_files=[],exclude_files=[]):
+    'convenience wrapper to glob_items returning only dirs'
+    for item in glob_items(path,depth,True,False,include,exclude,include_files,exclude_files):
+        yield item
+
+def glob_items(path,depth=0,dirs=True,files=True,
+               include=[],exclude=[],include_files=[],exclude_files=[]):
     '''
     glob items under a given path with optional recursion
     optional include and exclude pattern strings
     optional include and exclude pattern files (containing patterns)
-    include or exclude directories, files, symlinks
-    filters block entering of folders as well as return items
-    depth can be integer or tuple (min depth, max depth)
+    include or exclude directories, files (symlinks treated as the thing they point to)
+    filters block entering of folders as well as return of items
+    depth can be integer (the min and max) or tuple (min depth, max depth)
     '''
 
     #load filter files and add them to the include / exclude lists
     for fname in include_files: include += [line for line in generate_lines(fname)]
     for fname in exclude_files: exclude += [line for line in generate_lines(fname)]
 
+    #compile filters into regular expression objects
+    include = [re.compile(filt) for filt in include]
+    exclude = [re.compile(filt) for filt in exclude]
+
     if type(depth) == int:
         min_depth = max_depth = depth
     else:
         min_depth,max_depth = depth
 
-    curr_depth = 0
-    ops = {"inc":include,
-           "exc":exclude,
-           "dirs":dirs,
-           "files":files,
-           "syms":symlinks,
-           "min":min_depth,
-           "max":max_depth,
-          }
+    ops = {"inc":include,"exc":exclude,
+           "dirs":dirs,"files":files,
+           "min":min_depth,"max":max_depth}
 
-    for item in recursive_filtered_glob(path,curr_depth,ops):
+    #print(ops)
+
+    for item in recursive_filtered_glob(path,0,ops):
         yield item
-
-
-
-for dataset in glob_dirs(datadir):
-
 
 '''
 for DATASET in $(cat datasets/active_datasets)
@@ -141,3 +187,8 @@ JOBNAME=fastqc-$(mutein_random_id)
 echo qsub -N ${JOBNAME} -t 1-${TOTAL_TASKS} ${MUT_DIR}/Pipelines/premapping/fastqc_runner.sh ${JOBLIST_BASE}
 echo capture_qacct.sh ${JOBNAME}
 '''
+
+if __name__ == "__main__":
+    import sys
+
+    globals()["run_pipeline"](sys.argv)
