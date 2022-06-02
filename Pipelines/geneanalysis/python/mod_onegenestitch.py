@@ -52,10 +52,8 @@ def run_pipeline(args):
     fdfp = FileDf.FileDf(params_file)
     pm_df = fdfp.openDataFrame()
     pdbs = pm_df["pdb"].unique()
-
-    all_back_ps = []
-    all_back_bm = []
-    all_var_scan = []
+    
+    all_back_bm = []    
     all_var_build = []
 
     # first concat all the dfs, variants and backgrount
@@ -69,15 +67,10 @@ def run_pipeline(args):
             dataset=dataset,
             gene=gene,
             pdb=pdb,
-        )
-        file_var_ps = pdb_path.pdb_outputs + "ddg_posscan.csv"
+        )        
         file_var_bm = pdb_path.pdb_outputs + "ddg_buildmodel.csv"        
         file_back_bm = pdb_path.pdb_outputs + "ddg_background.csv"
-        if exists(file_var_ps):
-            fdf = FileDf.FileDf(file_var_ps)
-            all_var_scan.append(fdf.openDataFrame())
-        else:
-            exists_all_var = False
+        
         if exists(file_var_bm):
             fdf = FileDf.FileDf(file_var_bm)
             all_var_build.append(fdf.openDataFrame())
@@ -88,30 +81,20 @@ def run_pipeline(args):
             all_back_bm.append(fdf.openDataFrame())
         else:
             exists_all_back = False
-        if exists(file_back_ps):
-            fdf = FileDf.FileDf(file_back_ps)
-            all_back_ps.append(fdf.openDataFrame())
-        else:
-            exists_all_back = False
+        
 
-    if exists_all_back:
-        ddg_df_back_ps = pd.concat(all_back_ps, ignore_index=True)
-        ddg_df_back_ps.to_csv(gene_path.gene_outputs + "ddg_ps_background.csv", index=False)
+    if exists_all_back:        
         ddg_df_back_bm = pd.concat(all_back_bm, ignore_index=True)
         ddg_df_back_bm.to_csv(gene_path.gene_outputs + "ddg_bm_background.csv", index=False)
         # DB Coverage reports
         plot_file = gene_path.gene_outputs + "ALL_coverage.png"
-        anav = Analysis.Analysis(ddg_df_back, gene)
+        anav = Analysis.Analysis(ddg_df_back_bm, gene)
         anav.createPdbSummary(plot_file, "PDB Coverage")
     else:
         print("Gene stitch: not all pdb background files present for aggregation")
 
-    if exists_all_var:
-        ddg_df_var_scan = pd.concat(all_var_scan, ignore_index=True)
-        ddg_df_var_build = pd.concat(all_var_build, ignore_index=True)
-        ddg_df_var_scan.to_csv(
-            gene_path.gene_outputs + "ddg_variant_ps.csv", index=False
-        )
+    if exists_all_var:        
+        ddg_df_var_build = pd.concat(all_var_build, ignore_index=True)        
         ddg_df_var_build.to_csv(
             gene_path.gene_outputs + "ddg_variant_bm.csv", index=False
         )
@@ -119,12 +102,9 @@ def run_pipeline(args):
         print("Gene stitch: not all pdb variant files present for aggregation")
 
     tags = ["SMHOM", "SMEXP", "AF", "EXP"]
-    for tag in tags:
-        df_back = ddg_df_back.query("source=='" + tag + "'")
-        df_scan = ddg_df_var_scan.query("source=='" + tag + "'")
-        df_build = ddg_df_var_build.query("source=='" + tag + "'")
-
+    for tag in tags:                        
         if exists_all_back:
+            df_back = ddg_df_back_bm.query("source=='" + tag + "'")        
             anav_back = Analysis.Analysis(df_back, gene)
             anav_back.createDdgResidue(
                 gene_path.gene_outputs + tag + "_background_rid.png",
@@ -140,13 +120,8 @@ def run_pipeline(args):
             )
 
         if exists_all_var:
-            anav_scan = Analysis.Analysis(df_scan, gene)
-            anav_scan.createDdgResidue(
-                gene_path.gene_outputs + tag + "_variant_ps.png",
-                "Variant PosScan " + tag,
-                xax="gene_no",
-                dropnagene=False,
-            )
+            df_build = ddg_df_var_build.query("source=='" + tag + "'")            
+            
             anav_build = Analysis.Analysis(df_build, gene)
             anav_build.createDdgResidue(
                 gene_path.gene_outputs + tag + "_variant_bm.png",
