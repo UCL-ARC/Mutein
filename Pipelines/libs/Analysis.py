@@ -30,10 +30,10 @@ class Analysis:
         # And save something visual as a starting point for some analysis
         df = self.data
         df["ddg"] = pd.to_numeric(self.data["ddg"])
-        print(df)
+        #print(df)
         if dropnagene:
             df = df.dropna()
-        print(df)
+        #print(df)
         df_stab = df.query("ddg <= " + str(stabilising))
         df_destab = df.query("ddg >= " + str(destabilising))
 
@@ -115,10 +115,10 @@ class Analysis:
         # And save something visual as a starting point for some analysis
         df = self.data
         df["ddg"] = pd.to_numeric(self.data["ddg"])
-        print(df)
+        #print(df)
         if dropnagene:
             df = df.dropna()
-        print(df)
+        #print(df)
 
         count = len(df.index)
 

@@ -51,7 +51,14 @@ def run_pipeline(args):
     params_file = gene_path.gene_outputs + "Coverage_all.csv"
     fdfp = FileDf.FileDf(params_file)
     pm_df = fdfp.openDataFrame()
-    pdbs = pm_df["pdb"].unique()
+    
+    pdbs = []
+    pdbtasks = gene_path.gene_outputs + "pdb_tasklist.csv"
+    fio = FileDf.FileDf(pdbtasks)
+    df = fio.openDataFrame()
+    for t in range(len(df.index)):
+        pdbcode = df["pdb"][t].lower()
+        pdbs.append(pdbcode)
     
     all_back_bm = []    
     all_var_build = []
