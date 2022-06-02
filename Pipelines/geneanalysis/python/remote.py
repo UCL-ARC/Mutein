@@ -90,7 +90,7 @@ def run_pipeline(args):
                     patho = Paths.Paths(
                         DataDir, PipelineDir, dataset=dataset, gene=geneo
                     )
-                    filenameA = patho.outputs + "ddg_background.csv"
+                    filenameA = patho.outputs + "ddg_bm_background.csv"
                     existsfile, time = checkResult(filenameA)
                     if existsfile:
                         print(geneo, time)
@@ -109,7 +109,7 @@ def run_pipeline(args):
 
         print("Check results files for gene")
         print(path.outputs)
-        filenameA = path.outputs + "ddg_background.csv"
+        filenameA = path.outputs + "ddg_bm_background.csv"
         filenameB = path.outputs + "ddg_variant_bm.csv"        
         checkResults(filenameA, filenameB)
 
