@@ -18,7 +18,6 @@ def prepareGenes(args):
 
 def preparePdbs(args):
     import Pipelines.geneanalysis.python.mod_genetoproteins as ppa
-
     ppa.run_pipeline(args)
 
 

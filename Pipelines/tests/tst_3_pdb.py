@@ -22,14 +22,14 @@ def addpath(inputs):
 ######################################################################
 ### INPUTS
 dataset=""
-gene="NOTCH4"
-pdb=""
+gene=""
+pdb="1ejg"
 
 repairs=2
 split=10
 vsplit=10
 task=2
-runs = "j"
+runs = "b"
 """ 
     if "a" in runs:        print("Mutein: Preparing genes")        
     if "b" in runs:        print("Mutein: Preparing pdbs")        
