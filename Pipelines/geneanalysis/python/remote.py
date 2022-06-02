@@ -38,7 +38,7 @@ def checkResult(onefile):
     return False, ""
 
 
-def checkResults(ddg, bm, ps):
+def checkResults(ddg, bm):
     if exists(ddg):
         timeA = pathlib.Path(ddg).stat().st_mtime
         print(
@@ -55,16 +55,7 @@ def checkResults(ddg, bm, ps):
         )
     else:
         print("!!!Variant buildmodel file does not exist")
-    if exists(ps):
-        timeC = pathlib.Path(ps).stat().st_mtime
-        print(
-            "Variant posscan file was created at",
-            datetime.fromtimestamp(timeC).strftime("%d%b%y-%H:%M"),
-        )
-    else:
-        print("!!!Variant posscan file does not exist")
-
-
+    
 def run_pipeline(args):
     now = datetime.now()
     current_time = now.strftime("%d%b%y-%H.%H.%S")
@@ -119,9 +110,8 @@ def run_pipeline(args):
         print("Check results files for gene")
         print(path.outputs)
         filenameA = path.outputs + "ddg_background.csv"
-        filenameB = path.outputs + "ddg_variant_bm.csv"
-        filenameC = path.outputs + "ddg_variant_ps.csv"
-        checkResults(filenameA, filenameB, filenameC)
+        filenameB = path.outputs + "ddg_variant_bm.csv"        
+        checkResults(filenameA, filenameB)
 
         print("\nCheck pdb list\n")
         filename = path.outputs + "pdb_tasklist.csv"
@@ -197,9 +187,8 @@ def run_pipeline(args):
         print("Check results files for pdb")
         print(path.outputs)
         filenameA = path.outputs + "ddg_background.csv"
-        filenameB = path.outputs + "ddg_buildmodel.csv"
-        filenameC = path.outputs + "ddg_posscan.csv"
-        checkResults(filenameA, filenameB, filenameC)
+        filenameB = path.outputs + "ddg_buildmodel.csv"        
+        checkResults(filenameA, filenameB)
 
         # check the pdb
         filenamePdb = path.inputs + pdb + "_rep10.pdb"
@@ -267,9 +256,8 @@ def run_pipeline(args):
         print("Check results files for pdb")
         print(path.outputs)
         filenameA = path.outputs + "ddg_background.csv"
-        filenameB = path.outputs + "ddg_buildmodel.csv"
-        filenameC = path.outputs + "ddg_posscan.csv"
-        checkResults(filenameA, filenameB, filenameC)
+        filenameB = path.outputs + "ddg_buildmodel.csv"        
+        checkResults(filenameA, filenameB)
 
         # Check the background
         filenameP = path.thruputs + "params_background.txt"
@@ -365,27 +353,7 @@ def run_pipeline(args):
                 lines = fr.readlines()
                 for line in lines:
                     print(line.strip())
-            print("DATAFRAME_END")
-    elif mode == "PDB_PS":
-        dataset_gene_pdb = pattern.split(":")
-        dataset, gene, pdb = (
-            dataset_gene_pdb[0],
-            dataset_gene_pdb[1],
-            dataset_gene_pdb[2],
-        )
-        path = Paths.Paths(DataDir, PipelineDir, dataset=dataset, gene=gene, pdb=pdb)
-        filename = path.outputs + "ddg_posscan.csv"
-        if pdb == "":
-            filename = path.outputs + "ddg_variant_ps.csv"
-            print(filename)
-        mexists, time = checkResult(filename)
-        if mexists:
-            print("DATAFRAME_START")
-            with open(filename, "r") as fr:
-                lines = fr.readlines()
-                for line in lines:
-                    print(line.strip())
-            print("DATAFRAME_END")
+            print("DATAFRAME_END")        
     elif mode == "COVERAGE":
         dataset_gene_pdb = pattern.split(":")
         dataset, gene, pdb = (
