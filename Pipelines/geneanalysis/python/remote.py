@@ -325,7 +325,7 @@ def run_pipeline(args):
         )
         path = Paths.Paths(DataDir, PipelineDir, dataset=dataset, gene=gene, pdb=pdb)
         if "GENE" in mode or pdb == "":
-            filename = path.outputs + "ddg_bm_background,csv"
+            filename = path.outputs + "ddg_bm_background.csv"
         else:
             filename = path.outputs + "ddg_background.csv"
         print(filename)
