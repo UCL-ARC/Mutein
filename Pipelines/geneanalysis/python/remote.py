@@ -316,7 +316,7 @@ def run_pipeline(args):
             print(
                 "Missing variants file, the data needs preparation, or there are none"
             )
-    elif mode == "PDB_BACK":
+    elif mode == "PDB_BACK" or mode == "GENE_BACK":
         dataset_gene_pdb = pattern.split(":")
         dataset, gene, pdb = (
             dataset_gene_pdb[0],
@@ -324,7 +324,10 @@ def run_pipeline(args):
             dataset_gene_pdb[2],
         )
         path = Paths.Paths(DataDir, PipelineDir, dataset=dataset, gene=gene, pdb=pdb)
-        filename = path.outputs + "ddg_background.csv"
+        if "GENE" in mode:
+            filename = path.outputs + "ddg_bm_background,csv"
+        else:
+            filename = path.outputs + "ddg_background.csv"
         print(filename)
         mexists, time = checkResult(filename)
         if mexists:
