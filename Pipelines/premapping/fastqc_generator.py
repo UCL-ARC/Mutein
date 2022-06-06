@@ -8,6 +8,7 @@ import glob
 import os
 import re
 import sys
+import json
 import argparse
 import varcall as vc
 
@@ -36,23 +37,23 @@ def generate_array_job():
 
 def parse_args():
     '''
-    parse command line arguments
+    parse command line arguments and optional json file containing more arguments
+    priority is command line options > last json file... > first json file > defaults
     '''
+
     parser = argparse.ArgumentParser(description='Generate qsub array job specification file for FastQC')
-    parser.add_argument('--data',     type=str, help='folder containing datasets for FastQC to work on')
-    parser.add_argument('--out',      type=str, default='-',   help='file path to output array job spec to, - for stdout for debugging purposes')
-    parser.add_argument('--jsonfile', type=str, help='json file defining optional globbing parameters for "dataset", "subset" and "accession"')
-    parser.add_argument('--jsonstr',  type=str, help='json string defining optional globbing parameters for "dataset", "subset" and "accession"')
+    parser.add_argument('--data',      type=str, help='folder containing datasets for FastQC to work on')
+    parser.add_argument('--out',       type=str, default='-',   help='file path to output array job spec to, - for stdout for debugging purposes')
+    parser.add_argument('--conf',      action='append',         help='json file(s) defining additional parameters')
+    parser.add_argument('--dataset',   type=json.loads, default={}, help='json string defining parameters for "dataset" directory globbing')
+    parser.add_argument('--subset',    type=json.loads, default={}, help='json string defining parameters for "subset" directory globbing')
+    parser.add_argument('--accession', type=json.loads, default={}, help='json string defining parameters for "accession" directory globbing')
     vc.add_standard_args(parser) #add grid engine related arguments
-    args =  parser.parse_args()
 
-    #add default empty globbing filters
-    args.dataset = {}
-    args.subset = {}
-    args.accession = {}
+    #parser values including conf file(s)
+    args = vc.parse_and_load_conf(parser)
 
-    #add optional arguments from JSON file and or string
-    vc.add_json_arguments(args)
+    print(args)
 
     return args
 

@@ -6,6 +6,7 @@ import sys
 import random
 import time
 import json
+import argparse
 from datetime import datetime
 
 #ensure random has been seeded from system urandom or time (is this already done by the import??)
@@ -36,28 +37,36 @@ def find_file(filename):
 
     raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), filename)
 
-def add_json_arguments(args):
+def parse_and_load_conf(parser):
     '''
-    load additional arguments from a json file and/or string to args
-    --jsonfile <filename>
-    --jsonstr <json string>
-    do not overwrite existing arguments from the command line
+    load additional arguments from any --conf option(s)
+    store the values as the defaults in the parser
+    ready to re-parse the command line options in order to give them priority
     '''
 
-    #load additional args from JSON file
-    if args.jsonfile:
-        filename = find_file(args.jsonfile)
+    #parse command line arguments
+    args = parser.parse_args()
+    if args.conf is None: return args
+
+    #read conf files, store as new default values
+    for jsonfile in args.conf:
+        filename = find_file(jsonfile) # in case json is in the conf not the local folder
         f = open(filename)
-        for key,val in json.load(f).items():
-            if not hasattr(args,key):
-                setattr(args,key,val)
+        parser.set_defaults(**json.load(f))
         f.close()
 
-    #load additional args from JSON string
-    if args.jsonstr:
-        for key,val in json.loads(args.jsonstr).items():
-            if not hasattr(args,key):
-                setattr(args,key,val)
+    #re-read command line
+    return parser.parse_args()
+
+'''
+class JSON(argparse.Action):
+    'action to parse a json string, but found type=json.loads works better'
+    def __init__(self, option_strings, dest, nargs=None, **kwargs):
+        super().__init__(option_strings, dest, **kwargs)
+    def __call__(self, parser, namespace, values, option_string=None):
+        print('%r %r %r' % (namespace, values, option_string))
+        setattr(namespace, self.dest, json.loads(values))
+'''
 
 def add_standard_args(parser):
     '''
@@ -65,11 +74,11 @@ def add_standard_args(parser):
     intended to be generic, but based on grid engine
     '''
 
-    parser.add_argument('-m','--mem',   type=str, default='4G',       help='memory per core <integer>[M,G,T]')
-    parser.add_argument('-t','--time',  type=str, default='04:00:00', help='max wall time HH:MM:SS')
-    parser.add_argument('-c','--cores', type=str, default='4',        help='cores')
-    parser.add_argument('-p','--tmpfs', type=str, default='10G',      help='tmpfs space <integer>[M,G,T]')
-    parser.add_argument('-l','--logs',  type=str, default='logs',     help='path to write stdout and stderr log files to, "none" to rely on default behaviour')
+    parser.add_argument('--mem',   type=str, default='4G',       help='memory per core <integer>[M,G,T]')
+    parser.add_argument('--time',  type=str, default='01:00:00', help='max wall time HH:MM:SS')
+    parser.add_argument('--cores', type=str, default='1',        help='cores')
+    parser.add_argument('--tmpfs', type=str, default='10G',      help='tmpfs space <integer>[M,G,T]')
+    parser.add_argument('--logs',  type=str, default='logs',     help='path to write stdout and stderr log files to, "none" to rely on default behaviour')
     return parser
 
 class ArrayJob:
