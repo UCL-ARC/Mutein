@@ -82,7 +82,7 @@ def add_standard_args(parser):
     return parser
 
 class ArrayJob:
-    def __init__(self,filename,header,sep=','):
+    def __init__(self,filename,fixed={},header='',sep=','):
         self.tasks = 0
         self.filename = filename
 
@@ -99,6 +99,7 @@ class ArrayJob:
         else:
             self.f = open(self.filename,'w')
 
+        self.f.write(json.dumps(fixed)+'\n')
         self.f.write(self.sep.join(self.header)+'\n')
         self.format = self.sep.join(['{%s}'%x for x in self.header])
 

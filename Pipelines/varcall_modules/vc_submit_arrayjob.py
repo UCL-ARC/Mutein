@@ -19,14 +19,13 @@ def submit_arrayjob():
     for line in f: pass
     f.close()
 
-    #update the timestam[]
+    #update the timestamp
     cmd = line.strip().format(jobname_uid=vc.unique_id())
 
     #sanity check (qsub only for now)
     assert cmd.startswith("qsub")
 
     #issue the command, ensure no immediate error encountered
-    #print(cmd)
     subprocess.run(cmd.split(),check=True)
 
 def parse_args():
