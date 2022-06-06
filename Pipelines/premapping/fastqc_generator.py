@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 '''
-generate fastqc array job
+generate array job spec file for running FastQC on all selected samples
 '''
 
 import glob
@@ -12,27 +12,50 @@ import argparse
 import varcall as vc
 
 def generate_array_job():
+    '''
+    write the array job specification to a file one line per array task
+    with the parameter names as a head and the qsub command as the footer
+    '''
+
     args = parse_args()
 
-    #setup new file with variable names as header
-    f = vc.ArrayJob(args.output,'threads accession')
+    #setup new file with the per-task variable names listed in the header as column names
+    f = vc.ArrayJob(args.out,'threads accession')
 
-    threads=4 #this parameter stays the same across all tasks
-    for dataset in vc.glob_dirs(args.datadir,exclude=['test$']):
-        for subset in vc.glob_dirs(dataset,exclude=['gatk_db$','metadata$']):
-            for accession in vc.glob_dirs(subset,exclude=[]):
-                f.write_task(locals())#write "threads" and "accession" to next line of file
+    ##crawl the data folder finding data files by globbing
+    for dataset in vc.glob_dirs(args.data,**args.dataset):
+        for subset in vc.glob_dirs(dataset,**args.subset):
+            for accession in vc.glob_dirs(subset,**args.accession):
+                #write the next task to file as a new line
+                f.write_task({"threads":args.threads,"accession":accession})
 
+    #write file footer containing the qsub command required to launch this array job
     jobname = 'fastqc'
     f.write_qsub(jobname,args)
     f.close()
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Generate qsub array job for FastQC of data')
-    parser.add_argument('-d','--datadir', type=str, required=True, help='folder containing datasets as subfolders')
-    parser.add_argument('-o','--output',  type=str, required=True, help='file to output array job spec to')
-    vc.add_qsub_resource_params(parser)
-    return parser.parse_args()
+    parser = argparse.ArgumentParser(description='Generate qsub array job specification file for FastQC')
+    parser.add_argument('--data',     type=str, required=True, help='folder containing datasets for FastQC to work on')
+    parser.add_argument('--out',      type=str, default='-',   help='file path to output array job spec to, - for stdout')
+    parser.add_argument('--threads',  type=int, required=True, help='threads per FastQC job')
+    parser.add_argument('--jsonfile', type=str,                help='json file defining optional globbing parameters for "dataset", "subset" and "accession"')
+    vc.add_standard_args(parser)
+    args =  parser.parse_args()
+
+    #provide empty stubs for the optional globbing settings
+    args.dataset = {}
+    args.subset = {}
+    args.accession = {}
+
+    #load additional settings from JSON file
+    if args.jsonfile:
+        json_args = vc.load_json(args.jsonfile)
+        if "dataset" in json_args: args.dataset = json_args["dataset"]
+        if "subset" in json_args: args.subset = json_args["subset"]
+        if "accession" in json_args: args.accession = json_args["accession"]  
+
+    return args
 
 if __name__ == "__main__":
     globals()["generate_array_job"]()

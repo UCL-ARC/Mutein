@@ -4,26 +4,34 @@ import re
 import sys
 import random
 import time
+import json
 from datetime import datetime
 
 #ensure random has been seeded from system urandom or time (is this already done by the import??)
 random.seed()
 
 def unique_id():
-    'generate unique id based on timestamp and pseudo random number'
+    'generate unique id based on microsecond timestamp and pseudo random number'
 
-    timestamp = datetime.fromtimestamp(time.time()).strftime("%Y%m%d-%H%M%S%f")[:-3]
+    timestamp = datetime.fromtimestamp(time.time()).strftime("%Y%m%d-%H%M%S%f")
     randstamp = "-%06d"%random.randrange(1e6)
 
     return timestamp + randstamp
 
-def add_qsub_resource_params(parser):
-    'add qsub resource request parameters to the command line argument list'
+def load_json(filename):
+    'load additional arguments from a json file'
+    f = open(filename)
+    data = json.load(f)
+    f.close()
+    return data
 
-    parser.add_argument('-m','--mem',   type=str, default='4G',         help='memory per core')
-    parser.add_argument('-t','--time', type=str, default='0-04:00:00', help='max wall time')
+def add_standard_args(parser):
+    'add output file and qsub resource request parameters to the command line argument list'
+
+    parser.add_argument('-m','--mem',   type=str, default='4G',         help='memory per core <integer>[M,G,T]')
+    parser.add_argument('-t','--time',  type=str, default='0-04:00:00', help='max wall time [DAYS-]HH:MM:SS')
     parser.add_argument('-c','--cores', type=str, default='4',          help='cores')
-    parser.add_argument('-p','--tmpfs',   type=str, default='10G',        help='tmpfs space')
+    parser.add_argument('-p','--tmpfs', type=str, default='10G',        help='tmpfs space <integer>[M,G,T]')
     return parser
 
 class ArrayJob:
@@ -38,7 +46,12 @@ class ArrayJob:
             self.header = header
 
         self.sep = sep
-        self.f = open(self.filename,'w')
+
+        if self.filename == '-':
+            self.f = sys.stdout
+        else:
+            self.f = open(self.filename,'w')
+
         self.f.write(self.sep.join(self.header)+'\n')
         self.format = self.sep.join(['{%s}'%x for x in self.header])
 
@@ -58,7 +71,7 @@ class ArrayJob:
         cmd += " -o sge_logs/\$JOB_NAME.\$TASK_ID.o -e sge_logs/\$JOB_NAME.\$TASK_ID.e"
         cmd += " -N {jobname} -t 1-{self.tasks}"
         cmd += " -l h_rt={args.time} -l mem={args.mem} -l tmpfs={args.tmpfs} -pe smp {args.cores}"
-        cmd += " {jobscript} {args.output}"
+        cmd += " {jobscript} {self.filename}"
 
         self.append(cmd.format(**locals()))
 

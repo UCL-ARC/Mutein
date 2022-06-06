@@ -2,10 +2,10 @@
 
 set -eu
 source ~/.mutein_settings
+export SGE_TASK_ID
 conda activate ${MUT_PREFIX}trim-galore
-JOBLIST=$1
+TASKLIST=$1
 
-#set threads and accession
-$(vc_extract_params ${JOBLIST})
+$(vc_extract_params --params "threads accession" --tasklist ${TASKLIST})
 
-fastqc -t ${threads} ${accession}/*.fastq.gz
+echo fastqc -t ${threads} ${accession}/*.fastq.gz
