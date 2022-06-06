@@ -1,0 +1,20 @@
+{
+	"time":"1:00:0",
+    "mem":"1G",
+    "tmpfs":"15G",
+    "cores":"4",
+	"data":"datasets",
+	"dataset":
+	{
+		"exclude": ["test$","metadata$"],
+        "include": ["keogh2018$"]
+	},
+	"subset":
+	{
+		"exclude": ["gatk_db$","metadata$"]
+	},
+	"accession":
+	{
+		"exclude": ["gatk_db$","metadata$"]
+	}
+}

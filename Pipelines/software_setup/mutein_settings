@@ -4,6 +4,7 @@
 export MUT_DIR=~/repos/Mutein
 
 #which module name to give to "module load" command
+#except we now install our own minicona to make sure it's up-to-date
 #export MUT_CONDA_MODULE=python/miniconda3/4.5.11
 
 #which script to run and append output to bashrc to config conda
@@ -25,12 +26,18 @@ export PATH=${MUT_DIR}/Pipelines/scripts:${PATH}
 #add python modules to PYTHONPATH
 export PYTHONPATH=${MUT_DIR}/Pipelines/varcall_modules:${PYTHONPATH}
 
+#define a folder containing additional config files
+export MUT_CONFIG_DIR=${MUT_DIR}/Pipelines/varcall_config
+
+#define a folder containing qsub job templates
+export MUT_TEMPLATE_DIR=${MUT_DIR}/Pipelines/varcall_templates
+
 #which file inside reference subfolder to use as the reference
 export MUT_REFERENCE=GCA_000001405.15_GRCh38_no_alt_plus_hs38d1_analysis_set.fna.gz
 
 #optional prefix to put infront of all the conda environment names
 export MUT_PREFIX=mutein_
 
-mutein_random_id () {
-    printf "%05d%05d" ${RANDOM} ${RANDOM}
-}
+#mutein_random_id () {
+#    printf "%05d%05d" ${RANDOM} ${RANDOM}
+#}

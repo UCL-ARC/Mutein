@@ -6,6 +6,6 @@ export SGE_TASK_ID
 conda activate ${MUT_PREFIX}trim-galore
 TASKLIST=$1
 
-$(vc_extract_params --params "threads accession" --tasklist ${TASKLIST})
+$(vc_extract_params --params "cores accession" --tasklist ${TASKLIST})
 
-echo fastqc -t ${threads} ${accession}/*.fastq.gz
+fastqc -t ${cores} ${accession}/*.fastq.gz

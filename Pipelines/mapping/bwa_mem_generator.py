@@ -1,21 +1,19 @@
 #!/usr/bin/env python
 
 '''
-generate array job spec file for running FastQC on all selected samples
+generate array job spec file for read mapping with bwa mem
 '''
 
-import glob
 import os
-import re
 import sys
 import argparse
 import varcall as vc
 
 def generate_array_job():
     '''
-    find the data files to send to fastqc by crawling through the "data" folder
-    write the array job specification to a file one line per array task
-    with the parameter names as a head and the qsub command as the footer
+    this only deals with one reference genome sequence file at a time
+    since we expect to use only one
+    but you can change the path to point to any reference file
     '''
 
     args = parse_args()
@@ -38,18 +36,14 @@ def parse_args():
     '''
     parse command line arguments
     '''
-    parser = argparse.ArgumentParser(description='Generate qsub array job specification file for FastQC')
-    parser.add_argument('--data',     type=str, help='folder containing datasets for FastQC to work on')
-    parser.add_argument('--out',      type=str, default='-',   help='file path to output array job spec to, - for stdout for debugging purposes')
-    parser.add_argument('--jsonfile', type=str, help='json file defining optional globbing parameters for "dataset", "subset" and "accession"')
-    parser.add_argument('--jsonstr',  type=str, help='json string defining optional globbing parameters for "dataset", "subset" and "accession"')
+
+    parser = argparse.ArgumentParser(description='Generate qsub job specification file for bwa mem mapping reads to reference sequence and sorting them into a BAM file')
+    parser.add_argument('--data',     type=str, help='folder to glob for read datasets')
+    parser.add_argument('--out',       type=str, default='-',   help='file path to output array job spec to, - for stdout for debugging purposes')
+    parser.add_argument('--jsonfile',  type=str, help='json file defining optional globbing parameters for "dataset", "subset" and "accession"')
+    parser.add_argument('--jsonstr',   type=str, help='json string defining optional globbing parameters for "dataset", "subset" and "accession"')
     vc.add_standard_args(parser) #add grid engine related arguments
     args =  parser.parse_args()
-
-    #add default empty globbing filters
-    args.dataset = {}
-    args.subset = {}
-    args.accession = {}
 
     #add optional arguments from JSON file and or string
     vc.add_json_arguments(args)

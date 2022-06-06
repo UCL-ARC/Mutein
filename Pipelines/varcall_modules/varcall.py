@@ -1,5 +1,6 @@
 import glob
 import os
+import errno
 import re
 import sys
 import random
@@ -13,25 +14,62 @@ random.seed()
 def unique_id():
     'generate unique id based on microsecond timestamp and pseudo random number'
 
-    timestamp = datetime.fromtimestamp(time.time()).strftime("%Y%m%d-%H%M%S%f")
-    randstamp = "-%06d"%random.randrange(1e6)
+    timestamp = datetime.fromtimestamp(time.time()).strftime("%Y%m%d-%H%M%S.%f")[:-3]
+    randstamp = "-%04d"%random.randrange(1e4)
 
     return timestamp + randstamp
 
-def load_json(filename):
-    'load additional arguments from a json file'
-    f = open(filename)
-    data = json.load(f)
-    f.close()
-    return data
+def find_file(filename):
+    '''
+    return path to the filename
+    no change if path exists
+    otherwise look in $MUT_CONFIG_DIR if defined
+    otherwise raise exception
+    '''
+
+    if os.path.exists(filename): return filename
+
+    if "MUT_CONFIG_DIR" in os.environ:
+        filename = os.path.join(os.environ['MUT_CONFIG_DIR'],filename)
+
+    if os.path.exists(filename): return filename
+
+    raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), filename)
+
+def add_json_arguments(args):
+    '''
+    load additional arguments from a json file and/or string to args
+    --jsonfile <filename>
+    --jsonstr <json string>
+    do not overwrite existing arguments from the command line
+    '''
+
+    #load additional args from JSON file
+    if args.jsonfile:
+        filename = find_file(args.jsonfile)
+        f = open(filename)
+        for key,val in json.load(f).items():
+            if not hasattr(args,key):
+                setattr(args,key,val)
+        f.close()
+
+    #load additional args from JSON string
+    if args.jsonstr:
+        for key,val in json.loads(args.jsonstr).items():
+            if not hasattr(args,key):
+                setattr(args,key,val)
 
 def add_standard_args(parser):
-    'add output file and qsub resource request parameters to the command line argument list'
+    '''
+    add common job scheduler related parameters to the command line argument list
+    intended to be generic, but based on grid engine
+    '''
 
-    parser.add_argument('-m','--mem',   type=str, default='4G',         help='memory per core <integer>[M,G,T]')
-    parser.add_argument('-t','--time',  type=str, default='0-04:00:00', help='max wall time [DAYS-]HH:MM:SS')
-    parser.add_argument('-c','--cores', type=str, default='4',          help='cores')
-    parser.add_argument('-p','--tmpfs', type=str, default='10G',        help='tmpfs space <integer>[M,G,T]')
+    parser.add_argument('-m','--mem',   type=str, default='4G',       help='memory per core <integer>[M,G,T]')
+    parser.add_argument('-t','--time',  type=str, default='04:00:00', help='max wall time HH:MM:SS')
+    parser.add_argument('-c','--cores', type=str, default='4',        help='cores')
+    parser.add_argument('-p','--tmpfs', type=str, default='10G',      help='tmpfs space <integer>[M,G,T]')
+    parser.add_argument('-l','--logs',  type=str, default='logs',     help='path to write stdout and stderr log files to, "none" to rely on default behaviour')
     return parser
 
 class ArrayJob:
@@ -64,12 +102,15 @@ class ArrayJob:
         if not line.endswith('\n'): self.f.write('\n')
 
     def write_qsub(self,name,args):
-        jobname = name + '-' + unique_id()
-        jobscript = os.path.join(os.environ['MUT_DIR'],'Pipelines/varcall_templates',name+'.qsub')
+        jobname = name
+        jobscript = os.path.join(os.environ['MUT_TEMPLATE_DIR'],name+'.qsub')
 
         cmd  = "qsub -cwd -V"
-        cmd += " -o sge_logs/\$JOB_NAME.\$TASK_ID.o -e sge_logs/\$JOB_NAME.\$TASK_ID.e"
-        cmd += " -N {jobname} -t 1-{self.tasks}"
+
+        if args.logs != "none":
+            cmd += " -o {args.logs}/\$JOB_NAME.\$TASK_ID.o -e {args.logs}/\$JOB_NAME.\$TASK_ID.e"
+
+        cmd += " -N {jobname}-{{jobname_uid}} -t 1-{self.tasks}"
         cmd += " -l h_rt={args.time} -l mem={args.mem} -l tmpfs={args.tmpfs} -pe smp {args.cores}"
         cmd += " {jobscript} {self.filename}"
 
