@@ -32,8 +32,7 @@ def find_file(filename):
 
     if "MUT_CONFIG_DIR" in os.environ:
         filename = os.path.join(os.environ['MUT_CONFIG_DIR'],filename)
-
-    if os.path.exists(filename): return filename
+        if os.path.exists(filename): return filename
 
     raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), filename)
 
@@ -47,12 +46,14 @@ def parse_and_load_conf(parser):
     #parse command line arguments
     args = parser.parse_args()
     if args.conf is None: return args
+    if type(args.conf) == str: args.conf = [args.conf]
 
     #read conf files, store as new default values
     for jsonfile in args.conf:
         filename = find_file(jsonfile) # in case json is in the conf not the local folder
         f = open(filename)
-        parser.set_defaults(**json.load(f))
+        loaded = json.load(f)
+        parser.set_defaults(**loaded)
         f.close()
 
     #re-read command line
@@ -79,37 +80,28 @@ def add_standard_args(parser):
     parser.add_argument('--cores', type=str, default='1',        help='cores')
     parser.add_argument('--tmpfs', type=str, default='10G',      help='tmpfs space <integer>[M,G,T]')
     parser.add_argument('--logs',  type=str, default='logs',     help='path to write stdout and stderr log files to, "none" to rely on default behaviour')
+    parser.add_argument('--conf',  action='append',         help='json file(s) defining additional parameters')
     return parser
 
 class ArrayJob:
-    def __init__(self,filename,fixed={},header='',sep=','):
+    def __init__(self,filename,fixed={},per_task=[]):
         self.tasks = 0
         self.filename = filename
-
-        #convert header into a list if it's given as a space delimited string
-        if isinstance(header,str):
-            self.header = header.strip().split()
-        else:
-            self.header = header
-
-        self.sep = sep
+        self.per_task = per_task #list of per-task parameter names
 
         if self.filename == '-':
             self.f = sys.stdout
         else:
             self.f = open(self.filename,'w')
 
-        self.f.write(json.dumps(fixed)+'\n')
-        self.f.write(self.sep.join(self.header)+'\n')
-        self.format = self.sep.join(['{%s}'%x for x in self.header])
+        self.f.write(json.dumps(fixed)+'\n') #fixed parameter names and values
+        self.f.write(json.dumps(self.per_task)+'\n') #names of per-task parameters
+        self.format = ','.join(['{%s}'%x for x in self.per_task]) #how the values will be written
 
-    def write_task(self,args):
-        self.f.write(self.format.format(**args)+'\n')
-        self.tasks += 1
-
-    def append(self,line):
-        self.f.write(line)
-        if not line.endswith('\n'): self.f.write('\n')
+    def write_task(self,kwargs):
+        assert len(self.per_task) > 0, "no per-task parameters defined!"
+        self.f.write(self.format.format(**kwargs)+'\n') #write per-task values
+        self.tasks += 1 #count of total number of tasks defined so far
 
     def write_qsub(self,name,args):
         jobname = name
@@ -124,10 +116,18 @@ class ArrayJob:
         cmd += " -l h_rt={args.time} -l mem={args.mem} -l tmpfs={args.tmpfs} -pe smp {args.cores}"
         cmd += " {jobscript} {self.filename}"
 
-        self.append(cmd.format(**locals()))
+        self.f.write(cmd.format(**locals()) + '\n')
 
     def ntasks(self):
+        'how many tasks defined so far'
         return self.tasks
+
+    def next_task_id(self):
+        '''
+        the number of the next task
+        ie the task number that will be created by the next call to write_task
+        '''
+        return self.tasks+1
 
     def close(self):
         self.f.close()
@@ -188,6 +188,30 @@ def recursive_filtered_glob(curr_path,curr_depth,ops):
             elif ops["files"] and os.path.isfile(item):
                 yield item
 
+def single_file(path,depth=1,remove_base=False,include=[],exclude=[],include_files=[],exclude_files=[]):
+    return single_item(path,depth,False,True,remove_base,include,exclude,include_files,exclude_files)
+
+def single_dir(path,depth=1,remove_base=False,include=[],exclude=[],include_files=[],exclude_files=[]):
+    return single_dir(path,depth,True,False,remove_base,include,exclude,include_files,exclude_files)
+
+def single_item(path,depth=1,dirs=True,files=True,remove_base=False,include=[],exclude=[],include_files=[],exclude_files=[]):
+    '''
+    convenience wrapper to glob_items returning a single item
+    or raising exception for multiple hits
+    '''
+
+    hit = None
+    for item in glob_items(path,depth,dirs,files,remove_base,include,exclude,include_files,exclude_files):
+        if hit != None:
+            raise Exception('more than one matching item')
+        else:
+            hit = item
+
+    if hit == None:
+        raise Exception('no matching items found')
+
+    return hit
+
 def glob_files(path,depth=1,remove_base=False,include=[],exclude=[],include_files=[],exclude_files=[]):
     'convenience wrapper to glob_items returning only files'
     for item in glob_items(path,depth,False,True,remove_base,include,exclude,include_files,exclude_files):
@@ -229,9 +253,9 @@ def glob_items(path,depth=1,dirs=True,files=True,remove_base=False,
 
     for item in recursive_filtered_glob(path,1,ops):
         if remove_base == True:
-            yield item[len(path):]
-        else:
-            yield item
+            item = item[len(path)+1:]
+        
+        yield os.path.normpath(item)
 
 def list_dirs(path):
     '''

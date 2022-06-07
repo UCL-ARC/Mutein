@@ -8,7 +8,8 @@ JOBLIST=$1
 
 $(vc_extract_params --params "cores accession" --tasklist ${TASKLIST})
 
-mkdir -p /tmp/${USER}-bwa-${SGE_TASK_ID}
+SAMTOOLS_TMP=${USER}-${SGE_JOB_ID}-${SGE_TASK_ID}-${RANDOM}
+mkdir -p /tmp/${SAMTOOLS_TMP}
 
 #array job commands for step1:
 #map with bwa mem, add readgroup tag to say "these are all from the same sample"
@@ -17,7 +18,7 @@ bwa mem -t 4 ${REF} ${READS1} ${READS2} \
 | samtools addreplacerg \
     -r \"ID:${DATASET}_${SUBSET}_${ACCESSION}\" \
     -r \"SM:${DATASET}_${SUBSET}_${ACCESSION}\" - \
-| samtools sort -T /tmp/${USER}-bwa-${SGE_TASK_ID} -O bam -m 2G - \
+| samtools sort -T /tmp/${SAMTOOLS_TMP} -O bam -m 2G - \
 > ${BAMOUT}
 
-rm -rf /tmp/${USER}-bwa-${SGE_TASK_ID}
+rm -rf /tmp/${SAMTOOLS_TMP}

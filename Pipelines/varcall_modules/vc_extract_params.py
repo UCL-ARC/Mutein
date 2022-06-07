@@ -29,17 +29,10 @@ def extract_params():
     fixed = json.loads(f.readline().strip())
 
     #get header (per-task parameter names)
-    header = [item.strip() for item in f.readline().strip().split(',')]
+    header = json.loads(f.readline().strip())
 
-    #parameter lists must match though need not be in same order
+    #parameter lists match though need not be in same order
     verify_params(header+list(fixed.keys()),args.params)
-
-    #skip to revelant line
-    for i in range(taskid): line = f.readline()
-    f.close()
-
-    tokens = line.strip().split(',')
-    assert len(header) == len(tokens)
 
     output = []
 
@@ -47,10 +40,18 @@ def extract_params():
     for key,value in fixed.items():
         output.append('{key}="{value}"'.format(key=key,value=value))
 
-    #per-task parameter values
-    for i,key in enumerate(header):
-        value = tokens[i]
-        output.append('{key}="{value}"'.format(key=key,value=value))
+    #find the per-task parameters if present
+    if len(header) > 0:
+        for i in range(taskid): line = f.readline()
+        tokens = line.strip().split(',')
+        assert len(header) == len(tokens)
+
+        #per-task parameter values
+        for i,key in enumerate(header):
+            value = tokens[i]
+            output.append('{key}="{value}"'.format(key=key,value=value))
+
+    f.close()
 
     #set bash variables, assumes we are called using "$(vc_extract_params ...)"
     print('export ' + ' '.join(output))

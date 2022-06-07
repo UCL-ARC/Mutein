@@ -20,12 +20,8 @@ def generate_array_job():
 
     assert args.reference.endswith('.gz')
 
-    f = vc.ArrayJob(args.out,'reference')
-    f.write_task({"reference":args.reference})
-
-    #write file footer containing the qsub command required to launch this array job
-    jobname = 'bwa-index'
-    f.write_qsub(jobname,args)
+    f = vc.ArrayJob(args.out,fixed={'reference':args.reference})
+    f.write_qsub('bwa-index',args)
     f.close()
 
 def parse_args():
@@ -36,13 +32,8 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Generate qsub job specification file for indexing the reference sequence')
     parser.add_argument('--reference', type=str, help='path to the reference genome file which should be gzipped')
     parser.add_argument('--out',       type=str, default='-',   help='file path to output array job spec to, - for stdout for debugging purposes')
-    parser.add_argument('--jsonfile',  type=str, help='json file defining optional globbing parameters for "dataset", "subset" and "accession"')
-    parser.add_argument('--jsonstr',   type=str, help='json string defining optional globbing parameters for "dataset", "subset" and "accession"')
     vc.add_standard_args(parser) #add grid engine related arguments
-    args =  parser.parse_args()
-
-    #add optional arguments from JSON file and or string
-    vc.add_json_arguments(args)
+    args = vc.parse_and_load_conf(parser)
 
     return args
 

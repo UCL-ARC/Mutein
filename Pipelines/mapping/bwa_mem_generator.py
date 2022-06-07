@@ -6,30 +6,41 @@ generate array job spec file for read mapping with bwa mem
 
 import os
 import sys
+import json
 import argparse
 import varcall as vc
 
 def generate_array_job():
     '''
-    this only deals with one reference genome sequence file at a time
-    since we expect to use only one
-    but you can change the path to point to any reference file
+    glob fastq files to map against reference genome
+    using bwa mem then to be sorted with samtools
     '''
 
     args = parse_args()
 
-    #setup new file with the per-task variable names listed in the header as column names
-    f = vc.ArrayJob(args.out,'cores accession')
+    #cores is the total cores, we give cores-2 to bwa mem, the remainder for samtools
+    threads = int(args.cores) - 2
+    assert threads > 0, "ensure at least three cores to account for samtools and bwa"
+
+    f = vc.ArrayJob(args.out,fixed={'reference':args.reference,
+                                    'cores':args.cores,
+                                    'threads':threads},
+                             per_task=['accession','read_group','read1','read2','bam'])
 
     ##crawl the data folder finding data files by globbing
     for dataset in vc.glob_dirs(args.data,**args.dataset):
         for subset in vc.glob_dirs(dataset,**args.subset):
             for accession in vc.glob_dirs(subset,**args.accession):
-                f.write_task({"cores":args.cores,"accession":accession})
+                read1 = vc.single_file(accession,remove_base=True,include=['_1.fastq.gz$'])
+                read2 = vc.single_file(accession,remove_base=True,include=['_2.fastq.gz$'])
+                read_group = '_'.join(accession.split('/')[1:])
+                accession_id = accession.split('/')[-1]
+                bam = accession_id+'_aln_sort.bam'
+                f.write_task({"accession":accession,"read_group":read_group,
+                              "read1":read1,"read2":read2,"bam":bam})
 
     #write file footer containing the qsub command required to launch this array job
-    jobname = 'fastqc'
-    f.write_qsub(jobname,args)
+    f.write_qsub('bwa-mem',args)
     f.close()
 
 def parse_args():
@@ -38,15 +49,13 @@ def parse_args():
     '''
 
     parser = argparse.ArgumentParser(description='Generate qsub job specification file for bwa mem mapping reads to reference sequence and sorting them into a BAM file')
-    parser.add_argument('--data',     type=str, help='folder to glob for read datasets')
-    parser.add_argument('--out',       type=str, default='-',   help='file path to output array job spec to, - for stdout for debugging purposes')
-    parser.add_argument('--jsonfile',  type=str, help='json file defining optional globbing parameters for "dataset", "subset" and "accession"')
-    parser.add_argument('--jsonstr',   type=str, help='json string defining optional globbing parameters for "dataset", "subset" and "accession"')
+    parser.add_argument('--data',  type=str, help='folder to glob for read datasets')
+    parser.add_argument('--out',   type=str, default='-',   help='file path to output array job spec to, - for stdout for debugging purposes')
+    parser.add_argument('--dataset',   type=json.loads, default={}, help='json string defining parameters for "dataset" directory globbing')
+    parser.add_argument('--subset',    type=json.loads, default={}, help='json string defining parameters for "subset" directory globbing')
+    parser.add_argument('--accession', type=json.loads, default={}, help='json string defining parameters for "accession" directory globbing')
     vc.add_standard_args(parser) #add grid engine related arguments
-    args =  parser.parse_args()
-
-    #add optional arguments from JSON file and or string
-    vc.add_json_arguments(args)
+    args = vc.parse_and_load_conf(parser) 
 
     return args
 

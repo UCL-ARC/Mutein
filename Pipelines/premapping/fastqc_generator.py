@@ -22,7 +22,7 @@ def generate_array_job():
     args = parse_args()
 
     #setup new file with the per-task variable names listed in the header as column names
-    f = vc.ArrayJob(args.out,fixed={"cores":args.cores},header='accession')
+    f = vc.ArrayJob(args.out,fixed={"cores":args.cores},per_task=['accession'])
 
     ##crawl the data folder finding data files by globbing
     for dataset in vc.glob_dirs(args.data,**args.dataset):
@@ -31,14 +31,13 @@ def generate_array_job():
                 f.write_task({"accession":accession})
 
     #write file footer containing the qsub command required to launch this array job
-    jobname = 'fastqc'
-    f.write_qsub(jobname,args)
+    f.write_qsub('fastqc',args)
     f.close()
 
 def parse_args():
     '''
     parse command line arguments and optional json file containing more arguments
-    priority is command line options > last json file... > first json file > defaults
+    priority is command line options > last conf file... > first conf file > defaults
     '''
 
     parser = argparse.ArgumentParser(description='Generate qsub array job specification file for FastQC')
@@ -49,9 +48,7 @@ def parse_args():
     parser.add_argument('--subset',    type=json.loads, default={}, help='json string defining parameters for "subset" directory globbing')
     parser.add_argument('--accession', type=json.loads, default={}, help='json string defining parameters for "accession" directory globbing')
     vc.add_standard_args(parser) #add grid engine related arguments
-
-    #parser values including conf file(s)
-    args = vc.parse_and_load_conf(parser)
+    args = vc.parse_and_load_conf(parser) #add any parameters from conf file(s)
 
     return args
 

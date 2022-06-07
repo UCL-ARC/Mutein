@@ -1,0 +1,16 @@
+{
+	"data":"datasets",
+	"dataset":
+	{
+		"exclude": ["test$","metadata$"],
+        "include": ["keogh2018$"]
+	},
+	"subset":
+	{
+		"exclude": ["gatk_db$","metadata$"]
+	},
+	"accession":
+	{
+		"exclude": ["gatk_db$","metadata$"]
+	}
+}
