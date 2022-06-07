@@ -1,16 +1,8 @@
 {
-	"data":"datasets",
-	"dataset":
+	"datadir":"datasets",
+	"fileglob":
 	{
-		"exclude": ["test$","metadata$"],
-        "include": ["keogh2018$"]
-	},
-	"subset":
-	{
-		"exclude": ["gatk_db$","metadata$"]
-	},
-	"accession":
-	{
-		"exclude": ["gatk_db$","metadata$"]
+		"exclude": ["gatk_db","test","metadata"],
+        "include": ["keogh2018/SRP.*/SRR","yokoyama2019/EGAD.*/EGAF"]
 	}
 }

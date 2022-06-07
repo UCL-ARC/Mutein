@@ -2,6 +2,5 @@
     "time":"4:00:0",
     "mem":"6G",
     "tmpfs":"6G",
-    "cores":"1",
-    "reference": "references/GRCh38_noalt_withdecoys/GCA_000001405.15_GRCh38_no_alt_plus_hs38d1_analysis_set.fna.gz"
+    "cores":"1"
 }

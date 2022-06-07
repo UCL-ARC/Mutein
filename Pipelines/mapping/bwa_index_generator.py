@@ -31,7 +31,7 @@ def parse_args():
 
     parser = argparse.ArgumentParser(description='Generate qsub job specification file for indexing the reference sequence')
     parser.add_argument('--reference', type=str, help='path to the reference genome file which should be gzipped')
-    parser.add_argument('--out',       type=str, default='-',   help='file path to output array job spec to, - for stdout for debugging purposes')
+    parser.add_argument('--output',    type=str, default='-',   help='file path to output array job spec to, - for stdout for debugging purposes')
     vc.add_standard_args(parser) #add grid engine related arguments
     args = vc.parse_and_load_conf(parser)
 
