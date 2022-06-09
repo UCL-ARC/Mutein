@@ -48,6 +48,7 @@ def submit_arrayjob():
     get command from last line of file, insert an up to date timestamp
     submit the job to qsub
     '''
+    
     args = parse_args()
 
     task_count = count_tasks(args.taskfile,args.n_tasks)
@@ -55,27 +56,25 @@ def submit_arrayjob():
     assert os.path.exists(jobscript)
 
     env = generate_environment(args,task_count)
-
     cmd   = "qsub -cwd -V"
 
-    if args.logs != "none":
-        cmd += " -o '{args.logs}/$JOB_NAME.$TASK_ID.o' -e '{args.logs}/$JOB_NAME.$TASK_ID.e'"
-
     #add unique timestamp based id to jobname to avoid relying on JOBID
-    jobname_uid = vc.unique_id()
+    full_jobname = args.jobname + '-' + vc.unique_id()
 
-    cmd += " -N {args.jobname}-{jobname_uid} -t 1-{task_count}"
+    if args.logs != "none":
+        cmd += " -o {args.logs}/{full_jobname}.$TASK_ID.o"
+        cmd += " -e {args.logs}/{full_jobname}.$TASK_ID.e"
+
+    cmd += " -N {full_jobname} -t 1-{task_count}"
     cmd += " -l h_rt={args.time} -l mem={args.mem} -l tmpfs={args.tmpfs} -pe smp {args.cores}"
     cmd += " {jobscript}"
 
     #update the timestamp
     cmd = cmd.format(**locals())
 
-    print('\n'.join([key+'='+value for key,value in env.items()]) + '\n')
-    print(cmd)
-
     #issue the command, ensure no immediate error encountered
-    #subprocess.run(cmd.split(),check=True,env=env)
+    #note no subshell is invoked therefore no variable expansion of $TASK_ID etc
+    subprocess.run(cmd.split(),check=True,env=env)
 
 def parse_args():
     'get the filename of the array job specification file'

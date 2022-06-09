@@ -3,9 +3,6 @@
 set -eu
 source ~/.mutein_settings
 export SGE_TASK_ID
-TASKLIST=$1
-
-$(vc_extract_params --params "reference" --tasklist ${TASKLIST})
 
 conda activate ${MUT_PREFIX}bwa
 

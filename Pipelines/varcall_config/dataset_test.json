@@ -1,0 +1,8 @@
+{
+	"datadir":"datasets",
+	"fileglob":
+	{
+		"exclude": ["gatk_db","metadata"],
+        "include": ["test/subset1/sample1"]
+	}
+}

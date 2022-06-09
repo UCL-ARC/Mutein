@@ -260,20 +260,20 @@ def recursive_filtered_glob(curr_path,curr_depth,ops):
             elif ops["files"] and os.path.isfile(item):
                 yield item
 
-def single_file(path,depth=1,remove_base=False,include=[],exclude=[],include_files=[],exclude_files=[]):
-    return single_item(path,depth,False,True,remove_base,include,exclude,include_files,exclude_files)
+def single_file(path,depth=1,remove_base=False,allow_spaces=False,include=[],exclude=[],include_files=[],exclude_files=[]):
+    return single_item(path,depth,False,True,remove_base,allow_spaces,include,exclude,include_files,exclude_files)
 
-def single_dir(path,depth=1,remove_base=False,include=[],exclude=[],include_files=[],exclude_files=[]):
-    return single_dir(path,depth,True,False,remove_base,include,exclude,include_files,exclude_files)
+def single_dir(path,depth=1,remove_base=False,allow_spaces=False,include=[],exclude=[],include_files=[],exclude_files=[]):
+    return single_dir(path,depth,True,False,remove_base,allow_spaces,include,exclude,include_files,exclude_files)
 
-def single_item(path,depth=1,dirs=True,files=True,remove_base=False,include=[],exclude=[],include_files=[],exclude_files=[]):
+def single_item(path,depth=1,dirs=True,files=True,remove_base=False,allow_spaces=False,include=[],exclude=[],include_files=[],exclude_files=[]):
     '''
     convenience wrapper to glob_items returning a single item
     or raising exception for multiple hits
     '''
 
     hit = None
-    for item in glob_items(path,depth,dirs,files,remove_base,include,exclude,include_files,exclude_files):
+    for item in glob_items(path,depth,dirs,files,remove_base,allow_spaces,include,exclude,include_files,exclude_files):
         if hit != None:
             raise Exception('more than one matching item')
         else:
@@ -284,17 +284,17 @@ def single_item(path,depth=1,dirs=True,files=True,remove_base=False,include=[],e
 
     return hit
 
-def glob_files(path,depth=1,remove_base=False,include=[],exclude=[],include_files=[],exclude_files=[]):
+def glob_files(path,depth=1,remove_base=False,allow_spaces=False,include=[],exclude=[],include_files=[],exclude_files=[]):
     'convenience wrapper to glob_items returning only files'
-    for item in glob_items(path,depth,False,True,remove_base,include,exclude,include_files,exclude_files):
+    for item in glob_items(path,depth,False,True,remove_base,allow_spaces,include,exclude,include_files,exclude_files):
         yield item
 
-def glob_dirs(path,depth=1,remove_base=False,include=[],exclude=[],include_files=[],exclude_files=[]):
+def glob_dirs(path,depth=1,remove_base=False,allow_spaces=False,include=[],exclude=[],include_files=[],exclude_files=[]):
     'convenience wrapper to glob_items returning only dirs'
-    for item in glob_items(path,depth,True,False,remove_base,include,exclude,include_files,exclude_files):
+    for item in glob_items(path,depth,True,False,remove_base,allow_spaces,include,exclude,include_files,exclude_files):
         yield item
 
-def glob_items(path,depth=1,dirs=True,files=True,remove_base=False,
+def glob_items(path,depth=1,dirs=True,files=True,remove_base=False,allow_spaces=False,
                include=[],exclude=[],include_files=[],exclude_files=[]):
     '''
     glob items under a given path with optional recursion
@@ -326,8 +326,13 @@ def glob_items(path,depth=1,dirs=True,files=True,remove_base=False,
     for item in recursive_filtered_glob(path,1,ops):
         if remove_base == True:
             item = item[len(path)+1:]
+
+        item = os.path.normpath(item)
         
-        yield os.path.normpath(item)
+        if allow_spaces == False:
+            assert not ' ' in item,'space(s) found in filename {item}'.format(item)
+
+        yield item
 
 def list_dirs(path):
     '''
