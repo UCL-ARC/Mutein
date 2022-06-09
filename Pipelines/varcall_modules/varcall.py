@@ -12,6 +12,126 @@ from datetime import datetime
 #ensure random has been seeded from system urandom or time (is this already done by the import??)
 random.seed()
 
+class JobManifest:
+    '''
+    contains the per-job parameters (ie those that stay the same in value between tasks)
+    write a file containing the parameter names and values
+    and the task manifest filename
+    and a list of the jobs that can be launched
+    '''
+    def __init__(self,filename,jobname,args,task,fixed={}):
+        'open the output file, write the parameter names and values'
+        self.fixed = fixed
+        self.filename = filename
+
+        if self.filename == '-':
+            self.f = sys.stdout
+        else:
+            self.filename += '.job'
+            self.f = open(self.filename,'w')
+
+        self.f.write(json.dumps(self.fixed)+'\n')
+
+        task_count = task.n_tasks()
+        taskfile = task.get_filename()
+        jobscript = os.path.join(os.environ['MUT_TEMPLATE_DIR'],jobname+'.qsub')
+
+        cmd   = "TASKFILE='{taskfile}' SELECTFILE='{{selectfile}}'"
+        cmd  += " qsub -cwd -V"
+
+        if args.logs != "none":
+            cmd += " -o '{args.logs}/$JOB_NAME.$TASK_ID.o' -e '{args.logs}/$JOB_NAME.$TASK_ID.e'"
+
+        cmd += " -N {jobname}-{{jobname_uid}} -t 1-{task_count}"
+        cmd += " -l h_rt={args.time} -l mem={args.mem} -l tmpfs={args.tmpfs} -pe smp {args.cores}"
+        cmd += " {jobscript}"
+
+        self.job_list.append(cmd.format(**locals()))
+
+
+class TaskManifest:
+    '''
+    contains the per-task parameters (ie those that differ in value between tasks)
+    write a file containing a header of parameter names as a json list
+    and one line per task of an array job containing the corresponding parameter values
+    currently stored as csv style comma separated columns
+    '''
+    def __init__(self,filename,per_task=[]):
+        'open the output file, write the header of parameter names'
+        self.per_task = per_task
+        self.format = ','.join(['{%s}'%x for x in self.per_task])
+        self.task_count = 0
+        self.filename = filename
+
+        if self.filename == '-':
+            self.f = sys.stdout
+        else:
+            self.f = open(self.filename,'w')
+
+        self.f.write(json.dumps(self.per_task)+'\n')
+
+    def add_task(self,kwargs):
+        assert len(self.per_task) > 0, "no per-task parameters defined!"
+        self.f.write(self.format.format(**kwargs)+'\n')
+        self.task_count += 1
+
+    def get_filename(self):
+        return self.filename
+
+    # def add_job(self,name,args):
+    #     jobname = name
+
+    #     #find job script template
+    #     jobscript = os.path.join(os.environ['MUT_TEMPLATE_DIR'],name+'.qsub')
+
+    #     cmd  = "qsub -cwd -V"
+
+    #     if args.logs != "none":
+    #         cmd += " -o '{args.logs}/$JOB_NAME.$TASK_ID.o' -e '{args.logs}/$JOB_NAME.$TASK_ID.e'"
+
+    #     cmd += " -N {jobname}-{{jobname_uid}} -t 1-{self.tasks}"
+    #     cmd += " -l h_rt={args.time} -l mem={args.mem} -l tmpfs={args.tmpfs} -pe smp {args.cores}"
+    #     cmd += " {jobscript} {self.filename}"
+
+    #     self.job_list.append(cmd.format(**locals()))
+
+    def n_tasks(self):
+        'how many tasks defined so far'
+        return self.task_count
+
+    # def njobs(self):
+    #     'how many jobs defined so far'
+    #     return len(self.job_list)
+
+    def next_task_id(self):
+        '''
+        the number of the next task
+        ie the task number that will be created by the next call to write_task
+        '''
+        return self.ntasks()+1
+
+    # def write_manifest(self,filename):
+    #     if filename == '-':
+    #         self.f = sys.stdout
+    #     else:
+    #         sellf.f = open(filename,'w')
+
+    #     self.f.write(json.dumps({"jobs":len(self.job_list),"tasks":len(self.task_list)})+'\n')
+    #     for job in self.job_list: self.f.write(job + '\n')
+    #     self.f.write(json.dumps(fixed)+'\n') #fixed parameter names and values
+    #     self.f.write(json.dumps(self.per_task)+'\n') #names of per-task parameters
+    #     self.f.close()
+
+    def close(self):
+        self.f.close()
+        return self.task_count
+
+    # def __exit__(self,exception_type, exception_value, exception_traceback):
+    #     self.f.close()
+
+    # def __enter__(self):
+    #     return self
+
 def unique_id():
     'generate unique id based on microsecond timestamp and pseudo random number'
 
@@ -69,9 +189,18 @@ class JSON(argparse.Action):
         setattr(namespace, self.dest, json.loads(values))
 '''
 
+def add_conf_arg(parser):
+    'add the conf file option'
+    parser.add_argument('--conf',  action='append',         help='json file(s) defining additional parameters')
+    return parser
+
+def get_standard_args():
+    'keep this in sync with the options in add_standard_args'
+    return ['mem','time','cores','tmpfs','logs']
+
 def add_standard_args(parser):
     '''
-    add common job scheduler related parameters to the command line argument list
+    add job scheduler related parameters to the command line argument list
     intended to be generic, but based on grid engine
     '''
 
@@ -80,64 +209,7 @@ def add_standard_args(parser):
     parser.add_argument('--cores', type=str, default='1',        help='cores')
     parser.add_argument('--tmpfs', type=str, default='10G',      help='tmpfs space <integer>[M,G,T]')
     parser.add_argument('--logs',  type=str, default='logs',     help='path to write stdout and stderr log files to, "none" to rely on default behaviour')
-    parser.add_argument('--conf',  action='append',         help='json file(s) defining additional parameters')
     return parser
-
-class ArrayJob:
-    def __init__(self,filename,fixed={},per_task=[]):
-        self.tasks = 0
-        self.filename = filename
-        self.per_task = per_task #list of per-task parameter names
-
-        if self.filename == '-':
-            self.f = sys.stdout
-        else:
-            self.f = open(self.filename,'w')
-
-        self.f.write(json.dumps(fixed)+'\n') #fixed parameter names and values
-        self.f.write(json.dumps(self.per_task)+'\n') #names of per-task parameters
-        self.format = ','.join(['{%s}'%x for x in self.per_task]) #how the values will be written
-
-    def write_task(self,kwargs):
-        assert len(self.per_task) > 0, "no per-task parameters defined!"
-        self.f.write(self.format.format(**kwargs)+'\n') #write per-task values
-        self.tasks += 1 #count of total number of tasks defined so far
-
-    def write_qsub(self,name,args):
-        jobname = name
-        jobscript = os.path.join(os.environ['MUT_TEMPLATE_DIR'],name+'.qsub')
-
-        cmd  = "qsub -cwd -V"
-
-        if args.logs != "none":
-            cmd += " -o {args.logs}/\$JOB_NAME.\$TASK_ID.o -e {args.logs}/\$JOB_NAME.\$TASK_ID.e"
-
-        cmd += " -N {jobname}-{{jobname_uid}} -t 1-{self.tasks}"
-        cmd += " -l h_rt={args.time} -l mem={args.mem} -l tmpfs={args.tmpfs} -pe smp {args.cores}"
-        cmd += " {jobscript} {self.filename}"
-
-        self.f.write(cmd.format(**locals()) + '\n')
-
-    def ntasks(self):
-        'how many tasks defined so far'
-        return self.tasks
-
-    def next_task_id(self):
-        '''
-        the number of the next task
-        ie the task number that will be created by the next call to write_task
-        '''
-        return self.tasks+1
-
-    def close(self):
-        self.f.close()
-        return self.tasks
-
-    def __exit__(self,exception_type, exception_value, exception_traceback):
-        self.f.close()
-
-    def __enter__(self):
-        return self
 
 def exclude_item(item,ops):
     '''

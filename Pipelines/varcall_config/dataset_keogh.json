@@ -1,0 +1,8 @@
+{
+	"datadir":"datasets",
+	"fileglob":
+	{
+		"exclude": ["gatk_db","test","metadata"],
+        "include": ["keogh2018/SRP.*/SRR"]
+	}
+}

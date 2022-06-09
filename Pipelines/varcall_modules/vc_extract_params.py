@@ -42,6 +42,7 @@ def extract_params():
 
     #find the per-task parameters if present
     if len(header) > 0:
+        #skip to relevant line
         for i in range(taskid): line = f.readline()
         tokens = line.strip().split(',')
         assert len(header) == len(tokens)
