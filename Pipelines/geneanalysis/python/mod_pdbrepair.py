@@ -22,6 +22,8 @@ from os.path import exists
 # import from the shared library in Mutein/Pipelines/shared/lib
 import sys
 
+from Pipelines.libs import Pdb
+
 dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
 retpath = "/".join(dirs) + "/libs"
 sys.path.append(retpath)
@@ -30,6 +32,7 @@ import Arguments
 import Config
 import Foldx
 import FileDf
+import AA
 
 
 def run_pipeline(args):
@@ -55,7 +58,8 @@ def run_pipeline(args):
         pdb=pdbcode,
     )
 
-    repair_path = pdb_path.pdb_thruputs + "repair" + str(argus.arg("repairs")) + "/"
+    repair_path = pdb_path.pdb_thruputs + "repair" + "/"
+    repair_from = str(argus.arg("repair_from","x"))
     argus.addConfig({"repair_path": repair_path})
     pdb_path.goto_job_dir(repair_path, args, argus.params, "_inputs01")
     ############################################
@@ -63,74 +67,126 @@ def run_pipeline(args):
     # Set up files (retain copy of original)
     numRepairs = int(argus.arg("repairs"))
     repair_alreadynames = []
-    found = False
-    startRep = numRepairs
+    found = True
+    mostRecentRep = 1
     base_pdbfile = pdb_path.pdb_inputs + "/" + pdbfile
-    while not found and startRep > 0:        
-        name = pdb_path.pdb_inputs + "/" + pdbcode + "_rep" + str(startRep) + ".pdb"
+    # find all the existing repair files
+    while found:        
+        name = repair_path + pdbcode + "_" + str(mostRecentRep) + ".pdb"
+        #name = pdb_path.pdb_inputs + "/" + pdbcode + "_rep" + str(mostRecentRep) + ".pdb"
         if exists(name):
             found = True
-            base_pdbfile = name
+            base_pdbfile = name                
+            mostRecentRep += 1
         else:
-            startRep -= 1
+            mostRecentRep -=1
+            found = False
 
-    repairinnames = []
-    repairoutnames = []
-    for r in range(numRepairs + 1):
-        repairinnames.append(pdbcode + "_" + str(r) + ".pdb")
-        repairoutnames.append(pdbcode + "_" + str(r) + "_Repair.pdb")
+    # We are going to start rebuilding as effieciently as possibly from the most recent unless we specifically want to redo
+    startRep = mostRecentRep
+    if repair_from.lower() != "x":
+        startRep = int(repair_from)        
+        if startRep > mostRecentRep:            
+            startRep = mostRecentRep            
+        base_pdbfile = repair_path + pdbcode + "_" + str(startRep) + ".pdb"
 
-    repairinnames[numRepairs] = pdbcode + "_rep" + str(numRepairs) + ".pdb"
+    #repairinnames = []
+    #repairoutnames = []
+    #repairnextnames = []
+    #for r in range(startRep,numRepairs):
+    #    repairinnames.append(pdbcode + "_" + str(r) + ".pdb")
+    #    repairoutnames.append(pdbcode + "_" + str(r) + "_Repair.pdb")
+        #repairnextnames.append(pdbcode + "_" + str(r+1) + ".pdb")
+
+    #repairinnames[numRepairs] = pdbcode + "_rep" + str(numRepairs) + ".pdb"
     #### there are 2 files we need in the interim directory, pdb file rotabase, but rotabase is only needed for foldx4 and NOT needed for foldx5
-    print(
-        "### foldx03: ... copying file",
-        base_pdbfile,
-        pdb_path.pdb_inputs + "/" + repairinnames[startRep],
-        "... ###",
-    )
-
-    # first establish which we are currently on
-
-    copyfile(
-        base_pdbfile,
-        repair_path + repairinnames[startRep],
-    )
+    if startRep == 0:    
+        base_pdbfile = pdb_path.pdb_inputs + "/" + pdbfile
+        print(
+            "### foldx03: ... copying file",
+            base_pdbfile,
+            pdb_path.pdb_inputs + "/" + pdbcode + "_0.pdb"            
+        )
+        copyfile(
+            base_pdbfile,
+            repair_path + pdbcode + "_0.pdb"
+        )
 
     # Create Foldx class
     fx_runner = Foldx.Foldx(argus.arg("foldxe"))
     print("Starting repairs from", startRep, "and creating a repair for", numRepairs)
     # Run desired number of repairs
+    num_repairs_applied = 0
+    lastgoodrepair = numRepairs
     for r in range(startRep, numRepairs):
-        pdb = repairinnames[r]
+        pdb = pdbcode + "_" + str(r) + ".pdb"
         output_file = "repair_" + str(r) + ".txt"
         fx_runner.runRepair(pdb, output_file)
+        return_pdb = pdbcode + "_" + str(r) + "_Repair.pdb"
+        rename_pdb = pdbcode + "_" + str(r+1) + ".pdb"
 
         print(
             "### foldx03:  ... copying file",
-            argus.arg("repair_path") + repairoutnames[r],
-            argus.arg("repair_path") + repairinnames[r + 1],
+            repair_path + return_pdb,
+            repair_path + rename_pdb
         )
-        copyfile(repairoutnames[r], repairinnames[r + 1])
-
-    # copy the final repaired file to our main interim directory
-    print(
-        "### ... copying file",
-        argus.arg("repair_path") + repairinnames[numRepairs],
-        pdb_path.pdb_thruputs + "/" + repairinnames[numRepairs],
-    )
-    copyfile(
-        argus.arg("repair_path") + repairinnames[numRepairs],
-        pdb_path.pdb_thruputs + "/" + repairinnames[numRepairs].lower(),
-    )
-    print(
-        "### ... copying file",
-        pdb_path.pdb_thruputs + "/" + repairinnames[numRepairs].lower(),
-        pdb_path.pdb_inputs + "/" + repairinnames[numRepairs].lower(),
-    )
-    copyfile(
-        pdb_path.pdb_thruputs + "/" + repairinnames[numRepairs].lower(),
-        pdb_path.pdb_inputs + "/" + repairinnames[numRepairs].lower(),
-    )
+        copyfile(repair_path+return_pdb, repair_path+rename_pdb)
+        # After every repair check that all the variants exists, if not the last version was our best and we should stop
+        filename = pdb_path.pdb_thruputs + "params_variants.txt"
+        all_variants_exists = True
+        pdbobj = Pdb.PdbFile(pdbcode, repair_path + rename_pdb)
+        pdbobj.addVariants(filename)
+        if pdbobj.existsVariants():            
+            all_variants_exists = pdbobj.containsAllVariant()
+            
+            if not all_variants_exists:
+                lastgoodrepair = r-1
+                break
+            num_repairs_applied += 1
+        else:
+            num_repairs_applied += 1
+                                
+    
+    # only copy anything if we have been through a loop at all otherwise we have done nothing
+    copy_over = True
+    if num_repairs_applied == 0:
+        # still copy the good file through if it is good
+        filename = pdb_path.pdb_thruputs + "params_variants.txt"
+        last_good_pdb = pdbcode + "_" + str(lastgoodrepair) + ".pdb"
+        all_variants_exists = True
+        pdbobj = Pdb.PdbFile(pdbcode, last_good_pdb)
+        pdbobj.addVariants(filename)
+        if pdbobj.existsVariants():            
+            all_variants_exists = pdbobj.containsAllVariant()
+            if not all_variants_exists:
+                copy_over = False    
+    if copy_over:
+        # copy the final repaired file to our main interim directory
+        last_good_pdb = pdbcode + "_" + str(lastgoodrepair) + ".pdb"
+        save_pdb = pdbcode + "_rep" + str(lastgoodrepair) + ".pdb"
+        save_latest_pdb = pdbcode + "_repx.pdb"
+        
+        print(
+            "### ... copying file",
+            repair_path + last_good_pdb,
+            pdb_path.pdb_thruputs + save_pdb,
+        )
+        copyfile(
+            repair_path + last_good_pdb,
+            pdb_path.pdb_thruputs + "/" + save_pdb
+        )
+        print(
+            "### ... copying best file",
+            repair_path + last_good_pdb,
+            pdb_path.pdb_thruputs + save_latest_pdb,
+        )
+        copyfile(
+            repair_path + last_good_pdb,
+            pdb_path.pdb_thruputs + "/" + save_latest_pdb
+        )
+    else:
+        print("No repair changes have been made")
+    
 
     print("### COMPLETED FoldX repair job ###")
     print("MUTEIN SCRIPT ENDED")

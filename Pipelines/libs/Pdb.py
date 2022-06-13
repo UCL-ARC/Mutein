@@ -5,10 +5,15 @@ Class to manage the data associated with a pdb file specifically for a gene
 
 """
 import os
+from os.path import exists
 from urllib.request import urlretrieve
 import Bio.PDB as bio
 import warnings
 from Bio import BiopythonWarning
+
+import FileDf
+import AA
+
 
 warnings.simplefilter("ignore", BiopythonWarning)
 
@@ -148,3 +153,66 @@ class Pdb:
     def getAlphaFoldLink(self):
         af_path = "https://alphafold.ebi.ac.uk/files/" + self.pdbcode + ".pdb"
         return af_path
+
+class PdbFile:
+    def __init__(self,pdbcode,filepath):                    
+        self.pdbcode = pdbcode
+        self.filepath = filepath
+        self.lines = []
+
+        if exists(self.filepath):            
+            with open(self.filepath) as rf:
+                self.lines = rf.readlines()                
+        
+        self.variants = []
+
+    def addVariants(self,variant_file):
+        if exists(variant_file):
+            fdf = FileDf.FileDf(variant_file, sep=" ")
+            csv = fdf.openDataFrame()                        
+            pdb_muts = csv["pdb_mut"]
+            all_muts = []
+            for pmut in pdb_muts:
+                muts = pmut.split(",")
+                for mut in muts:
+                    all_muts.append(mut)
+
+    def existsVariants(self):
+        return len(self.variants) > 0
+    
+    def isCaOnly(self):
+        no_ca = False
+        for line in self.lines:
+            line = line.strip()
+            if len(line > 15):
+                if line[0:3] == "ATOM":
+                    if "CA" not in line:
+                        no_ca = True
+        return not no_ca
+
+    def containsAllVariant(self):
+        aa_conv = AA.AA()
+        contains_all = True
+        for mut in self.variants:
+            a = mut[0]
+            aaa = aa_conv.convert(a)
+            rid = mut[2:-1]
+            chain = mut[1]
+            string_match = aaa + " " + chain
+            if int(rid) < 10:
+                string_match += "   "
+            elif int(rid) < 100:
+                string_match += "  "
+            elif int(rid) < 1000:
+                string_match += " "
+            string_match += rid
+            this_variant = False
+            for line in self.lines:
+                line = line.strip()
+                if string_match in line:
+                    this_variant = True
+            if not this_variant:
+                contains_all = False
+        return contains_all
+
+
