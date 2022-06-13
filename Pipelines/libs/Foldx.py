@@ -241,10 +241,16 @@ class Foldx:
         # firs if the pdb_muts' 3rd charavter is a number then convert it to 3 code AA
         for i in range(len(pdb_muts)):
             pdb_mut = pdb_muts[i]
-            if pdb_mut[2].isnumeric():
+            a = pdb_mut[0]
+            ch = pdb_mut[1]
+            rid = pdb_mut[2:-1]
+            try:
+                rid = int(rid)            
                 a_from = pdb_mut[0]
                 aaa_from = self.AA.convert(a_from)
                 pdb_muts[i] = aaa_from + pdb_mut[1:]
+            except:
+                pass
 
         mut_dic = {}
         print(pdb_muts)
