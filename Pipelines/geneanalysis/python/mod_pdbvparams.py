@@ -50,7 +50,7 @@ def run_pipeline(args):
         pdb=pdbcode,
     )
     work_path = pdb_path.pdb_thruputs + "vparams/"
-    pdb_path.goto_job_dir(work_path, args, argus.params, "_inputs05")
+    pdb_path.goto_job_dir(work_path, args, argus.params, "_inputs05")    
     ############################################
     variant = argus.arg("variant")
     # chainid = argus.arg("chain")

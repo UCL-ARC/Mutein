@@ -46,6 +46,7 @@ def run_pipeline(args):
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
     pdb = argus.arg("pdb", "")
+    repairs = str(argus.arg("repairs", "x"))
 
     task = int(argus.arg("task"))
 
@@ -75,7 +76,7 @@ def run_pipeline(args):
         task = argus.arg("task", "none")
         mutation_string = argus.arg("mutation", "none")
         ############################################
-        pdbfile = pdbcode + "_rep" + str(argus.arg("repairs")) + ".pdb"
+        pdbfile = pdbcode + "_rep" + repairs + ".pdb"
         mutations = []
         # task=all means all, task=1:n means an explicit row, row=-1 means the mutation string has been passd in explicitly
         if mutation_string == "none":
@@ -115,7 +116,7 @@ def run_pipeline(args):
 
             #### TEMPORARILY DO BOTH POSCAN AND BUILD #####################
             fx_runner = Foldx.Foldx(argus.arg("foldxe"))
-            pdb = pdbcode + "_rep" + str(argus.arg("repairs"))
+            pdb = pdbcode + "_rep" + repairs
             filename = pdb_path.pdb_inputs + "Coverage.csv"
             if exists(filename):
                 fdfp = FileDf.FileDf(filename)

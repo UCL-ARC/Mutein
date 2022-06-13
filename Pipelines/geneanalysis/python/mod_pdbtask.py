@@ -48,6 +48,7 @@ def run_pipeline(args):
     task = int(argus.arg("task", "0"))
     pdb = argus.arg("pdb", "")
     missing = argus.arg("missing", "N")
+    repairs = str(argus.arg("repairs", "x"))
 
     if task == 0:
         print("No task entered")
@@ -80,8 +81,8 @@ def run_pipeline(args):
             # argus.addConfig(pdb_config.params)
             mutation_string = argus.arg("mutation", "none")
             ############################################
-            pdbfile = pdbcode + "_rep" + str(argus.arg("repairs")) + ".pdb"
-            pdbname = pdbcode + "_rep" + str(argus.arg("repairs"))
+            pdbfile = pdbcode + "_rep" + repairs + ".pdb"
+            pdbname = pdbcode + "_rep" + repairs
             mutations = []
             # task=all means all, task=1:n means an explicit row, row=-1 means the mutation string has been passd in explicitly
             if mutation_string == "none":
@@ -166,7 +167,7 @@ def run_pipeline(args):
                     ###########################################################################
                     fx_runner.runPosscan(pdbfile, mut)
                     ###########################################################################
-                    pdb = pdbcode + "_rep" + str(argus.arg("repairs"))
+                    pdb = pdbcode + "_rep" + repairs
                     # pass in the coverage to annotate the csv file
                     filename = pdb_path.pdb_inputs + "Coverage.csv"
                     ddg_file = row_path + "PS_" + pdb + "_scanning_output.txt"
