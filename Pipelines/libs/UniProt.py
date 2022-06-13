@@ -76,7 +76,12 @@ class UniProt:
             if len(segments) > 0:
                 onep = Pdb.Pdb(self.gene, pdb.lower(), method, reso)
                 onep.segments = segments
-                pdb_list.append(onep)
+                # check it is not CA only
+                pdb_fl = Pdb.PdbFile(pdb.lower(),pdb_file)
+                if not pdb_fl.isCaOnly():
+                    pdb_list.append(onep)
+                else:
+                    print("CA only pdb file",pdb_file)
 
         df = fd_pdb.saveAsDf()
 

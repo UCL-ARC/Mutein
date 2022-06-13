@@ -181,14 +181,17 @@ class PdbFile:
         return len(self.variants) > 0
     
     def isCaOnly(self):
-        no_ca = False
+        if self.pdbcode == "1pet":
+            bk = "yes"
+        ca = True
         for line in self.lines:
             line = line.strip()
-            if len(line > 15):
-                if line[0:3] == "ATOM":
+            if len(line) > 15:
+                atm = line[0:4]
+                if atm.upper() == "ATOM":
                     if "CA" not in line:
-                        no_ca = True
-        return not no_ca
+                        ca = False                
+        return ca
 
     def containsAllVariant(self):
         aa_conv = AA.AA()
