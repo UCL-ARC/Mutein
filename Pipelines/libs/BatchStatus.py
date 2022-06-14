@@ -45,7 +45,7 @@ class BatchStatus:
                     geneo = line.strip().split(",")[1]
                     patho = Paths.Paths(self.data_dir, self.pipe_dir, dataset=dataset, gene=geneo)
                     filenameA = patho.outputs + "ddg_bm_background.csv"
-                    line_string = "geneo\t"
+                    line_string = geneo+"\t"
                     existsfile, time = self.checkFile(filenameA)
                     if existsfile:
                         line_string += time + "\t"
