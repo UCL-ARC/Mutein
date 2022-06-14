@@ -167,7 +167,7 @@ class BatchStatus:
         '''
         return ""
     
-    def completedPdbTaskFiles(self,pdb,gene,isvariant):
+    def completedPdbTaskFiles(self,gene,pdb,isvariant):
         '''
         returns if it is completed and the filestamp
         '''
