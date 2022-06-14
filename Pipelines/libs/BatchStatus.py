@@ -178,6 +178,7 @@ class BatchStatus:
         existso, timeo = self.checkFile(filenameo)
         count = 0
         lasttime = ""                  
+        msg = ""
         if existso:                            
             with open(filenameo, "r") as fr:
                 lines = fr.readlines()
