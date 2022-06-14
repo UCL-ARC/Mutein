@@ -97,11 +97,11 @@ class BatchStatus:
                     var_split = patho.thruputs + "params_variants.txt"                     
                     var_results = patho.outputs + "ddg_buildmodel.csv"                     
                                                                       
-                    existsfileA, timeResA = self.checkResult(pdb_file)
-                    existsfileB, timeResB = self.checkResult(bg_split)
-                    existsfileC, timeResC = self.checkResult(bg_results)
-                    existsfileD, timeResD = self.checkResult(var_split)
-                    existsfileE, timeResE = self.checkResult(var_results)
+                    existsfileA, timeResA = self.checkFile(pdb_file)
+                    existsfileB, timeResB = self.checkFile(bg_split)
+                    existsfileC, timeResC = self.checkFile(bg_results)
+                    existsfileD, timeResD = self.checkFile(var_split)
+                    existsfileE, timeResE = self.checkFile(var_results)
 
                     pdb_line = pdbo + "\t\t"                    
                     if existsfileA:
