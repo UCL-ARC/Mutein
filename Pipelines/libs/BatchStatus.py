@@ -60,11 +60,74 @@ class BatchStatus:
                     print(line_string)
         else:
             print("Gene has not been prepped")
-            print("Run: Submit pdb prepare")
+            print("TODO: Submit pdb prepare")
         return ""
 
     def getGeneProgressReport(self,gene):
-        gene_path = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset,gene=gene)
+        gene_path = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset,gene=gene)                        
+        filenameA = gene_path.outputs + "ddg_bm_background.csv"
+        filenameB = gene_path.outputs + "ddg_variant_bm.csv"        
+        existsfileA, timeA = self.checkFile(filenameA)
+        existsfileB, timeB = self.checkFile(filenameB)
+        print("SUMMARY BACKGROUND\t\tSUMMARY VARIANTS")
+        print("------------------\t\t-----------------")
+        exists_string = ""
+        if existsfileA:
+            exists_string += timeA + "\t\t"
+        else:
+            exists_string += "  ----  \t\t"
+        if existsfileB:
+            exists_string += timeB + "\t\t"
+        else:
+            exists_string += "  ----  \t\t"
+        print(exists_string)        
+        print("")        
+        filename = gene_path.outputs + "pdb_tasklist.csv"
+        if exists(filename):
+            print("PDB\t\tBG SPLIT\t\tBG TASKS\t\tVAR SPLIT\t\tVAR TASKS")
+            with open(filename, "r") as fr:
+                lines = fr.readlines()
+                for ln in lines[1:]:
+                    pdbo = ln.strip().split(",")[2]
+                    patho = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset, gene=gene, pdb=pdbo)
+                    
+                    pdb_file = patho.inputs + pdbo.lower() + "_repx.pdb"
+                    bg_split = patho.thruputs + "params_background.txt"
+                    bg_results = patho.outputs + "ddg_background.csv"
+                    var_split = patho.thruputs + "params_variants.txt"                     
+                    var_results = patho.outputs + "ddg_buildmodel.csv"                     
+                                                                      
+                    existsfileA, timeResA = self.checkResult(pdb_file)
+                    existsfileB, timeResB = self.checkResult(bg_split)
+                    existsfileC, timeResC = self.checkResult(bg_results)
+                    existsfileD, timeResD = self.checkResult(var_split)
+                    existsfileE, timeResE = self.checkResult(var_results)
+
+                    pdb_line = pdbo + "\t\t"                    
+                    if existsfileA:
+                        msg += timeResA + "\t\t"
+                    else:
+                        msg += " ---- \t\t"
+                    if existsfileB:
+                        msg += timeResB + "\t\t"
+                    else:
+                        msg += " ---- \t\t"
+                    if existsfileC:
+                        msg += timeResC + "\t\t"
+                    else:
+                        msg += " ---- \t\t"
+                    if existsfileD:
+                        msg += timeResD + "\t\t"
+                    else:
+                        msg += " ---- \t\t"
+                    if existsfileE:
+                        msg += timeResE + "\t\t"
+                    else:
+                        msg += " ---- \t\t"
+                        
+        else:
+            print("The pdbs have not been prepared")
+            print("TODO: Submit pdb prepare")
         return ""
     
     def getPdbProgressReport(self,gene,pdb):
@@ -77,10 +140,11 @@ class BatchStatus:
         '''
         return ""
     
-    def existsPdbFile(self,pdb):
+    def existsPdbFile(self,gene,pdb):
         '''
         returns if it is completed and the filestamp
         '''
+        pdb_path = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset,gene=gene,pdb=pdb)
         return ""
 
     def existsGeneSplitFiles(self,gene):
@@ -89,7 +153,7 @@ class BatchStatus:
         '''
         return ""
     
-    def existsSplitFile(self,pdb):
+    def existsSplitFile(self,gene,pdb):
         '''
         returns if it is completed and the filestamp
         '''
@@ -102,7 +166,7 @@ class BatchStatus:
         '''
         return ""
     
-    def completedPdbTaskFiles(self,pdb,isvariant):
+    def completedPdbTaskFiles(self,gene,pdb,isvariant):
         '''
         returns if it is completed and the filestamp
         '''

@@ -83,35 +83,11 @@ def run_pipeline(args):
     print("")
     if mode == "GENES":
         batch_stat = BatchStatus.BatchStatus(DataDir, PipelineDir,dataset,"","")
-        batch_stat.createReport()
-        """
-        dataset_gene_pdb = pattern.split(":")
-        dataset, gene, pdb = (
-            dataset_gene_pdb[0],
-            dataset_gene_pdb[1],
-            dataset_gene_pdb[2],
-        )
-        path = Paths.Paths(DataDir, PipelineDir, dataset=dataset)
-        filename = path.inputs + "genes_pdb_list.csv"
-        print("\nCheck genes list\n")
-        if exists(filename):
-            with open(filename, "r") as fr:
-                lines = fr.readlines()
-                for line in lines[1:]:
-                    geneo = line.strip().split(",")[1]
-                    patho = Paths.Paths(
-                        DataDir, PipelineDir, dataset=dataset, gene=geneo
-                    )
-                    filenameA = patho.outputs + "ddg_bm_background.csv"
-                    existsfile, time = checkResult(filenameA)
-                    if existsfile:
-                        print(geneo, time)
-                    else:
-                        print(geneo, "---")
-        else:
-            print("The dataset has not been prepared - no genes list", filename)
-        """
+        batch_stat.createReport()        
     elif mode == "PDBS":
+        batch_stat = BatchStatus.BatchStatus(DataDir, PipelineDir,dataset,gene,"")
+        batch_stat.createReport()        
+        """
         dataset_gene_pdb = pattern.split(":")
         dataset, gene, pdb = (
             dataset_gene_pdb[0],
@@ -189,6 +165,7 @@ def run_pipeline(args):
                     print(msg)
         else:
             print("The pdbs have not been prepared - no pdb list", filename)
+        """
     elif mode == "PDB":
         dataset_gene_pdb = pattern.split(":")
         dataset, gene, pdb = (
