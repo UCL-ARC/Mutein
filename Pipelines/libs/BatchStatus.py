@@ -211,9 +211,9 @@ class BatchStatus:
                         print("Task", str(i), "at", time)
                     else:
                         print("Task", str(i), "----")
-            print("---------------------------------------------------")
+            print("------------------")
             print("Completed", count, "out of", len(lines) - 1)
-            print("---------------------------------------------------")
+            print("------------------")
             print("")
         
         if filenameE:
@@ -229,9 +229,9 @@ class BatchStatus:
                         print("Task", str(i), "at", time)
                     else:
                         print("Task", str(i), "----")
-            print("---------------------------------------------------")
+            print("------------------")
             print("Completed", count, "out of", len(lines) - 1)
-            print("---------------------------------------------------")
+            print("------------------")
 
         
 
