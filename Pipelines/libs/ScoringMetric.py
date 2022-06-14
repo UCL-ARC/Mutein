@@ -31,7 +31,7 @@ class ScoringMetric:
                 if src == "SMHOM":
                     metric = 0.5
                 elif src == "AF":
-                    metric = 0.1
+                    metric = 0.01
                 elif src == "EXP" and "x-ray" in mth:
                     metric = 1 * 2/5/float(res)            
                 metric *= float(cov) * 1000
