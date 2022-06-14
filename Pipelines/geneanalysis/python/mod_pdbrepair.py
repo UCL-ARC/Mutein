@@ -175,6 +175,10 @@ def run_pipeline(args):
             repair_path + last_good_pdb,
             pdb_path.pdb_thruputs + "/" + save_pdb
         )
+        copyfile(
+            repair_path + last_good_pdb,
+            pdb_path.pdb_inputs + "/" + save_pdb
+        )
         print(
             "### ... copying best file",
             repair_path + last_good_pdb,
@@ -183,6 +187,10 @@ def run_pipeline(args):
         copyfile(
             repair_path + last_good_pdb,
             pdb_path.pdb_thruputs + "/" + save_latest_pdb
+        )
+        copyfile(
+            repair_path + last_good_pdb,
+            pdb_path.pdb_inputs + "/" + save_latest_pdb
         )
     else:
         print("No repair changes have been made")

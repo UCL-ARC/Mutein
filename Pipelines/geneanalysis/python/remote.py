@@ -125,7 +125,7 @@ def run_pipeline(args):
                     )
                     filenameRes = patho.outputs + "ddg_background.csv"
                     fileNameSplit = patho.thruputs + "params_background.txt"
-                    filenamePdb = patho.inputs + pdbo.lower() + "_rep10.pdb"
+                    filenamePdb = patho.inputs + pdbo.lower() + "_repx.pdb"
                     existsfileRes, timeRes = checkResult(filenameRes)
                     existsfileSplit, timeSplit = checkResult(fileNameSplit)
                     existsfilePdb, timePdb = checkResult(filenamePdb)
@@ -191,13 +191,13 @@ def run_pipeline(args):
         checkResults(filenameA, filenameB)
 
         # check the pdb
-        filenamePdb = path.inputs + pdb + "_rep10.pdb"
+        filenamePdb = path.inputs + pdb + "_repx.pdb"
         existsPdb, time = checkResult(filenamePdb)
         print("\nChecking the pdb repair", filenamePdb)
         if existsPdb:
-            print("...PDB 10 repair at", time)
+            print("...PDB X repair at", time)
         else:
-            print("...PDB 10 repair has not been done")
+            print("...PDB X repair has not been done")
         # Check the background
         filenameP = path.thruputs + "params_background.txt"
         existsP, time = checkResult(filenameP)
