@@ -105,25 +105,26 @@ class BatchStatus:
 
                     pdb_line = pdbo + "\t\t"                    
                     if existsfileA:
-                        msg += timeResA + "\t\t"
+                        pdb_line += timeResA + "\t\t"
                     else:
-                        msg += " ---- \t\t"
+                        pdb_line += " ---- \t\t"
                     if existsfileB:
-                        msg += timeResB + "\t\t"
+                        pdb_line += timeResB + "\t\t"
                     else:
-                        msg += " ---- \t\t"
+                        pdb_line += " ---- \t\t"
                     if existsfileC:
-                        msg += timeResC + "\t\t"
+                        pdb_line += timeResC + "\t\t"
                     else:
-                        msg += " ---- \t\t"
+                        pdb_line += " ---- \t\t"
                     if existsfileD:
-                        msg += timeResD + "\t\t"
+                        pdb_line += timeResD + "\t\t"
                     else:
-                        msg += " ---- \t\t"
+                        pdb_line += " ---- \t\t"
                     if existsfileE:
-                        msg += timeResE + "\t\t"
+                        pdb_line += timeResE + "\t\t"
                     else:
-                        msg += " ---- \t\t"
+                        pdb_line += " ---- \t\t"
+                    print(pdb_line)
                         
         else:
             print("The pdbs have not been prepared")
