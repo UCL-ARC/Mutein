@@ -70,6 +70,13 @@ def run_pipeline(args):
     InstallDir = args[5]
     PipelineDir = args[6]
 
+    dataset_gene_pdb = pattern.split(":")
+    dataset, gene, pdb = (
+            dataset_gene_pdb[0],
+            dataset_gene_pdb[1],
+            dataset_gene_pdb[2],
+        )
+
     batch_stat = BatchStatus.BatchStatus(DataDir, PipelineDir,dataset,gene,pdb)
     
     print("Mode=", mode)
