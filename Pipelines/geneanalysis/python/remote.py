@@ -26,6 +26,7 @@ sys.path.append(retpath)
 
 import Arguments
 import Paths
+import BatchStatus
 from os import listdir
 from os.path import isfile, join
 import os
@@ -69,10 +70,14 @@ def run_pipeline(args):
     InstallDir = args[5]
     PipelineDir = args[6]
 
+    batch_stat = BatchStatus.BatchStatus(DataDir, PipelineDir,dataset,gene,pdb)
+    
     print("Mode=", mode)
     print("Pattern=", pattern)
     print("")
     if mode == "GENES":
+        batch_stat.createReport()
+        """
         dataset_gene_pdb = pattern.split(":")
         dataset, gene, pdb = (
             dataset_gene_pdb[0],
@@ -98,6 +103,7 @@ def run_pipeline(args):
                         print(geneo, "---")
         else:
             print("The dataset has not been prepared - no genes list", filename)
+        """
     elif mode == "PDBS":
         dataset_gene_pdb = pattern.split(":")
         dataset, gene, pdb = (
@@ -170,7 +176,7 @@ def run_pipeline(args):
                         msg += " "
                     msg += "\t"
                     if existsfilePdb:
-                        msg += "Pdb(10)@" + str(timePdb)
+                        msg += "Pdb@" + str(timePdb)
                     else:
                         msg += "No pdb"
                     print(msg)
