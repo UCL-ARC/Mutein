@@ -36,8 +36,8 @@ class BatchStatus:
     def createDatasetProgressReport(self,dataset):
         ds_path = Paths.Paths(self.data_dir, self.pipe_dir, dataset=dataset)                
         filename = ds_path.inputs + "genes_pdb_list.csv"        
-        print("GENE    \tBACKGROUND\tVARIANTS")
-        print("________\t___________\t________")
+        print("GENE      \tBACKGROUND  \tVARIANTS  ")
+        print("----------\t----------\t----------")
         if exists(filename):
             with open(filename, "r") as fr:
                 lines = fr.readlines()
