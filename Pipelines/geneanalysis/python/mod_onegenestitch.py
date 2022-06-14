@@ -24,6 +24,7 @@ import Arguments
 import Config
 import Analysis
 import FileDf
+import ScoringMetric
 
 
 def run_pipeline(args):
@@ -90,8 +91,11 @@ def run_pipeline(args):
             exists_all_back = False
         
 
+    metric = ScoringMetric.ScoringMetric(gene_path,dataset,gene)
     if exists_all_back:        
         ddg_df_back_bm = pd.concat(all_back_bm, ignore_index=True)
+        ddg_df_back_bm['pdb'] = ddg_df_back_bm.apply(lambda row: metric.cutPdb(row['pdb']), axis=1)
+        ddg_df_back_bm['metric'] = ddg_df_back_bm.apply(lambda row: metric.getScore(row['pdb']), axis=1)        
         ddg_df_back_bm.to_csv(gene_path.gene_outputs + "ddg_bm_background.csv", index=False)
         # DB Coverage reports
         plot_file = gene_path.gene_outputs + "ALL_coverage.png"
@@ -101,7 +105,9 @@ def run_pipeline(args):
         print("Gene stitch: not all pdb background files present for aggregation")
 
     if exists_all_var:        
-        ddg_df_var_build = pd.concat(all_var_build, ignore_index=True)        
+        ddg_df_var_build = pd.concat(all_var_build, ignore_index=True)
+        ddg_df_var_build['pdb'] = ddg_df_var_build.apply(lambda row: metric.cutPdb(row['pdb']), axis=1)
+        ddg_df_var_build['metric'] = ddg_df_var_build.apply(lambda row: metric.getScore(row['pdb']), axis=1)
         ddg_df_var_build.to_csv(
             gene_path.gene_outputs + "ddg_variant_bm.csv", index=False
         )
