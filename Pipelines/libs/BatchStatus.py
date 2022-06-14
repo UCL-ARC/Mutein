@@ -26,11 +26,11 @@ class BatchStatus:
                         
     def createReport(self):
         if self.pdb != "" and self.pdb.lower() != "x":
-            return self.getPdbProgresReport(self.pdb)
+            return self.getPdbProgressReport(self.pdb)
         elif self.gene != "" and self.gene.lower() != "x":
-            return self.getGeneProgresReport(self.gene)
+            return self.getGeneProgressReport(self.gene)
         else:
-            return self.getDatasetProgresReport(self.dataset)
+            return self.createDatasetProgressReport(self.dataset)
 
 
     def createDatasetProgressReport(self,dataset):
