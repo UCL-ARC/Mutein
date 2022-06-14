@@ -178,7 +178,7 @@ class BatchStatus:
         existso, timeo = self.checkFile(filenameo)
         count = 0
         lasttime = ""                  
-        msg = ""
+        msg = ""        
         if existso:                            
             with open(filenameo, "r") as fr:
                 lines = fr.readlines()
@@ -192,9 +192,9 @@ class BatchStatus:
                         count += 1
                         lasttime = timet                                  
         
-        msg += str(count) + "/" + str(numtasks)        
-        if count > 0:
-            msg += "@" + str(lasttime)
+            msg += str(count) + "/" + str(numtasks)        
+            if count > 0:
+                msg += "@" + str(lasttime)
         
         return msg
 
