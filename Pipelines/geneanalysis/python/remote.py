@@ -82,7 +82,7 @@ def run_pipeline(args):
     print("Pattern=", pattern)
     print("")
     if mode == "GENES":
-        batch_stat = BatchStatus.BatchStatus(DataDir, PipelineDir,dataset)
+        batch_stat = BatchStatus.BatchStatus(DataDir, PipelineDir,dataset,"","")
         batch_stat.createReport()
         """
         dataset_gene_pdb = pattern.split(":")
