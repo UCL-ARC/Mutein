@@ -84,7 +84,7 @@ class BatchStatus:
         print("")        
         filename = gene_path.outputs + "pdb_tasklist.csv"
         if exists(filename):
-            print("PDB\t\tBG SPLIT\t\tBG TASKS\t\tVAR SPLIT\t\tVAR TASKS")
+            print("PDB\t\tPDB REPAIR\t\tBG SPLIT\t\tBG TASKS\t\tVAR SPLIT\t\tVAR TASKS")
             with open(filename, "r") as fr:
                 lines = fr.readlines()
                 for ln in lines[1:]:
