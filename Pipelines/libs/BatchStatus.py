@@ -111,21 +111,23 @@ class BatchStatus:
                     if existsfileB:
                         pdb_line += timeResB + "\t\t"
                     else:
-                        pdb_line += " ---- \t\t"
-                    msgC,tmC = self.completedPdbTaskFiles(gene,pdbo,False)
+                        pdb_line += " ---- \t\t"                    
                     if existsfileC:
-                        pdb_line += timeResC + " (" + msgC +")\t\t"
+                        numC = self.getPdbNumTasks(gene,pdbo,False)
+                        pdb_line += timeResC + "(" + numC +")\t\t"
                     else:
-                        pdb_line += msgC + " (" + tmC +")\t\t"
+                        msgC,tmC = self.completedPdbTaskFiles(gene,pdbo,False)
+                        pdb_line += msgC + "(" + tmC +")\t\t"
                     if existsfileD:
                         pdb_line += timeResD + "\t\t"
                     else:
-                        pdb_line += " ---- \t\t"
-                    msgE,tmE = self.completedPdbTaskFiles(gene,pdbo,True)
+                        pdb_line += " ---- \t\t"                    
                     if existsfileE:
-                        pdb_line += timeResE + " (" + msgE +")\t\t"
+                        numE = self.getPdbNumTasks(gene,pdbo,True)
+                        pdb_line += timeResE + "(" + numE +")\t\t"
                     else:
-                        pdb_line += msgE + " (" + tmE +")\t\t"
+                        msgE,tmE = self.completedPdbTaskFiles(gene,pdbo,True)
+                        pdb_line += msgE + "(" + tmE +")\t\t"
                     print(pdb_line)
                         
         else:
@@ -133,6 +135,19 @@ class BatchStatus:
             print("TODO: Submit pdb prepare")
         return ""
     
+    def getPdbNumTasks(self,gene,pdb,isvariant):
+        pdb_path = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset,gene=gene,pdb=pdb)
+        filenameo = pdb_path.thruputs + "params_background.txt"
+        if isvariant:
+            filenameo = pdb_path.thruputs + "params_variants.txt"
+        existso, timeo = self.checkFile(filenameo)        
+        numtasks = ""
+        if existso:                            
+            with open(filenameo, "r") as fr:
+                lines = fr.readlines()
+                numtasks = str(len(lines)-1)
+        return numtasks
+
     def getPdbProgressReport(self,gene,pdb):
         pdb_path = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset,gene=gene,pdb=pdb)
         return ""
