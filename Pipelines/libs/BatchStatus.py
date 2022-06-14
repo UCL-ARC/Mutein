@@ -115,7 +115,7 @@ class BatchStatus:
                     if existsfileC:
                         pdb_line += timeResC + "\t\t"
                     else:
-                        pdb_line += " ---- \t\t"
+                        pdb_line += self.completedPdbTaskFiles(gene,pdbo,False) +  "\t\t"
                     if existsfileD:
                         pdb_line += timeResD + "\t\t"
                     else:
@@ -123,7 +123,7 @@ class BatchStatus:
                     if existsfileE:
                         pdb_line += timeResE + "\t\t"
                     else:
-                        pdb_line += " ---- \t\t"
+                        pdb_line += self.completedPdbTaskFiles(gene,pdbo,True) +  "\t\t"
                     print(pdb_line)
                         
         else:
@@ -167,11 +167,35 @@ class BatchStatus:
         '''
         return ""
     
-    def completedPdbTaskFiles(self,gene,pdb,isvariant):
+    def completedPdbTaskFiles(self,pdb,gene,isvariant):
         '''
         returns if it is completed and the filestamp
         '''
-        return ""
+        pdb_path = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset,gene=gene,pdb=pdb)
+        filenameo = pdb_path.thruputs + "params_background.txt"
+        if isvariant:
+            filenameo = pdb_path.thruputs + "params_variants.txt"
+        existso, timeo = self.checkFile(filenameo)
+        count = 0
+        lasttime = ""                  
+        if existso:                            
+            with open(filenameo, "r") as fr:
+                lines = fr.readlines()
+                numtasks = len(lines) - 1                                                                
+                for i in range(1, len(lines)):
+                    filenameoo = pdb_path.thruputs + "agg/" + str(i) + "_ddg_background.csv"
+                    if isvariant:
+                        filenameoo = pdb_path.thruputs + "vagg/" + str(i) + "_ddg_buildmodel.csv"
+                    existst, timet = self.checkFile(filenameoo)
+                    if existst:
+                        count += 1
+                        lasttime = timet                                  
+        
+        msg += str(count) + "/" + str(numtasks)        
+        if count > 0:
+            msg += "@" + str(lasttime)
+        
+        return msg
 
     def completedGeneResultsFiles(self,gene,isvariant):
         '''
