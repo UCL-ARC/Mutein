@@ -199,6 +199,7 @@ class BatchStatus:
             print("TODO Submit splits prepare")
                 
         if filenameD:
+            count = 0
             print("------------- Background tasks -------------")
             with open(filenameD, "r") as fr:
                 lines = fr.readlines()                                
@@ -213,6 +214,7 @@ class BatchStatus:
             print("Completed", count, "out of", len(lines) - 1)
         
         if filenameE:
+            count = 0
             print("------------- Variant tasks -------------")
             with open(filenameE, "r") as fr:
                 lines = fr.readlines()                                
