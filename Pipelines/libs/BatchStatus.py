@@ -112,18 +112,20 @@ class BatchStatus:
                         pdb_line += timeResB + "\t\t"
                     else:
                         pdb_line += " ---- \t\t"
+                    msgC,tmC = self.completedPdbTaskFiles(gene,pdbo,False)
                     if existsfileC:
-                        pdb_line += timeResC + "\t\t"
+                        pdb_line += timeResC + " (" + msgC +")\t\t"
                     else:
-                        pdb_line += self.completedPdbTaskFiles(gene,pdbo,False) +  "\t\t"
+                        pdb_line += msgC + " (" + tmC +")\t\t"
                     if existsfileD:
                         pdb_line += timeResD + "\t\t"
                     else:
                         pdb_line += " ---- \t\t"
+                    msgE,tmE = self.completedPdbTaskFiles(gene,pdbo,True)
                     if existsfileE:
-                        pdb_line += timeResE + "\t\t"
+                        pdb_line += timeResE + " (" + msgE +")\t\t"
                     else:
-                        pdb_line += self.completedPdbTaskFiles(gene,pdbo,True) +  "\t\t"
+                        pdb_line += msgE + " (" + tmE +")\t\t"
                     print(pdb_line)
                         
         else:
@@ -193,10 +195,8 @@ class BatchStatus:
                         lasttime = timet                                  
         
             msg += str(count) + "/" + str(numtasks)        
-            if count > 0:
-                msg += "@" + str(lasttime)
-        
-        return msg
+                    
+        return msg,lasttime
 
     def completedGeneResultsFiles(self,gene,isvariant):
         '''
