@@ -84,7 +84,7 @@ class BatchStatus:
         print("")        
         filename = gene_path.outputs + "pdb_tasklist.csv"
         if exists(filename):
-            print("PDB\t\tPDB REPAIR\t\tBG SPLIT\t\tBG TASKS\tBG TIME\t\tVAR SPLIT\t\tVAR TASKS\tVAR TIME")
+            print("PDB\t\tPDB REPAIR\t\tBG SPLIT\t\tBG TASKS\t\tVAR SPLIT\t\tVAR TASKS")
             with open(filename, "r") as fr:
                 lines = fr.readlines()
                 for ln in lines[1:]:
@@ -114,24 +114,24 @@ class BatchStatus:
                         pdb_line += " ---- \t\t"                    
                     if existsfileC:
                         numC = self.getPdbNumTasks(gene,pdbo,False)
-                        pdb_line += numC+"\t"
+                        #pdb_line += numC+"\t\t"
                         pdb_line += timeResC+"\t\t"
                     else:
                         msgC,tmC = self.completedPdbTaskFiles(gene,pdbo,False)
-                        pdb_line += msgC + "\t"
-                        pdb_line += tmC + "\t\t"
+                        pdb_line += msgC + "\t\t"
+                        #pdb_line += tmC + "\t\t"
                     if existsfileD:
                         pdb_line += timeResD + "\t\t"
                     else:
                         pdb_line += " ---- \t\t"                    
                     if existsfileE:
                         numE = self.getPdbNumTasks(gene,pdbo,True)
-                        pdb_line += numE+"\t"
+                        #pdb_line += numE+"\t\t"
                         pdb_line += timeResE+"\t\t"
                     else:
                         msgE,tmE = self.completedPdbTaskFiles(gene,pdbo,True)
-                        pdb_line += msgE + "\t"
-                        pdb_line += tmE + "\t\t"
+                        pdb_line += msgE + "\t\t"
+                        #pdb_line += tmE + "\t\t"
                     print(pdb_line)
                         
         else:
