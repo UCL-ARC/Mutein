@@ -86,87 +86,11 @@ def run_pipeline(args):
         batch_stat.createReport()        
     elif mode == "PDBS":
         batch_stat = BatchStatus.BatchStatus(DataDir, PipelineDir,dataset,gene,"")
-        batch_stat.createReport()        
-        """
-        dataset_gene_pdb = pattern.split(":")
-        dataset, gene, pdb = (
-            dataset_gene_pdb[0],
-            dataset_gene_pdb[1],
-            dataset_gene_pdb[2],
-        )
-        path = Paths.Paths(DataDir, PipelineDir, dataset=dataset, gene=gene)
-
-        print("Check results files for gene")
-        print(path.outputs)
-        filenameA = path.outputs + "ddg_bm_background.csv"
-        filenameB = path.outputs + "ddg_variant_bm.csv"        
-        checkResults(filenameA, filenameB)
-
-        print("\nCheck pdb list\n")
-        filename = path.outputs + "pdb_tasklist.csv"
-        if exists(filename):
-            with open(filename, "r") as fr:
-                lines = fr.readlines()
-                for ln in lines[1:]:
-                    pdbo = ln.strip().split(",")[2]
-                    patho = Paths.Paths(
-                        DataDir, PipelineDir, dataset=dataset, gene=gene, pdb=pdbo
-                    )
-                    filenameRes = patho.outputs + "ddg_background.csv"
-                    fileNameSplit = patho.thruputs + "params_background.txt"
-                    filenamePdb = patho.inputs + pdbo.lower() + "_repx.pdb"
-                    existsfileRes, timeRes = checkResult(filenameRes)
-                    existsfileSplit, timeSplit = checkResult(fileNameSplit)
-                    existsfilePdb, timePdb = checkResult(filenamePdb)
-                    msg = pdbo
-                    while len(msg) < 25:
-                        msg += " "
-                    msg += "\t"
-                    if existsfileRes:
-                        msg += "Results       @" + str(timeRes)
-                    else:
-                        # then find how many individual tasks have completed
-                        filenameo = patho.thruputs + "params_background.txt"
-                        existso, timeo = checkResult(filenameo)
-                        count = 0
-                        lasttime = ""                  
-                        if existso:                            
-                            with open(filenameo, "r") as fr:
-                                lines = fr.readlines()
-                                numtasks = len(lines) - 1                                                                
-                                for i in range(1, len(lines)):
-                                    filenameoo = patho.thruputs + "agg/" + str(i) + "_ddg_background.csv"
-                                    existst, timet = checkResult(filenameoo)
-                                    if existst:
-                                        count += 1
-                                        lasttime = timet
-                        #if count > 0:                            
-                        msg += "Tasks:" + str(count) + "/" + str(numtasks)
-                        while len(msg) < 40:
-                            msg += " "
-                        if count > 0:
-                            msg += "@" + str(lasttime)
-                        #else:
-                        #    msg += "No Results"
-                    while len(msg) < 55:
-                        msg += " "
-                    msg += "\t"
-                    if existsfileSplit:
-                        msg += "Split@" + str(timeSplit) + "\t"
-                    else:
-                        msg += "No split\t\t\t\t"
-                    while len(msg) < 75:
-                        msg += " "
-                    msg += "\t"
-                    if existsfilePdb:
-                        msg += "Pdb@" + str(timePdb)
-                    else:
-                        msg += "No pdb"
-                    print(msg)
-        else:
-            print("The pdbs have not been prepared - no pdb list", filename)
-        """
+        batch_stat.createReport()              
     elif mode == "PDB":
+        batch_stat = BatchStatus.BatchStatus(DataDir, PipelineDir,dataset,gene,pdb)
+        batch_stat.createReport()              
+        """
         dataset_gene_pdb = pattern.split(":")
         dataset, gene, pdb = (
             dataset_gene_pdb[0],
@@ -234,6 +158,7 @@ def run_pipeline(args):
             print(
                 "Missing variants file, the data needs preparation, or there are none"
             )
+        """
     elif mode == "PDBINCOMPLETE":
         dataset_gene_pdb = pattern.split(":")
         dataset, gene, pdb = (

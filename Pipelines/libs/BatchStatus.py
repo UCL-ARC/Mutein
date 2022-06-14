@@ -153,8 +153,82 @@ class BatchStatus:
         return numtasks
 
     def getPdbProgressReport(self,gene,pdb):
-        pdb_path = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset,gene=gene,pdb=pdb)
-        return ""
+        pdb_path = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset,gene=gene,pdb=pdb)                        
+        filenameA = pdb_path.thruputs + pdb + "_repx.pdb"
+        filenameB = pdb_path.outputs + "ddg_background.csv"
+        filenameC = pdb_path.outputs + "ddg_buildmodel.csv"                        
+        filenameD = pdb_path.thruputs + "params_background.txt"
+        filenameE = pdb_path.thruputs + "params_variants.txt"
+        
+        existsfileA, timeA = self.checkFile(filenameA)
+        existsfileB, timeB = self.checkFile(filenameB)
+        existsfileC, timeC = self.checkFile(filenameC)
+        existsfileD, timeD = self.checkFile(filenameD)
+        existsfileE, timeE = self.checkFile(filenameE)
+                
+        print("PDB REPAIR\t\tPDB BACKGROUND\t\tPDB VARIANTS\t\tBG SPLIT\t\tVAR SPLIT")
+        print("-----------\t\t--------------\t\t------------")
+        exists_string = ""
+        if existsfileA:
+            exists_string += timeA + "\t\t"
+        else:
+            exists_string += "  ----  \t\t"
+        if existsfileB:
+            exists_string += timeB + "\t\t"
+        else:
+            exists_string += "  ----  \t\t"
+        if existsfileC:
+            exists_string += timeC + "\t\t"
+        else:
+            exists_string += "  ----  \t\t"
+        if existsfileD:
+            exists_string += timeD + "\t\t"
+        else:
+            exists_string += "  ----  \t\t"
+        if existsfileE:
+            exists_string += timeE + "\t\t"
+        else:
+            exists_string += "  ----  \t\t"
+        print(exists_string)        
+        print("")     
+
+        if not existsfileA:
+            print("TODO Submit repair")
+        
+        if not existsfileD or not existsfileE:
+            print("TODO Submit splits prepare")
+                
+        if filenameD:
+            print("------------- Background tasks -------------")
+            with open(filenameD, "r") as fr:
+                lines = fr.readlines()                                
+                for i in range(1, len(lines)):
+                    filenameo = pdb_path.thruputs + "agg/" + str(i) + "_ddg_background.csv"
+                    existsfile, time = self.checkFile(filenameo)
+                    if existsfile:
+                        count += 1
+                        print("Task", str(i), "at", time)
+                    else:
+                        print("Task", str(i), "----")
+            print("Completed", count, "out of", len(lines) - 1)
+        
+        if filenameE:
+            print("------------- Variant tasks -------------")
+            with open(filenameE, "r") as fr:
+                lines = fr.readlines()                                
+                for i in range(1, len(lines)):
+                    filenameo = pdb_path.thruputs + "vagg/" + str(i) + "_ddg_buildmodel.csv"
+                    existsfile, time = self.checkFile(filenameo)
+                    if existsfile:
+                        count += 1
+                        print("Task", str(i), "at", time)
+                    else:
+                        print("Task", str(i), "----")
+            print("Completed", count, "out of", len(lines) - 1)
+
+        
+
+        
     
     def existsGenePdbFiles(self,gene):
         '''
