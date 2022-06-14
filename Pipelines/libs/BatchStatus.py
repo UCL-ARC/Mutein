@@ -16,7 +16,7 @@ import pathlib
 from datetime import datetime
 
 
-class BatchMaker:
+class BatchStatus:
     def __init__(self, data_dir,pipe_dir,dataset, gene, pdb):
         self.dataset = dataset
         self.gene=gene
