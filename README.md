@@ -4,4 +4,10 @@ RSDG project for [Ben Hall](https://iris.ucl.ac.uk/iris/browse/profile?upi=BHALL
 
 This is a research project to reanalyse multiple existing [datasets](https://github.com/UCL/Mutein/issues?q=is%3Aissue+label%3Adataset) from publications, aiming to understand the effects of mutations on protein structure, and through that to ultimately understand the proteins' functions and interactions. The datasets are DNA sequence data, including target capture of specific gene sets, whole exome capture and whole genome capture, from studies looking at diseased and normal tissue from various tissue types.
 
-####
+The project will essentially scale up and improve upon what has already been done in individual papers on single datasets by Ben and/or other lab members or collaborators (such as in [Fowler et al 2021](https://github.com/UCL/Mutein/issues/54), and produce a well documented, maintainable pipeline that Hall lab members can reuse or build on in the future.
+
+The data are being downloaded and processed on UCL's [Myriad](https://www.rc.ucl.ac.uk/docs/Clusters/Myriad/) HPC.
+
+#### Data Analysis Pipelines
+The data analysis process involves cloning this repository, installing the required dependencies, then running the appropriate scripts. Due to various sources of unreliability it not generally feasible to run the entire pipeline from start to finish in a fully automated fashion
+
