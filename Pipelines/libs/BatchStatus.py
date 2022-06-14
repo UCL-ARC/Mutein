@@ -91,7 +91,7 @@ class BatchStatus:
                     pdbo = ln.strip().split(",")[2]
                     patho = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset, gene=gene, pdb=pdbo)
                     
-                    pdb_file = patho.inputs + pdbo.lower() + "_repx.pdb"
+                    pdb_file = patho.thruputs + pdbo.lower() + "_repx.pdb"
                     bg_split = patho.thruputs + "params_background.txt"
                     bg_results = patho.outputs + "ddg_background.csv"
                     var_split = patho.thruputs + "params_variants.txt"                     
