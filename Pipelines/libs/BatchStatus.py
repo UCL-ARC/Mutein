@@ -167,7 +167,7 @@ class BatchStatus:
         existsfileE, timeE = self.checkFile(filenameE)
                 
         print("PDB REPAIR\t\tPDB BACKGROUND\t\tPDB VARIANTS\t\tBG SPLIT\t\tVAR SPLIT")
-        print("-----------\t\t--------------\t\t------------")
+        print("-----------\t\t--------------\t\t------------\t\t---------\t\t---------")
         exists_string = ""
         if existsfileA:
             exists_string += timeA + "\t\t"
@@ -211,7 +211,10 @@ class BatchStatus:
                         print("Task", str(i), "at", time)
                     else:
                         print("Task", str(i), "----")
+            print("---------------------------------------------------")
             print("Completed", count, "out of", len(lines) - 1)
+            print("---------------------------------------------------")
+            print("")
         
         if filenameE:
             count = 0
@@ -226,7 +229,9 @@ class BatchStatus:
                         print("Task", str(i), "at", time)
                     else:
                         print("Task", str(i), "----")
+            print("---------------------------------------------------")
             print("Completed", count, "out of", len(lines) - 1)
+            print("---------------------------------------------------")
 
         
 
