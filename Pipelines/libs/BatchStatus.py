@@ -36,8 +36,8 @@ class BatchStatus:
     def createDatasetProgressReport(self,dataset):
         ds_path = Paths.Paths(self.data_dir, self.pipe_dir, dataset=dataset)                
         filename = ds_path.inputs + "genes_pdb_list.csv"        
-        print("GENE      \tBACKGROUND  \tVARIANTS  ")
-        print("----------\t----------\t----------")
+        print("GENE      \t\tBACKGROUND  \t\tVARIANTS  ")
+        print("----------\t\t----------\t\t----------")
         if exists(filename):
             with open(filename, "r") as fr:
                 lines = fr.readlines()
@@ -45,18 +45,18 @@ class BatchStatus:
                     geneo = line.strip().split(",")[1]
                     patho = Paths.Paths(self.data_dir, self.pipe_dir, dataset=dataset, gene=geneo)
                     filenameA = patho.outputs + "ddg_bm_background.csv"
-                    line_string = geneo+"\t"
+                    line_string = geneo+"\t\t"
                     existsfile, time = self.checkFile(filenameA)
                     if existsfile:
-                        line_string += time + "\t"
+                        line_string += time + "\t\t"
                     else:
-                        line_string += "----\t"
+                        line_string += "----\t\t"
                     filenameB = patho.outputs + "ddg_variant_bm.csv"
                     existsfile, time = self.checkFile(filenameB)
                     if existsfile:
-                        line_string += time + "\t"
+                        line_string += time + "\t\t"
                     else:
-                        line_string += "----\t"
+                        line_string += "----\t\t"
                     print(line_string)
         else:
             print("Gene has not been prepped")
