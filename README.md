@@ -9,5 +9,5 @@ The project will essentially scale up and improve upon what has already been don
 The data are being downloaded and processed on UCL's [Myriad](https://www.rc.ucl.ac.uk/docs/Clusters/Myriad/) HPC.
 
 #### Data Analysis Pipelines
-The data analysis process involves cloning this repository, installing the required dependencies, then running the appropriate scripts. Due to various sources of unreliability it not generally feasible to run the entire pipeline from start to finish in a fully automated fashion
+The data analysis process involves cloning this repository, installing the required dependencies, then running the appropriate scripts. Due to various sources of [unreliability](https://github.com/UCL/Mutein/issues/95) it probably not feasible to run absolutely the entire pipeline from start to finish in a fully automated fashion. Never the less it is a key aim to have all the analysis steps scripted and automated as far as possible, and to support the use of command line scripting to accomplish every step, due to the suitability of scripting for self documentation, automation, maintainability and scaleability, and to enhance the shareability and reproducibility of the entire analysis
 
