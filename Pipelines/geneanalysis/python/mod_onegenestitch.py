@@ -106,7 +106,10 @@ def run_pipeline(args):
     if exists_all_back:        
         ddg_df_back_bm = pd.concat(all_back_bm, ignore_index=True)
         ddg_df_back_bm['pdb'] = ddg_df_back_bm.apply(lambda row: metric.cutPdb(row['pdb']), axis=1)
-        ddg_df_back_bm['metric'] = ddg_df_back_bm.apply(lambda row: metric.getScore(row['pdb']), axis=1)        
+        ddg_df_back_bm['score'] = ddg_df_back_bm.apply(lambda row: metric.getScore(row['pdb'])[0], axis=1)
+        ddg_df_back_bm['method'] = ddg_df_back_bm.apply(lambda row: metric.getScore(row['pdb'])[1], axis=1)
+        ddg_df_back_bm['resolution'] = ddg_df_back_bm.apply(lambda row: metric.getScore(row['pdb'])[2], axis=1)
+        ddg_df_back_bm['coverage'] = ddg_df_back_bm.apply(lambda row: metric.getScore(row['pdb'])[3], axis=1)
         ddg_df_back_bm.to_csv(gene_path.gene_outputs + "ddg_bm_background.csv", index=False)
         # DB Coverage reports
         plot_file = gene_path.gene_outputs + "ALL_coverage.png"

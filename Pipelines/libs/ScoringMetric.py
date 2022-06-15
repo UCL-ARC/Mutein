@@ -18,7 +18,7 @@ class ScoringMetric:
         pdb_file = self.path.outputs + "Coverage_all.csv"
         fdf = FileDf.FileDf(pdb_file,header=True)
         self.df = fdf.openDataFrame()        
-        self.score_dict = {}        
+        self.score_dict = {}                
         for i in range(len(self.df.index)):
             try:
                 src = self.df["source"][i]
@@ -35,7 +35,7 @@ class ScoringMetric:
                 elif src == "EXP" and "x-ray" in mth:
                     metric = 1 * 2/5/float(res)            
                 metric *= float(cov) * 1000
-                self.score_dict[pdb.lower()] = round(metric,2)
+                self.score_dict[pdb.lower()] = [round(metric,2),mth,res,cov] #score,method,resolution.coverage
             except:
                 pass
         
