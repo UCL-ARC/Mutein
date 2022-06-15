@@ -78,7 +78,7 @@ def run_pipeline(args):
         )        
         
         
-        file_lst_var = pdb_path.pdb_thruputs + "params_variants.csv"
+        file_lst_var = pdb_path.pdb_thruputs + "params_variants.txt"
         file_var_bm = pdb_path.pdb_outputs + "ddg_buildmodel.csv"        
         file_back_bm = pdb_path.pdb_outputs + "ddg_background.csv"
         
