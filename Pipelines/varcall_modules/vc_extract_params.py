@@ -45,17 +45,16 @@ def extract_params():
             if count == taskid:
                 break
         assert count == taskid, "insufficient lines in the tasklist file"
-        tokens = line.strip().split(',')
-        assert len(header) == len(tokens)
+        values = line.strip().split(',')
+        assert len(header) == len(values)
 
         #per-task parameter values
         for i,key in enumerate(header):
-            value = tokens[i]
-            output.append('{key}={value}'.format(key=key,value=value))
+            output.append(f'{key}={values[i]}')
 
     f.close()
 
-    #set bash variables, assumes we are called using "$(vc_extract_params ...)"
+    #set bash variables, must be called using "$(vc_extract_params ...)"
     if len(output) > 0:
         print('export ' + ' '.join(output))
 

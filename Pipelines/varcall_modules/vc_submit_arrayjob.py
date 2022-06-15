@@ -25,10 +25,14 @@ def count_tasks(filename,n_tasks):
 
 def generate_environment(args,task_count):
     '''
-    add parameters to the job's environment using the "preamble" part of the bash command
+    populate a dictionary with the environment variables the job will require
+    this will be passed to the job via the subprocess.run env parameter
     '''
 
+    #clone the current environment
     env = os.environ.copy()
+
+    #add new variables
     env['vc_taskcount'] = str(task_count)
     for key,value in vars(args).items():
         if key in ['conf','jobname']:
@@ -36,7 +40,7 @@ def generate_environment(args,task_count):
             continue
         elif key in vc.get_standard_args()+['taskfile','selectfile']:
             #prefix these resource request values with vc_
-            #("time" etc seems a bit in risk of a name collision otherwise)
+            #("time" etc seems a bit in risk of a name collision otherwise!)
             env["vc_"+key] = value
         elif type(value) == str:
             #pass everything else through as is provided the value is a simple string
@@ -55,25 +59,25 @@ def submit_arrayjob():
     jobscript = os.path.join(os.environ['MUT_TEMPLATE_DIR'],args.jobname+'.qsub')
     assert os.path.exists(jobscript)
 
-    env = generate_environment(args,task_count)
-    cmd   = "qsub -cwd -V"
-
     #add unique timestamp based id to jobname to avoid relying on JOBID
     full_jobname = args.jobname + '-' + vc.unique_id()
 
-    if args.logs != "none":
-        cmd += " -o {args.logs}/{full_jobname}.$TASK_ID.o"
-        cmd += " -e {args.logs}/{full_jobname}.$TASK_ID.e"
+    env = generate_environment(args,task_count)
+    cmd   = "qsub -cwd -V"
 
-    cmd += " -N {full_jobname} -t 1-{task_count}"
-    cmd += " -l h_rt={args.time} -l mem={args.mem} -l tmpfs={args.tmpfs} -pe smp {args.cores}"
-    cmd += " {jobscript}"
+    if args.logs != "none":
+        cmd += f" -o {args.logs}/{full_jobname}.$TASK_ID.o"
+        cmd += f" -e {args.logs}/{full_jobname}.$TASK_ID.e"
+
+    cmd += f" -N {full_jobname} -t 1-{task_count}"
+    cmd += f" -l h_rt={args.time} -l mem={args.mem} -l tmpfs={args.tmpfs} -pe smp {args.cores}"
+    cmd += f" {jobscript}"
 
     #update the timestamp
-    cmd = cmd.format(**locals())
+    #cmd = cmd.format(**locals())
 
-    #issue the command, ensure no immediate error encountered
-    #note no subshell is invoked therefore no variable expansion of $TASK_ID etc
+    #issue the command, ensure no immediate error encountered (check=True)
+    #note no subshell is invoked therefore no variable expansion of $TASK_ID takes place
     subprocess.run(cmd.split(),check=True,env=env)
 
 def parse_args():

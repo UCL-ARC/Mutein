@@ -9,7 +9,8 @@ export MUT_DIR=~/repos/Mutein
 
 #which script to run and append output to bashrc to config conda
 ##export MUT_CONDA_SETUP=/shared/ucl/apps/miniconda/4.5.11/etc/profile.d/conda.sh
-export MUT_CONDA_SETUP=/home/${USER}/miniconda3/etc/profile.d/conda.sh
+#export MUT_CONDA_SETUP=/home/${USER}/miniconda3/etc/profile.d/conda.sh
+export MUT_CONDA_SETUP=/home/${USER}/mambaforge/etc/profile.d/conda.sh
 
 #generate a timestamp string each time these settings are loaded
 export TIMESTAMP=$(date +%Y%m%d%H%M%S)
