@@ -26,7 +26,7 @@ class ScoringMetric:
                 mth = self.df["method"][i]
                 res = self.df["resolution"][i]
                 cov = self.df["coverage"][i]
-                print(src,pdb,mth,res,cov)
+                #print(src,pdb,mth,res,cov)
                 metric = 0.8
                 if src == "SMHOM":
                     metric = 0.5

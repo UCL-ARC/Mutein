@@ -83,16 +83,16 @@ def run_pipeline(args):
         file_back_bm = pdb_path.pdb_outputs + "ddg_background.csv"
         
         if exists(file_lst_var):
-            fdf = FileDf.FileDf(file_var_bm)
-            lstvardf = fdf.openDataFrame()
-            if len(lstvardf.index) > 0:
-                if exists(file_var_bm):
+            if exists(file_var_bm):
+                fdf = FileDf.FileDf(file_var_bm)
+                lstvardf = fdf.openDataFrame()
+                if len(lstvardf.index) > 0:                
                     fdf = FileDf.FileDf(file_var_bm)
                     all_var_build.append(fdf.openDataFrame())
                 else:
-                    exists_all_var = False
+                    print("No variants to aggregate",gene,pdb)                    
             else:
-                print("No variants to aggregate",gene,pdb)
+                exists_all_var = False
         else:
             exists_all_var = False
         if exists(file_back_bm):
