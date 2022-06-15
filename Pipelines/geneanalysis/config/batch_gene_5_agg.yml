@@ -1,6 +1,6 @@
 ---
 id: 'AGG'
-qsub_id: 'foldx_agg'
+qsub_id: 'agg'
 pipe_dir: 'Pipelines/geneanalysis/python/'
 script: 'ga__runner'
 time: '1:00:0'

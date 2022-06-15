@@ -1,6 +1,6 @@
 ---
 id: 'TASKS'
-qsub_id: 'foldx_posscan'
+qsub_id: 'tasks'
 pipe_dir: 'Pipelines/geneanalysis/python/'
 script: 'ga__runner'
 time: '10:00:0'
@@ -12,7 +12,7 @@ inputs: "runs=f@repairs=x"
 active: 'Y'
 ---
 id: 'VTASKS'
-qsub_id: 'foldx_varscan'
+qsub_id: 'vtasks'
 pipe_dir: 'Pipelines/geneanalysis/python/'
 script: 'ga__runner'
 time: '10:00:0'
