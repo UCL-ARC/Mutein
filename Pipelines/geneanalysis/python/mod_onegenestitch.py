@@ -83,16 +83,16 @@ def run_pipeline(args):
         file_back_bm = pdb_path.pdb_outputs + "ddg_background.csv"
         
         if exists(file_lst_var):
-            if exists(file_var_bm):
-                fdf = FileDf.FileDf(file_var_bm)
-                lstvardf = fdf.openDataFrame()
-                if len(lstvardf.index) > 0:                
-                    fdf = FileDf.FileDf(file_var_bm)
-                    all_var_build.append(fdf.openDataFrame())
+            fdf = FileDf.FileDf(file_lst_var)
+            lstvardf = fdf.openDataFrame()
+            if len(lstvardf.index) > 0: 
+                if exists(file_var_bm):
+                    fdf = FileDf.FileDf(file_var_bm)                    
+                    all_var_build.append(fdf.openDataFrame())                
                 else:
-                    print("No variants to aggregate",gene,pdb)                    
+                    exists_all_var = False
             else:
-                exists_all_var = False
+                print("No variants to aggregate",gene,pdb)                    
         else:
             exists_all_var = False
         if exists(file_back_bm):
@@ -121,7 +121,10 @@ def run_pipeline(args):
     if exists_all_var:        
         ddg_df_var_build = pd.concat(all_var_build, ignore_index=True)
         ddg_df_var_build['pdb'] = ddg_df_var_build.apply(lambda row: metric.cutPdb(row['pdb']), axis=1)
-        ddg_df_var_build['metric'] = ddg_df_var_build.apply(lambda row: metric.getScore(row['pdb']), axis=1)
+        ddg_df_var_build['score'] = ddg_df_var_build.apply(lambda row: metric.getScore(row['pdb'])[0], axis=1)
+        ddg_df_var_build['method'] = ddg_df_var_build.apply(lambda row: metric.getScore(row['pdb'])[1], axis=1)
+        ddg_df_var_build['resolution'] = ddg_df_var_build.apply(lambda row: metric.getScore(row['pdb'])[2], axis=1)
+        ddg_df_var_build['coverage'] = ddg_df_var_build.apply(lambda row: metric.getScore(row['pdb'])[3], axis=1)
         ddg_df_var_build.to_csv(
             gene_path.gene_outputs + "ddg_variant_bm.csv", index=False
         )
