@@ -45,20 +45,12 @@ def binaryToDataFrame(binary):
     df.columns = cols                        
     return df
 
-def show_background(txtBox,txtDataset,txtGene,txtPdb,mode,tab,frame):    
-    #try: 
-    #    figure_canvas.get_tk_widget().pack_forget()
-    #    figure_canvas.destroy()
-    #    tab.destroy()
-    #    tab = tk.Frame(frame, width=50)
-    #    tab.pack(padx=5, pady=15, side=tk.TOP)    
-    #except: 
-    #    pass 
+def show_background(txtBox,txtDataset,txtGene,txtPdb,mode):        
     dataset = txtDataset.get().strip()
     gene = txtGene.get().strip()
     pdb = txtPdb.get().strip()
     if mode=="GENE":    
-        ret = rs.RunScript("PDB_BACK",dataset+":"+gene+":"+pdb)
+        ret = rs.RunScript("GENE_BACK",dataset+":"+gene+":"+pdb)
     else:
         ret = rs.RunScript(mode,dataset+":"+gene+":"+pdb)
     df = binaryToDataFrame(ret)
@@ -66,12 +58,29 @@ def show_background(txtBox,txtDataset,txtGene,txtPdb,mode,tab,frame):
     txtBox.insert(tk.END, df)        
     txtBox.insert(tk.END, "\n")    
     txtBox.insert(tk.END, ret)                                    
+
+def show_plots(txtBox,txtDataset,txtGene,txtPdb,mode):        
+    dataset = txtDataset.get().strip()
+    gene = txtGene.get().strip()
+    if mode == "PDB":
+        pdb = txtPdb.get().strip()
+    else:
+        pdb = ""
+    ret_back = rs.RunScript("PDB_BACK",dataset+":"+gene+":"+pdb)
+    ret_var = rs.RunScript("PDB_BM",dataset+":"+gene+":"+pdb)
+    df_back = binaryToDataFrame(ret_back)
+    df_var = binaryToDataFrame(ret_var)
+    ana = Analysis.Analysis(df_back,df_var,dataset+":"+gene+":"+pdb)
     
-    #ana = Analysis.Analysis(df)
-    #if mode=="GENE":
-    #    ana.createPdbSummary()
-    #elif mode=="PDB_BACK":
-    #    ana.createDdgBackResidue()
+    if mode == "PDB":
+        ana.createDdgBackRid()
+        ana.createDdgBackFromTo()
+        ana.histAllBackground()
+        ana.show()
+    else:
+        ana.createPdbSummary()        
+        ana.show()    
+    
     
     
     
@@ -129,16 +138,19 @@ class tabResults:
         text_pdb.insert(0, "1pb5")
 
                 
-        btnCOV = tk.Button(rhs, text="View gene coverage", command=partial(show_background,self.txtBox,text_dataset,text_gene,text_pdb,"GENE",frame,frameLHS),borderwidth=5, relief="groove",width=20,bg="goldenrod")
-        btnBG = tk.Button(rhs, text="View background ddg", command=partial(show_background,self.txtBox,text_dataset,text_gene,text_pdb,"PDB_BACK",frame,frameLHS),borderwidth=5, relief="groove",width=20,bg="goldenrod")
-        btnBM = tk.Button(rhs, text="View variant bm ddg", command=partial(show_background,self.txtBox,text_dataset,text_gene,text_pdb,"PDB_BM",frame,frameLHS),borderwidth=5, relief="groove",width=20,bg="goldenrod")
-        btnPS = tk.Button(rhs, text="View variant ps ddg", command=partial(show_background,self.txtBox,text_dataset,text_gene,text_pdb,"PDB_PS",frame,frameLHS),borderwidth=5, relief="groove",width=20,bg="goldenrod")
+        btnGene = tk.Button(rhs, text="Show Plots-Gene", command=partial(show_plots,self.txtBox,text_dataset,text_gene,text_pdb,"GENE"),borderwidth=5, relief="groove",width=20,bg="goldenrod")
+        btnPdb = tk.Button(rhs, text="Show Plots-Pdb", command=partial(show_plots,self.txtBox,text_dataset,text_gene,text_pdb,"PDB"),borderwidth=5, relief="groove",width=20,bg="goldenrod")
+        
+        btnBG = tk.Button(rhs, text="View background ddg", command=partial(show_background,self.txtBox,text_dataset,text_gene,text_pdb,"PDB_BACK"),borderwidth=5, relief="groove",width=20,bg="goldenrod")
+        btnBM = tk.Button(rhs, text="View variant ddg", command=partial(show_background,self.txtBox,text_dataset,text_gene,text_pdb,"PDB_BM"),borderwidth=5, relief="groove",width=20,bg="goldenrod")
+        
         
         header.grid(row=0,column=0, padx=2, pady=2,columnspan=3)
-        btnCOV.grid(row=1,column=0, padx=2, pady=2)                
+        btnGene.grid(row=1,column=0, padx=2, pady=2)                
+        btnPdb.grid(row=1,column=1, padx=2, pady=2)                
         btnBG.grid(row=2,column=0, padx=2, pady=2)                
         btnBM.grid(row=2,column=1, padx=2, pady=2)                
-        btnPS.grid(row=2,column=2, padx=2, pady=2)                
+        
         lblDataset.grid(row=3,column=0, padx=2, pady=2)    
         lblGene.grid(row=3,column=1, padx=2, pady=2)
         lblPdb.grid(row=3,column=2, padx=2, pady=2)        

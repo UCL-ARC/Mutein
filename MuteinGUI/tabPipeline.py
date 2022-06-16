@@ -95,6 +95,13 @@ def run_gene_agg(txtBox,txtDataset,txtGene,txtPdb):
     ret = rs.SubmitJob("GENE_AGG",dataset,gene,pdb)
     txtBox.delete(1.0,tk.END)
     txtBox.insert('end', ret)
+def run_pdb_pdb(txtBox,txtDataset,txtGene,txtPdb):        
+    dataset = txtDataset.get().strip()
+    gene = txtGene.get().strip()
+    pdb = txtPdb.get().strip()    
+    ret = rs.SubmitJob("PDB_PDB",dataset,gene,pdb)
+    txtBox.delete(1.0,tk.END)
+    txtBox.insert('end', ret)
 def run_pdb_rep(txtBox,txtDataset,txtGene,txtPdb):        
     dataset = txtDataset.get().strip()
     gene = txtGene.get().strip()
@@ -205,6 +212,7 @@ class tabPipeline:
         btnSubmit_gagg = tk.Button(rhs, text="Submit aggregation", command=partial(run_gene_agg,self.txtBox,text_dataset,text_gene,text_pdb),borderwidth=5, relief="groove",width=20, bg=clrMaybe)
 
         # Pipeline PDB
+        btnSubmit_pdbpdb = tk.Button(rhs, text="Download pdb", command=partial(run_pdb_pdb,self.txtBox,text_dataset,text_gene,text_pdb),borderwidth=5, relief="groove",width=20, bg=clrAlertAlert)
         btnSubmit_rep = tk.Button(rhs, text="Submit repair", command=partial(run_pdb_rep,self.txtBox,text_dataset,text_gene,text_pdb),borderwidth=5, relief="groove",width=20, bg=clrAlertAlert)
         btnSubmit_prep = tk.Button(rhs, text="Submit splits prepare", command=partial(run_pdb_split,self.txtBox,text_dataset,text_gene,text_pdb),borderwidth=5, relief="groove",width=20, bg=clrMaybe)
         btnSubmit_ptasks = tk.Button(rhs, text="Submit all tasks", command=partial(run_pdb_tasks,self.txtBox,text_dataset,text_gene,text_pdb),borderwidth=5, relief="groove",width=20, bg=clrAlert)
@@ -233,13 +241,14 @@ class tabPipeline:
         btnSubmit_dssplit.grid(row=7,column=0, padx=2, pady=2)
         btnSubmit_dstasks.grid(row=8,column=0, padx=2, pady=2)        
         btnSubmit_dsagg.grid(row=9,column=0, padx=2, pady=2)
-
+        
         btnSubmit_gppdbs.grid(row=5,column=1, padx=2, pady=2)
         btnSubmit_grep.grid(row=6,column=1, padx=2, pady=2)
         btnSubmit_gprep.grid(row=7,column=1, padx=2, pady=2)
         btnSubmit_gtasks.grid(row=8,column=1, padx=2, pady=2)
         btnSubmit_gagg.grid(row=9,column=1, padx=2, pady=2)
-        
+                
+        btnSubmit_pdbpdb.grid(row=5,column=2, padx=2, pady=2)
         btnSubmit_rep.grid(row=6,column=2, padx=2, pady=2)
         btnSubmit_prep.grid(row=7,column=2, padx=2, pady=2)
         btnSubmit_ptasks.grid(row=8,column=2, padx=2, pady=2)

@@ -92,6 +92,8 @@ def SubmitJob(command,dataset,gene,pdb):
         scriptname = pipeline_dir + "REMOTE_foldx_gene_split.sh"
     elif command == "GENE_AGG":
         scriptname = pipeline_dir + "REMOTE_foldx_gene_agg.sh"
+    elif command == "PDB_PDB":
+        scriptname = pipeline_dir + "REMOTE_foldx_pdb_pdb.sh"
     elif command == "PDB_REP":
         scriptname = pipeline_dir + "REMOTE_foldx_pdb_rep.sh"
     elif command == "PDB_SPLIT":
