@@ -1,7 +1,30 @@
-#edit this file and save as ~/.mutein_settings
+## ============ ONLY EDIT THIS SECTION ============
 
-#where the Mutein repo was checked out to
+#the Mutein repository folder
 export MUT_DIR=~/repos/Mutein
+
+#the Mutein data folder
+export MUT_DATA=~/549_mutein
+
+## ================================================
+
+## the following will not normally need to be changed
+
+#add Mutein scripts to the path
+export PATH=${MUT_DIR}/Pipelines/scripts:${PATH}
+
+#add Mutein python modules to PYTHONPATH
+export PYTHONPATH=${MUT_DIR}/Pipelines/varcall_modules:${PYTHONPATH}
+
+#set the snakemake profile folder
+export SNAKEMAKE_PROFILE=${MUT_DATA}/config
+
+#conda environment names prefix to reduce chances of namespace collisions
+export MUT_PREFIX=mutein_
+
+## ========== END OF CONFIG =======================
+
+## below is fossil junk retained for now in case they are needed again for reference
 
 #which module name to give to "module load" command
 #except we now install our own minicona to make sure it's up-to-date
@@ -10,34 +33,30 @@ export MUT_DIR=~/repos/Mutein
 #which script to run and append output to bashrc to config conda
 ##export MUT_CONDA_SETUP=/shared/ucl/apps/miniconda/4.5.11/etc/profile.d/conda.sh
 #export MUT_CONDA_SETUP=/home/${USER}/miniconda3/etc/profile.d/conda.sh
-export MUT_CONDA_SETUP=/home/${USER}/mambaforge/etc/profile.d/conda.sh
+#export MUT_CONDA_SETUP=/home/${USER}/mambaforge/etc/profile.d/conda.sh
 
 #generate a timestamp string each time these settings are loaded
-export TIMESTAMP=$(date +%Y%m%d%H%M%S)
+#export TIMESTAMP=$(date +%Y%m%d%H%M%S)
 
 #make myriad's "module" function available (alternative to using #!/bin/bash -l)
-source /etc/profile.d/modules.sh
+#source /etc/profile.d/modules.sh
 
 #make sure conda commands are available
-source ${MUT_CONDA_SETUP}
+#source ${MUT_CONDA_SETUP}
 
-#add Mutein scripts to the path
-export PATH=${MUT_DIR}/Pipelines/scripts:${PATH}
 
-#add python modules to PYTHONPATH
-export PYTHONPATH=${MUT_DIR}/Pipelines/varcall_modules:${PYTHONPATH}
+
+
 
 #define a folder containing additional config files
-export MUT_CONFIG_DIR=${MUT_DIR}/Pipelines/varcall_config
+#export MUT_CONFIG_DIR=${MUT_DIR}/Pipelines/varcall_config
 
 #define a folder containing qsub job templates
-export MUT_TEMPLATE_DIR=${MUT_DIR}/Pipelines/varcall_templates
+#export MUT_TEMPLATE_DIR=${MUT_DIR}/Pipelines/varcall_templates
 
 #which file inside reference subfolder to use as the reference
-export MUT_REFERENCE=GCA_000001405.15_GRCh38_no_alt_plus_hs38d1_analysis_set.fna.gz
+#export MUT_REFERENCE=GCA_000001405.15_GRCh38_no_alt_plus_hs38d1_analysis_set.fna.gz
 
-#optional prefix to put infront of all the conda environment names
-export MUT_PREFIX=mutein_
 
 #mutein_random_id () {
 #    printf "%05d%05d" ${RANDOM} ${RANDOM}

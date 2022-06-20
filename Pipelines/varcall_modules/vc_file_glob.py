@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 '''
-generate array job spec file for running FastQC on all selected samples
+generate tasklist file containing
 '''
 
 import glob

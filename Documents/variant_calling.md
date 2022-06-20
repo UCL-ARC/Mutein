@@ -8,13 +8,18 @@ The recommended way to install and execute is to ssh into your HPC account, clon
 
 The steps to install and run the pipeline follow. Install everything where you will be running the pipeline's commands from, eg if you intend to run on an HPC install to your account on the HPC not your personal laptop/desktop computer.
 
-## install conda
+## Installation
+### install conda
 If you don't already have conda installed you must install it manually as the first step. On a shared HPC environment you may already have access to some version(s) of conda through a loadable module, but this may not be the most up-to-date version. In this case you may wish to simply ignore the system-provided conda and install your own version anyway.
 
 We recommend installing [Miniconda](https://docs.conda.io/en/latest/miniconda.html), follow the link to access installation instructions.
 
-## download or clone this repository
-If you have the git command available you can clone the repository, otherwise you can download the repository as a zip file and extract it. Either way put the repository in a suitable folder, such as ~/repos, that is not your intended data folder:
+### download or clone this repository
+While the repository is private (i.e. during its development stage) you can only access the code thorough an authorised github account. Once your account has been given access to the repository the simplest way to do a one-off download is to log into your github account, browse to the [Mutein repository](https://github.com/UCL/Mutein), click on the green Code button, then click Download zip. Then copy this zip file onto the HPC (if required).
+
+If you will require frequent downloading of the latest version then you need to setup ssh access to github from the place you intend to execute the pipeline, explained [here](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account). Then you'll be able to access it direct from the command line as if it were a public repo, explained next.
+
+If you have the git command available you can clone the repository, otherwise you can download the repository as a zip file and extract it. Either way put the repository in a suitable folder, such as ~/repos, that is not your intended data folder.
 
     mkdir -p ~/repos && cd !$
 
@@ -24,13 +29,47 @@ and then either:
 
 or:
 
-    wget https://github.com/UCL/Mutein/archive/refs/heads/main.zip #won't work for a private repo
+    wget https://github.com/UCL/Mutein/archive/refs/heads/main.zip
     unzip main.zip
 
-#(4) create data folder somewhere (not inside the repo folder)
-#(5) edit mutein bootstrap script within repo
-#(6) symlink to bootstrap script from data folder
-source bootstrap script
+### setup your data folder
+Create a new folder to contain all the project data, making sure this is not inside the repository folder. Select an appropriate folder name and location based on your particular storage setup. For example ~/mutein_data:
+
+    mkdir -p ~/mutein_data && cd !$
+
+When running the pipeline it is assumed you will have your main data folder we just created as your working directory.
+
+We also create a subfolder called config:
+
+    mkdir config && cd !$
+
+Now we need to create the boot strap script that will setup your environment ready to run the pipeline:
+
+    cd ~/mutein_data/config && cp ~/repos/Mutein/Pipelines/software_setup/mutein_settings .
+
+### customise the bootstrap script
+Finally edit the mutein_settings script you just copied to set the correct paths for your repository and data folders:
+
+    nano mutein_settings
+
+Set MUT_DIR to the repository folder (eg ~/repo/Mutein) and MUT_DATA to the data folder (eg ~/mutein_data).
+
+## Test Your Install
+### conda
+### qsub
+
+## Run the Pipeline
+If running on an HPC remotely over ssh upon first logging in enter into a screen session. This will enable you to disconnect without terminating any running snakemake commands. For example:
+
+    screen -S mutein
+
+will create a new screen session named mutein. Search online for a gnu screen tutorial for further information. If screen is not installed you should be able to get it through conda. Alternatives are tmux or, at a push, nohup.
+
+### source bootstrap script
+The pipeline is configured to be run from the command line from the data folder. Therefore change into the data folder and set up your environment by sourcing the bootstrap script you setup during installation:
+
+    cd ~/mutein_data
+    source ./config/mutein_settings
 
 ### Old Instructions Follow
 
