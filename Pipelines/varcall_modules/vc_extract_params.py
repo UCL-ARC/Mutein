@@ -61,7 +61,6 @@ def extract_params():
 def parse_args():
     parser = argparse.ArgumentParser(description="Extract the task's parameter values from the file, verify requested parameters match those in the file's header")
     parser.add_argument('params',  nargs='*', help='parameter names eg vc_extract_params threads accession')
-    #parser.add_argument('--tasklist', type=str, default=None, help='tasklist file made by generator script')
     return parser.parse_args()
 
 if __name__ == "__main__":

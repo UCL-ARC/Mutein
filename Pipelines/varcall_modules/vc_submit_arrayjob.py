@@ -73,9 +73,6 @@ def submit_arrayjob():
     cmd += f" -l h_rt={args.time} -l mem={args.mem} -l tmpfs={args.tmpfs} -pe smp {args.cores}"
     cmd += f" {jobscript}"
 
-    #update the timestamp
-    #cmd = cmd.format(**locals())
-
     #issue the command, ensure no immediate error encountered (check=True)
     #note no subshell is invoked therefore no variable expansion of $TASK_ID takes place
     subprocess.run(cmd.split(),check=True,env=env)
