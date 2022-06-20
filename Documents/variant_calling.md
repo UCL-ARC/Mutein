@@ -16,16 +16,16 @@ We recommend installing [Miniconda](https://docs.conda.io/en/latest/miniconda.ht
 ## download or clone this repository
 If you have the git command available you can clone the repository, otherwise you can download the repository as a zip file and extract it. Either way put the repository in a suitable folder, such as ~/repos, that is not your intended data folder:
 
-  mkdir -p ~/repos && cd !$
+    mkdir -p ~/repos && cd !$
 
 and then either:
 
-  git clone https://github.com/UCL/Mutein.git
+    git clone https://github.com/UCL/Mutein.git
 
 or:
 
-  wget https://github.com/UCL/Mutein/archive/refs/heads/main.zip #won't work for a private repo
-  unzip main.zip
+    wget https://github.com/UCL/Mutein/archive/refs/heads/main.zip #won't work for a private repo
+    unzip main.zip
 
 #(4) create data folder somewhere (not inside the repo folder)
 #(5) edit mutein bootstrap script within repo
@@ -34,22 +34,22 @@ source bootstrap script
 
 ### Old Instructions Follow
 
-#edit software_setup/mutein_settings to symlink to it from ~/.mutein_settings.sh
-source ~/.mutein_settings.sh
+    #edit software_setup/mutein_settings to symlink to it from ~/.mutein_settings.sh
+    source ~/.mutein_settings.sh
 
-configure_software_tools.sh
+    configure_software_tools.sh
 
-get_reference.sh
-get_dataset_keogh2018.sh
-generate_testdata_from_keogh2018.sh
-get_dataset_yokoyama2019.sh
+    get_reference.sh
+    get_dataset_keogh2018.sh
+    generate_testdata_from_keogh2018.sh
+    get_dataset_yokoyama2019.sh
 
-fastqc_generator --conf dataset_keogh.json --taskfile fastqc.tasks
-vc_submit_arrayjob --taskfile fastqc.tasks --jobname fastqc --conf fastqc.json
+    fastqc_generator --conf dataset_keogh.json --taskfile fastqc.tasks
+    vc_submit_arrayjob --taskfile fastqc.tasks --jobname fastqc --conf fastqc.json
 
-bwa_index_generator --conf reference.json --conf bwa_index.json --output bwa_index_tasklist
+    bwa_index_generator --conf reference.json --conf bwa_index.json --output bwa_index_tasklist
 
-bwa_mem_generator --conf dataset_keogh.json --taskfile bwa_mem.tasks
-vc_submit_arrayjob --taskfile bwa_mem.tasks --jobname bwa_mem --conf reference.json --conf bwa_mem.json
+    bwa_mem_generator --conf dataset_keogh.json --taskfile bwa_mem.tasks
+    vc_submit_arrayjob --taskfile bwa_mem.tasks --jobname bwa_mem --conf reference.json --conf bwa_mem.json
 
-haplotype_caller_generator.sh
+    haplotype_caller_generator.sh
