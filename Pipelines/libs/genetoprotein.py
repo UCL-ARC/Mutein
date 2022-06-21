@@ -41,6 +41,7 @@ def accession_from_bioservices(genename,organism_id,reviewed):
     )
     print(result)
     rows = result.split("\n")
+    accs = []
     if len(rows) > 1:
         for row in rows:
             print("Row:", row)
@@ -49,12 +50,13 @@ def accession_from_bioservices(genename,organism_id,reviewed):
                 acc = acc_gene[0]
                 gn = acc_gene[1].upper()
                 gns = gn.split(" ")
-                gn = gns[0]
-                if gn == genename:
-                    return acc
-        return ""
+                for gn in gns:
+                    gn = gn.strip()                
+                    if gn == genename:
+                        accs.append(acc)
+        return accs
     else:        
-        return ""
+        return []
 
 
 def sequence_from_bioservices(accession):

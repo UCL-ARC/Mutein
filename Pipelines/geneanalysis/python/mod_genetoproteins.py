@@ -25,6 +25,7 @@ import genestovariants
 import SwissModel
 import UniProt
 import PdbRunner
+import FileDf
 
 
 def run_pipeline(args):
@@ -42,14 +43,14 @@ def run_pipeline(args):
             data_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset, gene=gene
         )
         # this contains the organism id from uniport, eg human=9606 and mouse=10090
-        organism_id_path = gene_path.gene_inputs + "organism_id.txt"
-        with open(organism_id_path, "r") as fr:
-            lines = fr.readlines()
-            organism_id = lines[0].strip()
-
-        accession = genetoprotein.accession_from_bioservices(gene.upper(),organism_id,True)
-        if len(accession) < 2:
-            accession = genetoprotein.accession_from_bioservices(gene.upper(),organism_id,False)
+        accession_path = gene_path.gene_inputs + "accessions.csv"
+        acc_df = FileDf.FileDf(accession_path).openDataFrame()        
+        idx0 = acc_df.index[0]
+        organism_id = str(acc_df["organism"][idx0])
+        accession = str(acc_df["accession"][idx0])
+        #accession = genetoprotein.accession_from_bioservices(gene.upper(),organism_id,True)
+        #if len(accession) < 2:
+        #    accession = genetoprotein.accession_from_bioservices(gene.upper(),organism_id,False)
         if len(accession) > 1:            
             seq = genetoprotein.sequence_from_bioservices(accession)
             seq_lines = seq.split("\n")
@@ -68,7 +69,7 @@ def run_pipeline(args):
             # CREATE the pdbs for the gene
             # both these searches retun a tuple list of the pdb code and the thruput gene file path, ready for pdb inputs
             frag = -1
-            up = UniProt.UniProt(gene.upper(),organism_id)
+            up = UniProt.UniProt(gene.upper(),accession)
             df, pdb_list_up = up.searchForStructures(
                 gene_path.gene_outputs, gene_path.gene_outpdbs, fragment=frag
             )

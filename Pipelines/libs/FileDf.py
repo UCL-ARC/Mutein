@@ -39,7 +39,7 @@ class FileDic:
     def __init__(self, file_path, dic):
         self.file_path = file_path
         self.dic = dic
-
+        
     def add(self, key, val, fill_last=[]):
         if key not in self.dic:
             self.dic[key] = []
