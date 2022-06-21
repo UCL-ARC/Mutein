@@ -12,7 +12,14 @@ The steps to install and run the pipeline follow. Install everything where you w
 ### install conda
 If you don't already have conda installed you must install it manually as the first step. On a shared HPC environment you may already have access to some version(s) of conda through a loadable module, but this may not be the most up-to-date version. In this case you may wish to simply ignore the system-provided conda and install your own version anyway.
 
-We recommend installing [Miniconda](https://docs.conda.io/en/latest/miniconda.html), follow the link to access installation instructions.
+We recommend installing [Miniconda](https://docs.conda.io/en/latest/miniconda.html), follow the link to access full installation instructions. But typically to install miniconda you will download and run the installer:
+
+    wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+    chmod u+x ./Miniconda3-latest-Linux-x86_64.sh
+    ./Miniconda3-latest-Linux-x86_64.sh
+    
+then log out and in again after which the conda command should be available.
+
 
 ### download or clone this repository
 While the repository is private (i.e. during its development stage) you can only access the code thorough an authorised github account. Once your account has been given access to the repository the simplest way to do a one-off download is to log into your github account, browse to the [Mutein repository](https://github.com/UCL/Mutein), click on the green Code button, then click Download zip. Then copy this zip file onto the HPC (if required).

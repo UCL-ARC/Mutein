@@ -24,6 +24,16 @@ export MUT_PREFIX=mutein_
 
 ## ========== END OF CONFIG =======================
 
+# activate snakemake conda environment if setup
+result=$( conda env list | grep -e "${MUT_PREFIX}snakemake" | wc --lines )
+if [ "${result}" == "0" ] ; then
+    echo Setting up the conda snakemake environment...
+    mutein setup-snakemake
+fi
+
+echo Activating the conda snakemake environment...
+conda activate ${MUT_PREFIX}snakemake
+
 ## below is fossil junk retained for now in case they are needed again for reference
 
 #which module name to give to "module load" command

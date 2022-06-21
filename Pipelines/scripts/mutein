@@ -1,0 +1,55 @@
+#!/bin/bash
+
+#
+# tool to wrap up other mutein commands into a single interface
+# not using python for this as default hpc accounts do not always have python3!
+#
+
+#quit on error or undefined variable
+set -eu
+
+catch_err() {
+    show_help
+    exit 1
+}
+
+trap 'catch_err' ERR
+
+#get folder of this script
+SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]:-$0}"; )" &> /dev/null && pwd 2> /dev/null; )";
+
+show_help () {
+    echo "Usage: mutein [-h|--help] [setup-datafolder|setup-snakemake]"
+}
+
+setup_datafolder () {
+    echo "setup datafolder"
+
+}
+
+setup_snakemake () {
+    echo "setup snakemake"
+    conda create -y -n ${MUT_PREFIX}snakemake \
+        $(cat ${MUT_DIR}/Pipelines/conda_envs/channels) \
+        --file ${MUT_DIR}/Pipelines/conda_envs/snakemake
+}
+
+if [ "$#" == "0" ]; then
+    show_help
+    exit 0
+fi
+
+case $1 in
+    -[hH] | --help )
+        show_help
+        ;;
+    setup-datafolder )
+        setup_datafolder
+        ;;
+    setup-snakemake )
+        setup_snakemake
+        ;;
+    * )
+        show_help
+        ;;
+esac
