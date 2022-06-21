@@ -70,7 +70,9 @@ def run_pipeline(args):
         gene_path = Paths.Paths(
             data_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset, gene=gene
         )
-        accession = genetoprotein.accession_from_bioservices(gene.upper(),organism_id)
+        accession = genetoprotein.accession_from_bioservices(gene.upper(),organism_id,True)
+        if len(accession) < 2:
+            accession = genetoprotein.accession_from_bioservices(gene.upper(),organism_id,False)
         if len(accession) > 1:
             seq = genetoprotein.sequence_from_bioservices(accession)
             seq_lines = seq.split("\n")

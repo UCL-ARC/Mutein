@@ -22,7 +22,9 @@ class UniProt:
     def __init__(self, gene,organism_id):
         self.gene = gene
         self.organism_id = organism_id
-        self.accession = genetoprotein.accession_from_bioservices(gene,organism_id)
+        self.accession = genetoprotein.accession_from_bioservices(gene,organism_id,True)
+        if len(self.accession) < 2:
+            self.accession = genetoprotein.accession_from_bioservices(gene,organism_id,False)
         seq = genetoprotein.sequence_from_bioservices(self.accession)
         seq_lines = seq.split("\n")
         self.seq = ""

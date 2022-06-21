@@ -17,7 +17,7 @@ import Bio.PDB as bio
 # ----------------- -------------------------------------------
 ###       bioservices, uniprot                            ###
 # ------------------------------------------------------------
-def accession_from_bioservices(genename,organism_id):
+def accession_from_bioservices(genename,organism_id,reviewed):
     u = UniProt()
 
     ## If you have any uniprot problems this line should work so check it, eg you might have a connction error
@@ -27,7 +27,11 @@ def accession_from_bioservices(genename,organism_id):
     # https://rest.uniprot.org/uniprotkb/search?query=reviewed:true+AND+organism_id:9606
 
     #search_string = "organism_id:10090+and+reviewed:true+and+gene:" + genename    
-    search_string = "organism:"+organism_id+"+and+reviewed:yes+and+gene:" + genename
+    review_string = "yes"
+    if not reviewed:
+        review_string = "no"
+
+    search_string = "organism:"+organism_id+"+and+reviewed:"+review_string+"+and+gene:" + genename
     print("Searching:", "https://rest.uniprot.org/uniprotkb/search?query=" + search_string)
     result = u.search(
         #"organism:9606+and+reviewed:yes+and+gene:" + genename,
@@ -49,8 +53,7 @@ def accession_from_bioservices(genename,organism_id):
                 if gn == genename:
                     return acc
         return ""
-    else:
-        print("(!)" + result)
+    else:        
         return ""
 
 

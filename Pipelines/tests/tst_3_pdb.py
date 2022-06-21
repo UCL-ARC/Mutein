@@ -22,7 +22,7 @@ def addpath(inputs):
 ######################################################################
 ### INPUTS
 dataset="mouse"
-gene="NOTCH1"
+gene="FAT1"
 pdb=""
 
 repairs="1"

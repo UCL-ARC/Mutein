@@ -47,8 +47,10 @@ def run_pipeline(args):
             lines = fr.readlines()
             organism_id = lines[0].strip()
 
-        accession = genetoprotein.accession_from_bioservices(gene.upper(),organism_id)
-        if len(accession) > 1:
+        accession = genetoprotein.accession_from_bioservices(gene.upper(),organism_id,True)
+        if len(accession) < 2:
+            accession = genetoprotein.accession_from_bioservices(gene.upper(),organism_id,False)
+        if len(accession) > 1:            
             seq = genetoprotein.sequence_from_bioservices(accession)
             seq_lines = seq.split("\n")
             wholeseq = ""
