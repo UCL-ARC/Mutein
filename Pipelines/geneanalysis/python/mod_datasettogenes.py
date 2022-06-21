@@ -54,8 +54,8 @@ def run_pipeline(args):
     genes_df = FileDf.FileDf(genes_variant_file, sep=",", header=True).openDataFrame()
 
     # this contains the organism id from uniport, eg human=9606 and mouse=10090
-    organism_id = dataset_path.dataset_inputs + "organism_id.txt"
-    with open(organism_id, "r") as fr:
+    organism_id_path = dataset_path.dataset_inputs + "organism_id.txt"
+    with open(organism_id_path, "r") as fr:
         lines = fr.readlines()
         organism_id = lines[0].strip()
     
@@ -96,6 +96,9 @@ def run_pipeline(args):
                 gn.addVariant(vrnt)
             dfv = gn.getVariantsDataFrame()
             dfv.to_csv(gene_path.gene_inputs + "/variants.csv", index=False)
+            organism_id_path = gene_path.gene_inputs + "organism_id.txt"
+            with open(organism_id_path, "w") as fw:                
+                fw.write(organism_id)
 
     # make a list of the genes
     genes_csv = FileDf.FileDic(dataset_path.dataset_inputs + "genes_list.csv", {})

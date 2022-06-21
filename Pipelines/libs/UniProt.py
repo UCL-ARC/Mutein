@@ -19,9 +19,10 @@ warnings.simplefilter("ignore", BiopythonWarning)
 
 
 class UniProt:
-    def __init__(self, gene):
+    def __init__(self, gene,organism_id):
         self.gene = gene
-        self.accession = genetoprotein.accession_from_bioservices(gene)
+        self.organism_id = organism_id
+        self.accession = genetoprotein.accession_from_bioservices(gene,organism_id)
         seq = genetoprotein.sequence_from_bioservices(self.accession)
         seq_lines = seq.split("\n")
         self.seq = ""
