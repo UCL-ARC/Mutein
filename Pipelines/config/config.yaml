@@ -1,0 +1,16 @@
+# Snakemake profile file
+
+cores: 999
+local-cores: 2
+jobs: 99
+cluster: "qsub -cwd -V -N {rule}.{wildcards}.$(date +%Y%m%d%H%M%S).${{RANDOM}}
+  -l h_rt={params.time},mem={params.mem},tmpfs={params.tmpfs} -pe smp {threads} 
+  -e \\$JOB_NAME.err -o \\$JOB_NAME.out"
+#cluster-cancel: "qdel {jobname}" #not working!
+use-conda: True
+latency-wait: 30
+#jobscript: /home/ccaervi/snakemake-drmaa/jobscript.sh ##does it need #!/bin/bash -l
+#default-resources: "mem_mb=10" #,disk_mb=10" # tmpdir=/tmp"
+
+# auxillary config file
+configfile: "mutein.yaml"

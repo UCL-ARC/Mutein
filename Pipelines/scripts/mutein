@@ -1,55 +1,33 @@
-#!/bin/bash
+#!/usr/bin/env python3
 
-#
-# tool to wrap up other mutein commands into a single interface
-# not using python for this as default hpc accounts do not always have python3!
-#
+import argparse
+import os
 
-#quit on error or undefined variable
-set -eu
+def main_func():
+    args = parse_args()
 
-catch_err() {
-    show_help
-    exit 1
-}
+    if args.subcommand == "check-cwd":
+        check_cwd(args)
 
-trap 'catch_err' ERR
+def check_cwd(args):
+    if os.path.realpath(os.getcwd()) != os.path.realpath(os.environ['MUT_DATA']):
+        print("Warning: not in expected data directory!")
 
-#get folder of this script
-SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]:-$0}"; )" &> /dev/null && pwd 2> /dev/null; )";
+    exit(0)
 
-show_help () {
-    echo "Usage: mutein [-h|--help] [setup-datafolder|setup-snakemake]"
-}
+def parse_args():
+    '''
+    parse arguments from command line
+    '''
 
-setup_datafolder () {
-    echo "setup datafolder"
+    parser = argparse.ArgumentParser(description='Wrapper function for top-level mutein functions')
+    subparsers = parser.add_subparsers(dest="subcommand")
 
-}
+    parser_check_cwd = subparsers.add_parser('check-cwd', help='check the working directory is the expected data folder')
 
-setup_snakemake () {
-    echo "setup snakemake"
-    conda create -y -n ${MUT_PREFIX}snakemake \
-        $(cat ${MUT_DIR}/Pipelines/conda_envs/channels) \
-        --file ${MUT_DIR}/Pipelines/conda_envs/snakemake
-}
+    args = parser.parse_args()
 
-if [ "$#" == "0" ]; then
-    show_help
-    exit 0
-fi
+    return args
 
-case $1 in
-    -[hH] | --help )
-        show_help
-        ;;
-    setup-datafolder )
-        setup_datafolder
-        ;;
-    setup-snakemake )
-        setup_snakemake
-        ;;
-    * )
-        show_help
-        ;;
-esac
+if __name__ == "__main__":
+    globals()["main_func"]()

@@ -17,7 +17,7 @@ We recommend installing [Miniconda](https://docs.conda.io/en/latest/miniconda.ht
     wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
     chmod u+x ./Miniconda3-latest-Linux-x86_64.sh
     ./Miniconda3-latest-Linux-x86_64.sh
-    
+
 then log out and in again after which the conda command should be available.
 
 
@@ -42,17 +42,19 @@ or:
 ### setup your data folder
 Create a new folder to contain all the project data, making sure this is not inside the repository folder. Select an appropriate folder name and location based on your particular storage setup. For example ~/mutein_data:
 
-    mkdir -p ~/mutein_data && cd !$
+    mkdir -p ~/mutein_data
+    cd ~/mutein_data
 
 When running the pipeline it is assumed you will have your main data folder we just created as your working directory.
 
 We also create a subfolder called config:
 
-    mkdir config && cd !$
+    mkdir config
 
 Now we need to create the boot strap script that will setup your environment ready to run the pipeline:
 
-    cd ~/mutein_data/config && cp ~/repos/Mutein/Pipelines/software_setup/mutein_settings .
+    cd ~/mutein_data/config
+    cp ~/repos/Mutein/Pipelines/config/mutein_settings .
 
 ### customise the bootstrap script
 Finally edit the mutein_settings script you just copied to set the correct paths for your repository and data folders:
@@ -80,7 +82,7 @@ The pipeline is configured to be run from the command line from the data folder.
 
 ### Old Instructions Follow
 
-    #edit software_setup/mutein_settings to symlink to it from ~/.mutein_settings.sh
+    #edit config/mutein_settings to symlink to it from ~/.mutein_settings.sh
     source ~/.mutein_settings.sh
 
     configure_software_tools.sh
