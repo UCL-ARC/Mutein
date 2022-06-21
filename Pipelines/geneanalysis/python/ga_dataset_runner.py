@@ -14,7 +14,6 @@ sys.path.append(retpath)
 
 def prepareGenes(args):
     import Pipelines.geneanalysis.python.mod_datasettogenes as ppla
-
     ppla.run_pipeline(args)
 
 

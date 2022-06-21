@@ -21,8 +21,8 @@ def addpath(inputs):
 
 ######################################################################
 ### INPUTS
-dataset="shearwater"
-gene="tp63"
+dataset="mouse"
+gene="NOTCH1"
 pdb=""
 
 repairs="1"

@@ -17,18 +17,25 @@ import Bio.PDB as bio
 # ----------------- -------------------------------------------
 ###       bioservices, uniprot                            ###
 # ------------------------------------------------------------
-def accession_from_bioservices(genename):
+def accession_from_bioservices(genename,organism_id):
     u = UniProt()
 
     ## If you have any uniprot problems this line should work so check it, eg you might have a connction error
     # res = u.search("P43403", frmt="txt")
     # print(res)
+    # You can browse the reults in a browser:
+    # https://rest.uniprot.org/uniprotkb/search?query=reviewed:true+AND+organism_id:9606
 
+    #search_string = "organism_id:10090+and+reviewed:true+and+gene:" + genename    
+    search_string = "organism:"+organism_id+"+and+reviewed:yes+and+gene:" + genename
+    print("Searching:", "https://rest.uniprot.org/uniprotkb/search?query=" + search_string)
     result = u.search(
-        "organism:9606+and+reviewed:yes+and+gene:" + genename,
+        #"organism:9606+and+reviewed:yes+and+gene:" + genename,
+        search_string,
         columns="id,genes",
         limit=5,
     )
+    print(result)
     rows = result.split("\n")
     if len(rows) > 1:
         for row in rows:
@@ -98,7 +105,7 @@ def retrievePdbStructure(url, pdb, path_name):
     if retrieveFile(url, path_name):
         try:
             parser = bio.PDBParser()
-            print("PDB:", path_name)
+            #print("PDB:", path_name)
             struc = parser.get_structure(pdb, path_name)
             return struc
         except:

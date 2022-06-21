@@ -37,40 +37,40 @@ def run_pipeline(args):
     sys.path.append(install_dir + "/Pipelines/libs")
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
+    gene = argus.arg("gene","")
     dataset_path = Paths.Paths(
         data_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset
     )
     genes_list = []
+    if gene != "":
+        genes_list = [gene]
+
     """
     "gene_name"	"n_syn"	"n_mis"	"n_non"	"n_spl"	"n_ind"	"wmis_cv"	"wnon_cv"	"wspl_cv"	"wind_cv"	"pmis_cv"	"ptrunc_cv"	"pallsubs_cv"	"pind_cv"	"qmis_cv"	"qtrunc_cv"	"qallsubs_cv"	"pglobal_cv"	"qglobal_cv"
     "NOTCH1"	404	2700	772	360	1208	3.98846230912502	21.7266421919647	21.7266421919647	17.6547328391658	0	0	0	8.07429581976078e-68	0	0	0	0	0
     """
-    # 2.) First get list of genes:
-    if len(genes_list) == 0:
-        genes_file = dataset_path.dataset_inputs + "/genes.txt"
-        with open(genes_file, "r") as fr:
-            lines = fr.readlines()
-            # lines = ["","FAT1"]
-            for l in range(1, len(lines)):
-                # for l in range(1,2):
-                line = lines[l]
-                cols = line.split("\t")
-                gene = cols[0].upper()
-                if gene[0] == '"':
-                    gene = gene[1:]
-                if gene[-1] == '"':
-                    gene = gene[:-1]
-                genes_list.append(gene)
+    # The file contains the variants and the ist of genes
+    genes_variant_file = dataset_path.dataset_inputs + "genes_variants_inputs.csv"    
+    genes_df = FileDf.FileDf(genes_variant_file, sep=",", header=True).openDataFrame()
 
-    # 1.) First prepare the variants file
-    genes_variant_file = dataset_path.dataset_inputs + "genes_variants.txt"
-    gene_variant_dic = genestovariants.extractVariantsFromFile(genes_variant_file)
+    # this contains the organism id from uniport, eg human=9606 and mouse=10090
+    organism_id = dataset_path.dataset_inputs + "organism_id.txt"
+    with open(organism_id, "r") as fr:
+        lines = fr.readlines()
+        organism_id = lines[0].strip()
+    
+    # 2.) First get list of genes:
+    if len(genes_list) == 0:                
+        genes_list = genes_df["gene"].unique()
+
+    # 1.) First prepare the variants file    
+    gene_variant_dic = genestovariants.extractVariantsFromFile(genes_df)
     genes = []
     for gene in genes_list:
         gene_path = Paths.Paths(
             data_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset, gene=gene
         )
-        accession = genetoprotein.accession_from_bioservices(gene.upper())
+        accession = genetoprotein.accession_from_bioservices(gene.upper(),organism_id)
         if len(accession) > 1:
             seq = genetoprotein.sequence_from_bioservices(accession)
             seq_lines = seq.split("\n")
