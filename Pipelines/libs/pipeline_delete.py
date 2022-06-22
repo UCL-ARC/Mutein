@@ -106,7 +106,9 @@ def run_pipeline(args):
                 hourdiff = (now-time)                
                 days = hourdiff.days
                 hours, remainder = divmod(hourdiff.seconds, 3600)
-                print(hours, out_file)
+                if hours > 10:
+                    print(hours, out_file)
+                    shall_rerun = True
                         
             if shall_rerun and exists(out_file):
                 with open(out_file) as fr:
