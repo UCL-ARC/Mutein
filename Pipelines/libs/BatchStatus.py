@@ -150,6 +150,7 @@ class BatchStatus:
         gene_path = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset,gene=gene)
         filename = gene_path.outputs + "pdb_tasklist.csv"
         num_pdbs = 0
+        num_done = 0
         if exists(filename):            
             with open(filename, "r") as fr:
                 lines = fr.readlines()
@@ -159,8 +160,12 @@ class BatchStatus:
                         pdbo = ln.strip().split(",")[2]
                         patho = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset, gene=gene, pdb=pdbo)                        
                         pdb_file = patho.thruputs + pdbo.lower() + "_repx.pdb"
-            
-            return str(num_pdbs)
+                        existsfile, timeRes = self.checkFile(pdb_file)
+                        if existsfile:
+                            num_done += 1
+                                        
+            pdb_summary = str(num_done) + "/" + str(num_pdbs)
+            return str(pdb_summary)
         else:
             return "-"                
 
