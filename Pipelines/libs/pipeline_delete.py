@@ -150,7 +150,7 @@ def run_pipeline(args):
                         print("...removing", number, name)
                     else:
                         print("Can't re-run as manually started:", out_file)
-            else:
+            if shall_rerun and not exists(out_file):
                 print("Can't re-run error as no outfile:", error_file)
     elif mode == "RERUNALL":
         print("### Rerun everything ###")
