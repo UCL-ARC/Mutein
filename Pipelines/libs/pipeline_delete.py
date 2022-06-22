@@ -91,6 +91,7 @@ def run_pipeline(args):
                 file_numbers[number] = name
 
         for number, name in file_numbers.items():
+            print(number,name)
             shall_rerun = False
             error_file = scratch_dir + name + ".e" + str(number)
             out_file = scratch_dir + name + ".o" + str(number)

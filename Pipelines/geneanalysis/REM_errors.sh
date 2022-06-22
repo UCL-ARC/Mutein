@@ -14,27 +14,27 @@ python ${script} "MODE=$mode"
 
 
 
-echo ""
-echo ""
-echo "Current directory contents"
-target="/home/ucbtlcr/Scratch/workspace/"
-let count=0
-for f in "$target"/*
-do
-    let count=count+1
-done
-echo "Count: $count"
+# echo ""
+# echo ""
+# echo "Current directory contents"
+# target="/home/ucbtlcr/Scratch/workspace/"
+# let count=0
+# for f in "$target"/*
+# do
+#     let count=count+1
+# done
+# echo "Count: $count"
 
-outputString=$(python ${script} "MODE=$mode")
-echo $outputString
+# outputString=$(python ${script} "MODE=$mode")
+# echo $outputString
 
-target="/home/ucbtlcr/Scratch/workspace/"
-let count=0
-for f in "$target"/*
-do
-    echo $(basename $f)
-    let count=count+1
-done
-echo ""
-echo "Count: $count"
+# target="/home/ucbtlcr/Scratch/workspace/"
+# let count=0
+# for f in "$target"/*
+# do
+ #    echo $(basename $f)
+  #   let count=count+1
+# done
+# echo ""
+# echo "Count: $count"
 
