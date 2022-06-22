@@ -1,4 +1,4 @@
-# Snakemake profile file
+# Snakemake profile
 
 cores: 999
 local-cores: 2
@@ -13,4 +13,4 @@ latency-wait: 30
 #default-resources: "mem_mb=10" #,disk_mb=10" # tmpdir=/tmp"
 
 # auxillary config file
-configfile: "mutein.yaml"
+#configfile: "mutein.yaml"

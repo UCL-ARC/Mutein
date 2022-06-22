@@ -1,58 +1,6 @@
-# SRC_URL=ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids
-# REF_FILE=GCA_000001405.15_GRCh38_no_alt_plus_hs38d1_analysis_set.fna.gz
-# MD5_FILE=md5checksums.txt
-# DOC_FILE=README_analysis_sets.txt
+#download and md5 check the reference genome fasta file
+include: "reference.smk"
 
-# DST_FOLDER=reference
-# CHK_FILE=md5_GRCh38_no_alt_plus_hs38d1.txt
+#some simple test rules
+include: "test.smk"
 
-# #create folder to receive the reference sequence if not already present
-# mkdir -p ${DST_FOLDER} && cd ${DST_FOLDER}
-
-# #download the actual files
-# wget ${SRC_URL}/${MD5_FILE}
-# wget ${SRC_URL}/${DOC_FILE}
-# wget ${SRC_URL}/${REF_FILE}
-
-# #extract just the relevant checksum
-# cat ${MD5_FILE} | grep -e "${REF_FILE}" > ${CHK_FILE}
-
-# #perform the check
-# md5sum --check ${CHK_FILE}
-
-
-localrules: test, test2, get_reference, wget_ref_file
-
-#the reference fasta file, and its readme and md5 file
-#md5 check the reference file
-rule get_reference:
-    input:
-        md5all=os.path.join(config["ref"]["dir"],config["ref"]["md5"]),
-        readme=os.path.join(config["ref"]["dir"],config["ref"]["readme"]),
-        fasta=os.path.join(config["ref"]["dir"],config["ref"]["fasta"])
-    output:
-        md5ref=os.path.join(config["ref"]["dir"],"MD5.txt")
-    shell:
-        #extract and check just the relevant checksum
-        "cat {input.md5all} | grep -e '{config[ref][fasta]}' > {output.md5ref} && "
-        "cd {config[ref][dir]} && "
-        "md5sum --check MD5.txt"
-
-#download a file from config[ref][uri] to config[ref][dir]
-rule wget_ref_file:
-    output: os.path.join(config["ref"]["dir"],"{filename}")
-    shell:  "wget -O {output} {config[ref][uri]}/{wildcards.filename}"
-
-rule test2:
-    input: "data/output/output.txt"
-    output: "data/output/test.out"
-    shell: "echo {config[ref][local_dir]} >> {output}"
-
-rule test:
-    output: "data/output/output.txt"
-    input: "data/input/input.txt"
-    conda: "mutein_gatk4"
-    threads: 3
-    params: time="0:35:00", mem="3G", tmpfs="11G",
-    shell: "cat {input} > {output} && gatk >> {output}"
-    

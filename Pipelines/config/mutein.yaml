@@ -4,6 +4,7 @@ test_variable: "one two three"
 #which reference sequence to use
 ref:
   dir: "references/GRCh38_noalt_withdecoys"
+  tmp: "references/GRCh38_noalt_withdecoys/tmp"
   uri:  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids"
   fasta:  "GCA_000001405.15_GRCh38_no_alt_plus_hs38d1_analysis_set.fna.gz"
   md5:       "md5checksums.txt"

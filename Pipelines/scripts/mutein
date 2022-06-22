@@ -11,7 +11,7 @@ def main_func():
 
 def check_cwd(args):
     if os.path.realpath(os.getcwd()) != os.path.realpath(os.environ['MUT_DATA']):
-        print("Warning: not in expected data directory!")
+        print(f"Warning: not in expected data directory: {os.environ['MUT_DATA']}")
 
     exit(0)
 
