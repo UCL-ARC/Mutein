@@ -36,16 +36,22 @@ class BatchStatus:
     def createDatasetProgressReport(self,dataset):
         ds_path = Paths.Paths(self.data_dir, self.pipe_dir, dataset=dataset)                
         filename = ds_path.inputs + "genes_pdb_list.csv"        
-        print("GENE      \t\tBACKGROUND  \t\tVARIANTS  ")
-        print("----------\t\t----------\t\t----------")
+        print("GENE      \t\tPDBS   \t\tBACKGROUND  \t\tVARIANTS  ")
+        print("----------\t\t-------\t\t------------\t\t----------")
         if exists(filename):
             with open(filename, "r") as fr:
                 lines = fr.readlines()
                 for line in lines[1:]:
                     geneo = line.strip().split(",")[1]
-                    patho = Paths.Paths(self.data_dir, self.pipe_dir, dataset=dataset, gene=geneo)
-                    filenameA = patho.outputs + "ddg_bm_background.csv"
                     line_string = geneo+"\t\t"
+                    patho = Paths.Paths(self.data_dir, self.pipe_dir, dataset=dataset, gene=geneo)
+                    filenameC = patho.outputs + "pdb_tasklist.csv"                                        
+                    existsfile, time = self.checkFile(filenameC)
+                    if existsfile:
+                        line_string += time + "\t\t"
+                    else:
+                        line_string += "----\t\t"                    
+                    filenameA = patho.outputs + "ddg_bm_background.csv"
                     existsfile, time = self.checkFile(filenameA)
                     if existsfile:
                         line_string += time + "\t\t"
