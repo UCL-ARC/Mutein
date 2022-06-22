@@ -91,8 +91,7 @@ def run_pipeline(args):
             if number not in file_numbers:
                 file_numbers[number] = name
 
-        for number, name in file_numbers.items():
-            print(number,name)
+        for number, name in file_numbers.items():            
             shall_rerun = False
             error_file = scratch_dir + name + ".e" + str(number)
             out_file = scratch_dir + name + ".o" + str(number)
@@ -104,11 +103,11 @@ def run_pipeline(args):
             elif not error_only and exists(out_file):
                 time = datetime.datetime.fromtimestamp(pathlib.Path(out_file).stat().st_mtime)
                 now = pd.Timestamp.now()
-                hourdiff = (now-time)
-                print(hourdiff, out_file)
-
-            
-            
+                hourdiff = (now-time)                
+                days = hourdiff.days
+                hours, remainder = divmod(hourdiff.seconds, 3600)
+                print(hours, out_file)
+                        
             if shall_rerun and exists(out_file):
                 with open(out_file) as fr:
                     lines_out = fr.readlines()
