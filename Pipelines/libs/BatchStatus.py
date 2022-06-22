@@ -164,7 +164,10 @@ class BatchStatus:
                         if existsfile:
                             num_done += 1
                                         
-            pdb_summary = str(num_done) + "/" + str(num_pdbs)
+            if num_done == num_pdbs:
+                pdb_summary = str(num_done)
+            else:
+                pdb_summary = str(num_done) + "/" + str(num_pdbs)
             return str(pdb_summary)
         else:
             return "-"                
@@ -324,7 +327,10 @@ class BatchStatus:
                         count += 1
                         lasttime = timet                                  
         
-            msg += str(count) + "/" + str(numtasks)        
+            if count == numtasks:
+                msg += str(numtasks)        
+            else:
+                msg += str(count) + "/" + str(numtasks)        
                     
         return msg,lasttime
 
