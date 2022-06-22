@@ -28,8 +28,7 @@ from os.path import isfile, join
 import os
 
 
-def run_pipeline(args):
-    print("### Delete unnecessary log files ###")
+def run_pipeline(args):    
     print(args)
     ##############################################
     ret = "Actions:"
@@ -41,11 +40,13 @@ def run_pipeline(args):
 
     onlyfiles = [f for f in listdir(scratch_dir) if isfile(join(scratch_dir, f))]
     if mode == "ALL":
+        print("### Delete all log files ###")
         for file in onlyfiles:
             if exists(scratch_dir + file):
                 os.remove(scratch_dir + file)
 
     elif mode == "CLEAN":
+        print("### Delete unnecessary log files ###")
         file_numbers = {}
         for file in onlyfiles:
             name = file.split(".")[0]
@@ -77,7 +78,8 @@ def run_pipeline(args):
                 print("Missing files", number, name)
 
     elif mode == "RERUNERROR" or mode == "RERUNORPHANS":
-        error_only = mode == "RERUNERROR"
+        print("### Rerun failed or stalled jobs ###")
+        error_only = mode=="RERUNERROR"
         file_numbers = {}
         for file in onlyfiles:
             name = file.split(".")[0]
@@ -149,6 +151,7 @@ def run_pipeline(args):
             else:
                 print("Can't re-run error as no outfile:", error_file)
     elif mode == "RERUNALL":
+        print("### Rerun everything ###")
         file_numbers = {}
         for file in onlyfiles:
             name = file.split(".")[0]
