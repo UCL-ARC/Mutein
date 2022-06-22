@@ -48,7 +48,8 @@ class BatchStatus:
                     filenameC = patho.outputs + "pdb_tasklist.csv"                                        
                     existsfile, time = self.checkFile(filenameC)
                     if existsfile:
-                        line_string += time + "\t\t"
+                        num_pdbs = self.getGeneNumPdbs(geneo)
+                        line_string += num_pdbs + "\t\t"
                     else:
                         line_string += "----\t\t"                    
                     filenameA = patho.outputs + "ddg_bm_background.csv"
@@ -145,6 +146,24 @@ class BatchStatus:
             print("TODO: Submit pdb prepare")
         return ""
     
+    def getGeneNumPdbs(self,gene):
+        gene_path = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset,gene=gene)
+        filename = gene_path.outputs + "pdb_tasklist.csv"
+        num_pdbs = 0
+        if exists(filename):            
+            with open(filename, "r") as fr:
+                lines = fr.readlines()
+                if len(lines) > 0:
+                    num_pdbs = len(lines)-1
+                    for ln in lines[1:]:
+                        pdbo = ln.strip().split(",")[2]
+                        patho = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset, gene=gene, pdb=pdbo)                        
+                        pdb_file = patho.thruputs + pdbo.lower() + "_repx.pdb"
+            
+            return str(num_pdbs)
+        else:
+            return "-"                
+
     def getPdbNumTasks(self,gene,pdb,isvariant):
         pdb_path = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset,gene=gene,pdb=pdb)
         filenameo = pdb_path.thruputs + "params_background.txt"
