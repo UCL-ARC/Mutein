@@ -14,6 +14,9 @@ python ${script} "MODE=$mode"
 
 
 
+echo ""
+echo ""
+echo "Current directory contents"
 target="/home/ucbtlcr/Scratch/workspace/"
 let count=0
 for f in "$target"/*
