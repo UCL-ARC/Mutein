@@ -102,7 +102,7 @@ def run_pipeline(args):
             if len(lines_err) > 0:
                 shall_rerun = True
             elif not error_only and exists(out_file):
-                time = datetime.datetime.fromtimestamp(pathlib.Path(out_file).stat())
+                time = datetime.datetime.fromtimestamp(pathlib.Path(out_file).stat().st_mtime_ns)
                 now = pd.Timestamp.now()
                 hourdiff = (now-time).thrs
                 print(hourdiff, out_file)
