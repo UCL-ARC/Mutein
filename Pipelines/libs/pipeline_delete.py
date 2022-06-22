@@ -14,6 +14,7 @@ import pandas as pd
 from shutil import copyfile
 from os.path import exists
 import subprocess
+import pathlib
 
 # import from the shared library in Mutein/Pipelines/shared/lib
 import sys
@@ -75,7 +76,8 @@ def run_pipeline(args):
             else:
                 print("Missing files", number, name)
 
-    elif mode == "RERUNERROR":
+    elif mode == "RERUNERROR" or mode == "RERUNORPHANS":
+        error_only = mode == "RERUNERROR"
         file_numbers = {}
         for file in onlyfiles:
             name = file.split(".")[0]
@@ -87,55 +89,65 @@ def run_pipeline(args):
                 file_numbers[number] = name
 
         for number, name in file_numbers.items():
+            shall_rerun = False
             error_file = scratch_dir + name + ".e" + str(number)
             out_file = scratch_dir + name + ".o" + str(number)
             if exists(error_file):
                 with open(error_file) as fr:
                     lines_err = fr.readlines()
             if len(lines_err) > 0:
-                if exists(out_file):
-                    with open(out_file) as fr:
-                        lines_out = fr.readlines()
-                    if len(lines_out) > 1:
-                        cmd = lines_out[1].strip()
-                        if len(cmd) > 3:
-                            print("Rerunning cmd:", cmd)
-                            # but if it is an array job we only want to run the single task
-                            args = cmd.split(" ")
-                            if "pipeline_array" in cmd:
-                                script = args[-4]
-                                # cmd = cmd.replace("pipeline_array","pipeline_single")
-                                script = script[:-8]
-                                script += "single.sh"
-                                args[-4] = script
-                                task = number.split(".")[1]
-                                args[-3] += "@task=" + task
-                                args = args[2:]
-                                args[0] = "qsub"
-                                print(number, name, "rerunning as single task:", args)
+                shall_rerun = True
+            elif not error_only and exists(out_file):
+                time = pathlib.Path(out_file).stat().st_mtime
+                now = pd.Timestamp.now()
+                hourdiff = (now-time).thrs
+                print(hourdiff, out_file)
 
-                            fullcall = ""
-                            for arg in args:
-                                fullcall += arg + " "
-                            args.append(
-                                fullcall
-                            )  # add the batch itself onto the arguments
+            
+            
+            if shall_rerun and exists(out_file):
+                with open(out_file) as fr:
+                    lines_out = fr.readlines()
+                if len(lines_out) > 1:
+                    cmd = lines_out[1].strip()
+                    if len(cmd) > 3:
+                        print("Rerunning cmd:", cmd)
+                        # but if it is an array job we only want to run the single task
+                        args = cmd.split(" ")
+                        if "pipeline_array" in cmd:
+                            script = args[-4]
+                            # cmd = cmd.replace("pipeline_array","pipeline_single")
+                            script = script[:-8]
+                            script += "single.sh"
+                            args[-4] = script
+                            task = number.split(".")[1]
+                            args[-3] += "@task=" + task
+                            args = args[2:]
+                            args[0] = "qsub"
+                            print(number, name, "rerunning as single task:", args)
 
-                            process = subprocess.Popen(
-                                args=args,
-                                stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE,
-                                text=True,
-                            )
-                            result = process.communicate()
-                            print(result)
-                            os.remove(error_file)
-                            os.remove(out_file)
-                            print("...removing", number, name)
-                        else:
-                            print("Can't re-run as manually started:", out_file)
-                else:
-                    print("Can't re-run error as no outfile:", error_file)
+                        fullcall = ""
+                        for arg in args:
+                            fullcall += arg + " "
+                        args.append(
+                            fullcall
+                        )  # add the batch itself onto the arguments
+
+                        process = subprocess.Popen(
+                            args=args,
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE,
+                            text=True,
+                        )
+                        result = process.communicate()
+                        print(result)
+                        os.remove(error_file)
+                        os.remove(out_file)
+                        print("...removing", number, name)
+                    else:
+                        print("Can't re-run as manually started:", out_file)
+            else:
+                print("Can't re-run error as no outfile:", error_file)
     elif mode == "RERUNALL":
         file_numbers = {}
         for file in onlyfiles:
