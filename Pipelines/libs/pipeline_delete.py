@@ -15,6 +15,7 @@ from shutil import copyfile
 from os.path import exists
 import subprocess
 import pathlib
+import datetime
 
 # import from the shared library in Mutein/Pipelines/shared/lib
 import sys
@@ -101,7 +102,7 @@ def run_pipeline(args):
             if len(lines_err) > 0:
                 shall_rerun = True
             elif not error_only and exists(out_file):
-                time = pathlib.Path(out_file).stat().st_mtime
+                time = datetime.datetime.fromtimestamp(pathlib.Path(out_file).stat())
                 now = pd.Timestamp.now()
                 hourdiff = (now-time).thrs
                 print(hourdiff, out_file)
