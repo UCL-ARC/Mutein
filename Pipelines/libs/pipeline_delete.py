@@ -104,7 +104,7 @@ def run_pipeline(args):
             elif not error_only and exists(out_file):
                 time = datetime.datetime.fromtimestamp(pathlib.Path(out_file).stat().st_mtime)
                 now = pd.Timestamp.now()
-                hourdiff = (now-time).thrs
+                hourdiff = (now-time)
                 print(hourdiff, out_file)
 
             
