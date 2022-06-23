@@ -15,6 +15,7 @@ N.b this file may be run on the myriad clusters or on a local machine
 import os
 import pandas as pd
 from shutil import copyfile
+from os.path import exists
 
 # import from the shared library in Mutein/Pipelines/shared/lib
 import sys
@@ -45,6 +46,7 @@ def run_pipeline(args):
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
     pdb = argus.arg("pdb", "")
+    repairs = str(argus.arg("repairs", "x"))
 
     task = int(argus.arg("task"))
 
@@ -74,7 +76,7 @@ def run_pipeline(args):
         task = argus.arg("task", "none")
         mutation_string = argus.arg("mutation", "none")
         ############################################
-        pdbfile = pdbcode + "_rep" + str(argus.arg("repairs")) + ".pdb"
+        pdbfile = pdbcode + "_rep" + repairs + ".pdb"
         mutations = []
         # task=all means all, task=1:n means an explicit row, row=-1 means the mutation string has been passd in explicitly
         if mutation_string == "none":
@@ -94,6 +96,9 @@ def run_pipeline(args):
             # we have specified a mutation and row from the file
             mutations.append([mutation_string, 0])
 
+        work_path = pdb_path.pdb_thruputs + "vagg/"
+        pdb_path.goto_job_dir(work_path, args, argus.params, "_inputs04b")
+
         for pdb_mut, gene_mut, row in mutations:
             print(pdb_mut, gene_mut, row)
             row_path = pdb_path.pdb_thruputs + "var_" + str(row) + "/"
@@ -101,7 +106,7 @@ def run_pipeline(args):
             argus.params["thisrow"] = row
             argus.params["genemut"] = gene_mut
             argus.params["pdbmut"] = pdb_mut
-            pdb_path.goto_job_dir(row_path, args, argus.params, "_inputs06")
+            pdb_path.goto_job_dir(row_path, args, argus.params, "_inputs06",emptyDirectory=True)
             print(
                 "### foldx06: ... copying file",
                 pdb_path.pdb_thruputs + pdbfile,
@@ -111,20 +116,20 @@ def run_pipeline(args):
 
             #### TEMPORARILY DO BOTH POSCAN AND BUILD #####################
             fx_runner = Foldx.Foldx(argus.arg("foldxe"))
-            pdb = pdbcode + "_rep" + str(argus.arg("repairs"))
+            pdb = pdbcode + "_rep" + repairs
             filename = pdb_path.pdb_inputs + "Coverage.csv"
-            fdfp = FileDf.FileDf(filename)
-            cov_df = fdfp.openDataFrame()
+            if exists(filename):
+                fdfp = FileDf.FileDf(filename)
+                cov_df = fdfp.openDataFrame()                    
+            else:
+                empty_dic = {"source": [],"gene": [],"accession": [],"pdb": [],"method": [],"resolution": [],"chain": [],"pdb_start": [],"pdb_end": [],"gene_start": [],"gene_end": [],"coverage": [],"score": []}
+                cov_df = pd.DataFrame.from_dict(empty_dic)            
             if gene_mut.lower() == "x" or gene_mut == "":
                 gene_muts = []
             else:
                 gene_muts = gene_mut.split(",")
-
-            work_path = pdb_path.pdb_thruputs + "vagg/"
-            pdb_path.goto_job_dir(work_path, args, argus.params, "_inputs04b")
-            pdb_path.goto_job_dir(row_path, args, argus.params, "_inputs04b")
-
-            if True:
+                        
+            if False:
                 # ~~~~~~~~~~~~~~~~~~~~~~~~~~ POSITION SCAN ~~~~~~~~~~~~~~~~~~~~~~~~#
                 ################################################################
                 fx_runner.runPosscan(pdbfile, pdb_mut)
@@ -144,13 +149,25 @@ def run_pipeline(args):
                 ddg_files = []
                 tag = 0
                 pdb_muts = pdb_mut.split(",")
-                for pm in pdb_muts:
-                    tag += 1
-                    ################################################################
-                    fx_runner.runBuild(pdbfile, pm, tag)
-                    ################################################################
+
+                allAtOnce=True
+                if allAtOnce:
+                    muts = []
+                    tag = 0
                     ddg_file = row_path + "Dif_" + str(tag) + "_" + pdb + ".fxout"
-                    ddg_files.append([ddg_file, pm])
+                    for pm in pdb_muts:                            
+                        muts.append(pm)                        
+                    fx_runner.runBuild(pdbfile, pdb_muts, tag)                        
+                    ddg_files.append([ddg_file, pdb_muts])
+                else:
+                    for pm in pdb_muts:
+                        tag += 1
+                        ################################################################
+                        fx_runner.runBuild(pdbfile, [pm], tag)
+                        ################################################################
+                        ddg_file = row_path + "Dif_" + str(tag) + "_" + pdb + ".fxout"
+                        ddg_files.append([ddg_file, pm])
+
 
                 # create them all into 1 ddg file
                 # df_file = row_path + "ddg_buildmodel.csv"
@@ -158,7 +175,7 @@ def run_pipeline(args):
                     pdb_path.pdb_thruputs + "vagg/" + str(row) + "_ddg_buildmodel.csv"
                 )
                 fx_runner.createBuildCsv(
-                    row_path, pdb, pdb_muts, gene_muts, cov_df, ddg_files, df_file
+                    row_path, pdb, pdb_muts, gene_muts, cov_df, ddg_files, df_file,allAtOnce
                 )
     print("MUTEIN SCRIPT ENDED")
 

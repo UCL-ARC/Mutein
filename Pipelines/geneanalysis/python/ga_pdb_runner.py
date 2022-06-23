@@ -17,18 +17,17 @@ def prepareGenes(args):
 
 
 def preparePdbs(args):
-    print("!!!ERROR - irrelevant pipeline")
+    import Pipelines.geneanalysis.python.mod_pdbtoprotein as ppa
+    ppa.run_pipeline(args)
 
 
 def repairPdbs(args):
     import Pipelines.geneanalysis.python.mod_pdbrepair as ppb
-
     ppb.run_pipeline(args)
 
 
 def makeParams(args):
     import Pipelines.geneanalysis.python.mod_pdbparams as ppc
-
     ppc.run_pipeline(args)
 
 

@@ -218,6 +218,15 @@ def pipeline_qsubber(args):
                     inputs += "@dataset=" + dataset
                     inputs += "@gene=" + gene
                     inputs += "@pdb=" + pdb
+                    id_ext = ""
+                    if len(dataset)>=2:
+                        id_ext += dataset[0:2]
+                    if len(gene)>=2:
+                        id_ext += ""+gene[0:2]
+                    if len(pdb)>=2:
+                        id_ext += ""+pdb[0:2] + "_"
+                    qsubid = id_ext + qsubid
+
                     # inputs += "@chain=" + chain
                     if active:
                         batch_dic[str(id)] = (

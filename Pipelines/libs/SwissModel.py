@@ -95,9 +95,15 @@ class SwissModel:
                     fd_exp.add("score", 1)
 
                 if len(segments) > 0:
+                    # check it is not CA only
                     onep = Pdb.Pdb(self.gene, sm_pdb, method, reso)
                     onep.segments = segments
-                    pdb_list.append(onep)
+                    pdb_fl = Pdb.PdbFile(sm_pdb,sm_file)
+                    if not pdb_fl.isCaOnly():
+                        pdb_list.append(onep)
+                    else:
+                        print("CA only pdb file",sm_file)
+                    
 
             elif s["provider"].upper() == "SWISSMODEL":
                 sm_pdb = "smhom_" + s["template"].lower() + "_" + frm + "_" + to
@@ -135,6 +141,12 @@ class SwissModel:
 
                     onep = Pdb.Pdb(self.gene, sm_pdb, method, reso)
                     onep.segments = segments
+                    # check it is not CA only
+                    pdb_fl = Pdb.PdbFile(sm_pdb,sm_file)
+                    if not pdb_fl.isCaOnly():
+                        pdb_list.append(onep)
+                    else:
+                        print("CA only pdb file",sm_file)
                     pdb_list.append(onep)
 
             else:

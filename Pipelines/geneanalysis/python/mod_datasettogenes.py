@@ -37,72 +37,110 @@ def run_pipeline(args):
     sys.path.append(install_dir + "/Pipelines/libs")
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
+    gene = argus.arg("gene","")
     dataset_path = Paths.Paths(
         data_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset
     )
     genes_list = []
+    if gene != "":
+        genes_list = [gene]
+
     """
     "gene_name"	"n_syn"	"n_mis"	"n_non"	"n_spl"	"n_ind"	"wmis_cv"	"wnon_cv"	"wspl_cv"	"wind_cv"	"pmis_cv"	"ptrunc_cv"	"pallsubs_cv"	"pind_cv"	"qmis_cv"	"qtrunc_cv"	"qallsubs_cv"	"pglobal_cv"	"qglobal_cv"
     "NOTCH1"	404	2700	772	360	1208	3.98846230912502	21.7266421919647	21.7266421919647	17.6547328391658	0	0	0	8.07429581976078e-68	0	0	0	0	0
     """
-    # 2.) First get list of genes:
-    if len(genes_list) == 0:
-        genes_file = dataset_path.dataset_inputs + "/genes.txt"
-        with open(genes_file, "r") as fr:
-            lines = fr.readlines()
-            # lines = ["","FAT1"]
-            for l in range(1, len(lines)):
-                # for l in range(1,2):
-                line = lines[l]
-                cols = line.split("\t")
-                gene = cols[0].upper()
-                if gene[0] == '"':
-                    gene = gene[1:]
-                if gene[-1] == '"':
-                    gene = gene[:-1]
-                genes_list.append(gene)
+    # The file contains the variants and the ist of genes
+    genes_variant_file = dataset_path.dataset_inputs + "genes_variants_inputs.csv"    
+    genes_df = FileDf.FileDf(genes_variant_file, sep=",", header=True).openDataFrame()
 
-    # 1.) First prepare the variants file
-    genes_variant_file = dataset_path.dataset_inputs + "genes_variants.txt"
-    gene_variant_dic = genestovariants.extractVariantsFromFile(genes_variant_file)
+    # this contains the organism id from uniport, eg human=9606 and mouse=10090
+    organism_id_path = dataset_path.dataset_inputs + "organism_id.txt"
+    with open(organism_id_path, "r") as fr:
+        lines = fr.readlines()
+        organism_id = lines[0].strip()
+    
+    # 2.) First get list of genes:
+    acc_no = {}
+    acc_gene = {}
+    if len(genes_list) == 0:                
+        genes_list = genes_df["gene"].unique()
+
+    # 1.) First prepare the variants file    
+    gene_variant_dic = genestovariants.extractVariantsFromFile(genes_df)
     genes = []
     for gene in genes_list:
         gene_path = Paths.Paths(
             data_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset, gene=gene
         )
-        accession = genetoprotein.accession_from_bioservices(gene.upper())
-        if len(accession) > 1:
-            seq = genetoprotein.sequence_from_bioservices(accession)
-            seq_lines = seq.split("\n")
-            wholeseq = ""
-            for s in range(1, len(seq_lines)):
-                sl = str(seq_lines[s].strip())
-                wholeseq += sl
-            gn = Gene.Gene(gene, accession, wholeseq)
-            genes.append(gn)  # main repository for data we are creating in function
-            script_file = "libs/pipeline_qsubber.py"
-            yaml_file = "geneanalysis/config/batch_pdb.yml"
-            bm = BatchMaker.BatchMaker(script_file, yaml_file)
-            # CREATE the variants for the gene
-            vrs = gene_variant_dic[gene.upper()]
-            for i in range(len(vrs["bases"])):
-                bs = vrs["bases"][i]
-                p1 = vrs["prev_aa"][i]
-                rs = vrs["residue"][i]
-                na = vrs["new_aa"][i]
-                vr = vrs["variant"][i]
-                # print(bs,p1,rs,na,vr)
-                vrnt = Variant.Variant(gene, vr, bs)
-                gn.addVariant(vrnt)
-            dfv = gn.getVariantsDataFrame()
-            dfv.to_csv(gene_path.gene_inputs + "/variants.csv", index=False)
-
+        accessions = genetoprotein.accession_from_bioservices(gene.upper(),organism_id,True)
+        if len(accessions) == 0:
+            accessions = genetoprotein.accession_from_bioservices(gene.upper(),organism_id,False)
+        if len(accessions) > 0:
+            for accession in accessions:
+                seq = genetoprotein.sequence_from_bioservices(accession)
+                seq_lines = seq.split("\n")
+                wholeseq = ""
+                for s in range(1, len(seq_lines)):
+                    sl = str(seq_lines[s].strip())
+                    wholeseq += sl
+                gn = Gene.Gene(gene, accession, wholeseq)
+                genes.append(gn)  # main repository for data we are creating in function
+                script_file = "libs/pipeline_qsubber.py"
+                yaml_file = "geneanalysis/config/batch_pdb.yml"
+                bm = BatchMaker.BatchMaker(script_file, yaml_file)
+                # CREATE the variants for the gene
+                vrs = gene_variant_dic[gene.upper()]
+                for i in range(len(vrs["bases"])):
+                    bs = vrs["bases"][i]
+                    p1 = vrs["prev_aa"][i]
+                    rs = vrs["residue"][i]
+                    na = vrs["new_aa"][i]
+                    vr = vrs["variant"][i]
+                    # print(bs,p1,rs,na,vr)
+                    vrnt = Variant.Variant(gene, vr, bs)
+                    gn.addVariant(vrnt)
+                acc_gene[gn.accession] = gene
+                acc_no[gn.accession] = gn.numVariants()
+                dfv = gn.getVariantsDataFrame()
+                dfv.to_csv(gene_path.gene_inputs + "/variants.csv", index=False)
+                
     # make a list of the genes
     genes_csv = FileDf.FileDic(dataset_path.dataset_inputs + "genes_list.csv", {})
-    for gn in genes_list:
-        genes_csv.add("dataset", dataset)
-        genes_csv.add("gene", gn)
+    genes_csv_all = FileDf.FileDic(dataset_path.dataset_inputs + "genes_list_all.csv", {})
+    
+    used_genes = []
+    
+    for w in sorted(acc_no, key=acc_no.get, reverse=True):
+        acc,no = w, acc_no[w]
+        gn = acc_gene[acc]
+        genes_csv_all.add("dataset", dataset)
+        genes_csv_all.add("gene", gn)
+        genes_csv_all.add("organism", organism_id)
+        genes_csv_all.add("accession", acc)
+        genes_csv_all.add("no_vars", no)
+
+        if gn not in used_genes:
+            genes_csv.add("dataset", dataset)
+            genes_csv.add("gene", gn)
+            genes_csv.add("organism", organism_id)
+            genes_csv.add("accession", acc)
+            genes_csv.add("no_vars", no)
+            used_genes.append(gn)
+        
+            
+
+    #for gn,no in genes_dic.items():
+    #    genes_csv.add("dataset", dataset)
+    #    genes_csv.add("gene", gn)
+    #    genes_csv.add("no_vars", no)
     genes_csv.saveAsDf()
+    genes_df = genes_csv_all.saveAsDf()
+    for gene in genes_list:
+        genes_one = genes_df.query('gene == "'+gene+'"')        
+        gene_path = Paths.Paths(data_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset, gene=gene)
+        one_path = gene_path.gene_inputs + "accessions.csv"
+        genes_one.to_csv(one_path, index=False)
+        
 
     print("### COMPLETED genes to gene ###")
     print("MUTEIN SCRIPT ENDED")

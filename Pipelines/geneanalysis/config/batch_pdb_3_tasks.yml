@@ -1,25 +1,25 @@
 ---
 id: 'TASKS'
-qsub_id: 'foldx_posscan'
+qsub_id: 'tasks'
 pipe_dir: 'Pipelines/geneanalysis/python/'
 script: 'ga__runner'
-time: '48:00:0'
+time: '10:00:0'
 cores: "8"
 dependency: '-1'
 array: -1
 arrayfile: "params"
-inputs: "runs=f@repairs=10"
+inputs: "runs=f@repairs=x"
 active: 'Y'
 ---
 id: 'VTASKS'
-qsub_id: 'foldx_varscan'
+qsub_id: 'vtasks'
 pipe_dir: 'Pipelines/geneanalysis/python/'
 script: 'ga__runner'
-time: '48:00:0'
+time: '10:00:0'
 cores: "8"
 dependency: '-1'
 array: -1
 arrayfile: "vparams"
-inputs: "runs=g@repairs=10@variant=*"
+inputs: "runs=g@repairs=x@variant=*"
 active: 'Y'
 --- 

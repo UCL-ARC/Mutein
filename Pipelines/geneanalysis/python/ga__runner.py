@@ -48,11 +48,9 @@ def run_pipeline(args):
     else:
         import Pipelines.geneanalysis.python.ga_dataset_runner as runner
 
-    if "a" in runs:
-        import Pipelines.geneanalysis.python.ga_dataset_runner as runnerd
-
+    if "a" in runs:        
         print("Mutein: Preparing genes")
-        runnerd.prepareGenes(args)
+        runner.prepareGenes(args)
     if "b" in runs:
         print("Mutein: Preparing pdbs")
         runner.preparePdbs(args)

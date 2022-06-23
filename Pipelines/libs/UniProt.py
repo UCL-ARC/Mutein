@@ -19,9 +19,12 @@ warnings.simplefilter("ignore", BiopythonWarning)
 
 
 class UniProt:
-    def __init__(self, gene):
+    def __init__(self, gene,accession):
         self.gene = gene
-        self.accession = genetoprotein.accession_from_bioservices(gene)
+        #self.organism_id = organism_id
+        self.accession = accession#genetoprotein.accession_from_bioservices(gene,organism_id,True)
+        #if len(self.accession) < 2:
+        #    self.accession = genetoprotein.accession_from_bioservices(gene,organism_id,False)
         seq = genetoprotein.sequence_from_bioservices(self.accession)
         seq_lines = seq.split("\n")
         self.seq = ""
@@ -76,7 +79,12 @@ class UniProt:
             if len(segments) > 0:
                 onep = Pdb.Pdb(self.gene, pdb.lower(), method, reso)
                 onep.segments = segments
-                pdb_list.append(onep)
+                # check it is not CA only
+                pdb_fl = Pdb.PdbFile(pdb.lower(),pdb_file)
+                if not pdb_fl.isCaOnly():
+                    pdb_list.append(onep)
+                else:
+                    print("CA only pdb file",pdb_file)
 
         df = fd_pdb.saveAsDf()
 

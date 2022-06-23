@@ -40,7 +40,7 @@ def run_pipeline(args):
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
     pdbcode = argus.arg("pdb").lower()
-    reps = str(argus.arg("repairs"))
+    reps = str(argus.arg("repairs","x"))
 
     pdb_path = Paths.Paths(
         data_dir,
@@ -111,15 +111,18 @@ def run_pipeline(args):
                         aaa = linecontents[3].strip()
                         if aaa in aa_dict:
                             aa = aa_dict[aaa]
-                            mut = (
-                                aa
-                                + linecontents[4].strip()
-                                + linecontents[5].strip()
-                                + "a"
-                            )  # aa chain rid mutation = mutation string
-                            params_lst.append(mut)
+                            aas = "ACDEFGHIKLMNPQRSTVWY"
+
+                            for aam in aas:                            
+                                mut = (
+                                    aa
+                                    + linecontents[4].strip()
+                                    + linecontents[5].strip()
+                                    + aam
+                                )  # aa chain rid mutation = mutation string
+                                params_lst.append(mut)
                         else:
-                            print("!Error maybe?", aaa)  # TODO think about this
+                            print("Non residue entry", aaa)  
 
         ##### Create a dataframe for the paramterfile in the number of chunks specified
         ##### Open up the coverage file

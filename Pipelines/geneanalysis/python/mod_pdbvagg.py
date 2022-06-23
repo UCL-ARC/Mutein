@@ -123,7 +123,7 @@ def run_pipeline(args):
                 ana = Analysis.Analysis(ddg_df, argus.arg("pdb"))
                 ana.createDdgResidue(plot_file, "variants", xax="gene_no")
             else:
-                print("vAgg - not all results present for aggregation")
+                print("vAgg - not all results present for aggregation",in_csv)
 
     print("### COMPLETED FoldX aggregate job ###")
     print("MUTEIN SCRIPT ENDED")

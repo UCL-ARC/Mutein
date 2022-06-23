@@ -20,71 +20,18 @@ def addpath(inputs):
     return inputs
 
 ######################################################################
-def test_proteinprep(inputs):
-    inputs = addpath(inputs)
-    import ga_3_0_pdbprep as ppl
-    args = ["", inputs]
-    ppl.run_pipeline(args)
-
-def test_proteinsplit(inputs):
-    inputs = addpath(inputs)
-    import ga_3_pdbbackparams as ppl
-    args = ["", inputs]
-    ppl.run_pipeline(args)
-
-def test_proteinvsplit(inputs):
-    inputs = addpath(inputs)
-    import ga_3_pdbvarparams as ppl
-    args = ["", inputs]
-    ppl.run_pipeline(args)
-
-def test_proteinrepair(inputs):
-    inputs = addpath(inputs)
-    import ga_3_proteinrepair as ppl
-    args = ["", inputs]
-    ppl.run_pipeline(args)
-
-def test_proteintasks(inputs):
-    inputs = addpath(inputs)
-    import ga04a_posscan as ppl
-    args = ["", inputs]
-    ppl.run_pipeline(args)
-
-def test_proteinvtasks(inputs):
-    inputs = addpath(inputs)
-    import ga04b_singlescan as ppl
-    args = ["", inputs]
-    ppl.run_pipeline(args)
-
-def test_proteinagg(inputs):
-    inputs = addpath(inputs)
-    import ga05a_aggddg as ppl
-    args = ["", inputs]
-    ppl.run_pipeline(args)
-
-def test_proteinvagg(inputs):
-    inputs = addpath(inputs)
-    import ga05b_singlesagg as ppl
-    args = ["", inputs]
-    ppl.run_pipeline(args)
-
-def test_proteindblagg(inputs):
-    inputs = addpath(inputs)
-    import ga_2_genestitch as ppl
-    args = ["", inputs]
-    ppl.run_pipeline(args)
-######################################################################
 ### INPUTS
-dataset="notch"
-gene="notch1"
-pdb="2he0"
+dataset="mouse"
+gene="FAT1"
+pdb="smhom_6vg4_1_a_768_1347"
 
-repairs=8
-split=20
-vsplit=50
-
-runs = "c"
-"""
+repairs="1"
+repair_from = "x"
+split=10
+vsplit=10
+task=1
+runs = "e"
+""" 
     if "a" in runs:        print("Mutein: Preparing genes")        
     if "b" in runs:        print("Mutein: Preparing pdbs")        
     if "c" in runs:        print("Mutein: Repairing pdbs")        
@@ -103,43 +50,6 @@ def runPPL(inputs):
     import ga__runner as ppl
     args = ["", inputs]
     ppl.run_pipeline(args)
-runPPL("runs="+runs+"@dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@repairs="+str(repairs)+"@task=2"+"@chunk="+str(split)+"@variant=*@vchunk="+str(vsplit))
 
+runPPL("runs="+runs+"@dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@repairs="+str(repairs)+"@repair_from="+str(repair_from)+"@task=" +str(task)+"@chunk="+str(split)+"@variant=*@vchunk="+str(vsplit))
 
-"""
-# whhich steps of the pipeline to run
-repair = 1
-prepareA = 0
-prepareB = 0
-tasks = 0
-vtasks = 0
-agg = 0
-vagg = 0
-doubleagg = 0
-
-if repair:
-    # @@@@ - REPAIR - @@@@
-    test_proteinrepair("dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@repairs="+str(repairs))
-if prepareA:
-    # @@@@ - PREPARE A - @@@@
-    test_proteinprep("variant=*@dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@split="+str(split)+"@vsplit="+str(vsplit))
-if prepareB:
-    # @@@@ - PREPARE B - @@@@
-    test_proteinsplit("dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@split="+str(split))
-    test_proteinvsplit("variant=*@dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@vsplit="+str(vsplit))
-if tasks:
-    # @@@@ - TASKS - @@@@
-    test_proteintasks("dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@repairs="+str(repairs)+"@task=1")
-if vtasks:
-    # @@@@ - Variant TASKS - @@@@
-    test_proteinvtasks("dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@repairs="+str(repairs)+"@task=1")
-if agg:
-    # @@@@ - AGG - @@@@
-    test_proteinagg("dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@repairs="+str(repairs))
-if vagg:
-    # @@@@ - Variant AGG - @@@@
-    test_proteinvagg("dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@repairs="+str(repairs))
-if doubleagg:
-    # @@@@ - Variant AGG - @@@@
-    test_proteindblagg("dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@repairs="+str(repairs))
-"""

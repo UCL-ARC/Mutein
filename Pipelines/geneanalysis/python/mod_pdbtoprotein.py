@@ -25,7 +25,6 @@ import genestovariants
 import SwissModel
 import UniProt
 import PdbRunner
-import FileDf
 
 
 def run_pipeline(args):
@@ -35,30 +34,24 @@ def run_pipeline(args):
     sys.path.append(install_dir + "/Pipelines")
     sys.path.append(install_dir + "/Pipelines/libs")
     data_dir = argus.arg("data_dir")
-    dataset = argus.arg("dataset")
+    dataset = argus.arg("dataset", "")
     gene = argus.arg("gene")
-    gene_path = Paths.Paths(
-        data_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset, gene=gene
-    )
-
-    import Pipelines.geneanalysis.python.mod_genetoproteins as pplb
-
-    print("Extracting pdbs for", gene)
-    pplb.run_pipeline(args)
-
-    import Pipelines.geneanalysis.python.mod_geneparams as pplc
-
-    print("Extracting pdbs for", gene)
-    exists = pplc.run_pipeline(args)
-
-    if exists:
-        import Pipelines.geneanalysis.python.mod_genevparams as ppld
-
-        print("Extracting pdbs for", gene)
-        ppld.run_pipeline(args)
-
-    print("### COMPLETED gene preparation ###")
+    pdb = argus.arg("pdb")    
+    for pdb in [pdb]:
+        pdb_path = Paths.Paths(
+                    data_dir,
+                    install_dir + "Pipelines/geneanalysis",
+                    dataset=dataset,
+                    gene=gene,
+                    pdb=pdb,
+                )
+        
+        pdburl = genetoprotein.getPDBLink(pdb)
+        biopdb = genetoprotein.retrievePdbStructure(pdburl, pdb, pdb_path.pdb_inputs + pdb + ".pdb")
+        
+    print("### COMPLETED gene to proteins pipeline ###")
     print("MUTEIN SCRIPT ENDED")
+    return [pdb]
 
 
 ##########################################################################################

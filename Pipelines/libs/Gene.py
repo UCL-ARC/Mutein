@@ -19,8 +19,19 @@ class Gene:
         self.pdbs = {}
 
     def addVariant(self, variant):
-        if variant.variant not in self.variants:
-            self.variants[variant.variant] = variant
+        # check that the variant is correctly specified
+        
+        if len(self.sequence) >= variant.residue:
+            if self.sequence[variant.residue-1] == variant.from_aa:
+                if variant.variant not in self.variants:
+                    self.variants[variant.variant] = variant
+            else:
+                print("!!! Variant does not exist in gene:" + self.gene,variant.from_aa, variant.residue)
+        else:
+                print("!!!INPUT ERROR!!! Variant off the end of gene seq:" + self.gene,variant.from_aa, variant.residue)
+
+    def numVariants(self):
+        return len(self.variants)
 
     def getPdb(self, pdbcode, method, res):
         if pdbcode not in self.pdbs:

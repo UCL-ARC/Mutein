@@ -9,6 +9,9 @@ If any restructuring is wanted, it should be possible to do it all here and feed
 """
 # import helper as hlp
 import os
+from os import listdir
+from os.path import isfile, join
+from os.path import exists
 
 
 class Paths:
@@ -152,12 +155,21 @@ class Paths:
                 pass  # this could be a rare case of 2 nodes creating it at the same time
         return retpath + "/"
 
-    def goto_job_dir(self, dir_path, args, params, name):
+    def goto_job_dir(self, dir_path, args, params, name, emptyDirectory=False):
         if not os.path.exists(dir_path):
             try:
                 os.mkdir(dir_path)
             except:
                 pass  # this could be a rare case of 2 nodes creating it at the same time
+        else:
+            if emptyDirectory:
+                onlyfiles = [f for f in listdir(dir_path) if isfile(join(dir_path, f))]                
+                for file in onlyfiles:
+                    if exists(dir_path + file):
+                        os.remove(dir_path + file)
+
+
+            
         os.chdir(dir_path)
         inputs_file = name + ".log"
         with open(inputs_file, "w") as fw:

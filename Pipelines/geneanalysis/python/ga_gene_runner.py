@@ -13,12 +13,12 @@ sys.path.append(retpath)
 
 
 def prepareGenes(args):
-    print("!!!ERROR - irrelevant pipeline")
+    import Pipelines.geneanalysis.python.mod_datasettogenes as ppla
+    ppla.run_pipeline(args)
 
 
 def preparePdbs(args):
     import Pipelines.geneanalysis.python.mod_genetoproteins as ppa
-
     ppa.run_pipeline(args)
 
 
