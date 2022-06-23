@@ -1,5 +1,4 @@
-# Snakemake mutein config file
-test_variable: "one two three"
+# Snakemake mutein YAML config file
 
 #which reference sequence to use
 ref:
@@ -9,3 +8,4 @@ ref:
   fasta:  "GCA_000001405.15_GRCh38_no_alt_plus_hs38d1_analysis_set.fna.gz"
   md5:       "md5checksums.txt"
   readme:    "README_analysis_sets.txt"
+

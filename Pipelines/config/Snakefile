@@ -1,6 +1,23 @@
+#setup any variables that require python rather than just YAML
+include: "variables.smk"
+
+#use this first, default rule to trigger what you want to happen
+rule all:
+    input:
+        all_conda_envs, #ensure all conda envs are setup
+        all_ref_files   #ensure reference genome is present and indexed
+
+# ==== order of included files below indicates normal execution order ====
+
+#some simple test rules
+#include: "test.smk"
+
+#setup all the conda environments using conda create
+#(this is a workaround for conda env environment.yaml not working)
+include: "setup_conda_envs.smk"
+
 #download and md5 check the reference genome fasta file
 include: "reference.smk"
 
-#some simple test rules
-include: "test.smk"
-
+#download keogh2018 dataset
+#include: "download/keogh2018.smk"

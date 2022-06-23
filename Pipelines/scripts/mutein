@@ -1,19 +1,55 @@
 #!/usr/bin/env python3
 
 import argparse
+import sys
 import os
+import random
+import shutil
+
+#seed with system time
+random.seed()
 
 def main_func():
     args = parse_args()
 
-    if args.subcommand == "check-cwd":
-        check_cwd(args)
+    if args.subcommand == "check-cwd": check_cwd(args)
+    if args.subcommand == "recycle":   recycle(args)
 
 def check_cwd(args):
     if os.path.realpath(os.getcwd()) != os.path.realpath(os.environ['MUT_DATA']):
         print(f"Warning: not in expected data directory: {os.environ['MUT_DATA']}")
 
     exit(0)
+
+def recycle(args):
+    recycle_bin = "recycle_bin"
+
+    assert sys.argv[1] == "recycle"
+    assert sys.argv[-1] == "END", f"the literal END must follow the file to be recycled: {sys.argv[2:]}"
+    assert "END" not in sys.argv[2:-1], f"the literal END must only appear once at the end of the list: {sys.argv[2:]}"
+
+    for fname in sys.argv[2:-1]:
+        #sliently ignore non existing files
+        if not os.path.exists(fname):
+            #not an error if file does not exist
+            #this is to prevent scripts having to test for the file before recycling it
+            #ie we want any stale file out of the way without using risky "rm -f" command
+            continue
+
+        #try to create recycle bin if not already present
+        if not os.path.isdir(recycle_bin):
+            #fail here if we cannot create the folder
+            os.mkdir(recycle_bin)
+
+        new_name = os.path.join(recycle_bin,os.path.basename(fname))
+
+        #make sure not to overwrite existing recycle bin file
+        if os.path.exists(new_name):
+            new_name += ".%d"%random.randrange(1000000)
+            if os.path.exists(new_name): raise Exception(f"File {new_name} already in recycle bin")
+
+        #move to recycle bin
+        shutil.move(fname,new_name)
 
 def parse_args():
     '''
@@ -23,7 +59,9 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Wrapper function for top-level mutein functions')
     subparsers = parser.add_subparsers(dest="subcommand")
 
-    parser_check_cwd = subparsers.add_parser('check-cwd', help='check the working directory is the expected data folder')
+    check_cwd = subparsers.add_parser('check-cwd', help='check the working directory is the expected data folder')
+    recycle = subparsers.add_parser('recycle', help='move the file into a subfolder called recycle_bin')
+    recycle.add_argument('file',nargs='+',help="list of files to recycle, last one must be a list terminator END")
 
     args = parser.parse_args()
 

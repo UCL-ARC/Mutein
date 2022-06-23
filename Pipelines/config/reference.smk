@@ -1,10 +1,3 @@
-import os
-
-#define the main reference genome fasta path and all its index files
-bgz_fasta = os.path.join(config["ref"]["dir"],config["ref"]["fasta"])
-exts = ['gzi','fai','bwt','pac','ann','amb','sa']
-all_ref_files = [ bgz_fasta ] + expand('{base}.{ext}',base=bgz_fasta,ext=exts)
-
 #require the reference fasta file, and its readme and md5 file
 #md5 check the reference file
 localrules: check_reference
@@ -24,27 +17,70 @@ rule check_reference:
 #download a file from config[ref][uri] to config[ref][tmp]
 localrules: wget_ref_file
 rule wget_ref_file:
-    output: os.path.join(config["ref"]["tmp"],"{filename}")
-    shell:  "wget -O {output} {config[ref][uri]}/{wildcards.filename}"
-
-#convert gzip into bgzip format, index with samtools and bwa
-rule gzip_to_bgzip:
-    input:
-        gz_fasta=os.path.join(config["ref"]["tmp"],config["ref"]["fasta"])
     output:
-        all_ref_files
-        # bgz_fasta=os.path.join(config["ref"]["dir"],config["ref"]["fasta"]),
-        # fname=expand('{bgz_fasta}.{ext}',
-        #     bgz_fasta=os.path.join(config["ref"]["dir"],config["ref"]["fasta"]),
-        #     ext=['gzi','fai','bwt','pac','ann','amb','sa']),
-    conda: "{os.environ[MUT_PREFIX]}bwa"
-    threads: 1
-    params:
-        time="4:00:00", mem="6G", tmpfs="10G",
+        os.path.join(config["ref"]["tmp"],"{filename}")
     shell:
-        "gunzip --to-stdout {gz_fasta} | "
-        "bgzip --index {bgz_fasta}.gzi > {bgz_fasta} && "
-        "samtools faidx {bgz_fasta} && "
+        "wget -O {output} {config[ref][uri]}/{wildcards.filename}"
+
+#convert gzip into an indexed bgzip format
+rule create_bgzip:
+    input:
+        gz_fasta=os.path.join(config["ref"]["tmp"],config["ref"]["fasta"]),
+        md5ref=os.path.join(config["ref"]["tmp"],"MD5.txt") #require that MD5 was valid
+    output:
+        bgz_fasta,
+        bgz_fasta+".gzi"
+    conda:
+        os.environ["MUT_PREFIX"]+"bwa"
+    threads:
+        1
+    params:
+        time="1:00:00", mem="6G", tmpfs="10G",
+    shell:
+        "gunzip --to-stdout {input.gz_fasta} | bgzip -i -I {bgz_fasta}.gzi > {bgz_fasta}"
+
+#create fasta file index with samtools
+rule create_fai:
+    input:
+        bgz_fasta
+    output:
+        bgz_fasta+".fai"
+    conda:
+        os.environ["MUT_PREFIX"]+"bwa"
+    threads:
+        1
+    params:
+        time="1:00:00", mem="6G", tmpfs="10G",
+    shell:
+        "samtools faidx {bgz_fasta}"
+
+#create bwa index
+rule create_bwtsw:
+    input:
+        bgz_fasta
+    output:
+        bwt_indexes
+    conda:
+        os.environ["MUT_PREFIX"]+"bwa"
+    threads:
+        1
+    params:
+        time="2:00:00", mem="6G", tmpfs="10G",
+    shell:
         "bwa index -a bwtsw {bgz_fasta}"
 
-
+#create gatk index
+rule create_gatk_dict:
+    input:
+        bgz_fasta
+    output:
+        bgz_fasta+'.dict'
+    conda:
+        os.environ["MUT_PREFIX"]+"gatk4"
+    threads:
+        1
+    params:
+        time="1:00:00", mem="6G", tmpfs="10G",
+    shell:
+        "mutein recycle {bgz_fasta}.dict END && "
+        "gatk CreateSequenceDictionary -R {bgz_fasta} -O {bgz_fasta}.dict"

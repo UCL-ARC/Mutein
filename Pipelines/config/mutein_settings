@@ -33,7 +33,7 @@ export MUT_PREFIX=mutein_
 # note: this file will be sourced into an interactive shell
 # therefore it's not appropriate to use "set -eu"
 
-# setup conda snakemake environment if not already available
+# setup conda snakemake environment if not already available (also provides python3)
 result=$( conda env list | grep -e "${MUT_PREFIX}snakemake" | wc --lines )
 if [ "${result}" == "0" ] ; then
     echo "Setting up the conda snakemake environment..."
@@ -51,4 +51,3 @@ conda activate ${MUT_PREFIX}snakemake \
 # verify mutein is in the PATH and print warning if not in MUT_DATA directory
 mutein check-cwd \
 || { echo "Failed to run mutein script!"; exit 1; }
-
