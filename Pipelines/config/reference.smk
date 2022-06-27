@@ -35,7 +35,7 @@ rule create_bgzip:
     threads:
         1
     params:
-        time="1:00:00", mem="6G", tmpfs="10G",
+        time="1:00:00", mem="6G", tmpfs="10G"
     shell:
         "gunzip --to-stdout {input.gz_fasta} | bgzip -i -I {bgz_fasta}.gzi > {bgz_fasta}"
 

@@ -10,7 +10,7 @@ rule all:
 # ==== order of included files below indicates normal execution order ====
 
 #some simple test rules
-#include: "test.smk"
+include: "test.smk"
 
 #setup all the conda environments using conda create
 #(this is a workaround for conda env environment.yaml not working)

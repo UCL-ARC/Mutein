@@ -1,3 +1,16 @@
+#local test rule
+#test error handling from multiline shell fragment
+localrules: test3
+rule test3:
+    input:
+        "test/input/{sample}.fastq.gz"
+    output:
+        "test/output/{sample}.bam"
+    shell:
+        """
+        bwa mem {input} > {output}
+        """
+
 # #local test rule
 # localrules: test2
 # rule test2:

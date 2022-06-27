@@ -1,4 +1,5 @@
 # Snakemake profile
+# these are treated basically as if they were provided as command line options
 
 cores: 999
 local-cores: 2
