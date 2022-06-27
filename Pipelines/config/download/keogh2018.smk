@@ -59,21 +59,5 @@ rule download_accession:
         download_limit=1
     shell:
         #download one accession as fastq.gz file(s) from ENA (in UK)
-        '''
-        enaDataGet -f fastq {output.sample}
-        '''
-
-# localrules: download_accessions
-# rule download_accessions:
-#     input:
-#         accession_file
-#     output:
-#         touch("datasets/{dataset}/download_success")
-#     shell:
-#         #download each accession as a fastq file from ENA (in UK)
-#         '''
-#         for accession in $(cat "{accession_file}")
-#         do
-#             enaDataGet -f fastq ${{accession}}
-#         done
-#         '''
+        f'cd datasets/{dataset_id}/{subset_id} && '
+        'enaDataGet -f fastq {wildcards.sample}'

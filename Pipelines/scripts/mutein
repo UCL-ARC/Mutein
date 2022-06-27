@@ -5,6 +5,9 @@ import sys
 import os
 import random
 import shutil
+import getpass
+import pyaes
+import base64
 
 #seed with system time
 random.seed()
@@ -12,8 +15,41 @@ random.seed()
 def main_func():
     args = parse_args()
 
-    if args.subcommand == "check-cwd": check_cwd(args)
-    if args.subcommand == "recycle":   recycle(args)
+    if args.subcommand == "check-cwd":    check_cwd(args)
+    if args.subcommand == "recycle":      recycle(args)
+    if args.subcommand == "set-password": set_password(args)
+    if args.subcommand == "encrypt-json": encrypt_json(args)
+
+def bytes2int(bytes):
+    val = 0
+    for x in bytes:
+        val = (val << 8) + int(x)
+    return val
+
+def encrypt_json(args):
+    plain_text = getpass.getpass(prompt="Enter JSON as a single line (blank to cancel): ").strip()
+
+    if plain_text == '':
+        print("Cancelled")
+        return
+
+    initial_counter = bytes2int(os.urandom(16))
+    key_256 = base64.b64decode(os.environ['MUT_PASSWORD'])
+    counter = pyaes.Counter(initial_value = initial_counter)
+    aes = pyaes.AESModeOfOperationCTR(key_256, counter = counter)
+    cipher_text = aes.encrypt(plain_text)
+    with open('./config/password_vault','wb') as f:
+        #need to store IV as well
+        f.write(cipher_text)
+    
+
+def set_password(args):
+    password = getpass.getpass(prompt="Enter password (blank for none): ").strip()
+    
+    if password == '':
+        print("")
+    else:
+        print(password)
 
 def check_cwd(args):
     if os.path.realpath(os.getcwd()) != os.path.realpath(os.environ['MUT_DATA']):
@@ -59,9 +95,18 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Wrapper function for top-level mutein functions')
     subparsers = parser.add_subparsers(dest="subcommand")
 
+    #check_cwd
     check_cwd = subparsers.add_parser('check-cwd', help='check the working directory is the expected data folder')
+
+    #recycle
     recycle = subparsers.add_parser('recycle', help='move the file into a subfolder called recycle_bin')
     recycle.add_argument('file',nargs='+',help="list of files to recycle, last one must be a list terminator END")
+
+    #get master password from user, store in environment variable
+    set_password = subparsers.add_parser('set-password', help='read in password from keyboard to environment variable')
+
+    #encrypt json to file
+    encrypt_json  = subparsers.add_parser('encrypt-json', help='read in json from keyboard, save to encrypted file')
 
     args = parser.parse_args()
 
