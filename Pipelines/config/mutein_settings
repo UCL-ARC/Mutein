@@ -34,18 +34,18 @@ export MUT_PREFIX=mutein_
 # therefore it's not appropriate to use "set -eu"
 
 # setup conda snakemake environment if not already available (also provides python3)
-result=$( conda env list | grep -e "${MUT_PREFIX}snakemake" | wc --lines )
+result=$( conda env list | grep -e "${MUT_PREFIX}main" | wc --lines )
 if [ "${result}" == "0" ] ; then
-    echo "Setting up the conda snakemake environment..."
-    conda create -y -n ${MUT_PREFIX}snakemake \
+    echo "Setting up the main conda environment..."
+    conda create -y -n ${MUT_PREFIX}main \
         $(cat ${MUT_DIR}/Pipelines/conda_envs/channels) \
-        --file ${MUT_DIR}/Pipelines/conda_envs/snakemake \
+        --file ${MUT_DIR}/Pipelines/conda_envs/main \
     || { echo "Failed to setup snakemake conda environment!"; exit 1; }
 fi
 
 # activate snakemake conda environment, also provides python3
 echo "Activating the conda snakemake environment..."
-conda activate ${MUT_PREFIX}snakemake \
+conda activate ${MUT_PREFIX}main \
 || { echo "Failed to activate snakemake conda environment!"; exit 1; }
 
 # verify mutein is in the PATH and print warning if not in MUT_DATA directory

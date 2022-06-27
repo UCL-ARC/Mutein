@@ -4,8 +4,9 @@ include: "variables.smk"
 #use this first, default rule to trigger what you want to happen
 rule all:
     input:
-        all_conda_envs, #ensure all conda envs are setup
-        all_ref_files   #ensure reference genome is present and indexed
+        all_conda_envs,         #ensure all conda envs are setup
+        all_ref_files,          #ensure reference genome is present and indexed
+        all_datasets_downloaded #ensure all raw dataset files downloaded
 
 # ==== order of included files below indicates normal execution order ====
 
@@ -19,5 +20,5 @@ include: "setup_conda_envs.smk"
 #download and md5 check the reference genome fasta file
 include: "reference.smk"
 
-#download keogh2018 dataset
-#include: "download/keogh2018.smk"
+#download all datasets
+include: "download/keogh2018.smk"
