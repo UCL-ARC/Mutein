@@ -16,6 +16,7 @@ export PATH=${MUT_DIR}/Pipelines/scripts:${PATH}
 
 #add Mutein python modules to PYTHONPATH
 export PYTHONPATH=${MUT_DIR}/Pipelines/varcall_modules:${PYTHONPATH}
+export PYTHONPATH=${MUT_DIR}/Pipelines/pymodules:${PYTHONPATH}
 
 #set the snakemake profile folder and path to snakefile and mutein config
 export SNAKEMAKE_PROFILE=${MUT_DIR}/Pipelines/config
@@ -53,4 +54,4 @@ mutein check-cwd \
 || { echo "Failed to run mutein script!"; exit 1; }
 
 # set the master password used to decrypt specific passwords from encrypted file
-export MUT_PASSWORD=$(mutein get-password)
+export MUT_PASSWORD=$(mutein set-password)
