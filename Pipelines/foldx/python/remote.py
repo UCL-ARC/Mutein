@@ -85,75 +85,12 @@ def run_pipeline(args):
     elif mode == "PDB":
         batch_stat = BatchStatus.BatchStatus(DataDir, PipelineDir,dataset,gene,pdb)
         batch_stat.createReport()              
-        """
-        dataset_gene_pdb = pattern.split(":")
-        dataset, gene, pdb = (
-            dataset_gene_pdb[0],
-            dataset_gene_pdb[1],
-            dataset_gene_pdb[2],
-        )
-        path = Paths.Paths(DataDir, PipelineDir, dataset=dataset, gene=gene, pdb=pdb)
-        print("Check results files for pdb")
-        print(path.outputs)
-        filenameA = path.outputs + "ddg_background.csv"
-        filenameB = path.outputs + "ddg_buildmodel.csv"        
-        checkResults(filenameA, filenameB)
-
-        # check the pdb
-        filenamePdb = path.inputs + pdb + "_repx.pdb"
-        existsPdb, time = checkResult(filenamePdb)
-        print("\nChecking the pdb repair", filenamePdb)
-        if existsPdb:
-            print("...PDB X repair at", time)
-        else:
-            print("...PDB X repair has not been done")
-        # Check the background
-        filenameP = path.thruputs + "params_background.txt"
-        existsP, time = checkResult(filenameP)
-        count = 0
-        print("\nChecking the background tasks", filenameP)
-        if existsP:
-            print("...Params background at", time)
-            with open(filenameP, "r") as fr:
-                lines = fr.readlines()
-                print("\nThe pdb has been split into tasks=", len(lines) - 1)
-                print("...Any tasks that have completed are below\n")
-                for i in range(1, len(lines)):
-                    filenameo = path.thruputs + "agg/" + str(i) + "_ddg_background.csv"
-                    existsfile, time = checkResult(filenameo)
-                    if existsfile:
-                        count += 1
-                        print("Task", str(i), "at", time)
-                    else:
-                        print("Task", str(i), "----")
-            print("Completed", count, "out of", len(lines) - 1)
-
-        else:
-            print("Missing parameters file, the data needs preparation")
-
-        # Check the background
-        filenameP = path.thruputs + "params_variants.txt"
-        print("\nChecking the variant tasks")
-        count = 0
-        if exists(filenameP):
-            with open(filenameP, "r") as fr:
-                lines = fr.readlines()
-                print("The variants have been split into tasks=", len(lines) - 1)
-                print("...Any tasks that have completed are below\n")
-                for i in range(1, len(lines)):
-                    filenameo = path.thruputs + "vagg/" + str(i) + "_ddg_buildmodel.csv"
-                    existsfile, time = checkResult(filenameo)
-                    if existsfile:
-                        count += 1
-                        print("Task", str(i), "at", time)
-                    else:
-                        print("Task", str(i), "----")
-            print("Completed", count, "out of", len(lines) - 1)
-        else:
-            print(
-                "Missing variants file, the data needs preparation, or there are none"
-            )
-        """
+    elif mode == "GENEINCOMPLETE":
+        batch_stat = BatchStatus.BatchStatus(DataDir, PipelineDir,dataset,gene,"")
+        pdblist = batch_stat.getGenePdbs(gene)    
+        for pdb in pdblist:          
+            batch_stat.createUntasksForPdb(gene,pdb)
+    
     elif mode == "PDBINCOMPLETE":
         dataset_gene_pdb = pattern.split(":")
         dataset, gene, pdb = (
@@ -161,71 +98,11 @@ def run_pipeline(args):
             dataset_gene_pdb[1],
             dataset_gene_pdb[2],
         )
-        path = Paths.Paths(DataDir, PipelineDir, dataset=dataset, gene=gene, pdb=pdb)
-        print("RECREATING TASK FILE with missing tasks\n")
-        print("Check results files for pdb")
-        print(path.outputs)
-        filenameA = path.outputs + "ddg_background.csv"
-        filenameB = path.outputs + "ddg_buildmodel.csv"        
-        checkResults(filenameA, filenameB)
+        batch_stat = BatchStatus.BatchStatus(DataDir, PipelineDir,dataset,gene,pdb)
+        batch_stat.createUntasksForPdb(gene,pdb)
+        
 
-        # Check the background
-        filenameP = path.thruputs + "params_background.txt"
-        filename_incomplete = path.thruputs + "params_background_incomplete.txt"
-        count = 0
-        print("\nChecking the background tasks")
-        if exists(filenameP):
-            with open(filename_incomplete, "w") as fw:
-                with open(filenameP, "r") as fr:
-                    lines = fr.readlines()
-                    fw.write((lines[0]).strip() + "\n")
-                    print("The pdb has been split into tasks=", len(lines) - 1)
-                    print("...Any tasks that have completed are below\n")
-                    for i in range(1, len(lines)):
-                        filenameo = (
-                            path.thruputs + "agg/" + str(i) + "_ddg_background.csv"
-                        )
-                        existsfile, time = checkResult(filenameo)
-                        if existsfile:
-                            count += 1
-                            print("Task", str(i), "at", time)
-                        else:
-                            print("Task", str(i), "----")
-                            fw.write((lines[i]).strip() + "\n")
-            print("Completed", count, "out of", len(lines) - 1)
-
-        else:
-            print("Missing parameters file, the data needs preparation")
-
-        # Check the background
-        filenameP = path.thruputs + "params_variants.txt"
-        filename_incomplete = path.thruputs + "params_variants_incomplete.txt"
-        print("\nChecking the variant tasks")
-        count = 0
-        if exists(filenameP):
-            with open(filename_incomplete, "w") as fw:
-                with open(filenameP, "r") as fr:
-                    lines = fr.readlines()
-                    fw.write((lines[0]).strip() + "\n")
-                    print("The variants have been split into tasks=", len(lines) - 1)
-                    print("...Any tasks that have completed are below\n")
-                    for i in range(1, len(lines)):
-                        filenameo = (
-                            path.thruputs + "vagg/" + str(i) + "_ddg_buildmodel.csv"
-                        )
-                        existsfile, time = checkResult(filenameo)
-                        if existsfile:
-                            count += 1
-                            print("Task", str(i), "at", time)
-                        else:
-                            print("Task", str(i), "----")
-                            fw.write((lines[i]).strip() + "\n")
-            print("Completed", count, "out of", len(lines) - 1)
-
-        else:
-            print(
-                "Missing variants file, the data needs preparation, or there are none"
-            )
+        
     elif mode == "PDB_BACK" or mode == "GENE_BACK":
         dataset_gene_pdb = pattern.split(":")
         dataset, gene, pdb = (

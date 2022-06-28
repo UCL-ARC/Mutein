@@ -146,6 +146,18 @@ class BatchStatus:
             print("TODO: Submit pdb prepare")
         return ""
     
+    def getGenePdbs(self,gene):
+        gene_path = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset,gene=gene)
+        filename = gene_path.outputs + "pdb_tasklist.csv"
+        pdbs = []
+        if exists(filename):            
+            with open(filename, "r") as fr:
+                lines = fr.readlines()
+                for ln in lines[1:]:
+                    pdbo = ln.strip().split(",")[2]
+                    pdbs.append(pdbo)
+        return pdbs
+    
     def getGeneNumPdbs(self,gene):
         gene_path = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset,gene=gene)
         filename = gene_path.outputs + "pdb_tasklist.csv"
@@ -268,14 +280,75 @@ class BatchStatus:
 
         
 
+    def createUntasksForPdb(self,gene,pdb):
+        path = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset,gene=gene,pdb=pdb)        
+        print("RECREATING TASK FILE with missing tasks\n")
+        print("Check results files for pdb")
+        print(path.outputs)
+        filenameA = path.outputs + "ddg_background.csv"
+        filenameB = path.outputs + "ddg_buildmodel.csv"       
+        self.checkFile(filenameA) 
+        self.checkFile(filenameB) 
         
+        # Check the background
+        filenameP = path.thruputs + "params_background.txt"
+        filename_incomplete = path.thruputs + "params_background_incomplete.txt"
+        count = 0
+        print("\nChecking the background tasks")
+        if exists(filenameP):
+            with open(filename_incomplete, "w") as fw:
+                with open(filenameP, "r") as fr:
+                    lines = fr.readlines()
+                    fw.write((lines[0]).strip() + "\n")
+                    print("The pdb has been split into tasks=", len(lines) - 1)
+                    print("...Any tasks that have completed are below\n")
+                    for i in range(1, len(lines)):
+                        filenameo = (
+                            path.thruputs + "agg/" + str(i) + "_ddg_background.csv"
+                        )
+                        existsfile, time = self.checkFile(filenameo)
+                        if existsfile:
+                            count += 1
+                            print("Task", str(i), "at", time)
+                        else:
+                            print("Task", str(i), "----")
+                            fw.write((lines[i]).strip() + "\n")
+            print("Completed", count, "out of", len(lines) - 1)
+
+        else:
+            print("Missing parameters file, the data needs preparation")
+
+        # Check the background
+        filenameP = path.thruputs + "params_variants.txt"
+        filename_incomplete = path.thruputs + "params_variants_incomplete.txt"
+        print("\nChecking the variant tasks")
+        count = 0
+        if exists(filenameP):
+            with open(filename_incomplete, "w") as fw:
+                with open(filenameP, "r") as fr:
+                    lines = fr.readlines()
+                    fw.write((lines[0]).strip() + "\n")
+                    print("The variants have been split into tasks=", len(lines) - 1)
+                    print("...Any tasks that have completed are below\n")
+                    for i in range(1, len(lines)):
+                        filenameo = (
+                            path.thruputs + "vagg/" + str(i) + "_ddg_buildmodel.csv"
+                        )
+                        existsfile, time = self.checkFile(filenameo)
+                        if existsfile:
+                            count += 1
+                            print("Task", str(i), "at", time)
+                        else:
+                            print("Task", str(i), "----")
+                            fw.write((lines[i]).strip() + "\n")
+            print("Completed", count, "out of", len(lines) - 1)
+
+        else:
+            print(
+                "Missing variants file, the data needs preparation, or there are none"
+            )
     
-    def existsGenePdbFiles(self,gene):
-        '''
-        returns the number complete and the latest file stamp
-        '''
-        return ""
-    
+                
     def existsPdbFile(self,gene,pdb):
         '''
         returns if it is completed and the filestamp
@@ -283,25 +356,10 @@ class BatchStatus:
         pdb_path = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset,gene=gene,pdb=pdb)
         return ""
 
-    def existsGeneSplitFiles(self,gene):
-        '''
-        returns the number complete and the latest file stamp
-        '''
-        return ""
     
-    def existsSplitFile(self,gene,pdb):
-        '''
-        returns if it is completed and the filestamp
-        '''
-        return ""
+    
 
-    def completedGeneTaskFiles(self,gene,isvariant):
-        '''
-        returns the number complete and the latest file stamp
-        AND those completed and those not
-        '''
-        return ""
-    
+       
     def completedPdbTaskFiles(self,gene,pdb,isvariant):
         '''
         returns if it is completed and the filestamp
@@ -334,18 +392,6 @@ class BatchStatus:
                     
         return msg,lasttime
 
-    def completedGeneResultsFiles(self,gene,isvariant):
-        '''
-        returns the number complete and the latest file stamp
-        AND those completed and those not
-        '''
-        return ""
-    
-    def completedPdbResultsFiles(self,pdb,isvariant):
-        '''
-        returns if it is completed and the filestamp
-        '''
-        return ""
 
     def checkFile(self,onefile):
         if exists(onefile):
