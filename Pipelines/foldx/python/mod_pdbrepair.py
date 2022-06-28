@@ -157,32 +157,35 @@ def run_pipeline(args):
         save_pdb = pdbcode + "_rep" + str(lastgoodrepair) + ".pdb"
         save_latest_pdb = pdbcode + "_repx.pdb"
         
-        print(
-            "### ... copying file",
-            repair_path + last_good_pdb,
-            pdb_path.pdb_thruputs + save_pdb,
-        )
-        copyfile(
-            repair_path + last_good_pdb,
-            pdb_path.pdb_thruputs + "/" + save_pdb
-        )
-        copyfile(
-            repair_path + last_good_pdb,
-            pdb_path.pdb_inputs + "/" + save_pdb
-        )
-        print(
-            "### ... copying best file",
-            repair_path + last_good_pdb,
-            pdb_path.pdb_thruputs + save_latest_pdb,
-        )
-        copyfile(
-            repair_path + last_good_pdb,
-            pdb_path.pdb_thruputs + "/" + save_latest_pdb
-        )
-        copyfile(
-            repair_path + last_good_pdb,
-            pdb_path.pdb_inputs + "/" + save_latest_pdb
-        )
+        try:
+            print(
+                "### ... copying file",
+                repair_path + last_good_pdb,
+                pdb_path.pdb_thruputs + save_pdb,
+            )
+            copyfile(
+                repair_path + last_good_pdb,
+                pdb_path.pdb_thruputs + "/" + save_pdb
+            )
+            copyfile(
+                repair_path + last_good_pdb,
+                pdb_path.pdb_inputs + "/" + save_pdb
+            )
+            print(
+                "### ... copying best file",
+                repair_path + last_good_pdb,
+                pdb_path.pdb_thruputs + save_latest_pdb,
+            )
+            copyfile(
+                repair_path + last_good_pdb,
+                pdb_path.pdb_thruputs + "/" + save_latest_pdb
+            )
+            copyfile(
+                repair_path + last_good_pdb,
+                pdb_path.pdb_inputs + "/" + save_latest_pdb
+            )
+        except:
+            print("An error copying the files")
     else:
         print("No repair changes have been made")
     
