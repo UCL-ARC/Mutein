@@ -99,6 +99,7 @@ def pipeline_qsubber(args):
     # There are 3 files that can control the number of tasks to be run. If those files exists we load up those numbers now.
     gene_tasks = []
     pdb_tasks = 0
+    pdb_tasks_missing = 0
     params_tasks = 0
     vparams_tasks = 0
     unparams_tasks = 0
