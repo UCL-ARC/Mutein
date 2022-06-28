@@ -70,6 +70,18 @@ class BatchStatus:
             print("TODO: Submit pdb prepare")
         return ""
 
+    def getGenes(self):
+        genes = []
+        ds_path = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset)                
+        filename = ds_path.inputs + "genes_pdb_list.csv"                
+        if exists(filename):
+            with open(filename, "r") as fr:
+                lines = fr.readlines()
+                for line in lines[1:]:
+                    geneo = line.strip().split(",")[1]
+                    genes.append(geneo)                    
+        return genes
+
     def getGeneProgressReport(self,gene):
         gene_path = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset,gene=gene)                        
         filenameA = gene_path.outputs + "ddg_bm_background.csv"

@@ -17,6 +17,7 @@ N.b this file may be run on the myriad clusters or on a local machine
 import os
 from shutil import copyfile
 import sys
+from os.path import exists
 
 import _helper
 import Paths
@@ -37,6 +38,7 @@ def run_pipeline(args):
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
     task = int(argus.arg("task", "none"))
+    missing = argus.arg("missing", "N").upper()
 
     gene_path = Paths.Paths(
         data_dir,
@@ -55,10 +57,14 @@ def run_pipeline(args):
         arglist += "@pdb=" + pdbcode
         argsgn[1] = arglist
         import mod_pdbrepair as ppl
-
-        print("Repairing pdb", pdbcode)
-        ppl.run_pipeline(argsgn)
-
+        # check if it exists incase we don't want to recreate
+        pdb_path = Paths.Paths(data_dir,install_dir,dataset=dataset,gene=gene,pdb=pdbcode)
+        pdb_file = pdb_path.thruputs + pdbcode + "_repx.pdb"
+        if exists(pdb_file) and missing == "Y":
+            print("Exists already",pdbcode)
+        else:                
+            print("Repairing pdb", pdbcode)
+            ppl.run_pipeline(argsgn)
     else:
         print("Task beyond the data")
 

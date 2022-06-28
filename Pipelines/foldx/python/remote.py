@@ -85,6 +85,13 @@ def run_pipeline(args):
     elif mode == "PDB":
         batch_stat = BatchStatus.BatchStatus(DataDir, PipelineDir,dataset,gene,pdb)
         batch_stat.createReport()              
+    elif mode == "DSINCOMPLETE":
+        batch_stat = BatchStatus.BatchStatus(DataDir, PipelineDir,dataset,"","")
+        genelist = batch_stat.getGenes()    
+        for gene in genelist:
+            pdblist = batch_stat.getGenePdbs(gene)    
+            for pdb in pdblist:          
+                batch_stat.createUntasksForPdb(gene,pdb)    
     elif mode == "GENEINCOMPLETE":
         batch_stat = BatchStatus.BatchStatus(DataDir, PipelineDir,dataset,gene,"")
         pdblist = batch_stat.getGenePdbs(gene)    
