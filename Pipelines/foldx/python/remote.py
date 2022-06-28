@@ -89,8 +89,7 @@ def run_pipeline(args):
         batch_stat = BatchStatus.BatchStatus(DataDir, PipelineDir,dataset,gene,"")
         pdblist = batch_stat.getGenePdbs(gene)    
         for pdb in pdblist:          
-            batch_stat.createUntasksForPdb(gene,pdb)
-    
+            batch_stat.createUntasksForPdb(gene,pdb)    
     elif mode == "PDBINCOMPLETE":
         dataset_gene_pdb = pattern.split(":")
         dataset, gene, pdb = (
@@ -99,10 +98,7 @@ def run_pipeline(args):
             dataset_gene_pdb[2],
         )
         batch_stat = BatchStatus.BatchStatus(DataDir, PipelineDir,dataset,gene,pdb)
-        batch_stat.createUntasksForPdb(gene,pdb)
-        
-
-        
+        batch_stat.createUntasksForPdb(gene,pdb)                
     elif mode == "PDB_BACK" or mode == "GENE_BACK":
         dataset_gene_pdb = pattern.split(":")
         dataset, gene, pdb = (

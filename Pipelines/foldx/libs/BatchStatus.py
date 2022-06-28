@@ -283,8 +283,8 @@ class BatchStatus:
     def createUntasksForPdb(self,gene,pdb):
         path = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset,gene=gene,pdb=pdb)        
         print("RECREATING TASK FILE with missing tasks\n")
-        print("Check results files for pdb")
-        print(path.outputs)
+        print("Check results files for pdb",pdb)
+        #print(path.outputs)
         filenameA = path.outputs + "ddg_background.csv"
         filenameB = path.outputs + "ddg_buildmodel.csv"       
         self.checkFile(filenameA) 
@@ -300,8 +300,8 @@ class BatchStatus:
                 with open(filenameP, "r") as fr:
                     lines = fr.readlines()
                     fw.write((lines[0]).strip() + "\n")
-                    print("The pdb has been split into tasks=", len(lines) - 1)
-                    print("...Any tasks that have completed are below\n")
+                    #print("The pdb has been split into tasks=", len(lines) - 1)
+                    #print("...Any tasks that have completed are below\n")
                     for i in range(1, len(lines)):
                         filenameo = (
                             path.thruputs + "agg/" + str(i) + "_ddg_background.csv"
@@ -309,9 +309,9 @@ class BatchStatus:
                         existsfile, time = self.checkFile(filenameo)
                         if existsfile:
                             count += 1
-                            print("Task", str(i), "at", time)
+                            #print("Task", str(i), "at", time)
                         else:
-                            print("Task", str(i), "----")
+                            #print("Task", str(i), "----")
                             fw.write((lines[i]).strip() + "\n")
             print("Completed", count, "out of", len(lines) - 1)
 
@@ -328,8 +328,8 @@ class BatchStatus:
                 with open(filenameP, "r") as fr:
                     lines = fr.readlines()
                     fw.write((lines[0]).strip() + "\n")
-                    print("The variants have been split into tasks=", len(lines) - 1)
-                    print("...Any tasks that have completed are below\n")
+                    #print("The variants have been split into tasks=", len(lines) - 1)
+                    #print("...Any tasks that have completed are below\n")
                     for i in range(1, len(lines)):
                         filenameo = (
                             path.thruputs + "vagg/" + str(i) + "_ddg_buildmodel.csv"
@@ -337,9 +337,9 @@ class BatchStatus:
                         existsfile, time = self.checkFile(filenameo)
                         if existsfile:
                             count += 1
-                            print("Task", str(i), "at", time)
+                            #print("Task", str(i), "at", time)
                         else:
-                            print("Task", str(i), "----")
+                            #print("Task", str(i), "----")
                             fw.write((lines[i]).strip() + "\n")
             print("Completed", count, "out of", len(lines) - 1)
 
