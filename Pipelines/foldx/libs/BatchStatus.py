@@ -380,7 +380,7 @@ class BatchStatus:
         returns if it is completed and the filestamp
         '''
         pdb_path = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset,gene=gene,pdb=pdb)
-        filenameo = pdb_path.thruputs + pdb.lower + "_repx.pdb"
+        filenameo = pdb_path.thruputs + pdb.lower() + "_repx.pdb"
         exists,dt = self.checkFile(filenameo)
         return exists        
        

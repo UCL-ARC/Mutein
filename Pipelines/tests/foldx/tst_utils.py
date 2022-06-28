@@ -10,25 +10,24 @@ This tests the outer pipeline
 import os
 import sys
 
-def addpath():        
-    dirs = (os.path.dirname(os.path.realpath(__file__))).split("/")[:-2]
-    newpath = "/".join(dirs)        
-    print("Adding sys path=", newpath)
-    sys.path.append(newpath)
+dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
+python_path = "/".join(dirs) + "/foldx/python"
+lib_path = "/".join(dirs) + "/foldx/libs"
+sys.path.append(python_path)
+sys.path.append(lib_path)
+import Paths
+import remote
         
-def test_clean():
-    addpath()
-    # There are 7 arguments
-    #install_dir = args[1]   # 1) the executable installation directory, the root directory of the peipeline    
-    #working_dir = args[2]   # 1) the working dir, the root that the data output and input lives in
-    
-    import Pipelines.libs.pipeline_delete as pipe
-    args = [
-        "",
-        "/home/rachel/UCL/github/Mutein/",
-        "/home/rachel/UCL/github/MuteinData/",                
-    ]
-    pipe.run_pipeline(args)
+def test_clean():    
+    #python ${script} $mode $pattern $WorkDir $DataDir $InstallDir $PipelineDir
+    args = ["",
+            'GENEINCOMPLETEPDB', 
+            'notch:notch1:x', 
+            '/home/ucbtlcr/Scratch/workspace/', 
+            '/home/rachel/UCL/github/MuteinData/', 
+            '/home/rachel/UCL/github/Mutein/', 
+            '/home/rachel/UCL/github/Mutein/Pipelines/foldx/']    
+    remote.run_pipeline(args)
 
 
 ######################################
