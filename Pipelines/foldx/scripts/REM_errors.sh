@@ -3,7 +3,7 @@ module load python3/recommended
 
 mode=$1
 install_dir=$2
-script=${install_dir}Pipelines/libs/pipeline_delete.py
+script=${install_dir}Pipelines/foldx/libs/pipeline_delete.py
 
 echo "EXE PATH=$install_dir"
 echo "CURRENT=$PWD"

@@ -12,7 +12,7 @@ InstallDir=$6		#/home/ucbtlcr/Mutein/
 PipelineDir=$7		#/home/ucbtlcr/Mutein/Pipelines/geneanalysis/
 
 config=${PipelineDir}config/batch_gene_5_agg.yml
-script=${InstallDir}Pipelines/libs/pipeline_qsubber.py
+script=${InstallDir}Pipelines/foldx/libs/pipeline_qsubber.py
 
 cd $DataDir
 echo "Submitting ${script} $InstallDir $PWD ${config} $run $dataset"
