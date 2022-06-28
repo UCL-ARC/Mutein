@@ -22,7 +22,7 @@ def addpath(inputs):
 ######################################################################
 ### INPUTS
 dataset="mouse"
-gene="FAT1"
+gene="ryr2"
 pdb=""
 
 repairs="1"
@@ -30,7 +30,7 @@ repair_from = "x"
 split=10
 vsplit=10
 task=1
-runs = "d"
+runs = "a"
 """ 
     if "a" in runs:        print("Mutein: Preparing genes")        
     if "b" in runs:        print("Mutein: Preparing pdbs")        
