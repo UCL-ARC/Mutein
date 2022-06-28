@@ -103,6 +103,7 @@ def run_pipeline(args):
         for gene in genelist:
             batch_stat.makeMissingPdbs(gene)                
     elif mode == "GENEINCOMPLETEPDB":
+        print("GIP")
         batch_stat = BatchStatus.BatchStatus(DataDir, PipelineDir,dataset,gene,"")
         batch_stat.makeMissingPdbs(gene)        
     elif mode == "PDBINCOMPLETE":
