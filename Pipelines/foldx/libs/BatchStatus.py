@@ -372,7 +372,7 @@ class BatchStatus:
                     for ln in lines:
                         pdb = ln.strip().split(",")[2]
                         if not self.existsPdbFile(gene,pdb):
-                            fw.write((lines[0]).strip() + "\n")
+                            fw.write((ln).strip() + "\n")
 
         
     def existsPdbFile(self,gene,pdb):
