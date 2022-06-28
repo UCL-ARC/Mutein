@@ -202,6 +202,9 @@ def pipeline_qsubber(args):
                             array = pdb_tasks
                         if arrayfile == "unpdbs":
                             array = pdb_tasks_missing
+                            if int(array) == 0:
+                                print("Complete",gene)
+                                continue
                         if arrayfile == "params":
                             array = params_tasks
                         if arrayfile == "vparams":
