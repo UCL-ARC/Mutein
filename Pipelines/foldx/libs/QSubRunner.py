@@ -29,9 +29,9 @@ class QSubRunner:
         inputs += "@data_dir=" + data_dir
         isarray = int(array) > 0
         if isarray:
-            sh_script_name = install_dir + "Pipelines/libs/pipeline_array.sh"
+            sh_script_name = install_dir + "Pipelines/foldx/libs/pipeline_array.sh"
         else:
-            sh_script_name = install_dir + "Pipelines/libs/pipeline_single.sh"
+            sh_script_name = install_dir + "Pipelines/foldx/libs/pipeline_single.sh"
         os.system("chmod +x " + sh_script_name)
         self.runid = runid
         self.print_only = print_only

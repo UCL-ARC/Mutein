@@ -18,9 +18,9 @@ class SubRunner:
         self.args = []
         self.args.append(exe)  # 0 arg=executable
         if not isarray:
-            sh_script_name = install_dir + "Pipelines/libs/pipeline_array.sh"
+            sh_script_name = install_dir + "Pipelines/foldx/libs/pipeline_array.sh"
         else:
-            sh_script_name = install_dir + "Pipelines/libs/pipeline_single.sh"
+            sh_script_name = install_dir + "Pipelines/foldx/libs/pipeline_single.sh"
         py_script = install_dir + pipe_dir + script + ".py"
 
         if exe == "bash":
