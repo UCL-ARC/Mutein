@@ -14,13 +14,9 @@ N.b this file may be run on the myriad clusters or on a local machine
 import os
 import pandas as pd
 from os.path import exists
-
-# import from the shared library in Mutein/Pipelines/shared/lib
 import sys
 
-dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
-retpath = "/".join(dirs) + "/libs"
-sys.path.append(retpath)
+import _helper
 import Paths
 import Arguments
 import Config
@@ -32,10 +28,7 @@ def run_pipeline(args):
     print("### FoldX make params job ###")
     print(args)
     argus = Arguments.Arguments(args)
-    install_dir = argus.arg("install_dir")
-    sys.path.append(install_dir)
-    sys.path.append(install_dir + "/Pipelines")
-    sys.path.append(install_dir + "/Pipelines/libs")
+    install_dir = argus.arg("install_dir")    
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
     gene = argus.arg("gene")
@@ -43,7 +36,7 @@ def run_pipeline(args):
 
     gene_path = Paths.Paths(
         data_dir,
-        install_dir + "Pipelines/geneanalysis",
+        install_dir,
         dataset=dataset,
         gene=gene,
     )
@@ -71,7 +64,7 @@ def run_pipeline(args):
         pdbcode = df["pdb"][t].lower()
         pdb_path = Paths.Paths(
             data_dir,
-            install_dir + "Pipelines/geneanalysis",
+            install_dir,
             dataset=dataset,
             gene=gene,
             pdb=pdbcode,
@@ -81,7 +74,7 @@ def run_pipeline(args):
         arglist = args[1]
         arglist += "@pdb=" + pdbcode
         argsgn[1] = arglist
-        import Pipelines.geneanalysis.python.mod_pdbparams as ppl
+        import mod_pdbparams as ppl
 
         ppl.run_pipeline(argsgn)
         filename = pdb_path.pdb_thruputs + "params_background.txt"

@@ -1,7 +1,7 @@
 ---
 id: 'REP'
 qsub_id: 'repair'
-pipe_dir: 'Pipelines/geneanalysis/python/'
+pipe_dir: 'Pipelines/foldx/python/'
 script: 'ga__runner'
 time: '10:00:0'
 cores: "4"

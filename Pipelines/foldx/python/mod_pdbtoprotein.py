@@ -12,9 +12,7 @@ import sys
 import yaml
 import pandas as pd
 
-dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
-retpath = "/".join(dirs) + "/libs"
-sys.path.append(retpath)
+import _helper
 import Paths
 import Arguments
 import BatchMaker
@@ -29,10 +27,7 @@ import PdbRunner
 
 def run_pipeline(args):
     argus = Arguments.Arguments(args)
-    install_dir = argus.arg("install_dir")
-    sys.path.append(install_dir)
-    sys.path.append(install_dir + "/Pipelines")
-    sys.path.append(install_dir + "/Pipelines/libs")
+    install_dir = argus.arg("install_dir")    
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset", "")
     gene = argus.arg("gene")
@@ -40,7 +35,7 @@ def run_pipeline(args):
     for pdb in [pdb]:
         pdb_path = Paths.Paths(
                     data_dir,
-                    install_dir + "Pipelines/geneanalysis",
+                    install_dir,
                     dataset=dataset,
                     gene=gene,
                     pdb=pdb,

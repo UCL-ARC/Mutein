@@ -1,7 +1,7 @@
 ---
 id: 'PRAM'
 qsub_id: 'pram'
-pipe_dir: 'Pipelines/geneanalysis/python/'
+pipe_dir: 'Pipelines/foldx/python/'
 script: 'ga__runner'
 time: '1:00:0'
 cores: "1"
@@ -12,7 +12,7 @@ active: 'Y'
 ---
 id: 'VPRAM'
 qsub_id: 'vpram'
-pipe_dir: 'Pipelines/geneanalysis/python/'
+pipe_dir: 'Pipelines/foldx/python/'
 script: 'ga__runner'
 time: '1:00:0'
 cores: "1"

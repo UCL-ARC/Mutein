@@ -16,14 +16,9 @@ from shutil import copyfile
 from os.path import exists
 import subprocess
 from datetime import datetime
-
-# import from the shared library in Mutein/Pipelines/shared/lib
 import sys
 
-dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
-retpath = "/".join(dirs) + "/libs"
-sys.path.append(retpath)
-
+import _helper
 import Arguments
 import Paths
 import BatchStatus

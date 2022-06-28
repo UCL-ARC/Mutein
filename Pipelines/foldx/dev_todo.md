@@ -2,8 +2,8 @@
 ### Before a pull request
 - Run the pep8 code formatter (https://pypi.org/project/black/)
 ```
-python -m black Pipelines/geneanalysis/python/*.py
-python -m black Pipelines/libs/*.py
+python -m black Pipelines/foldx/python/*.py
+python -m black Pipelines/foldx/python/libs/*.py
 ```
 - Run the manual regression tests
 

@@ -11,11 +11,9 @@ import os
 import sys
 import yaml
 import pandas as pd
+import _helper
 
-
-dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
-retpath = "/".join(dirs) + "/libs"
-sys.path.append(retpath)
+import _helper
 import Paths
 import Arguments
 import BatchMaker
@@ -31,15 +29,12 @@ import FileDf
 
 def run_pipeline(args):
     argus = Arguments.Arguments(args)
-    install_dir = argus.arg("install_dir")
-    sys.path.append(install_dir)
-    sys.path.append(install_dir + "/Pipelines")
-    sys.path.append(install_dir + "/Pipelines/libs")
+    install_dir = argus.arg("install_dir")    
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
     gene = argus.arg("gene","")
     dataset_path = Paths.Paths(
-        data_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset
+        data_dir, install_dir, dataset=dataset
     )
     genes_list = []
     if gene != "":
@@ -70,7 +65,7 @@ def run_pipeline(args):
     genes = []
     for gene in genes_list:
         gene_path = Paths.Paths(
-            data_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset, gene=gene
+            data_dir, install_dir, dataset=dataset, gene=gene
         )
         accessions = genetoprotein.accession_from_bioservices(gene.upper(),organism_id,True)
         if len(accessions) == 0:
@@ -84,10 +79,7 @@ def run_pipeline(args):
                     sl = str(seq_lines[s].strip())
                     wholeseq += sl
                 gn = Gene.Gene(gene, accession, wholeseq)
-                genes.append(gn)  # main repository for data we are creating in function
-                script_file = "libs/pipeline_qsubber.py"
-                yaml_file = "geneanalysis/config/batch_pdb.yml"
-                bm = BatchMaker.BatchMaker(script_file, yaml_file)
+                genes.append(gn)  # main repository for data we are creating in function                
                 # CREATE the variants for the gene
                 vrs = gene_variant_dic[gene.upper()]
                 for i in range(len(vrs["bases"])):
@@ -137,7 +129,7 @@ def run_pipeline(args):
     genes_df = genes_csv_all.saveAsDf()
     for gene in genes_list:
         genes_one = genes_df.query('gene == "'+gene+'"')        
-        gene_path = Paths.Paths(data_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset, gene=gene)
+        gene_path = Paths.Paths(data_dir, install_dir, dataset=dataset, gene=gene)
         one_path = gene_path.gene_inputs + "accessions.csv"
         genes_one.to_csv(one_path, index=False)
         

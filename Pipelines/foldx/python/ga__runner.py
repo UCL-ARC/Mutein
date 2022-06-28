@@ -12,9 +12,7 @@ import sys
 import yaml
 import pandas as pd
 
-dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
-retpath = "/".join(dirs) + "/libs"
-sys.path.append(retpath)
+import _helper
 import Paths
 import Arguments
 import BatchMaker
@@ -30,10 +28,7 @@ import FileDf
 
 def run_pipeline(args):
     argus = Arguments.Arguments(args)
-    install_dir = argus.arg("install_dir")
-    sys.path.append(install_dir)
-    sys.path.append(install_dir + "/Pipelines")
-    sys.path.append(install_dir + "/Pipelines/libs")
+    install_dir = argus.arg("install_dir")    
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
     gene = argus.arg("gene", "")
@@ -42,11 +37,11 @@ def run_pipeline(args):
 
     runner = None
     if pdb != "":
-        import Pipelines.geneanalysis.python.ga_pdb_runner as runner
+        import ga_pdb_runner as runner
     elif gene != "":
-        import Pipelines.geneanalysis.python.ga_gene_runner as runner
+        import ga_gene_runner as runner
     else:
-        import Pipelines.geneanalysis.python.ga_dataset_runner as runner
+        import ga_dataset_runner as runner
 
     if "a" in runs:        
         print("Mutein: Preparing genes")
@@ -76,7 +71,7 @@ def run_pipeline(args):
         print("Mutein: Aggregating variant tasks")
         runner.aggVtasks(args)
     if "j" in runs:
-        import Pipelines.geneanalysis.python.ga_gene_runner as runnerj
+        import ga_gene_runner as runnerj
 
         print("Mutein: Aggregating gene tasks")
         runnerj.aggGene(args)

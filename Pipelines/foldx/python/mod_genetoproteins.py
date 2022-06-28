@@ -12,9 +12,7 @@ import sys
 import yaml
 import pandas as pd
 
-dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
-retpath = "/".join(dirs) + "/libs"
-sys.path.append(retpath)
+import _helper
 import Paths
 import Arguments
 import BatchMaker
@@ -30,17 +28,14 @@ import FileDf
 
 def run_pipeline(args):
     argus = Arguments.Arguments(args)
-    install_dir = argus.arg("install_dir")
-    sys.path.append(install_dir)
-    sys.path.append(install_dir + "/Pipelines")
-    sys.path.append(install_dir + "/Pipelines/libs")
+    install_dir = argus.arg("install_dir")    
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset", "")
     gene = argus.arg("gene")
     pdbs = 0
     for gene in [gene]:
         gene_path = Paths.Paths(
-            data_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset, gene=gene
+            data_dir, install_dir, dataset=dataset, gene=gene
         )
         # this contains the organism id from uniport, eg human=9606 and mouse=10090
         accession_path = gene_path.gene_inputs + "accessions.csv"
@@ -86,7 +81,7 @@ def run_pipeline(args):
             for pdb in pdb_list:
                 pdb_path = Paths.Paths(
                     data_dir,
-                    install_dir + "Pipelines/geneanalysis",
+                    install_dir,
                     dataset=dataset,
                     gene=gn.gene,
                     pdb=pdb.pdbcode,

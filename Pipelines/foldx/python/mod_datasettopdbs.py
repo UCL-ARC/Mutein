@@ -12,9 +12,7 @@ import sys
 import yaml
 import pandas as pd
 
-dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
-retpath = "/".join(dirs) + "/libs"
-sys.path.append(retpath)
+import _helper
 import Paths
 import Arguments
 import BatchMaker
@@ -30,26 +28,23 @@ import FileDf
 
 def run_pipeline(args):
     argus = Arguments.Arguments(args)
-    install_dir = argus.arg("install_dir")
-    sys.path.append(install_dir)
-    sys.path.append(install_dir + "/Pipelines")
-    sys.path.append(install_dir + "/Pipelines/libs")
+    install_dir = argus.arg("install_dir")    
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
     dataset_path = Paths.Paths(
-        data_dir, install_dir + "Pipelines/geneanalysis", dataset=dataset
+        data_dir, install_dir, dataset=dataset
     )
 
     # We want batches for prep and tasks
-    script_file = "libs/pipeline_qsubber.py"
-    pdbs_yaml_file = "geneanalysis/config/batch_gene_1_pdbs.yml"
-    pdbs_bm = BatchMaker.BatchMaker(script_file, pdbs_yaml_file)
-    rep_yaml_file = "geneanalysis/config/batch_gene_2_rep.yml"
-    rep_bm = BatchMaker.BatchMaker(script_file, rep_yaml_file)
-    prep_yaml_file = "geneanalysis/config/batch_gene_3_prep.yml"
-    prep_bm = BatchMaker.BatchMaker(script_file, prep_yaml_file)
-    tasks_yaml_file = "geneanalysis/config/batch_gene_4_tasks.yml"
-    tasks_bm = BatchMaker.BatchMaker(script_file, tasks_yaml_file)
+    #script_file = "libs/pipeline_qsubber.py"
+    #pdbs_yaml_file = "geneanalysis/config/batch_gene_1_pdbs.yml"
+    #pdbs_bm = BatchMaker.BatchMaker(script_file, pdbs_yaml_file)
+    #rep_yaml_file = "geneanalysis/config/batch_gene_2_rep.yml"
+    #rep_bm = BatchMaker.BatchMaker(script_file, rep_yaml_file)
+    #prep_yaml_file = "geneanalysis/config/batch_gene_3_prep.yml"
+    #prep_bm = BatchMaker.BatchMaker(script_file, prep_yaml_file)
+    #tasks_yaml_file = "geneanalysis/config/batch_gene_4_tasks.yml"
+    #tasks_bm = BatchMaker.BatchMaker(script_file, tasks_yaml_file)
 
     # load the list of the genes
     genes_fd = FileDf.FileDf(dataset_path.dataset_inputs + "genes_list.csv")
@@ -64,7 +59,7 @@ def run_pipeline(args):
         arglist += "@gene=" + gn
         argsgn[1] = arglist
 
-        import Pipelines.geneanalysis.python.mod_genetoproteins as pplb
+        import mod_genetoproteins as pplb
 
         print("Extracting pdbs for", gn)
         pdbs = pplb.run_pipeline(argsgn)
@@ -86,13 +81,14 @@ def run_pipeline(args):
     for gn in genes:
         genes_csv.add("dataset", dataset)
         genes_csv.add("gene", gn)
-        tasks_bm.addBatch(dataset, gn)
-        prep_bm.addBatch(dataset, gn)
-        pdbs_bm.addBatch(dataset, gn)
-        rep_bm.addBatch(dataset, gn)
+        #tasks_bm.addBatch(dataset, gn)
+        #prep_bm.addBatch(dataset, gn)
+        #pdbs_bm.addBatch(dataset, gn)
+        #rep_bm.addBatch(dataset, gn)
 
     genes_csv.saveAsDf()
 
+    """
     pdbs_bm.printBatchScript(
         dataset_path.pipeline_path + "/foldx_" + dataset + "_1_pdbs.sh"
     )
@@ -105,6 +101,7 @@ def run_pipeline(args):
     tasks_bm.printBatchScript(
         dataset_path.pipeline_path + "/foldx_" + dataset + "_4_tasks.sh"
     )
+    """
 
     print("### COMPLETED dataset preparation ###")
     print("MUTEIN SCRIPT ENDED")

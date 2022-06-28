@@ -6,19 +6,15 @@ Consistent script to run gene level
 """
 import os
 import sys
-
-dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
-retpath = "/".join(dirs) + "/libs"
-sys.path.append(retpath)
-
+import _helper
 
 def prepareGenes(args):
-    import Pipelines.geneanalysis.python.mod_datasettogenes as ppla
+    import mod_datasettogenes as ppla
     ppla.run_pipeline(args)
 
 
 def preparePdbs(args):
-    import Pipelines.geneanalysis.python.mod_datasettopdbs as pplb
+    import mod_datasettopdbs as pplb
 
     pplb.run_pipeline(args)
 
