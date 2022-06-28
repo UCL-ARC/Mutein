@@ -81,7 +81,7 @@ class BatchStatus:
                     geneo = line.strip().split(",")[1]
                     genes.append(geneo)                    
         return genes
-
+    
     def getGeneProgressReport(self,gene):
         gene_path = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset,gene=gene)                        
         filenameA = gene_path.outputs + "ddg_bm_background.csv"
@@ -361,16 +361,28 @@ class BatchStatus:
             )
     
                 
+    def makeMissingPdbs(self,gene):
+        gene_path = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset,gene=gene)
+        filename = gene_path.outputs + "pdb_tasklist.csv"        
+        filename_incomplete = gene_path.outputs + "pdb_tasklist_incomplete.csv"              
+        if exists(filename):
+            with open(filename_incomplete, "w") as fw:
+                with open(filename, "r") as fr:
+                    lines = fr.readlines()
+                    for ln in lines:
+                        pdb = ln.strip().split(",")[2]
+                        if not self.existsPdbFile(gene,pdb):
+                            fw.write((lines[0]).strip() + "\n")
+
+        
     def existsPdbFile(self,gene,pdb):
         '''
         returns if it is completed and the filestamp
         '''
         pdb_path = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset,gene=gene,pdb=pdb)
-        return ""
-
-    
-    
-
+        filenameo = pdb_path.thruputs + pdb.lower + "_repx.pdb"
+        exists,dt = self.checkFile(filenameo)
+        return exists        
        
     def completedPdbTaskFiles(self,gene,pdb,isvariant):
         '''

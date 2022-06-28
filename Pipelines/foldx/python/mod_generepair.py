@@ -47,6 +47,8 @@ def run_pipeline(args):
         gene=gene,
     )
     pdbtasks = gene_path.gene_outputs + "pdb_tasklist.csv"
+    if missing == "Y":
+        pdbtasks = gene_path.gene_outputs + "pdb_tasklist_incomplete.csv"
     fio = FileDf.FileDf(pdbtasks)
     df = fio.openDataFrame()
 
@@ -58,13 +60,9 @@ def run_pipeline(args):
         argsgn[1] = arglist
         import mod_pdbrepair as ppl
         # check if it exists incase we don't want to recreate
-        pdb_path = Paths.Paths(data_dir,install_dir,dataset=dataset,gene=gene,pdb=pdbcode)
-        pdb_file = pdb_path.thruputs + pdbcode + "_repx.pdb"
-        if exists(pdb_file) and missing == "Y":
-            print("Exists already",pdbcode)
-        else:                
-            print("Repairing pdb", pdbcode)
-            ppl.run_pipeline(argsgn)
+        pdb_path = Paths.Paths(data_dir,install_dir,dataset=dataset,gene=gene,pdb=pdbcode)                
+        print("Repairing pdb", pdbcode)
+        ppl.run_pipeline(argsgn)
     else:
         print("Task beyond the data")
 

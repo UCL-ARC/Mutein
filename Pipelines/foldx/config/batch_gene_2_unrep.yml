@@ -7,7 +7,7 @@ time: '10:00:0'
 cores: "4"
 dependency: '-1'
 array: -1
-arrayfile: "pdbs"
+arrayfile: "unpdbs"
 inputs: "runs=c@repairs=10@missing=Y"
 active: 'Y'
 ---

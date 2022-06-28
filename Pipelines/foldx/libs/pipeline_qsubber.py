@@ -142,11 +142,11 @@ def pipeline_qsubber(args):
             with open(pdb_tasks_file) as fr:
                 lines = fr.readlines()
                 pdb_tasks = len(lines) - 1
-        pdb_tasks_file = path.outputs + "pdb_tasklist.csv"
-        if exists(pdb_tasks_file):
-            with open(pdb_tasks_file) as fr:
+        pdb_tasks_file_missing = path.outputs + "pdb_tasklist_incomplete.csv"
+        if exists(pdb_tasks_file_missing):
+            with open(pdb_tasks_file_missing) as fr:
                 lines = fr.readlines()
-                pdb_tasks = len(lines) - 1
+                pdb_tasks_missing = len(lines) - 1
         params_tasks_file = path.thruputs + "params_background.txt"
         if exists(params_tasks_file):
             with open(params_tasks_file) as fr:
@@ -199,6 +199,8 @@ def pipeline_qsubber(args):
                         arrayfile = pipe["arrayfile"].strip()
                         if arrayfile == "pdbs":
                             array = pdb_tasks
+                        if arrayfile == "unpdbs":
+                            array = pdb_tasks_missing
                         if arrayfile == "params":
                             array = params_tasks
                         if arrayfile == "vparams":
@@ -207,7 +209,7 @@ def pipeline_qsubber(args):
                             array = unparams_tasks
                         if arrayfile == "vunparams":
                             array = vunparams_tasks
-
+                        
                     inputs = pipe["inputs"].strip()
                     active = pipe["active"].strip() == "Y"
                     # add the dataset, gene and pdb onto inputs
