@@ -218,7 +218,7 @@ class BatchStatus:
         if existso:                            
             with open(filenameo, "r") as fr:
                 lines = fr.readlines()
-                numtasks = str(len(lines)-1)
+                numtasks = len(lines)-1
                 for n in range(numtasks):
                     no = n+1
                     filenamet = pdb_path.thruputs + f"agg/{no}_ddg_background.csv"
