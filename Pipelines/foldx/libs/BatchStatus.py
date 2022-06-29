@@ -251,7 +251,7 @@ class BatchStatus:
         if isvariant:
             filenameo = pdb_path.thruputs + "params_variants.txt"
         existso, timeo = self.checkFile(filenameo)        
-        numtasks = ""
+        numtasks = "0"
         if existso:                            
             with open(filenameo, "r") as fr:
                 lines = fr.readlines()
