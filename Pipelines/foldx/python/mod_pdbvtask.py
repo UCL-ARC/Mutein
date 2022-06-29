@@ -38,6 +38,7 @@ def run_pipeline(args):
     dataset = argus.arg("dataset","")
     gene = argus.arg("gene","")
     pdb = argus.arg("pdb", "")
+    missing = argus.arg("missing", "N")
     repairs = str(argus.arg("repairs", "x"))
 
     task = int(argus.arg("task"))
@@ -50,6 +51,8 @@ def run_pipeline(args):
         pdb=pdb,
     )
     all_tasks = gene_path.thruputs + "params_variants.txt"
+    if missing.upper() == "Y":
+        all_tasks = gene_path.thruputs + "params_variants_incomplete.txt"
     fio = FileDf.FileDf(all_tasks, sep=" ", header=True)
     df = fio.openDataFrame()
 
