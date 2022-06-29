@@ -226,7 +226,7 @@ class BatchStatus:
                         filenamet = pdb_path.thruputs + f"vagg/{no}_ddg_buildmodel.csv"
                     existst, timeo = self.checkFile(filenamet)      
                     if existst:
-                        numtsaks+=1  
+                        numtasks+=1  
         return numtasks
 
     def getGeneNumTasks(self,gene,isvariant):
@@ -234,13 +234,13 @@ class BatchStatus:
         filename = gene_path.outputs + "pdb_tasklist.csv"
         pdbs = []
         num_tasks = 0
-        numnum_done = 0
+        num_done = 0
         if exists(filename):            
             with open(filename, "r") as fr:
                 lines = fr.readlines()
                 for ln in lines[1:]:
                     pdbo = ln.strip().split(",")[2]
-                    num_tasks += self.getPdbNumTasks(gene,pdbo,isvariant)
+                    num_tasks += int(self.getPdbNumTasks(gene,pdbo,isvariant))
                     num_done += self.getPdbNumTasksComplete(gene,pdbo,isvariant)
                     
         return num_tasks,num_done
