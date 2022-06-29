@@ -214,7 +214,7 @@ class BatchStatus:
         if isvariant:
             filenameo = pdb_path.thruputs + "params_variants.txt"
         existso, timeo = self.checkFile(filenameo)        
-        numtasks = 0
+        nums = 0
         if existso:                            
             with open(filenameo, "r") as fr:
                 lines = fr.readlines()
@@ -226,8 +226,8 @@ class BatchStatus:
                         filenamet = pdb_path.thruputs + f"vagg/{no}_ddg_buildmodel.csv"
                     existst, timeo = self.checkFile(filenamet)      
                     if existst:
-                        numtasks+=1  
-        return numtasks
+                        nums+=1  
+        return nums
 
     def getGeneNumTasks(self,gene,isvariant):
         gene_path = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset,gene=gene)

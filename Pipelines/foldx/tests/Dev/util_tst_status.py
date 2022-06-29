@@ -29,7 +29,7 @@ timea = datetime.now()
 timec = datetime.now()            
 print("### MUTEIN TEST - CREATING UNTASKS ###")
 print("--- ETA= 0:01:00")
-rem.run_pipeline(["",'GENES', 'cutdown:cr2:', data_d + "/log/", data_d, inst_d, inst_d+"/Pipelines/foldx/"])
+rem.run_pipeline(["",'GENES', 'notch:notch1:', data_d + "/log/", data_d, inst_d, inst_d+"/Pipelines/foldx/"])
     
 ################################################
 timeb = datetime.now()            
