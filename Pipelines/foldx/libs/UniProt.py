@@ -22,21 +22,14 @@ class UniProt:
     def __init__(self, gene,accession):
         self.gene = gene
         #self.organism_id = organism_id
-        self.accession = accession#genetoprotein.accession_from_bioservices(gene,organism_id,True)
-        #if len(self.accession) < 2:
-        #    self.accession = genetoprotein.accession_from_bioservices(gene,organism_id,False)
-        seq = genetoprotein.sequence_from_bioservices(self.accession)
-        seq_lines = seq.split("\n")
-        self.seq = ""
-        for s in range(1, len(seq_lines)):
-            sl = str(seq_lines[s].strip())
-            self.seq += sl
-
+        self.accession = accession        
+        self.seq = genetoprotein.sequence_from_uniprot(self.accession)
+        
     def searchForStructures(self, gene_path, pdb_path, fragment=-1):
         # using bioservices to get pdbs
         fd_pdb = FileDf.FileDic(gene_path + "Coverage_pdb.csv", {})
         pdb_list = []
-        pdbs = genetoprotein.pdbs_from_accession_bioservices(self.accession)
+        pdbs = genetoprotein.pdbs_from_accession_uniprot(self.accession)
         for pdburl in pdbs:
             pdb = pdburl["pdb"]
             pdb_url = pdburl["path"]

@@ -10,79 +10,57 @@ https://stackoverflow.com/questions/23443505/how-to-query-uniprot-org-to-get-all
 
 import os
 import requests
-from bioservices import UniProt
+
 from urllib.request import urlretrieve
 import Bio.PDB as bio
-
-# ----------------- -------------------------------------------
-###       bioservices, uniprot                            ###
-# ------------------------------------------------------------
-def accession_from_bioservices(genename,organism_id,reviewed):
-    u = UniProt()
-
-    ## If you have any uniprot problems this line should work so check it, eg you might have a connction error
-    #print("QUERY THAT WORKS")
-    #res = u.search("P43403", frmt="txt")
-    #print(res)
-    # You can browse the reults in a browser:
-    # https://rest.uniprot.org/uniprotkb/search?query=reviewed:true+AND+organism_id:9606
-
-    #search_string = "organism_id:10090+and+reviewed:true+and+gene:" + genename    
-    review_string = "yes"
+## Recreating all functions wiuth uniprot API
+#https://www.uniprot.org/help/api_queries
+def accession_from_uniprot(genename,organism_id,reviewed):
+    accessions = []
+    url = f"https://rest.uniprot.org/uniprotkb/search?query=reviewed:true+AND+organism_id:{organism_id}+AND+gene_exact:{genename}"        
     if not reviewed:
-        review_string = "no"
+        url = f"https://rest.uniprot.org/uniprotkb/search?query=organism_id:{organism_id}+and+reviewed:false+and+gene_exact:{genename}"    
+    print(url)      
+    # sending get request and saving the response as response object
+    ra = requests.get(url=url)    
+    # extracting data in json format
+    data = ra.json()
+    if len(data["results"])> 0:
+        for dt in data["results"]:                
+            accession = dt["primaryAccession"]      
+            accessions.append(accession)
+    
+    return accessions
 
-    search_string = "organism:"+organism_id+"+and+reviewed:"+review_string+"+and+gene:" + genename
-    print("Searching:", "https://rest.uniprot.org/uniprotkb/search?query=" + search_string)
-    result = u.search(
-        #"organism:9606+and+reviewed:yes+and+gene:" + genename,
-        search_string,
-        columns="id,genes",
-        limit=5,
-    )
-    print(result)
-    try:
-        rows = result.split("\n")
-    except:
-        raise TypeError("!!! Error in BioServices HTML request !!! Aborting :-(")
-    accs = []
-    if len(rows) > 1:
-        for row in rows:
-            print("Row:", row)
-            acc_gene = row.split("\t")
-            if len(acc_gene) > 1:
-                acc = acc_gene[0]
-                gn = acc_gene[1].upper()
-                gns = gn.split(" ")
-                for gn in gns:
-                    gn = gn.strip()                
-                    if gn == genename:
-                        accs.append(acc)
-        return accs
-    else:        
-        return []
-
-
-def sequence_from_bioservices(accession):
-    u = UniProt()
-    seq = u.retrieve(accession, "fasta")
+def sequence_from_uniprot(accession):
+    url = f"https://rest.uniprot.org/uniprotkb/search?query=accession:{accession}"        
+    print(url)      
+    r = requests.get(url=url)    
+    data = r.json()  
+    res = data["results"][0]    
+    seq = res["sequence"]["value"]    
     return seq
 
 
-def pdbs_from_accession_bioservices(accession):
-    u = UniProt()
-    af_model, af_version = "F1", "v2"
+def pdbs_from_accession_uniprot(accession):
     pdb_paths = []  # a tuple of pdb code and path for download
-    res = u.mapping("ACC", "PDB_ID", accession)
+    # first alphafold
+    af_model, af_version = "F1", "v2"
     af_name, af_path = getAlphaFoldLink(accession, af_model, af_version)
-    pdb_paths.append({"pdb": af_name, "path": af_path})
-    if accession in res:
-        for pdb in res[accession]:
+    # next uniprot PBS experiemntal structures
+    url = f"https://rest.uniprot.org/uniprotkb/search?query=accession:{accession}"            
+    print(url)      
+    r = requests.get(url=url)    
+    data = r.json()  
+    res = data["results"][0]["uniProtKBCrossReferences"]
+    for x in res:
+        db = x["database"]
+        pdb = x["id"]
+        if x == "PDB":
             pdb_path = getPDBLink(pdb)
-            pdb_paths.append({"pdb": pdb.lower(), "path": pdb_path})
+            pdb_paths.append({"pdb": pdb.lower(), "path": pdb_path})                        
     return pdb_paths
-
-
+    
 # ----------------- -------------------------------------------
 ###       PDB Links                                       ###
 # ------------------------------------------------------------
@@ -143,3 +121,78 @@ def retrieveFile(url, path_name, overwrite=False):
             print("...!!! No data for", url)
             return False
     return True
+
+
+"""
+##################### BIOSERVICES IS TOO UNRELIABLE #################################
+# ----------------- -------------------------------------------
+###       bioservices, uniprot                            ###
+# ------------------------------------------------------------
+from bioservices import UniProt
+def xaccession_from_bioservices(genename,organism_id,reviewed):    
+    u = UniProt()
+
+    ## If you have any uniprot problems this line should work so check it, eg you might have a connction error
+    #print("QUERY THAT WORKS")
+    #res = u.search("P43403", frmt="txt")
+    #print(res)
+    # You can browse the reults in a browser:
+    # https://rest.uniprot.org/uniprotkb/search?query=reviewed:true+AND+organism_id:9606
+
+    #search_string = "organism_id:10090+and+reviewed:true+and+gene:" + genename    
+    review_string = "yes"
+    if not reviewed:
+        review_string = "no"
+
+    search_string = "organism:"+organism_id+"+and+reviewed:"+review_string+"+and+gene:" + genename
+    print("Searching:", "https://rest.uniprot.org/uniprotkb/search?query=" + search_string)
+    result = u.search(
+        #"organism:9606+and+reviewed:yes+and+gene:" + genename,
+        search_string,
+        columns="id,genes",
+        limit=5,
+    )
+    print(result)
+    try:
+        rows = result.split("\n")
+    except:
+        raise TypeError("!!! Error in BioServices HTML request !!! Aborting :-(")
+    accs = []
+    if len(rows) > 1:
+        for row in rows:
+            print("Row:", row)
+            acc_gene = row.split("\t")
+            if len(acc_gene) > 1:
+                acc = acc_gene[0]
+                gn = acc_gene[1].upper()
+                gns = gn.split(" ")
+                for gn in gns:
+                    gn = gn.strip()                
+                    if gn == genename:
+                        accs.append(acc)
+        return accs
+    else:        
+        return []
+
+
+def xsequence_from_bioservices(accession):
+    u = UniProt()
+    seq = u.retrieve(accession, "fasta")
+    return seq
+
+
+def xpdbs_from_accession_bioservices(accession):
+    u = UniProt()
+    af_model, af_version = "F1", "v2"
+    pdb_paths = []  # a tuple of pdb code and path for download
+    res = u.mapping("ACC", "PDB_ID", accession)
+    af_name, af_path = getAlphaFoldLink(accession, af_model, af_version)
+    pdb_paths.append({"pdb": af_name, "path": af_path})
+    if accession in res:
+        for pdb in res[accession]:
+            pdb_path = getPDBLink(pdb)
+            pdb_paths.append({"pdb": pdb.lower(), "path": pdb_path})
+    return pdb_paths
+
+
+"""

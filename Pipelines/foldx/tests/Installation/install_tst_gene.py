@@ -20,20 +20,30 @@ import environments as env
 envs = env.getenvironment() # WARNING YOU NEED TO HAVE ADDED YOURSELF HERE
 inst_d = envs["install_dir"]
 data_d = envs["data_dir"]
+dataset="mouse2"
 
-ab,c,de,f,g,h = 1,0,0,0,0,0
+a,b = 0,1
 
 timea = datetime.now()
-if ab:
+if a:
     timec = datetime.now()            
     print("### MUTEIN INSTALL TEST - PREPARING GENE ###")
-    print("--- ETA= 0:00:08")
-    ppl.run_pipeline(["",f"runs=a@dataset=one@install_dir={inst_d}@data_dir={data_d}"])
-    ppl.run_pipeline(["",f"runs=b@dataset=one@install_dir={inst_d}@data_dir={data_d}"])
+    print("--- ETA= 0:01:00")
+    #ppl.run_pipeline(["",f"runs=a@dataset=cutdown@install_dir={inst_d}@data_dir={data_d}"])
+    ppl.run_pipeline(["",f"runs=a@dataset={dataset}@install_dir={inst_d}@data_dir={data_d}"])
     timed = datetime.now()            
     print("Time taken = ", timed-timec)
     print("Problems with this are usually html request problems ewith bioservices")
 
+if b:
+    timec = datetime.now()            
+    print("### MUTEIN INSTALL TEST - PREPARING PDBS ###")
+    print("--- ETA= 0:00:08")
+    #ppl.run_pipeline(["",f"runs=a@dataset=cutdown@install_dir={inst_d}@data_dir={data_d}"])
+    ppl.run_pipeline(["",f"runs=b@dataset={dataset}@install_dir={inst_d}@data_dir={data_d}"])
+    timed = datetime.now()            
+    print("Time taken = ", timed-timec)
+    
 ################################################
 timeb = datetime.now()            
 print("Total time taken = ", timeb-timea)

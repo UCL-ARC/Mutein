@@ -43,17 +43,10 @@ def run_pipeline(args):
         idx0 = acc_df.index[0]
         organism_id = str(acc_df["organism"][idx0])
         accession = str(acc_df["accession"][idx0])
-        #accession = genetoprotein.accession_from_bioservices(gene.upper(),organism_id,True)
-        #if len(accession) < 2:
-        #    accession = genetoprotein.accession_from_bioservices(gene.upper(),organism_id,False)
+        
         if len(accession) > 1:            
-            seq = genetoprotein.sequence_from_bioservices(accession)
-            seq_lines = seq.split("\n")
-            wholeseq = ""
-            for s in range(1, len(seq_lines)):
-                sl = str(seq_lines[s].strip())
-                wholeseq += sl
-            gn = Gene.Gene(gene, accession, wholeseq)
+            seq = genetoprotein.sequence_from_uniprot(accession)            
+            gn = Gene.Gene(gene, accession, seq)
             # Read the variants from intray
             dfv = pd.read_csv(gene_path.gene_inputs + "/variants.csv")
             for i in range(len(dfv.index)):

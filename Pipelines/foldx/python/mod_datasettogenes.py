@@ -67,18 +67,13 @@ def run_pipeline(args):
         gene_path = Paths.Paths(
             data_dir, install_dir, dataset=dataset, gene=gene,readonly=False
         )
-        accessions = genetoprotein.accession_from_bioservices(gene.upper(),organism_id,True)
+        accessions = genetoprotein.accession_from_uniprot(gene.upper(),organism_id,True)
         if len(accessions) == 0:
-            accessions = genetoprotein.accession_from_bioservices(gene.upper(),organism_id,False)
+            accessions = genetoprotein.accession_from_uniprot(gene.upper(),organism_id,False)
         if len(accessions) > 0:
             for accession in accessions:
-                seq = genetoprotein.sequence_from_bioservices(accession)
-                seq_lines = seq.split("\n")
-                wholeseq = ""
-                for s in range(1, len(seq_lines)):
-                    sl = str(seq_lines[s].strip())
-                    wholeseq += sl
-                gn = Gene.Gene(gene, accession, wholeseq)
+                seq = genetoprotein.sequence_from_uniprot(accession)                            
+                gn = Gene.Gene(gene, accession, seq)
                 genes.append(gn)  # main repository for data we are creating in function                
                 # CREATE the variants for the gene
                 vrs = gene_variant_dic[gene.upper()]
