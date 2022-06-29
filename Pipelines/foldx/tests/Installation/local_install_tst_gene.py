@@ -24,6 +24,8 @@ dataset="mouse2"
 
 a,b = 0,1
 
+### Note the HTML links do not work if you have CISCO connect turned on.###
+
 timea = datetime.now()
 if a:
     timec = datetime.now()            

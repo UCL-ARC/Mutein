@@ -35,8 +35,8 @@ def run_pipeline(args):
     argus = Arguments.Arguments(args)
     install_dir = argus.arg("install_dir")    
     data_dir = argus.arg("data_dir")
-    dataset = argus.arg("dataset")
-    gene = argus.arg("gene")
+    dataset = argus.arg("dataset""")
+    gene = argus.arg("gene","")
     task = int(argus.arg("task", "none"))
     missing = argus.arg("missing", "N").upper()
 

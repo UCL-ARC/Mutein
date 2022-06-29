@@ -354,7 +354,7 @@ class BatchStatus:
                         else:                            
                             fw.write((lines[i]).strip() + "\n")
                             if write_genes:
-                                gene_var_writer.write((lines[0]).strip() + "\n")                    
+                                gene_var_writer.write((lines[i]).strip() + "\n")                    
             print("Completed", count, "out of", len(lines) - 1)
 
         else:

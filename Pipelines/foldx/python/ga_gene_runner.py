@@ -20,7 +20,6 @@ def preparePdbs(args):
 
 def repairPdbs(args):
     import mod_generepair as ppb
-
     ppb.run_pipeline(args)
 
 
