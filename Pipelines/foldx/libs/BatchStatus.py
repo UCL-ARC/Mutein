@@ -312,7 +312,7 @@ class BatchStatus:
                 with open(filenameP, "r") as fr:
                     lines = fr.readlines()                    
                     fw.write((lines[0]).strip() + "\n")
-                    if write_genes and gene_num > 0:
+                    if write_genes and gene_num == 0:
                         gene_writer.write((lines[0]).strip() + "\n")
                     
                     for i in range(1, len(lines)):
@@ -342,7 +342,7 @@ class BatchStatus:
                 with open(filenameP, "r") as fr:
                     lines = fr.readlines()
                     fw.write((lines[0]).strip() + "\n")
-                    if write_genes and gene_num > 0:
+                    if write_genes and gene_num == 0:
                         gene_var_writer.write((lines[0]).strip() + "\n")                    
                     for i in range(1, len(lines)):
                         filenameo = (

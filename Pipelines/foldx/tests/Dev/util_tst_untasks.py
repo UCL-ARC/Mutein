@@ -34,7 +34,10 @@ if cde:
     timec = datetime.now()            
     print("### MUTEIN TEST - DOWNLOAD FROM WEB ###")
     print("--- ETA= 0:00:03")       
-    ppl.run_pipeline(["",f"runs=c@dataset=cutdown@gene=cr2@repairs=0@task=1@repair_from=0@install_dir={inst_d}@data_dir={data_d}"])
+    for i in range(7):
+        t = i+1
+        ppl.run_pipeline(["",f"runs=c@dataset=cutdown@gene=cr2@repairs=0@task={t}@repair_from=0@install_dir={inst_d}@data_dir={data_d}"])
+        ppl.run_pipeline(["",f"runs=c@dataset=cutdown@gene=cr2@repairs=0@task={t}@repair_from=0@install_dir={inst_d}@data_dir={data_d}"])
     ppl.run_pipeline(["",f"runs=d@dataset=cutdown@gene=cr2@repairs=x@chunk=500@variant=*@vchunk=10@install_dir={inst_d}@data_dir={data_d}"])
     ppl.run_pipeline(["",f"runs=e@dataset=cutdown@gene=cr2@repairs=x@chunk=10@variant=*@vchunk=10@install_dir={inst_d}@data_dir={data_d}"])
     timed = datetime.now()            
