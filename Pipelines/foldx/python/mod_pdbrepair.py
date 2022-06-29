@@ -47,6 +47,7 @@ def run_pipeline(args):
         dataset=dataset,
         gene=gene,
         pdb=pdbcode,
+        readonly=False
     )
 
     repair_path = pdb_path.pdb_thruputs + "repair" + "/"

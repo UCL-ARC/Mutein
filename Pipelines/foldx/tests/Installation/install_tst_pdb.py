@@ -21,10 +21,17 @@ envs = env.getenvironment() # WARNING YOU NEED TO HAVE ADDED YOURSELF HERE
 inst_d = envs["install_dir"]
 data_d = envs["data_dir"]
 
-c,de,f,g,h = 1,0,0,0,0
+b,c,de,f,g,h = 0,0,0,1,0,0
 
 timea = datetime.now()
 
+if b:
+    timec = datetime.now()            
+    print("### MUTEIN INSTALL TEST - DOWNLOAD FROM WEB ###")
+    print("--- ETA= 0:00:03")
+    ppl.run_pipeline(["",f"runs=b@pdb=1pb5@install_dir={inst_d}@data_dir={data_d}"])
+    timed = datetime.now()            
+    print("Time taken = ", timed-timec)
 if c:
     timec = datetime.now()            
     print("### MUTEIN INSTALL TEST - REPAIRING PROTEIN STRUCTURE ###")

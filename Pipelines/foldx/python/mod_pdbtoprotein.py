@@ -30,7 +30,7 @@ def run_pipeline(args):
     install_dir = argus.arg("install_dir")    
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset", "")
-    gene = argus.arg("gene")
+    gene = argus.arg("gene","")
     pdb = argus.arg("pdb")    
     for pdb in [pdb]:
         pdb_path = Paths.Paths(

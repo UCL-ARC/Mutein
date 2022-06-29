@@ -41,6 +41,7 @@ def run_pipeline(args):
         dataset=dataset,
         gene=gene,
         pdb=pdbcode,
+        readonly=False
     )
     work_path = pdb_path.pdb_thruputs + "vparams/"
     pdb_path.goto_job_dir(work_path, args, argus.params, "_inputs05")    
@@ -55,6 +56,7 @@ def run_pipeline(args):
         dataset=dataset,
         gene=gene,
         pdb=pdbcode,
+        readonly=False
     )
 
     in_mutations_file = pdb_path.pdb_inputs + "variants.csv"
