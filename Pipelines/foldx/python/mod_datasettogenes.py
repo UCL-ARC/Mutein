@@ -65,7 +65,7 @@ def run_pipeline(args):
     genes = []
     for gene in genes_list:
         gene_path = Paths.Paths(
-            data_dir, install_dir, dataset=dataset, gene=gene,,readonly=False
+            data_dir, install_dir, dataset=dataset, gene=gene,readonly=False
         )
         accessions = genetoprotein.accession_from_bioservices(gene.upper(),organism_id,True)
         if len(accessions) == 0:
