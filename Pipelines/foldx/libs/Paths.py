@@ -15,9 +15,10 @@ from os.path import exists
 
 
 class Paths:
-    def __init__(self, data_dir, pipe_path, dataset="", gene="", pdb=""):
+    def __init__(self, data_dir, pipe_path, dataset="", gene="", pdb="",readonly=True):
         # Depending on the levels we will ensure the correct paths are present for inputs and ouputs
 
+        self.readonly = readonly
         self.inputs = ""
         self.thruputs = ""
         self.outputs = ""
@@ -150,7 +151,8 @@ class Paths:
             raise Exception("The folder is missing: " + retpath)
         else:
             try:
-                os.mkdir(retpath)
+                if not self.readonly:
+                    os.mkdir(retpath)
             except:
                 pass  # this could be a rare case of 2 nodes creating it at the same time
         return retpath + "/"
