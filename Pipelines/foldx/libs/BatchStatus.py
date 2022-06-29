@@ -50,20 +50,32 @@ class BatchStatus:
                     if existsfile:
                         num_pdbs = self.getGeneNumPdbs(geneo)
                         line_string += num_pdbs + "\t\t"
-                    else:
-                        line_string += "----\t\t"                    
+                    else:                        
+                        line_string += "----\t\t"                        
                     filenameA = patho.outputs + "ddg_bm_background.csv"
                     existsfile, time = self.checkFile(filenameA)
                     if existsfile:
                         line_string += time + "\t\t"
                     else:
-                        line_string += "----\t\t"
+                        num_tsks,num_done = self.getGeneNumTasks(geneo,False)
+                        if num_tsks == 0:                        
+                            line_string += "----\t\t"
+                        elif num_tsks == num_done:
+                            line_string += f"{num_tsks}\t\t"      
+                        else:
+                            line_string += f"{num_done}/{num_tsks}\t\t"      
                     filenameB = patho.outputs + "ddg_variant_bm.csv"
                     existsfile, time = self.checkFile(filenameB)
                     if existsfile:
                         line_string += time + "\t\t"
                     else:
-                        line_string += "----\t\t"
+                        num_tsks,num_done = self.getGeneNumTasks(geneo,True)
+                        if num_tsks == 0:                        
+                            line_string += "----\t\t"
+                        elif num_tsks == num_done:
+                            line_string += f"{num_tsks}\t\t"      
+                        else:
+                            line_string += f"{num_done}/{num_tsks}\t\t"      
                     print(line_string)
         else:
             print("Gene has not been prepped")
@@ -93,7 +105,7 @@ class BatchStatus:
         exists_string = ""
         if existsfileA:
             exists_string += timeA + "\t\t"
-        else:
+        else:            
             exists_string += "  ----  \t\t"
         if existsfileB:
             exists_string += timeB + "\t\t"
@@ -195,6 +207,43 @@ class BatchStatus:
             return str(pdb_summary)
         else:
             return "-"                
+
+    def getPdbNumTasksComplete(self,gene,pdb,isvariant):
+        pdb_path = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset,gene=gene,pdb=pdb)
+        filenameo = pdb_path.thruputs + "params_background.txt"
+        if isvariant:
+            filenameo = pdb_path.thruputs + "params_variants.txt"
+        existso, timeo = self.checkFile(filenameo)        
+        numtasks = 0
+        if existso:                            
+            with open(filenameo, "r") as fr:
+                lines = fr.readlines()
+                numtasks = str(len(lines)-1)
+                for n in range(numtasks):
+                    no = n+1
+                    filenamet = pdb_path.thruputs + f"agg/{no}_ddg_background.csv"
+                    if isvariant:
+                        filenamet = pdb_path.thruputs + f"vagg/{no}_ddg_buildmodel.csv"
+                    existst, timeo = self.checkFile(filenamet)      
+                    if existst:
+                        numtsaks+=1  
+        return numtasks
+
+    def getGeneNumTasks(self,gene,isvariant):
+        gene_path = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset,gene=gene)
+        filename = gene_path.outputs + "pdb_tasklist.csv"
+        pdbs = []
+        num_tasks = 0
+        numnum_done = 0
+        if exists(filename):            
+            with open(filename, "r") as fr:
+                lines = fr.readlines()
+                for ln in lines[1:]:
+                    pdbo = ln.strip().split(",")[2]
+                    num_tasks += self.getPdbNumTasks(gene,pdbo,isvariant)
+                    num_done += self.getPdbNumTasksComplete(gene,pdbo,isvariant)
+                    
+        return num_tasks,num_done
 
     def getPdbNumTasks(self,gene,pdb,isvariant):
         pdb_path = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset,gene=gene,pdb=pdb)
