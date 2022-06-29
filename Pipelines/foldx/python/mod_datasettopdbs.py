@@ -32,7 +32,7 @@ def run_pipeline(args):
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
     dataset_path = Paths.Paths(
-        data_dir, install_dir, dataset=dataset
+        data_dir, install_dir, dataset=dataset,readonly=False
     )
 
     # We want batches for prep and tasks

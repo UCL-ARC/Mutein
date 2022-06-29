@@ -13,18 +13,7 @@ import yaml
 import pandas as pd
 
 import _helper
-import Paths
 import Arguments
-import BatchMaker
-import Gene
-import Variant
-import genetoprotein
-import genestovariants
-import SwissModel
-import UniProt
-import PdbRunner
-import FileDf
-
 
 def run_pipeline(args):
     argus = Arguments.Arguments(args)

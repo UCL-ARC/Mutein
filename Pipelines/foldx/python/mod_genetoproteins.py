@@ -35,7 +35,7 @@ def run_pipeline(args):
     pdbs = 0
     for gene in [gene]:
         gene_path = Paths.Paths(
-            data_dir, install_dir, dataset=dataset, gene=gene
+            data_dir, install_dir, dataset=dataset, gene=gene,readonly=False
         )
         # this contains the organism id from uniport, eg human=9606 and mouse=10090
         accession_path = gene_path.gene_inputs + "accessions.csv"
@@ -85,6 +85,7 @@ def run_pipeline(args):
                     dataset=dataset,
                     gene=gn.gene,
                     pdb=pdb.pdbcode,
+                    readonly=False
                 )
                 prun = PdbRunner.PdbRunner(pdb.pdbcode)
                 prun.copyToInput(gene_path.gene_outpdbs, pdb_path.pdb_inputs, vc)

@@ -37,7 +37,7 @@ def run_pipeline(args):
     if gene != "":
         genes_list = [gene]
             
-    dataset_path = Paths.Paths(data_dir, install_dir, dataset=dataset)
+    dataset_path = Paths.Paths(data_dir, install_dir, dataset=dataset,readonly=False)
     genes_variant_file = dataset_path.dataset_inputs + "genes_variants_inputs.csv"    
     
     """
@@ -65,7 +65,7 @@ def run_pipeline(args):
     genes = []
     for gene in genes_list:
         gene_path = Paths.Paths(
-            data_dir, install_dir, dataset=dataset, gene=gene
+            data_dir, install_dir, dataset=dataset, gene=gene,,readonly=False
         )
         accessions = genetoprotein.accession_from_bioservices(gene.upper(),organism_id,True)
         if len(accessions) == 0:
@@ -129,7 +129,7 @@ def run_pipeline(args):
     genes_df = genes_csv_all.saveAsDf()
     for gene in genes_list:
         genes_one = genes_df.query('gene == "'+gene+'"')        
-        gene_path = Paths.Paths(data_dir, install_dir, dataset=dataset, gene=gene)
+        gene_path = Paths.Paths(data_dir, install_dir, dataset=dataset, gene=gene,readonly=False)
         one_path = gene_path.gene_inputs + "accessions.csv"
         genes_one.to_csv(one_path, index=False)
         
