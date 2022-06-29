@@ -292,7 +292,7 @@ class BatchStatus:
 
         
 
-    def createUntasksForPdb(self,gene,pdb):
+    def createUntasksForPdb(self,gene,pdb,write_genes=False,gene_writer=None,gene_var_writer=None,gene_num=0):
         path = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset,gene=gene,pdb=pdb)        
         print("RECREATING TASK FILE with missing tasks\n")
         print("Check results files for pdb",pdb)
@@ -310,21 +310,23 @@ class BatchStatus:
         if exists(filenameP):
             with open(filename_incomplete, "w") as fw:
                 with open(filenameP, "r") as fr:
-                    lines = fr.readlines()
+                    lines = fr.readlines()                    
                     fw.write((lines[0]).strip() + "\n")
-                    #print("The pdb has been split into tasks=", len(lines) - 1)
-                    #print("...Any tasks that have completed are below\n")
+                    if write_genes and gene_num > 0:
+                        gene_writer.write((lines[0]).strip() + "\n")
+                    
                     for i in range(1, len(lines)):
                         filenameo = (
                             path.thruputs + "agg/" + str(i) + "_ddg_background.csv"
                         )
                         existsfile, time = self.checkFile(filenameo)
                         if existsfile:
-                            count += 1
-                            #print("Task", str(i), "at", time)
-                        else:
-                            #print("Task", str(i), "----")
+                            count += 1                    
+                        else:                            
                             fw.write((lines[i]).strip() + "\n")
+                            if write_genes:
+                                gene_writer.write((lines[i]).strip() + "\n")
+
             print("Completed", count, "out of", len(lines) - 1)
 
         else:
@@ -340,19 +342,19 @@ class BatchStatus:
                 with open(filenameP, "r") as fr:
                     lines = fr.readlines()
                     fw.write((lines[0]).strip() + "\n")
-                    #print("The variants have been split into tasks=", len(lines) - 1)
-                    #print("...Any tasks that have completed are below\n")
+                    if write_genes and gene_num > 0:
+                        gene_var_writer.write((lines[0]).strip() + "\n")                    
                     for i in range(1, len(lines)):
                         filenameo = (
                             path.thruputs + "vagg/" + str(i) + "_ddg_buildmodel.csv"
                         )
                         existsfile, time = self.checkFile(filenameo)
                         if existsfile:
-                            count += 1
-                            #print("Task", str(i), "at", time)
-                        else:
-                            #print("Task", str(i), "----")
+                            count += 1                            
+                        else:                            
                             fw.write((lines[i]).strip() + "\n")
+                            if write_genes:
+                                gene_var_writer.write((lines[0]).strip() + "\n")                    
             print("Completed", count, "out of", len(lines) - 1)
 
         else:

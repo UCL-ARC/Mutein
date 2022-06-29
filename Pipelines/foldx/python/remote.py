@@ -91,19 +91,13 @@ def run_pipeline(args):
         for gene in genelist:
             pdblist = batch_stat.getGenePdbs(gene)    
             for pdb in pdblist:          
-                batch_stat.createUntasksForPdb(gene,pdb)    
-    elif mode == "GENEINCOMPLETE":
-        batch_stat = BatchStatus.BatchStatus(DataDir, PipelineDir,dataset,gene,"")
-        pdblist = batch_stat.getGenePdbs(gene)    
-        for pdb in pdblist:          
-            batch_stat.createUntasksForPdb(gene,pdb)    
+                batch_stat.createUntasksForPdb(gene,pdb)        
     elif mode == "DSINCOMPLETEPDB":
         batch_stat = BatchStatus.BatchStatus(DataDir, PipelineDir,dataset,"","")
         genelist = batch_stat.getGenes()    
         for gene in genelist:
             batch_stat.makeMissingPdbs(gene)                
-    elif mode == "GENEINCOMPLETEPDB":
-        print("GIP")
+    elif mode == "GENEINCOMPLETEPDB":        
         batch_stat = BatchStatus.BatchStatus(DataDir, PipelineDir,dataset,gene,"")
         batch_stat.makeMissingPdbs(gene)        
     elif mode == "PDBINCOMPLETE":
@@ -115,6 +109,19 @@ def run_pipeline(args):
         )
         batch_stat = BatchStatus.BatchStatus(DataDir, PipelineDir,dataset,gene,pdb)
         batch_stat.createUntasksForPdb(gene,pdb)                
+    elif mode == "GENEINCOMPLETE":
+        batch_stat = BatchStatus.BatchStatus(DataDir, PipelineDir,dataset,gene,"")
+        pdblist = batch_stat.getGenePdbs(gene)#
+        #We also need to create the genes level incomplete file
+        path = Paths.Paths(DataDir, PipelineDir, dataset=dataset, gene=gene)
+        filename_incomplete_b = path.thruputs + "params_background_incomplete.txt"
+        filename_incomplete_v = path.thruputs + "params_variants_incomplete.txt"
+        count = 0                
+        with open(filename_incomplete_b, "w") as fw_back:
+            with open(filename_incomplete_v, "w") as fw_var:
+                for pdb in pdblist:          
+                    batch_stat.createUntasksForPdb(gene,pdb,True,fw_back,fw_var,count)    
+                    count += 1
     elif mode == "PDB_BACK" or mode == "GENE_BACK":
         dataset_gene_pdb = pattern.split(":")
         dataset, gene, pdb = (
