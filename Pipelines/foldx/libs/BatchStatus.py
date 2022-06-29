@@ -57,7 +57,7 @@ class BatchStatus:
                     if existsfile:
                         line_string += time + "\t\t"
                     else:
-                        num_tsks,num_done = self.getGeneNumTasks(geneo,False)
+                        num_done,num_tsks = self.getGeneNumTasks(geneo,False)
                         if num_tsks == 0:                        
                             line_string += "----\t\t"
                         elif num_tsks == num_done:
@@ -69,7 +69,7 @@ class BatchStatus:
                     if existsfile:
                         line_string += time + "\t\t"
                     else:
-                        num_tsks,num_done = self.getGeneNumTasks(geneo,True)
+                        num_done,num_tsks = self.getGeneNumTasks(geneo,True)
                         if num_tsks == 0:                        
                             line_string += "----\t\t"
                         elif num_tsks == num_done:
@@ -243,7 +243,7 @@ class BatchStatus:
                     num_tasks += int(self.getPdbNumTasks(gene,pdbo,isvariant))
                     num_done += self.getPdbNumTasksComplete(gene,pdbo,isvariant)
                     
-        return num_tasks,num_done
+        return num_done,num_tasks
 
     def getPdbNumTasks(self,gene,pdb,isvariant):
         pdb_path = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset,gene=gene,pdb=pdb)
