@@ -75,9 +75,9 @@ def run_pipeline(args):
     if len(all_params) > 0:
         all_df = pd.concat(all_params, axis=0)
         all_df.to_csv(all_path, index=False, sep=" ", header=True)
-        print("MUTEIN SCRIPT ENDED")
+        #print("MUTEIN SCRIPT ENDED")
         return True
-    print("MUTEIN SCRIPT ENDED")
+    #print("MUTEIN SCRIPT ENDED")
     return False
 
 

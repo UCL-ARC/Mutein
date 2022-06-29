@@ -119,7 +119,7 @@ def run_pipeline(args):
                 print("vAgg - not all results present for aggregation",in_csv)
 
     print("### COMPLETED FoldX aggregate job ###")
-    print("MUTEIN SCRIPT ENDED")
+    #print("MUTEIN SCRIPT ENDED")
 
 
 ##########################################################################################

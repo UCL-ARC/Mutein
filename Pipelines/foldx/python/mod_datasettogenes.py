@@ -31,21 +31,21 @@ def run_pipeline(args):
     argus = Arguments.Arguments(args)
     install_dir = argus.arg("install_dir")    
     data_dir = argus.arg("data_dir")
-    dataset = argus.arg("dataset")
+    dataset = argus.arg("dataset","")
     gene = argus.arg("gene","")
-    dataset_path = Paths.Paths(
-        data_dir, install_dir, dataset=dataset
-    )
     genes_list = []
     if gene != "":
         genes_list = [gene]
-
+            
+    dataset_path = Paths.Paths(data_dir, install_dir, dataset=dataset)
+    genes_variant_file = dataset_path.dataset_inputs + "genes_variants_inputs.csv"    
+    
     """
     "gene_name"	"n_syn"	"n_mis"	"n_non"	"n_spl"	"n_ind"	"wmis_cv"	"wnon_cv"	"wspl_cv"	"wind_cv"	"pmis_cv"	"ptrunc_cv"	"pallsubs_cv"	"pind_cv"	"qmis_cv"	"qtrunc_cv"	"qallsubs_cv"	"pglobal_cv"	"qglobal_cv"
     "NOTCH1"	404	2700	772	360	1208	3.98846230912502	21.7266421919647	21.7266421919647	17.6547328391658	0	0	0	8.07429581976078e-68	0	0	0	0	0
     """
     # The file contains the variants and the ist of genes
-    genes_variant_file = dataset_path.dataset_inputs + "genes_variants_inputs.csv"    
+    
     genes_df = FileDf.FileDf(genes_variant_file, sep=",", header=True).openDataFrame()
 
     # this contains the organism id from uniport, eg human=9606 and mouse=10090
@@ -134,8 +134,8 @@ def run_pipeline(args):
         genes_one.to_csv(one_path, index=False)
         
 
-    print("### COMPLETED genes to gene ###")
-    print("MUTEIN SCRIPT ENDED")
+    #print("### COMPLETED genes to gene ###")
+    #print("MUTEIN SCRIPT ENDED")
 
 
 ##########################################################################################

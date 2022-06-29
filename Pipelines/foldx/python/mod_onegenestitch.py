@@ -154,7 +154,7 @@ def run_pipeline(args):
             )
 
     print("### COMPLETED GENE STITCH job ###")
-    print("MUTEIN SCRIPT ENDED")
+    #print("MUTEIN SCRIPT ENDED")
 
 
 ##########################################################################################

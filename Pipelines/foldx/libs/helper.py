@@ -60,8 +60,8 @@ def configparams(pdb):
     # Code to decide if it is test or live environment can be overridden from the command line
     import environments
 
-    user, envs = environments.getenvironment()
-    params["user"] = user
+    envs = environments.getenvironment()
+    params["user"] = envs["user"]
     return params
 
 

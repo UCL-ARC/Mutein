@@ -12,6 +12,5 @@ dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-1]
 lib_path = "/".join(dirs) + "/libs"
 sys.path.append(python_path)
 sys.path.append(lib_path)
-
-print(python_path)
-print(lib_path)
+#print(python_path)
+#print(lib_path)

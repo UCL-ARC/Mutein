@@ -36,8 +36,8 @@ def run_pipeline(args):
     argus = Arguments.Arguments(args)
     install_dir = argus.arg("install_dir")    
     data_dir = argus.arg("data_dir")
-    dataset = argus.arg("dataset")
-    gene = argus.arg("gene")
+    dataset = argus.arg("dataset","")
+    gene = argus.arg("gene","")
     task = int(argus.arg("task", "0"))
     pdb = argus.arg("pdb", "")
     missing = argus.arg("missing", "N")
@@ -168,7 +168,7 @@ def run_pipeline(args):
                         pdb_path.pdb_thruputs + "agg/" + str(row) + "_ddg_background.csv"
                     )
                     fx_runner.createPosscanCsv(row_path, pdb, mut.split(","), [], cov_df, ddg_file, df_file)                    
-        print("MUTEIN SCRIPT ENDED")
+        #print("MUTEIN SCRIPT ENDED")
 
 
 ##########################################################################################

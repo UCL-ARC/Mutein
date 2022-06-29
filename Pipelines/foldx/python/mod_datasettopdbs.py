@@ -103,8 +103,8 @@ def run_pipeline(args):
     )
     """
 
-    print("### COMPLETED dataset preparation ###")
-    print("MUTEIN SCRIPT ENDED")
+    #print("### COMPLETED dataset preparation ###")
+    #print("MUTEIN SCRIPT ENDED")
 
 
 ##########################################################################################

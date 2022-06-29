@@ -41,7 +41,10 @@ def accession_from_bioservices(genename,organism_id,reviewed):
         limit=5,
     )
     print(result)
-    rows = result.split("\n")
+    try:
+        rows = result.split("\n")
+    except:
+        raise TypeError("!!! Error in BioServices HTML request !!! Aborting :-(")
     accs = []
     if len(rows) > 1:
         for row in rows:

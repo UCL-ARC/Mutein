@@ -1,40 +1,43 @@
 """
 RSA 11.4.22
 --------------------------------------
-New users, add your environment details here to and check them in to 
-avoid having to mess about locally all the time
-For example, when I run locally, I want to use python instead of hpc, 
-and my exe path to foldx and python is different (environment variable incompetence)
+New users, add your environment details here 
+1) Add the 5 elements in the environment dictionary
+2) Add to the IF statement a way to know who you are
+
 """
 environments = (
     {}
-)  # [env]=[triple of: (foldx path), (python path), (whether to run hpc or python or just log inputs)]
-environments["myriad"] = ["foldx", "python", "hpc"]  # Main myriad environment
-environments["myriad_tst"] = ["foldx", "python", "python"]  # run python tets on myriad
+)  
+# [env]=[
+#   (foldx path), 
+#   (python path), 
+#   (whether to run hpc or python),
+#   (install_directory),
+#   (data_directory)
+# ]
+environments["myriad"] = [
+    "foldx", 
+    "python", 
+    "hpc",
+    "",
+    ""
+]  # Main myriad environment
+
 environments["rachel"] = [
     "~/UCL/libs/foldx5/foldx",
     "/bin/python3",
     "python",
+    "/home/rachel/UCL/github/Mutein/",
+    "/home/rachel/UCL/github/MuteinData/"
 ]  # RA laptop
-environments["inputs_hpc"] = [
-    "foldx",
-    "python",
-    "inputs_hpc",
-]  # just prints out what it would run
-environments["inputs_python"] = [
-    "foldx",
-    "python",
-    "inputs_python",
-]  # just prints out what it would run
-environments["python"] = [
-    "foldx",
-    "python",
-    "python",
-]  # just prints out what it would run
+
 environments["CI"] = [
     "~/UCL/libs/foldx5/foldx",
     "/bin/python3",
     "python",
+    "",
+    ""
 ]  # continuous integration
 
 import os
@@ -57,6 +60,8 @@ def getenvironment(user=""):
         envs["pythonexe"] = environments[user][1]
         envs["env"] = environments[user][2]
         envs["user"] = user
+        envs["install_dir"] = environments[user][3]
+        envs["data_dir"] = environments[user][4]
         return envs
 
     return {}

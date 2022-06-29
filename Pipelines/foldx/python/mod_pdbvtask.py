@@ -35,8 +35,8 @@ def run_pipeline(args):
     argus = Arguments.Arguments(args)
     install_dir = argus.arg("install_dir")    
     data_dir = argus.arg("data_dir")
-    dataset = argus.arg("dataset")
-    gene = argus.arg("gene")
+    dataset = argus.arg("dataset","")
+    gene = argus.arg("gene","")
     pdb = argus.arg("pdb", "")
     repairs = str(argus.arg("repairs", "x"))
 
@@ -169,7 +169,7 @@ def run_pipeline(args):
                 fx_runner.createBuildCsv(
                     row_path, pdb, pdb_muts, gene_muts, cov_df, ddg_files, df_file,allAtOnce
                 )
-    print("MUTEIN SCRIPT ENDED")
+    #print("MUTEIN SCRIPT ENDED")
 
 
 ##########################################################################################

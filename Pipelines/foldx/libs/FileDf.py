@@ -17,7 +17,7 @@ class FileDf:
         self.cols = cols
 
     def openDataFrame(self):
-        print("FileDf opening", self.file_path)
+        #print("FileDf opening", self.file_path)
         if self.header:
             df = pd.read_csv(self.file_path, sep=self.sep)
         else:

@@ -104,7 +104,7 @@ def run_pipeline(args):
             dfv.to_csv(gene_path.gene_outputs + "/pdb_candidates.csv", index=False)
 
     print("### COMPLETED gene to proteins pipeline ###")
-    print("MUTEIN SCRIPT ENDED")
+    #print("MUTEIN SCRIPT ENDED")
     return pdbs
 
 

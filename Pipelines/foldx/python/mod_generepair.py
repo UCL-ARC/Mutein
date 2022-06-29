@@ -67,7 +67,7 @@ def run_pipeline(args):
         print("Task beyond the data")
 
     print("### COMPLETED FoldX repair job ###")
-    print("MUTEIN SCRIPT ENDED")
+    #print("MUTEIN SCRIPT ENDED")
 
 
 ##########################################################################################

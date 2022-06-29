@@ -45,7 +45,7 @@ def run_pipeline(args):
         biopdb = genetoprotein.retrievePdbStructure(pdburl, pdb, pdb_path.pdb_inputs + pdb + ".pdb")
         
     print("### COMPLETED gene to proteins pipeline ###")
-    print("MUTEIN SCRIPT ENDED")
+    #print("MUTEIN SCRIPT ENDED")
     return [pdb]
 
 

@@ -85,7 +85,7 @@ def run_pipeline(args):
         print("No gene stitch, pdb only")
 
     print("### COMPLETED FoldX stitch job ###")
-    print("MUTEIN SCRIPT ENDED")
+    #print("MUTEIN SCRIPT ENDED")
 
 
 ##########################################################################################

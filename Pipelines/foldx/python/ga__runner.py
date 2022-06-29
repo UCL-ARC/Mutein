@@ -30,7 +30,7 @@ def run_pipeline(args):
     argus = Arguments.Arguments(args)
     install_dir = argus.arg("install_dir")    
     data_dir = argus.arg("data_dir")
-    dataset = argus.arg("dataset")
+    dataset = argus.arg("dataset","")
     gene = argus.arg("gene", "")
     pdb = argus.arg("pdb", "")
     runs = argus.arg("runs")
@@ -83,5 +83,4 @@ def run_pipeline(args):
 ##########################################################################################
 if __name__ == "__main__":
     import sys
-
     globals()["run_pipeline"](sys.argv)
