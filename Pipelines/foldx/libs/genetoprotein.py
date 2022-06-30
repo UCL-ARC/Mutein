@@ -9,6 +9,7 @@ https://stackoverflow.com/questions/23443505/how-to-query-uniprot-org-to-get-all
 """
 
 import os
+from urllib.error import URLError
 import requests
 
 from urllib.request import urlretrieve
@@ -72,6 +73,14 @@ def getPDBLink(pdb):
     return "https://files.rcsb.org/download/" + pdb.upper() + ".pdb"
 
 
+def getAlphaFoldLinkFromPdb(pdbcode):
+    ver = pdbcode[-2:]
+    mainbit = pdbcode[4:-3]
+    bits = mainbit.split("-")
+    acc = bits[1]
+    model = bits[2]
+    return getAlphaFoldLink(acc,model,ver)[1]
+
 def getAlphaFoldLink(accession, model, version):
     af_path = (
         "https://alphafold.ebi.ac.uk/files/AF-"
@@ -117,8 +126,8 @@ def retrieveFile(url, path_name, overwrite=False):
         try:
             urlretrieve(url, path_name)
             return True
-        except:
-            print("...!!! No data for", url)
+        except URLError as e:
+            print("...!!! No data for", url,e.message)
             return False
     return True
 

@@ -7,8 +7,8 @@ It enables debugging of the scripts as if run from a batch
 import sys, os
 # import from the shared library in Mutein/Pipelines/shared/lib
 dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
-python_path = "/".join(dirs) + "/foldx/python"
-lib_path = "/".join(dirs) + "/foldx/libs"
+python_path = "/".join(dirs) + "/python"
+lib_path = "/".join(dirs) + "/libs"
 sys.path.append(python_path)
 sys.path.append(lib_path)
 import Paths
@@ -22,15 +22,15 @@ def addpath(inputs):
 ######################################################################
 ### INPUTS
 dataset="mouse"
-gene="ryr2"
-pdb="smexp_6wov_10_4966"
+gene="notch2"
+pdb="pdb_af-o35516-f1-model_v2"
 
-repairs="3"
+repairs="0"
 repair_from = "x"
-split=10
+split=500
 vsplit=10
-task=1
-runs = "c"
+task=29
+runs = "f"
 """ 
     if "a" in runs:        print("Mutein: Preparing genes")        
     if "b" in runs:        print("Mutein: Preparing pdbs")        

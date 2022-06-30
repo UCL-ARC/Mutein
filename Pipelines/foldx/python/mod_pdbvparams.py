@@ -11,6 +11,7 @@ N.b this file may be run on the myriad clusters or on a local machine
 import os
 import pandas as pd
 from shutil import copyfile
+from os.path import exists
 import itertools
 import sys
 
@@ -60,6 +61,9 @@ def run_pipeline(args):
     )
 
     in_mutations_file = pdb_path.pdb_inputs + "variants.csv"
+    if not exists(in_mutations_file):
+        print("!!!Mutations file does not exist",in_mutations_file)
+        return
     new_mutations_file = pdb_path.pdb_outputs + "variants.csv"
     print("### foldx05: ... copying file", in_mutations_file, new_mutations_file)
     copyfile(in_mutations_file, new_mutations_file)

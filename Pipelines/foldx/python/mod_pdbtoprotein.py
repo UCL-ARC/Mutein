@@ -41,7 +41,10 @@ def run_pipeline(args):
                     pdb=pdb,
                 )
         
-        pdburl = genetoprotein.getPDBLink(pdb)
+        if pdb[:6].upper() == "PDB_AF":
+            pdburl = genetoprotein.getAlphaFoldLinkFromPdb(pdb)            
+        else:
+            pdburl = genetoprotein.getPDBLink(pdb)
         biopdb = genetoprotein.retrievePdbStructure(pdburl, pdb, pdb_path.pdb_inputs + pdb + ".pdb")
         
     print("### COMPLETED gene to proteins pipeline ###")

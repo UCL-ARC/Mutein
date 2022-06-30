@@ -53,7 +53,7 @@ def aggTasks(args):
 
 
 def aggVtasks(args):
-    import python.mod_pdbvagg as pph
+    import mod_pdbvagg as pph
     pph.run_pipeline(args)
 
 
