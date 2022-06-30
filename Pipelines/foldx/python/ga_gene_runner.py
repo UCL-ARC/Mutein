@@ -49,17 +49,14 @@ def runVtasks(args):
 
 def aggTasks(args):
     import mod_pdbagg as ppg
-
     ppg.run_pipeline(args)
 
 
 def aggVtasks(args):
     import python.mod_pdbvagg as pph
-
     pph.run_pipeline(args)
 
 
 def aggGene(args):
     import mod_genestitch as ppi
-
     ppi.run_pipeline(args)

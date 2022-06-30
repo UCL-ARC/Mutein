@@ -69,10 +69,7 @@ def run_pipeline(args):
         argus.params["work_path"] = work_path
         pdb_path.goto_job_dir(argus.arg("work_path"), args, argus.params, "_inputs05b")
         ############################################
-        params_file = gene_path.thruputs + "params_variants.txt"
-        fdfp = FileDf.FileDf(params_file, sep=" ", header=True)
-        pm_df = fdfp.openDataFrame()
-
+        
         analyses = []
         analyses.append(
             [
@@ -81,7 +78,7 @@ def run_pipeline(args):
                 pdb_path.pdb_outputs
                 + argus.arg("pdb")
                 + "_ps_"
-                + str(argus.arg("repairs"))
+                + str(argus.arg("repairs","x"))
                 + "_variants_plot.png",
             ]
         )
@@ -97,26 +94,34 @@ def run_pipeline(args):
             ]
         )
 
-        for in_csv, out_csv, plot_file in analyses:
-            all_df = []
-            exists_all = True
-            for i in range(len(pm_df.index)):
-                r = pm_df["row"][i]
-                rpdb = pm_df["pdb"][i]
-                if rpdb == pdbcode:
-                    in_csv_i = work_path + str(r) + "_" + in_csv
-                    if exists(in_csv_i):
-                        fdf = FileDf.FileDf(in_csv_i)
-                        all_df.append(fdf.openDataFrame())
-                    else:
-                        exists_all = False
-            if len(all_df) > 0 and exists_all:
-                ddg_df = pd.concat(all_df, ignore_index=True)
-                ddg_df.to_csv(out_csv, index=False)
-                ana = Analysis.Analysis(ddg_df, argus.arg("pdb"))
-                ana.createDdgResidue(plot_file, "variants", xax="gene_no")
-            else:
-                print("vAgg - not all results present for aggregation",in_csv)
+        params_file = gene_path.thruputs + "params_variants.txt"
+        if exists(params_file):
+            fdfp = FileDf.FileDf(params_file, sep=" ", header=True)
+            pm_df = fdfp.openDataFrame()
+
+            for in_csv, out_csv, plot_file in analyses:
+                all_df = []
+                exists_all = True
+                for i in range(len(pm_df.index)):
+                    r = pm_df["row"][i]
+                    rpdb = pm_df["pdb"][i]
+                    if rpdb == pdbcode:
+                        in_csv_i = work_path + str(r) + "_" + in_csv
+                        if exists(in_csv_i):
+                            fdf = FileDf.FileDf(in_csv_i)
+                            all_df.append(fdf.openDataFrame())
+                        else:
+                            exists_all = False
+                if len(all_df) > 0 and exists_all:
+                    ddg_df = pd.concat(all_df, ignore_index=True)
+                    ddg_df.to_csv(out_csv, index=False)
+                    ana = Analysis.Analysis(ddg_df, argus.arg("pdb"))
+                    ana.createDdgResidue(plot_file, "variants", xax="gene_no")
+                else:
+                    print("vAgg - not all results present for aggregation",in_csv)
+        else:
+            print("vAgg - no params file present",params_file)
+            
 
     print("### COMPLETED FoldX aggregate job ###")
     #print("MUTEIN SCRIPT ENDED")

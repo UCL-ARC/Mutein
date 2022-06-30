@@ -111,16 +111,19 @@ def run_pipeline(args):
     else:
         print("Gene stitch: not all pdb background files present for aggregation")
 
-    if exists_all_var:        
-        ddg_df_var_build = pd.concat(all_var_build, ignore_index=True)
-        ddg_df_var_build['pdb'] = ddg_df_var_build.apply(lambda row: metric.cutPdb(row['pdb']), axis=1)
-        ddg_df_var_build['score'] = ddg_df_var_build.apply(lambda row: metric.getScore(row['pdb'])[0], axis=1)
-        ddg_df_var_build['method'] = ddg_df_var_build.apply(lambda row: metric.getScore(row['pdb'])[1], axis=1)
-        ddg_df_var_build['resolution'] = ddg_df_var_build.apply(lambda row: metric.getScore(row['pdb'])[2], axis=1)
-        ddg_df_var_build['coverage'] = ddg_df_var_build.apply(lambda row: metric.getScore(row['pdb'])[3], axis=1)
-        ddg_df_var_build.to_csv(
-            gene_path.gene_outputs + "ddg_variant_bm.csv", index=False
-        )
+    if exists_all_var:
+        if len(all_var_build) > 0:        
+            ddg_df_var_build = pd.concat(all_var_build, ignore_index=True)
+            ddg_df_var_build['pdb'] = ddg_df_var_build.apply(lambda row: metric.cutPdb(row['pdb']), axis=1)
+            ddg_df_var_build['score'] = ddg_df_var_build.apply(lambda row: metric.getScore(row['pdb'])[0], axis=1)
+            ddg_df_var_build['method'] = ddg_df_var_build.apply(lambda row: metric.getScore(row['pdb'])[1], axis=1)
+            ddg_df_var_build['resolution'] = ddg_df_var_build.apply(lambda row: metric.getScore(row['pdb'])[2], axis=1)
+            ddg_df_var_build['coverage'] = ddg_df_var_build.apply(lambda row: metric.getScore(row['pdb'])[3], axis=1)
+            ddg_df_var_build.to_csv(
+                gene_path.gene_outputs + "ddg_variant_bm.csv", index=False
+            )
+        else:
+            print("Gene stitch: no files available for aggreation")
     else:
         print("Gene stitch: not all pdb variant files present for aggregation")
 
@@ -142,7 +145,7 @@ def run_pipeline(args):
                 dropnagene=True,
             )
 
-        if exists_all_var:
+        if exists_all_var and len(all_var_build) > 0:
             df_build = ddg_df_var_build.query("source=='" + tag + "'")            
             
             anav_build = Analysis.Analysis(df_build, gene)

@@ -169,8 +169,6 @@ class Paths:
                 for file in onlyfiles:
                     if exists(dir_path + file):
                         os.remove(dir_path + file)
-
-
             
         os.chdir(dir_path)
         inputs_file = name + ".log"

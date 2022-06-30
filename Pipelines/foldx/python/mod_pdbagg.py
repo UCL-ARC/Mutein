@@ -68,23 +68,26 @@ def run_pipeline(args):
         pdb_path.goto_job_dir(argus.arg("work_path"), args, argus.params, "_inputs05a")
         ############################################
         params_file = gene_path.thruputs + "params_background.txt"
-        fdfp = FileDf.FileDf(
-            params_file, sep=" ", cols=["pdb", "mut", "task"], header=False
-        )
-        pm_df = fdfp.openDataFrame()
-        all_df = []
-        all_exists = True
-        for i in range(len(pm_df.index)):
-            r = pm_df["task"][i]
-            rpdb = pm_df["pdb"][i]
-            if rpdb == pdbcode:
-                # the file has already been turned into a dataframe called posscan_df.csv
-                in_csv_i = work_path + str(r) + "_ddg_background.csv"
-                if exists(in_csv_i):
-                    fdf = FileDf.FileDf(in_csv_i)
-                    all_df.append(fdf.openDataFrame())
-                else:
-                    all_exists = False
+        if exists(params_file):
+            fdfp = FileDf.FileDf(
+                params_file, sep=" ", cols=["pdb", "mut", "task"], header=False
+            )
+            pm_df = fdfp.openDataFrame()
+            all_df = []
+            all_exists = True
+            for i in range(len(pm_df.index)):
+                r = pm_df["task"][i]
+                rpdb = pm_df["pdb"][i]
+                if rpdb == pdbcode:
+                    # the file has already been turned into a dataframe called posscan_df.csv
+                    in_csv_i = work_path + str(r) + "_ddg_background.csv"
+                    if exists(in_csv_i):
+                        fdf = FileDf.FileDf(in_csv_i)
+                        all_df.append(fdf.openDataFrame())
+                    else:
+                        all_exists = False
+        else:
+            all_exists = False
 
         if all_exists:
             if len(all_df) > 0:

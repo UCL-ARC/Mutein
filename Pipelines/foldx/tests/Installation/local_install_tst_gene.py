@@ -20,9 +20,9 @@ import environments as env
 envs = env.getenvironment() # WARNING YOU NEED TO HAVE ADDED YOURSELF HERE
 inst_d = envs["install_dir"]
 data_d = envs["data_dir"]
-dataset="mouse2"
+dataset="cutdown"
 
-a,b = 0,1
+a,b,j = 0,0,1
 
 ### Note the HTML links do not work if you have CISCO connect turned on.###
 
@@ -30,19 +30,24 @@ timea = datetime.now()
 if a:
     timec = datetime.now()            
     print("### MUTEIN INSTALL TEST - PREPARING GENE ###")
-    print("--- ETA= 0:01:00")
-    #ppl.run_pipeline(["",f"runs=a@dataset=cutdown@install_dir={inst_d}@data_dir={data_d}"])
+    print("--- ETA= 0:01:00")    
     ppl.run_pipeline(["",f"runs=a@dataset={dataset}@install_dir={inst_d}@data_dir={data_d}"])
     timed = datetime.now()            
     print("Time taken = ", timed-timec)
     print("Problems with this are usually html request problems ewith bioservices")
-
 if b:
     timec = datetime.now()            
     print("### MUTEIN INSTALL TEST - PREPARING PDBS ###")
-    print("--- ETA= 0:00:08")
-    #ppl.run_pipeline(["",f"runs=a@dataset=cutdown@install_dir={inst_d}@data_dir={data_d}"])
+    print("--- ETA= 0:00:08")    
     ppl.run_pipeline(["",f"runs=b@dataset={dataset}@install_dir={inst_d}@data_dir={data_d}"])
+    timed = datetime.now()            
+    print("Time taken = ", timed-timec)
+if j:
+    timec = datetime.now()            
+    print("### MUTEIN INSTALL TEST - PREPARING PDBS ###")
+    print("--- ETA= 0:00:08")
+    gene=""    
+    ppl.run_pipeline(["",f"runs=j@dataset={dataset}@gene={gene}@install_dir={inst_d}@data_dir={data_d}"])
     timed = datetime.now()            
     print("Time taken = ", timed-timec)
     

@@ -59,11 +59,9 @@ def run_pipeline(args):
     if "i" in runs:
         print("Mutein: Aggregating variant tasks")
         runner.aggVtasks(args)
-    if "j" in runs:
-        import ga_gene_runner as runnerj
-
+    if "j" in runs:        
         print("Mutein: Aggregating gene tasks")
-        runnerj.aggGene(args)
+        runner.aggGene(args)
 
     print("### COMPLETED Mutein script ###")
     print("MUTEIN SCRIPT ENDED")

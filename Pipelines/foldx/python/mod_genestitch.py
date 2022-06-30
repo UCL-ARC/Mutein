@@ -62,7 +62,9 @@ def run_pipeline(args):
             pdb_list.append(pdbcode)
 
     for pdbcode in pdb_list:
-        argsgn = args
+        argsgn = []
+        for arg in args:
+            argsgn.append(arg)
         arglist = args[1]
         arglist += "@pdb=" + pdbcode
         argsgn[1] = arglist

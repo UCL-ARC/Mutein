@@ -47,5 +47,6 @@ def aggVtasks(args):
     print("!!!ERROR irrelevant")
 
 
-def aggGene(args):
-    print("!!!ERROR irrelevant")
+def aggGene(args):    
+    import mod_datasetstitch as ppi
+    ppi.run_pipeline(args)
