@@ -1,4 +1,4 @@
-import os
-
-dataset_id="yokoyama2019"
-subset_list=["EGAD00001004464","EGAD00001004462","EGAD00010001631"]
+module yokoyama2019:
+    snakefile: "_yokoyama2019.smk"
+    config: config
+use rule * from yokoyama2019 as yokoyama2019_*

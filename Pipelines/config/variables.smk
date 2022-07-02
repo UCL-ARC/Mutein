@@ -22,7 +22,7 @@ bwt_indexes = list(expand('{base}.{ext}',base=bgz_fasta,ext=['bwt','pac','ann','
 all_datasets = \
 [
     "keogh2018",
-    #"yokoyama2019",
+    "yokoyama2019",
 ]
 
 #path to a "touch" file used to flag that data download is completed

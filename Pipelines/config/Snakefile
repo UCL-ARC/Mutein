@@ -1,3 +1,6 @@
+from snakemake.utils import min_version
+min_version("6.0")
+
 #setup any variables that require python rather than just YAML
 include: "variables.smk"
 
@@ -22,3 +25,4 @@ include: "reference.smk"
 
 #download all datasets
 include: "download/keogh2018.smk"
+include: "download/yokoyama2019.smk"
