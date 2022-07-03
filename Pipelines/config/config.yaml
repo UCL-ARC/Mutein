@@ -9,7 +9,7 @@ cluster: "MUT_PASSWORD=_ qsub -cwd -V -N {rule}_{wildcards}_$(date +%Y%m%d%H%M%S
   -e logs/\\$JOB_NAME.err -o logs/\\$JOB_NAME.out"
 #cluster-cancel: "qdel" #not tested!
 use-conda: True
-latency-wait: 30
+latency-wait: 10
 #jobscript: /home/ccaervi/snakemake-drmaa/jobscript.sh ##does it need #!/bin/bash -l
 #default-resources: [ mem_mb=10 , disk_mb=10 , tmpdir='/tmp' ]
 

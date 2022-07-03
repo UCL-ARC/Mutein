@@ -1,0 +1,40 @@
+- config:
+    test_dir: test
+    #mut_prefix: mutein_
+- rule:
+    name:     "step1"
+    exec:     "local"
+    conda:    "{mut_prefix}main"
+    data_dir: "{test_dir}/array_test"
+    input:
+      - step0: "{data_dir}/{=sample}.input"
+    output:
+      - step1: "{data_dir}/{sample}.step1"
+    shell: |
+      cat {step0} > {step1}
+      echo processed >> {step1}
+- rule:
+    name: step2
+    conda: "{$MUT_PREFIX}main"
+    input:
+      - step1: "{test_dir}/array_test/{=sample}.step1"
+    output:
+      - final: "{test_dir}/array_test/{sample}.step2"
+    exec: qsub
+    shell: |
+      cat {step1} > {final}
+      echo processed >> {final}
+- rule:
+    name: step3
+    conda: "{$MUT_PREFIX}main"
+    input:
+      - fastq: "datasets/{=dataset}/{=subset}/{=accession}/{accession}_{*read}.fastq.gz"
+      - index: "datasets/{dataset}/{subset}/{accession}/{accession}_{read}.fastq.gz"
+      #glob:"datasets/*/*/*/*_*.fastq.gz"
+      #re:"datasets/(?P<dataset>[^/]*)/(?P<subset>[^/]*)/(?P<accession>[^/]*)/(?P=<accession>)"...
+    output:
+      - info: "datasets/{dataset}/{subset}/{accession}/{accession}.info"
+    exec: qsub
+    shell: |
+      file {fastq} > {info}
+      echo processed >> {info}
