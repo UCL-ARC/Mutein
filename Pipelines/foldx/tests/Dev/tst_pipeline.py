@@ -22,15 +22,16 @@ def addpath(inputs):
 ######################################################################
 ### INPUTS
 dataset="mouse"
-gene="rpl10"
-pdb="smexp_6swa_3_213"
+gene="psme4"
+pdb=""#smexp_6swa_3_213"
 
-repairs="0"
+repairs="x"
 repair_from = "x"
 split=500
 vsplit=10
-task=271
-runs = "f"
+task=1
+runs = "g"
+missing="Y"
 """ 
     if "a" in runs:        print("Mutein: Preparing genes")        
     if "b" in runs:        print("Mutein: Preparing pdbs")        
@@ -51,5 +52,5 @@ def runPPL(inputs):
     args = ["", inputs]
     ppl.run_pipeline(args)
 
-runPPL("runs="+runs+"@dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@repairs="+str(repairs)+"@repair_from="+str(repair_from)+"@task=" +str(task)+"@chunk="+str(split)+"@variant=*@vchunk="+str(vsplit))
+runPPL("runs="+runs+"@dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@repairs="+str(repairs)+"@repair_from="+str(repair_from)+"@task=" +str(task)+"@chunk="+str(split)+"@variant=*@vchunk="+str(vsplit)+"@missing="+missing)
 
