@@ -120,50 +120,51 @@ class BatchStatus:
                 lines = fr.readlines()
                 for ln in lines[1:]:
                     pdbo = ln.strip().split(",")[2]
-                    patho = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset, gene=gene, pdb=pdbo)
-                    
-                    pdb_file = patho.thruputs + pdbo.lower() + "_repx.pdb"
-                    bg_split = patho.thruputs + "params_background.txt"
-                    bg_results = patho.outputs + "ddg_background.csv"
-                    var_split = patho.thruputs + "params_variants.txt"                     
-                    var_results = patho.outputs + "ddg_buildmodel.csv"                     
-                                                                      
-                    existsfileA, timeResA = self.checkFile(pdb_file)
-                    existsfileB, timeResB = self.checkFile(bg_split)
-                    existsfileC, timeResC = self.checkFile(bg_results)
-                    existsfileD, timeResD = self.checkFile(var_split)
-                    existsfileE, timeResE = self.checkFile(var_results)
+                    if pdbo[0] != "#":
+                        patho = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset, gene=gene, pdb=pdbo)
+                        
+                        pdb_file = patho.thruputs + pdbo.lower() + "_repx.pdb"
+                        bg_split = patho.thruputs + "params_background.txt"
+                        bg_results = patho.outputs + "ddg_background.csv"
+                        var_split = patho.thruputs + "params_variants.txt"                     
+                        var_results = patho.outputs + "ddg_buildmodel.csv"                     
+                                                                        
+                        existsfileA, timeResA = self.checkFile(pdb_file)
+                        existsfileB, timeResB = self.checkFile(bg_split)
+                        existsfileC, timeResC = self.checkFile(bg_results)
+                        existsfileD, timeResD = self.checkFile(var_split)
+                        existsfileE, timeResE = self.checkFile(var_results)
 
-                    pdb_line = pdbo + "\t\t"                    
-                    if existsfileA:
-                        pdb_line += timeResA + "\t\t"
-                    else:
-                        pdb_line += " ---- \t\t"
-                    if existsfileB:
-                        pdb_line += timeResB + "\t\t"
-                    else:
-                        pdb_line += " ---- \t\t"                    
-                    if existsfileC:
-                        numC = self.getPdbNumTasks(gene,pdbo,False)
-                        #pdb_line += numC+"\t\t"
-                        pdb_line += timeResC+"\t\t"
-                    else:
-                        msgC,tmC = self.completedPdbTaskFiles(gene,pdbo,False)
-                        pdb_line += msgC + "\t\t"
-                        #pdb_line += tmC + "\t\t"
-                    if existsfileD:
-                        pdb_line += timeResD + "\t\t"
-                    else:
-                        pdb_line += " ---- \t\t"                    
-                    if existsfileE:
-                        numE = self.getPdbNumTasks(gene,pdbo,True)
-                        #pdb_line += numE+"\t\t"
-                        pdb_line += timeResE+"\t\t"
-                    else:
-                        msgE,tmE = self.completedPdbTaskFiles(gene,pdbo,True)
-                        pdb_line += msgE + "\t\t"
-                        #pdb_line += tmE + "\t\t"
-                    print(pdb_line)
+                        pdb_line = pdbo + "\t\t"                    
+                        if existsfileA:
+                            pdb_line += timeResA + "\t\t"
+                        else:
+                            pdb_line += " ---- \t\t"
+                        if existsfileB:
+                            pdb_line += timeResB + "\t\t"
+                        else:
+                            pdb_line += " ---- \t\t"                    
+                        if existsfileC:
+                            numC = self.getPdbNumTasks(gene,pdbo,False)
+                            #pdb_line += numC+"\t\t"
+                            pdb_line += timeResC+"\t\t"
+                        else:
+                            msgC,tmC = self.completedPdbTaskFiles(gene,pdbo,False)
+                            pdb_line += msgC + "\t\t"
+                            #pdb_line += tmC + "\t\t"
+                        if existsfileD:
+                            pdb_line += timeResD + "\t\t"
+                        else:
+                            pdb_line += " ---- \t\t"                    
+                        if existsfileE:
+                            numE = self.getPdbNumTasks(gene,pdbo,True)
+                            #pdb_line += numE+"\t\t"
+                            pdb_line += timeResE+"\t\t"
+                        else:
+                            msgE,tmE = self.completedPdbTaskFiles(gene,pdbo,True)
+                            pdb_line += msgE + "\t\t"
+                            #pdb_line += tmE + "\t\t"
+                        print(pdb_line)
                         
         else:
             print("The pdbs have not been prepared")
@@ -179,7 +180,8 @@ class BatchStatus:
                 lines = fr.readlines()
                 for ln in lines[1:]:
                     pdbo = ln.strip().split(",")[2]
-                    pdbs.append(pdbo)
+                    if pdbo[0] != "#":
+                        pdbs.append(pdbo)
         return pdbs
     
     def getGeneNumPdbs(self,gene):
@@ -190,15 +192,16 @@ class BatchStatus:
         if exists(filename):            
             with open(filename, "r") as fr:
                 lines = fr.readlines()
-                if len(lines) > 0:
-                    num_pdbs = len(lines)-1
+                if len(lines) > 0:                    
                     for ln in lines[1:]:
                         pdbo = ln.strip().split(",")[2]
-                        patho = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset, gene=gene, pdb=pdbo)                        
-                        pdb_file = patho.thruputs + pdbo.lower() + "_repx.pdb"
-                        existsfile, timeRes = self.checkFile(pdb_file)
-                        if existsfile:
-                            num_done += 1
+                        if pdbo[0] != "#":
+                            num_pdbs += 1
+                            patho = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset, gene=gene, pdb=pdbo)                        
+                            pdb_file = patho.thruputs + pdbo.lower() + "_repx.pdb"
+                            existsfile, timeRes = self.checkFile(pdb_file)
+                            if existsfile:
+                                num_done += 1
                                         
             if num_done == num_pdbs:
                 pdb_summary = str(num_done)
@@ -240,8 +243,9 @@ class BatchStatus:
                 lines = fr.readlines()
                 for ln in lines[1:]:
                     pdbo = ln.strip().split(",")[2]
-                    num_tasks += int(self.getPdbNumTasks(gene,pdbo,isvariant))
-                    num_done += self.getPdbNumTasksComplete(gene,pdbo,isvariant)
+                    if pdbo[0] != "#":
+                        num_tasks += int(self.getPdbNumTasks(gene,pdbo,isvariant))
+                        num_done += self.getPdbNumTasksComplete(gene,pdbo,isvariant)
                     
         return num_done,num_tasks
 
@@ -422,8 +426,9 @@ class BatchStatus:
                     lines = fr.readlines()
                     for ln in lines:
                         pdb = ln.strip().split(",")[2]
-                        if not self.existsPdbFile(gene,pdb):
-                            fw.write((ln).strip() + "\n")
+                        if pdb[0]!= "#":
+                            if not self.existsPdbFile(gene,pdb):
+                                fw.write((ln).strip() + "\n")
 
         
     def existsPdbFile(self,gene,pdb):

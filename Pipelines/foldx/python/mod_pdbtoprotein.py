@@ -43,6 +43,8 @@ def run_pipeline(args):
         
         if pdb[:6].upper() == "PDB_AF":
             pdburl = genetoprotein.getAlphaFoldLinkFromPdb(pdb)            
+        elif pdb[:5].upper() == "SMEXP" or pdb[:5].upper() == "SMHOM":
+            pdburl = genetoprotein.getAlphaFoldLinkFromPdb(pdb)            
         else:
             pdburl = genetoprotein.getPDBLink(pdb)
         biopdb = genetoprotein.retrievePdbStructure(pdburl, pdb, pdb_path.pdb_inputs + pdb + ".pdb")

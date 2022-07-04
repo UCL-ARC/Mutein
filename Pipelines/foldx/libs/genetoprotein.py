@@ -127,7 +127,7 @@ def retrieveFile(url, path_name, overwrite=False):
             urlretrieve(url, path_name)
             return True
         except URLError as e:
-            print("...!!! No data for", url,e.message)
+            print("...!!! No data for", url,e)
             return False
     return True
 

@@ -58,7 +58,7 @@ class SwissModel:
                 sm_pdb = sm_pdb.replace(".", "_")
                 sm_file = pdb_path + sm_pdb + ".pdb"
 
-                # If it is a pdb structure we walso want the pdb file directly
+                # If it is a pdb structure we walso want the pdb file directly  - WHY? REMOVE THIS
                 biopdb = genetoprotein.retrievePdbStructure(
                     pdb_url, s["template"], pdb_file
                 )
