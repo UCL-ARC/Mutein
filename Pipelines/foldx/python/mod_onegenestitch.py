@@ -52,7 +52,8 @@ def run_pipeline(args):
     df = fio.openDataFrame()
     for t in range(len(df.index)):
         pdbcode = df["pdb"][t].lower()
-        pdbs.append(pdbcode)
+        if pdb[0] != "#":
+            pdbs.append(pdbcode)
     
     all_back_bm = []    
     all_var_build = []
