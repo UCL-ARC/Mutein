@@ -127,6 +127,7 @@ def run_pipeline(args):
     else:
         print("Gene stitch: not all pdb variant files present for aggregation")
 
+    """
     tags = ["SMHOM", "SMEXP", "AF", "EXP"]
     for tag in tags:                        
         if exists_all_back:
@@ -155,6 +156,7 @@ def run_pipeline(args):
                 xax="gene_no",
                 dropnagene=False,
             )
+    """
 
     print("### COMPLETED GENE STITCH job ###")
     #print("MUTEIN SCRIPT ENDED")

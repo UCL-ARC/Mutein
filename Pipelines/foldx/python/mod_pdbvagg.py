@@ -51,7 +51,8 @@ def run_pipeline(args):
 
         for t in range(len(df.index)):
             pdbcode = df["pdb"][t].lower()
-            pdb_list.append(pdbcode)
+            if pdbcode[0] !='#': #we can comment out failed dpbs
+                pdb_list.append(pdbcode)
 
     for pdbcode in pdb_list:
 
@@ -115,8 +116,8 @@ def run_pipeline(args):
                 if len(all_df) > 0 and exists_all:
                     ddg_df = pd.concat(all_df, ignore_index=True)
                     ddg_df.to_csv(out_csv, index=False)
-                    ana = Analysis.Analysis(ddg_df, argus.arg("pdb"))
-                    ana.createDdgResidue(plot_file, "variants", xax="gene_no")
+                    #ana = Analysis.Analysis(ddg_df, argus.arg("pdb"))
+                    #ana.createDdgResidue(plot_file, "variants", xax="gene_no")
                 else:
                     print("vAgg - not all results present for aggregation",in_csv)
         else:

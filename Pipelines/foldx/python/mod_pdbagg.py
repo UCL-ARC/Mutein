@@ -50,7 +50,8 @@ def run_pipeline(args):
 
         for t in range(len(df.index)):
             pdbcode = df["pdb"][t].lower()
-            pdb_list.append(pdbcode)
+            if pdbcode[0] != '#': #we can comment out failed pdbs
+                pdb_list.append(pdbcode)
 
     for pdbcode in pdb_list:
         pdb_path = Paths.Paths(
@@ -95,6 +96,7 @@ def run_pipeline(args):
                 df_file = pdb_path.pdb_outputs + "ddg_background.csv"
                 ddg_df.to_csv(df_file, index=False)
 
+                """
                 plot_file = (
                     pdb_path.pdb_outputs
                     + argus.arg("pdb")
@@ -115,6 +117,7 @@ def run_pipeline(args):
                 ana.createDdgResidue(
                     plot_file_gene, "background muts", dropnagene=True, xax="gene_no"
                 )
+                """
         else:
             print("!!! Agg: not all results are present !!!")
 

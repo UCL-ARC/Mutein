@@ -62,20 +62,21 @@ def run_pipeline(args):
             pdb_list.append(pdbcode)
 
     for pdbcode in pdb_list:
-        argsgn = []
-        for arg in args:
-            argsgn.append(arg)
-        arglist = args[1]
-        arglist += "@pdb=" + pdbcode
-        argsgn[1] = arglist
-        import mod_pdbagg as ppla
+        if pdbcode[0] != "#": #we can comment out failed pdbs
+            argsgn = []
+            for arg in args:
+                argsgn.append(arg)
+            arglist = args[1]
+            arglist += "@pdb=" + pdbcode
+            argsgn[1] = arglist
+            import mod_pdbagg as ppla
 
-        print("Aggregating background pdb", pdbcode)
-        ppla.run_pipeline(argsgn)
-        import mod_pdbvagg as pplb
+            print("Aggregating background pdb", pdbcode)
+            ppla.run_pipeline(argsgn)
+            import mod_pdbvagg as pplb
 
-        print("Aggregating variants pdb", pdbcode)
-        pplb.run_pipeline(argsgn)
+            print("Aggregating variants pdb", pdbcode)
+            pplb.run_pipeline(argsgn)
 
     if gene_stitch:
         print("Gene stitching...")
