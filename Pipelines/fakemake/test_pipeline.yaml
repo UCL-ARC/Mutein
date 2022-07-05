@@ -29,9 +29,6 @@
     conda: "{$MUT_PREFIX}main"
     input:
       - fastq: "datasets/{=dataset}/{=subset}/{=accession}/{accession}_{*read}.fastq.gz"
-      - index: "datasets/{dataset}/{subset}/{accession}/{accession}_{read}.fastq.gz"
-      #glob:"datasets/*/*/*/*_*.fastq.gz"
-      #re:"datasets/(?P<dataset>[^/]*)/(?P<subset>[^/]*)/(?P<accession>[^/]*)/(?P=<accession>)"...
     output:
       - info: "datasets/{dataset}/{subset}/{accession}/{accession}.info"
     exec: qsub

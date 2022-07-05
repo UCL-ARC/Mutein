@@ -3,6 +3,7 @@ import re
 import copy
 import json
 import os
+import glob
 
 def sub_place_holders(key,avail,config,pattern):
     for m in re.finditer(pattern,config[key]):
@@ -85,31 +86,53 @@ def parse_yaml(fname):
 # test_input = "datasets/{=dataset}/{=subset}/{=accession}/{accession}_{*read}.fastq.gz"
 # test_output = "datasets/{dataset}/{subset}/{accession}/{accession}.info"
 #in general it would be lists of input and output files not just one or each
+#"datasets/(?P<dataset>[^/]*)/(?P<subset>[^/]*)/(?P<accession>[^/]*)/(?P=<accession>)"
 def expand_io_paths(input,output):
-    pattern = '\{[^\}]*\}'
+    pattern = '\{[^\}]+\}'
     input_glob = ''
-    items = []
+    input_regx = '^'
+    pholders = []
+    ditems = {}
+    prev_end = 0
+
     for m in re.finditer(pattern,input):
         name = m.group(0)[1:-1]
+        start = m.start(0)
+
+        input_glob += input[prev_end:start] + '*'
+        input_regx += input[prev_end:start]
+
         if name.startswith('='):
-            ptype = 'job'
+            #placeholder defines a set of separate *jobs*
+            name = name[1:]
+            assert name not in ditems
+            pholders.append(name)
+            ditems[name] = 'job'
+            input_regx += '(?P<' + name + '>[^/]+)'
         elif name.startswith('*'):
-            ptype = 'list'
+            #placeholder defines a *list* of filenames within a job
+            name = name[1:]
+            assert name not in ditems
+            pholders.append(name)
+            ditems[name] = 'list'
+            input_regx += '(?P<' + name + '>[^/]+)'
         else:
-            ptype = 'normal'
+            #back reference to previous job or list placeholder
+            assert name in ditems
+            input_regx += '(?P=' + name + ')'
 
-        if len(items) > 0:
-            start = items[-1][3]
-        else:
-            start = 0
-        end = m.start(0)
-        input_glob += input[start:end]
+        prev_end = m.end(0)
 
-        input_glob += '*'
-        items.append([name,ptype,m.start(0),m.end(0)])
-
-    start = items[-1][3]
-    input_glob += input[start:]
+    input_glob += input[prev_end:]
+    input_regx += input[prev_end:] + '$'
 
     print(input)
     print(input_glob)
+    print(input_regx)
+
+    for path in glob.iglob(input_glob):
+        print(path)
+        m = re.fullmatch(input_regx,path)
+        if m is not None:
+            print(m.group(0))
+            for name in pholders: print(m.group(name))
