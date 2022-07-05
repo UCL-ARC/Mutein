@@ -14,4 +14,10 @@ import RefGenome
 
 
 import pandas as pd
-rg = RefGenome.RefGenome()
+genes = []
+genes.append("ANG")
+genes.append("APOE")
+genes.append("APP")
+genes.append("DAO")
+
+rg = RefGenome.RefGenome(genes)
