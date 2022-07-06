@@ -6,14 +6,8 @@ import fakemake as fm
 def run_main():
     args = parse_args()
     pipeline = fm.parse_yaml(args.file)
-    fm.process(pipeline)
-
-def test_glob():
-    #assume we've already substituted any config variable into the paths
-    #so that any remaining are to be determined by globbing
-    test_input = "datasets/{=dataset}/{=subset}/{=accession}/{accession}_{*read}.fastq.gz"
-    test_output = "datasets/{dataset}/{subset}/{accession}/{accession}.info"
-    fm.expand_io_paths(test_input,test_output)
+    config = fm.setup_config(pipeline)
+    fm.process(config,pipeline)
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -22,5 +16,4 @@ def parse_args():
     return args
 
 if __name__ == "__main__":
-    test_glob()
-    #run_main()
+    run_main()

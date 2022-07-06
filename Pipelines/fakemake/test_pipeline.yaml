@@ -1,37 +1,37 @@
 - config:
     test_dir: test
-    #mut_prefix: mutein_
+    mut_prefix: "{$MUT_PREFIX}"
+    user: "{mut_prefix}{$USER}_{test_dir}"
 - rule:
     name:     "step1"
     exec:     "local"
     conda:    "{mut_prefix}main"
     data_dir: "{test_dir}/array_test"
-    input:
-      - step0: "{data_dir}/{=sample}.input"
-    output:
-      - step1: "{data_dir}/{sample}.step1"
+    input:    "{data_dir}/{=sample}.input"
+    output:   "{data_dir}/{=sample}.step1"
     shell: |
-      cat {step0} > {step1}
-      echo processed >> {step1}
+      cat {input} > {output}
+      echo processed >> {output}
 - rule:
     name: step2
     conda: "{$MUT_PREFIX}main"
     input:
-      - step1: "{test_dir}/array_test/{=sample}.step1"
+      step1: "{test_dir}/array_test/{=sample}.step1"
     output:
-      - final: "{test_dir}/array_test/{sample}.step2"
+      final: "{test_dir}/array_test/{=sample}.step2"
     exec: qsub
     shell: |
       cat {step1} > {final}
       echo processed >> {final}
 - rule:
-    name: step3
+    name: step4
     conda: "{$MUT_PREFIX}main"
     input:
-      - fastq: "datasets/{=dataset}/{=subset}/{=accession}/{accession}_{*read}.fastq.gz"
+      read1: "datasets/{=dataset}/{=subset}/{=accession}/{=accession}_1.fastq.gz"
+      read2: "datasets/{=dataset}/{=subset}/{=accession}/{=accession}_2.fastq.gz"
     output:
-      - info: "datasets/{dataset}/{subset}/{accession}/{accession}.info"
+      info: "datasets/{=dataset}/{=subset}/{=accession}/{=accession}.info"
     exec: qsub
     shell: |
-      file {fastq} > {info}
-      echo processed >> {info}
+      file {read1} {read2} > {info}
+      echo {$USER} processed >> {info}
