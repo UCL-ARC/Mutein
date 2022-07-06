@@ -21,14 +21,34 @@ class Fasta:
                     self.seqs[cid] = seq_record.seq
                     break
                     
-        if cid in self.seqs:
-            seq = self.seqs[cid][start-1:end]
+        if cid in self.seqs:            
             if reverse:
-                return seq[::-1]
+                rev_seq = self.flipSeq(self.seqs[cid][start-1:end][::-1])
+                return rev_seq
             else:
+                seq = self.seqs[cid][start-1:end]
                 return seq
         else:
             return ""
+
+    def flipSeq(self,seq):    
+        rev_seq = ""
+        for n in seq:            
+            fn = self.flipNucleotide(n)
+            rev_seq += fn
+        return rev_seq#[::-1]
+
+    def flipNucleotide(self,nuc):    
+        if nuc.upper() == "C":
+            return "G"
+        elif nuc.upper() == "G":
+            return "C"
+        elif nuc.upper() == "A":
+            return "T"
+        elif nuc.upper() == "T":
+            return "A"
+        else:
+            return "?"
 
     
                 

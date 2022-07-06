@@ -85,7 +85,7 @@ codons_aa["GGA"]="G"
 codons_aa["GGG"]="G"
 
 def getAA(triple_seq,append_first="", phase=0):
-    #print(triple_seq,append_first,phase)
+    #print(triple_seq,append_first,phase)    
     seq_out = ""
     end = ""        
     seq_use = append_first + triple_seq[int(phase):]
@@ -98,3 +98,6 @@ def getAA(triple_seq,append_first="", phase=0):
             end = nuc
             #raise Exception("Not a multiple of 3")
     return seq_use,seq_out,end
+
+
+    

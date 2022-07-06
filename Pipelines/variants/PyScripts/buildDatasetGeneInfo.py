@@ -8,7 +8,7 @@ I then build it up to show the gene sequence, length, and coding regions so that
 
 Headers
 
-Gene,Chme,UniprotSeq,UniprotLength,CodingRegions,GeneNucSeq,GeneNucLength,GeneAASeq,GeneAALength
+Chme,Gene,Accession,UniprotSeq,UniprotLength,CodingRegions,GeneNucSeq,GeneNucLength,GeneAASeq,GeneAALength
 
 """
 # I may want to build this file up incrementally

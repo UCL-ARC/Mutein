@@ -15,6 +15,7 @@ https://learn.gencore.bio.nyu.edu/ngs-file-formats/gff3-format/
 
 import pandas as pd
 import codons
+import CodingGene
 
 
 class Annotation:
@@ -27,10 +28,12 @@ class Annotation:
         #print("COLUMNS=", self.gencode.columns)
     
     def getCdsRegions(self,genes,gene_key,preferred_source=""):
+        cds_dic = {} #per chme_gene per position/tuple NUC/AA
         gene_cds = {}
         print(self.gencode.columns)        
         have_gene = False
-        cg_id = ""                
+        cg_id = ""       
+        coding_genes = []         
         for idx in self.gencode.index:
             chme = self.gencode["seqname"][idx]
             src = self.gencode["source"][idx]
@@ -67,33 +70,63 @@ class Annotation:
                         gene_cds[cg_id][strt] = [chme,strt,stp,strd,frm]
                         print(cg_id,src,strt,stp,strd,frm)                
                                         
-        print("##################################################")
-        
+        print("##################################################")        
         for cg,cds in gene_cds.items():
-            print(cg)
-            seq = ""
+            cg = CodingGene.CodingGene(cg)
+            chunks = []            
+            print(cg)            
+            for st,tpl in cds.items():                
+                chme,strt,stp,strd,frm = tpl                                
+                seq_chunk = self.fasta.getSeq(chme,int(strt),int(stp),strd=="-")
+                print("seq chunk", strd=="-",seq_chunk)
+                print("3 either side", self.fasta.getSeq(chme,int(strt)-3,int(stp)+3,strd=="-"))
+                if strd=="-":
+                    chunks.insert(0,[seq_chunk,tpl])
+                else:
+                    chunks.append([seq_chunk,tpl])
+            print("---------------------------------------------")            
+            seqaas = ""
+            seqnucs = ""
             last_carry = ""
-            for st,tpl in cds.items():
-                print("Carry over=",last_carry)
-                chme,strt,stp,strd,frm = tpl                            
-                #def getSeq(self,chme,start,end,reverse=False):
-                seq_chunk = self.fasta.getSeq(chme,strt,stp,strd=="-")
-                seq += seq_chunk
+            for seq_chunk, tpl in chunks:                
+                chme,strt,stp,strd,frm = tpl
+                # frame includes push from last carry
+                # frame is 3- for reverse
+                if strd == "-" and int(frm) > 0:
+                    frm = 3-int(frm)
+                    frm = frm - len(last_carry)
+                print("Chunk ends=",seq_chunk[:12],"...",seq_chunk[-12:])
+                print("Carry over=",last_carry, "Phase=",frm)                                
+                print(seq_chunk)
                 seqnuc,seqaa,end_carry = codons.getAA(seq_chunk,last_carry,frm)
                 print("Seq start=",seqnuc[0:3])
-                print("Seq left=",divmod(len(seq),3),end_carry)
-                print(seqaa)
-                last_carry = end_carry
+                print("Seq left=",divmod(len(seqnuc),3),end_carry)
+                print(seqaa)                
+                print(seqnuc)      
                 print("try all phases")
-                print(codons.getAA(seq_chunk,last_carry,0))
-                print(codons.getAA(seq_chunk,last_carry,1))
-                print(codons.getAA(seq_chunk,last_carry,2))
+                print(codons.getAA(seq_chunk,last_carry,0)[1])
+                print(codons.getAA(seq_chunk,last_carry,1)[1])
+                print(codons.getAA(seq_chunk,last_carry,2)[1])
+                seqnucs += seqnuc
+                seqaas += seqaa
+                last_carry = end_carry
+                cg.addChunk(int(strt),int(stp),strd=="+",seqnuc,seqaa)
+                                
 
-            seqnuc,seqaa,end_carry = codons.getAA(seq)
+            seqnuc,seqaa,end_carry = codons.getAA(seqnuc)
             print("** NUC SEQ**")
             print(seqnuc)
             print("** AA SEQ**")
             print(seqaa)
+            print("** NUC SEQS**")
+            print(seqnucs)
+            print("** AA SEQS**")
+            print(seqaas)
+            coding_genes.append(cg)
+    
+        return coding_genes
+
+            
 
             
 
