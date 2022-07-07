@@ -4,6 +4,8 @@ import copy
 import json
 import os
 import glob
+import datetime
+import time
 
 #regex patterns to match non nested {placeholders} and {$environment variables}
 ph_regx = r'\{[^\$=].*?\}'
@@ -27,6 +29,7 @@ reserved_chrs = ['$','=']       #,'*']
 #default conda and exec values
 default_conda = 'fm_default_env'
 default_exec = 'local'
+default_job_dir = 'fakemake_jobs'
 
 # def _sub_vars(config,extra=None):
 #     'substitute all simple placeholders or fail trying'
@@ -106,13 +109,34 @@ def process_rule(config,rule):
     #fill in any globbing placeholders in inputs and outputs
     #return list of values, one per job
     job_list = generate_job_list(rule,input,output)
-    #show(job_list,"jobs")
+    show(job_list,"jobs")
+
+    if len(job_list) == 0:
+        print(f"rule {rule['name']} no jobs generated")
+        return
 
     #determine if all inputs are present
     #and if outputs need to be regenerated
-    validate_jobs(rule,job_list,shell)
+    shell_list = generate_final_shell_commands(rule,job_list,shell)
+
+    timestamp = datetime.datetime.fromtimestamp(time.time()).strftime(".%Y%m%d-%H%M%S.%f")
+    jobfile = os.path.join(config['temp_job_dir'],rule['name']+timestamp)
+    with open(jobfile,'w') as f:
+        json.dump(shell_list,f,sort_keys=False,indent=2)
+        f.write('\n')
+
+    execute_jobs(rule,jobfile)
+
+def check_cwd(config):
+    if 'expected_working_dir' in config:
+        if os.path.realpath(os.getcwd()) != config['expected_working_dir']:
+            print("warning: current path is not the expected working directory")
+            print(f"expecting: {config['expected_working_dir']}")
+            print(f"but found {os.path.realpath(os.getcwd())}")
 
 def process(config,pipeline):
+    check_cwd(config)
+
     #pipeline yaml must be a list of items all called "rule"
     for i,item in enumerate(pipeline):
         assert type(item) == dict
@@ -121,6 +145,14 @@ def process(config,pipeline):
         assert item_type == 'rule'
         #show(item[item_type],item_type)
         process_rule(config,item[item_type])
+
+def find_duplicates(dict_list):
+    all_keys = set()
+
+    for config in dict_list:
+        for key in config.keys():
+            assert not key in all_keys, f"duplicate key {key}"
+            all_keys.add(key)
 
 def setup_rule(config,rule):
     assert type(rule) == dict
@@ -138,7 +170,7 @@ def setup_rule(config,rule):
             #general rule options must be simple strings
             assert type(value) == str
         else:
-            #input and output can also be dictionaries of strings
+            #input and output can be simple strings or dictionaries of strings
             if type(value) != str:
                 assert type(value) == dict
                 for k,v in value.items():
@@ -152,10 +184,14 @@ def setup_rule(config,rule):
     #separate out and canonicalise input, output and shell
     input,output,shell = split_rule(rule)
 
-    #merge temporary copy of config into the rule, giving rule priority
+    #merge temporary copy of config into the rule
+    #such that rule keys overwrite any matching config keys
     _config = copy.deepcopy(config)
     _config.update(rule)
     rule.update(_config)
+
+    #verify that rule, input and output do not share any keys
+    find_duplicates([rule,input,output])
 
     #substitute any environment variables
     sub_environ(rule)
@@ -163,7 +199,7 @@ def setup_rule(config,rule):
     sub_environ(output)
     sub_environ(shell)
 
-    #substitute any fakemake variables except for shell
+    #substitute any fakemake variables except for the shell dict
     #which contains input/output variables yet to be determined
     sub_vars(rule)
     sub_vars(input,extra=rule)
@@ -189,7 +225,7 @@ def split_rule(rule):
 
 def setup_config(pipeline):
     #set any defaults here
-    config = {'example_default':'example_value'}
+    config = {'temp_job_dir':default_job_dir}
 
     #include the config from the pipeline yaml file if present
     item = pipeline[0]
@@ -213,6 +249,9 @@ def setup_config(pipeline):
     show(config,"config")
 
     del pipeline[0]
+
+    if not os.path.exists(config['temp_job_dir']):
+        os.makedirs(config['temp_job_dir'])
 
     return config
 
@@ -290,16 +329,93 @@ def generate_job_list(rule,input,output):
 
     return job_list
 
-def validate_jobs(rule,job_list,shell):
-    for job in job_list:
-        job['shell'] = copy.deepcopy(shell)
+def check_input_mtimes(input):
+    #verify all input paths present
+    all_inputs_present = True
+    newest_mtime = 0
+    for item,path in input.items():
+        if not os.path.exists(path):
+            print(f"missing input {path}")
+            all_inputs_present = False
+            continue
 
+        mtime = os.path.getmtime(path)
+        if mtime > newest_mtime: newest_mtime = mtime
+
+    #return newest mtime if all inputs present otherwise None
+    if all_inputs_present == False: return None
+    return newest_mtime
+
+def check_output_mtimes(output):
+    all_outputs_present = True
+    oldest_mtime = time.time() + 31e6 #dummy time 1 year in the future
+    for item,path in output.items():
+        if not os.path.exists(path):
+            print(f"missing output {path}")
+            all_outputs_present = False
+            continue
+
+        mtime = os.path.getmtime(path)
+        if mtime < oldest_mtime: oldest_mtime = mtime
+
+    #return oldest mtime if all outputs present otherwise None
+    if all_outputs_present == False: return None
+    return oldest_mtime
+
+def generate_final_shell_commands(rule,job_list,shell):
+    name = rule['name']
+    for job_numb,job in enumerate(job_list):
+        #check all inputs present, returned newest mtime
+        newest_input = check_input_mtimes(job['input'])
+
+        #one or more inputs missing, job not runnable
+        if newest_input == None:
+            #flag job for removal from the list
+            job_list[job_numb] = None
+            continue
+
+        #all inputs present
+        print(f"rule:{name} job:{job_numb} all inputs present")
+        newest_datetime = datetime.datetime.fromtimestamp(newest_input)
+        print(f"newest input {newest_datetime}")
+
+        #check if any outputs missing or older than newest input
+        oldest_output = check_output_mtimes(job['output'])
+
+        #all outputs present and newer than newest input: no need to run
+        if oldest_output != None and oldest_output > newest_input:
+            print(f"rule:{name} job:{job_numb} all outputs present")
+            oldest_datetime = datetime.datetime.fromtimestamp(oldest_output)
+            print(f"oldest output {oldest_datetime}")
+
+            #flag job for removal from the list
+            job_list[job_numb] = None
+            continue
+
+    #filter out deleted jobs
+    job_list = [job for job in job_list if job is not None]
+    shell_list = []
+
+    for job_numb,job in enumerate(job_list):
         #merge input and output filenames into rule variables
         config = copy.deepcopy(rule)
         config.update(job['input'])
         config.update(job['output'])
 
         #substitute remaining placeholders in shell command
-        sub_vars(job['shell'],config)
+        shell_final = copy.deepcopy(shell)
+        sub_vars(shell_final,config)
+        show(shell_final,"shell")
+        shell_list.append(shell_final["shell"])
 
-        show(job['shell'],"shell")
+    return shell_list
+
+def execute_jobs(rule,jobfile):
+    if rule['exec'] == 'local':
+        pass
+        #local execution
+    elif rule['exec'] == 'qsub':
+        pass
+        #qsub execution
+    else:
+        raise Exception(f"unsupported execution method {rule['exec']}")

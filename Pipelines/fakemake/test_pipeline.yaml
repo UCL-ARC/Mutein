@@ -1,7 +1,9 @@
 - config:
+    expected_working_dir: "/lustre/scratch/scratch/{$USER}/549_mutein"
     test_dir: test
     mut_prefix: "{$MUT_PREFIX}"
     user: "{mut_prefix}{$USER}_{test_dir}"
+    temp_job_dir: "fakemake_jobs"
 - rule:
     name:     "step1"
     exec:     "local"
@@ -23,15 +25,15 @@
     shell: |
       cat {step1} > {final}
       echo processed >> {final}
-- rule:
-    name: step4
-    conda: "{$MUT_PREFIX}main"
-    input:
-      read1: "datasets/{=dataset}/{=subset}/{=accession}/{=accession}_1.fastq.gz"
-      read2: "datasets/{=dataset}/{=subset}/{=accession}/{=accession}_2.fastq.gz"
-    output:
-      info: "datasets/{=dataset}/{=subset}/{=accession}/{=accession}.info"
-    exec: qsub
-    shell: |
-      file {read1} {read2} > {info}
-      echo {$USER} processed >> {info}
+# - rule:
+#     name: step4
+#     conda: "{$MUT_PREFIX}main"
+#     input:
+#       read1: "datasets/{=dataset}/{=subset}/{=accession}/{=accession}_1.fastq.gz"
+#       read2: "datasets/{=dataset}/{=subset}/{=accession}/{=accession}_2.fastq.gz"
+#     output:
+#       info: "datasets/{=dataset}/{=subset}/{=accession}/{=accession}.info"
+#     exec: qsub
+#     shell: |
+#       file {read1} {read2} > {info}
+#       echo {$USER} processed >> {info}
