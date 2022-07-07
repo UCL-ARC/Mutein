@@ -11,7 +11,7 @@ import codons
 
 class CodingGene:
     def __init__(self, gene_name):
-        self.gene = gene_name
+        self.gene = gene_name        
         self.chunks = {}
         self.aas = ""
         self.nucs = ""

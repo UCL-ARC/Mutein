@@ -94,7 +94,7 @@ def getAA(triple_seq,append_first="", phase=0):
         if nuc in codons_aa:
             seq_out += codons_aa[nuc]
         else:
-            seq_out += "?"
+            #seq_out += "?" #we pass the end back, don;t need to add it on.
             end = nuc
             #raise Exception("Not a multiple of 3")
     return seq_use,seq_out,end

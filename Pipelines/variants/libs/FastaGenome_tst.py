@@ -6,10 +6,10 @@ class to test RefGenome
 """
 
 import pandas as pd
-import Fasta
+import Pipelines.variants.libs.FastaGenome as FastaGenome
 
 fasta_path = "/home/rachel/UCL/github/MuteinData/data_genome/GCA_000001405.15_GRCh38_no_alt_plus_hs38d1_analysis_set.fna"
-fst = Fasta.Fasta(fasta_path)
+fst = FastaGenome.Fasta(fasta_path)
 # FROM shearwater
 print(fst.getSeq(1,7961913,7961913)=="G")
 print(fst.getSeq(1,7965215,7965215)=="C")
