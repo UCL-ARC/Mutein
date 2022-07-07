@@ -16,18 +16,15 @@ class FastaGenome:
                 cid = f"CHR{chm}"       
                 chm_file = f"fasta_file/chr{chm}.fna" 
                 for seq_record in SeqIO.parse(chm_file, "fasta"):
-                    self.seqs[cid] = str(seq_record.seq)
+                    self.seqs[cid] = seq_record.seq
                     #print(str(seq_record.seq))
         else:               
             for seq_record in SeqIO.parse(fasta_file, "fasta"):
-                for chm in self.chmes:
-                    cid = f"CHR{chm}"                    
-                    self.seqs[cid] = seq_record.seq
-                    if seq_record.id.upper() == cid:                    
-                        print("Storing",cid)
-                        self.seqs[cid] = str(seq_record.seq)
-                        #print(str(seq_record.seq))
-
+                cid = str(seq_record.id).upper()
+                if cid not in self.seqs:                                                      
+                    self.seqs[cid] = str(seq_record.seq)
+                    print("Storing",str(cid))
+                    
                 
     def getSeq(self,chme,start,end,reverse=False):
         cid = f"CHR{chme}"                                    

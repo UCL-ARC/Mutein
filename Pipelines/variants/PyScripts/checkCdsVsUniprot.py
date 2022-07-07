@@ -44,7 +44,7 @@ with open(hardcoded_gene_path, mode='r') as org:
 
 
 ##### Or replace with chosen genes ###
-genes = ["APOE"]
+genes = ["NOTCH1"]
 
 matches = []
 not_matches = []
@@ -87,11 +87,17 @@ fstGen = FastaGenome.FastaGenome(fasta_path)
 anno = Annotation.Annotation(gff3_path,fstGen)
 
 print("########  Creating the CDS #############")
+transcripts = []
 for gene, seq,transcript in matches:
     print(gene, transcript)
-    print(fstGen.getSeq(1,500,520,False))
-    maybe I want to get the regions out of anno and only after that ask for fasta anf the AFTER that get the protein seqeunce
-    anno.getCdsRegions([transcript])
+    transcripts.append(transcript)
+    #print(fstGen.getSeq(1,500,520,False))
+    #print(fstGen.getSeq(19,44906625,44906667,False))
+    #print(fstGen.getSeq(19,44907760,44907952,False))
+    #print(fstGen.getSeq(19,44908533,44909250,False))
+for transcript in transcripts:
+    #maybe I want to get the regions out of anno and only after that ask for fasta anf the AFTER that get the protein seqeunce
+    anno.getCdsRegions(transcripts)
     
 
 

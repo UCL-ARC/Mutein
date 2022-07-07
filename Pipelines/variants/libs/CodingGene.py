@@ -16,7 +16,7 @@ class CodingGene:
         self.aas = ""
         self.nucs = ""
                                 
-    def __str__(self):
+    def getString(self):
         ret = self.gene + "/n"
         for pos,tpl in self.chunks.items():
             ret += str(tpl)

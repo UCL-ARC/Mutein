@@ -67,7 +67,8 @@ class Annotation:
                 chunks = []            
                 print(cg)            
                 for st,tpl in cds.items():                
-                    chme,strt,stp,strd,frm = tpl                                
+                    chme,strt,stp,strd,frm = tpl
+                    print("Seek chme", chme,strt,stp,strd=="-")                       
                     seq_chunk = self.fasta.getSeq(chme,int(strt),int(stp),strd=="-")
                     print("seq chunk", strd=="-",seq_chunk)
                     print("3 either side", self.fasta.getSeq(chme,int(strt)-3,int(stp)+3,strd=="-"))
