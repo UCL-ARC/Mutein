@@ -188,7 +188,7 @@ def run_pipeline(args):
             dataset_gene_pdb[2],
         )
         path = Paths.Paths(DataDir, PipelineDir, dataset=dataset)
-        filename = path.outputs + "genes_pdb_list.csv"
+        filename = path.inputs + "genes_pdb_list.csv"
         mexists, time = checkResult(filename)
         if mexists:
             print("DATAFRAME_START")
