@@ -180,6 +180,23 @@ def run_pipeline(args):
                 for line in lines:
                     print(line.strip())
             print("DATAFRAME_END")
+    elif mode == "DS_GENES":
+        dataset_gene_pdb = pattern.split(":")
+        dataset, gene, pdb = (
+            dataset_gene_pdb[0],
+            dataset_gene_pdb[1],
+            dataset_gene_pdb[2],
+        )
+        path = Paths.Paths(DataDir, PipelineDir, dataset=dataset)
+        filename = path.outputs + "genes_pdb_list.csv"
+        mexists, time = checkResult(filename)
+        if mexists:
+            print("DATAFRAME_START")
+            with open(filename, "r") as fr:
+                lines = fr.readlines()
+                for line in lines:
+                    print(line.strip())
+            print("DATAFRAME_END")
 
 
 ##########################################################################################
