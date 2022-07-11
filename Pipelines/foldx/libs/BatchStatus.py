@@ -33,18 +33,35 @@ class BatchStatus:
             return self.createDatasetProgressReport(self.dataset)
 
 
+    def getDirSize(self,start_path):
+        total_size = 0
+        for dirpath, dirnames, filenames in os.walk(start_path):
+            for f in filenames:
+                fp = os.path.join(dirpath, f)
+                # skip if it is symbolic link
+                if not os.path.islink(fp):
+                    total_size += os.path.getsize(fp)
+
+        return str(total_size/1000)+" MB"
+
+
     def createDatasetProgressReport(self,dataset):
         ds_path = Paths.Paths(self.data_dir, self.pipe_dir, dataset=dataset)                
         filename = ds_path.inputs + "genes_pdb_list.csv"        
-        print("GENE      \t\tPDBS   \t\tBACKGROUND  \t\tVARIANTS  ")
-        print("----------\t\t-------\t\t------------\t\t----------")
+        print("GENE      \t\tSIZE       \t\tPDBS   \t\tBACKGROUND  \t\tVARIANTS  ")
+        print("----------\t\t-----------\t\t-------\t\t------------\t\t----------")
         if exists(filename):
             with open(filename, "r") as fr:
                 lines = fr.readlines()
                 for line in lines[1:]:
                     geneo = line.strip().split(",")[1]
+                    ####################
                     line_string = geneo+"\t\t"
                     patho = Paths.Paths(self.data_dir, self.pipe_dir, dataset=dataset, gene=geneo)
+                    ## dir size
+                    size = self.getDirSize(patho.gene_inputs)
+                    line_string += size + "\t\t"
+                    ###################
                     filenameC = patho.outputs + "pdb_tasklist.csv"                                        
                     existsfile, time = self.checkFile(filenameC)
                     if existsfile:
@@ -52,6 +69,7 @@ class BatchStatus:
                         line_string += num_pdbs + "\t\t"
                     else:                        
                         line_string += "----\t\t"                        
+                    ####################
                     filenameA = patho.outputs + "ddg_bm_background.csv"
                     existsfile, time = self.checkFile(filenameA)
                     if existsfile:
@@ -64,7 +82,8 @@ class BatchStatus:
                             line_string += f"{num_tsks}\t\t"      
                         else:
                             line_string += f"{num_done}/{num_tsks}\t\t"      
-                    filenameB = patho.outputs + "ddg_variant_bm.csv"
+                    #######################
+                    filenameB = patho.outputs + "ddg_variant_bm.csv"                    
                     existsfile, time = self.checkFile(filenameB)
                     if existsfile:
                         line_string += time + "\t\t"

@@ -39,7 +39,7 @@ def run_pipeline(args):
     
     for f in fs:                
         onepath = mypath + f
-        print(onepath)
+        #print(onepath)
         if os.path.exists(onepath):
             os.remove(onepath)
         
@@ -47,7 +47,7 @@ def run_pipeline(args):
     for p in ps:
         if p.upper() != "RESULTS":
             onepath = mypath + p
-            print(onepath)
+            #print(onepath)
             shutil.rmtree(onepath,ignore_errors=True)
             
     
