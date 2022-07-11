@@ -12,9 +12,9 @@ This table lists the papers from which our multi-tissue dataset is drawn. UID is
 |6|[#11](https://github.com/UCL/Mutein/issues/11)|[doi](https://doi.org/10.1073/pnas.1902510116)|[pubmed](https://pubmed.ncbi.nlm.nih.gov/30992375/)|Zhang|2019|Single-cell whole-genome sequencing reveals the functional landscape of somatic mutations in B lymphocytes across the human lifespan|
 |7|[#12](https://github.com/UCL/Mutein/issues/12)|[doi](https://doi.org/10.1038/s41586-018-0811-x)|[pubmed](https://pubmed.ncbi.nlm.nih.gov/30602793/)|Yokoyama|2019|Age-related remodelling of oesophageal epithelia by mutated cancer drivers|
 |8|[#13](https://github.com/UCL/Mutein/issues/13)|[doi](https://doi.org/10.1182/blood-2017-04-777029)|[pubmed](https://pubmed.ncbi.nlm.nih.gov/28655780/)|Buscarlet|2017|DNMT3A and TET2 dominate clonal hematopoiesis and demonstrate benign phenotypes and different genetic predispositions|
-|9|||https://www.nature.com/articles/s41467-022-28568-2||||
-|10|||https://pubmed.ncbi.nlm.nih.gov/33004514/||||
-|11|||https://pubmed.ncbi.nlm.nih.gov/31645727/||||
+|9|||[pubmed](https://pubmed.ncbi.nlm.nih.gov/35177608/)|Yamaguchi|2022|Spatiotemporal dynamics of clonal selection and diversification in normal endometrial epithelium|
+|10|||[pubmed](https://pubmed.ncbi.nlm.nih.gov/33004514/)|Lawson|2020|Extensive heterogeneity in somatic mutation and selection in the human bladder|
+|11|||[pubmed](https://pubmed.ncbi.nlm.nih.gov/31645727/)|Brunner|2019|Somatic mutations and clonal dynamics in healthy and cirrhotic human liver|
 
 ### Summary of Datasets Mentioned in each Paper
 
