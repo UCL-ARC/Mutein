@@ -42,7 +42,7 @@ class BatchStatus:
                 if not os.path.islink(fp):
                     total_size += os.path.getsize(fp)
 
-        return str(total_size/1000)+" MB"
+        return str(total_size/1000000)+" MB"
 
 
     def createDatasetProgressReport(self,dataset):
@@ -56,11 +56,11 @@ class BatchStatus:
                 for line in lines[1:]:
                     geneo = line.strip().split(",")[1]
                     ####################
-                    line_string = geneo+"\t\t"
+                    line_string = geneo+"  \t\t"
                     patho = Paths.Paths(self.data_dir, self.pipe_dir, dataset=dataset, gene=geneo)
                     ## dir size
-                    size = self.getDirSize(patho.gene_inputs)
-                    line_string += size + "\t\t"
+                    size = "xyz MB"#self.getDirSize(patho.gene_inputs)
+                    line_string += size + "\t\t      "
                     ###################
                     filenameC = patho.outputs + "pdb_tasklist.csv"                                        
                     existsfile, time = self.checkFile(filenameC)
@@ -92,9 +92,9 @@ class BatchStatus:
                         if num_tsks == 0:                        
                             line_string += "----\t\t"
                         elif num_tsks == num_done:
-                            line_string += f"{num_tsks}\t\t"      
+                            line_string += f"     {num_tsks}\t\t"      
                         else:
-                            line_string += f"{num_done}/{num_tsks}\t\t"      
+                            line_string += f"     {num_done}/{num_tsks}\t\t"      
                     print(line_string)
         else:
             print("Gene has not been prepped")

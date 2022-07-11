@@ -11,8 +11,8 @@ import os
 import sys
 
 dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-2]
-python_path = "/".join(dirs) + "/foldx/python"
-lib_path = "/".join(dirs) + "/foldx/libs"
+python_path = "/".join(dirs) + "/python"
+lib_path = "/".join(dirs) + "/libs"
 sys.path.append(python_path)
 sys.path.append(lib_path)
 import Paths
@@ -21,7 +21,7 @@ import remote
 def test_clean():    
     #python ${script} $mode $pattern $WorkDir $DataDir $InstallDir $PipelineDir
     args = ["",
-            'GENEINCOMPLETEPDB', 
+            'GENES', 
             'notch:notch1:x', 
             '/home/ucbtlcr/Scratch/workspace/', 
             '/home/rachel/UCL/github/MuteinData/', 
