@@ -24,15 +24,17 @@ class Annotation:
         self.annotation_path =annotation_path
         print("Loading genome...")
         #self.gencode = pd.read_table(self.annotation_path, comment="#", sep = "\t")        
-        self.gencode = pd.read_table(self.annotation_path, comment="#", sep = "\t", names = ['seqname', 'source', 'feature', 'start' , 'end', 'score', 'strand', 'frame', 'attribute'])        
+        self.gencode = pd.read_table(self.annotation_path, comment="#", sep = "\t", names = ['seqname', 'source', 'feature', 'start' , 'end', 'score', 'strand', 'frame', 'attribute'],low_memory=False)        
         #print("COLUMNS=", self.gencode.columns)
     
     
-    def getCdsRegions(self,transcripts):        
-        gene_cds = {}
-        print(self.gencode.columns)                
-        cg_id = ""       
-        coding_genes = []         
+    def getCdsRegions(self,transcript,loglevel=0):        
+        cdg = CodingGene.CodingGene(transcript)
+        trans_starts = {}
+        seqaas = ""
+        seqnucs = ""
+        #print(self.gencode.columns)                
+        cg_id = ""               
         for idx in self.gencode.index:
             chme = self.gencode["seqname"][idx]
             src = self.gencode["source"][idx]
@@ -53,73 +55,82 @@ class Annotation:
                     if "transcript:" in at:
                         ats = at.split(":")
                         this_trn = ats[1].upper()
-                        if this_trn in transcripts:
-                            if this_trn not in gene_cds:
-                                gene_cds[this_trn] = {}                            
-                            gene_cds[this_trn][strt] = [chme,strt,stp,strd,frm]
+                        if this_trn == transcript:                                                        
+                            trans_starts[strt] = [chme,strt,stp,strd,frm]
                             print(this_trn,chme,strt,stp,strd,frm)
-                    
-                                        
-        if True:
+                            
+                                                            
+        if loglevel > 1:
             print("##################################################")        
-            for cg,cds in gene_cds.items():
-                cdg = CodingGene.CodingGene(cg)
-                chunks = []            
-                print(cg)            
-                for st,tpl in cds.items():                
-                    chme,strt,stp,strd,frm = tpl
-                    print("Seek chme", chme,strt,stp,strd=="-")                       
-                    seq_chunk = self.fasta.getSeq(chme,int(strt),int(stp),strd=="-")
-                    print("seq chunk", strd=="-",seq_chunk)
-                    print("3 either side", self.fasta.getSeq(chme,int(strt)-3,int(stp)+3,strd=="-"))
-                    if strd=="-":
-                        chunks.insert(0,[seq_chunk,tpl])
-                    else:
-                        chunks.append([seq_chunk,tpl])
-                print("---------------------------------------------")            
-                seqaas = ""
-                seqnucs = ""
-                last_carry = ""
-                for seq_chunk, tpl in chunks:                
-                    print("#################  New chunk",tpl,"last_carry=",last_carry)
-                    chme,strt,stp,strd,frm = tpl
-                    # frame includes push from last carry
-                    # frame is 3- for reverse
-                    if False:
-                        if strd == "-" and int(frm) > 0:
-                            frm = 3-int(frm)
-                            frm = frm - len(last_carry)
-                    print("Chunk ends=",seq_chunk[:12],"...",seq_chunk[-12:])                                
-                    seqnuc,seqaa,end_carry = codons.getAA(seq_chunk,last_carry,frm)
-                    print("Seq ends=",seqnuc[:12],"...",seqnuc[-12:])                                                
-                    print("-------------Sequences---------------")
-                    print(seqaa)     
-                    print("----------------------------")
-                    print(seqnuc)      
-                    print("-------------Try all phases---------------")
-                    print(codons.getAA(seq_chunk,last_carry,0)[1])
-                    print(codons.getAA(seq_chunk,last_carry,1)[1])
-                    print(codons.getAA(seq_chunk,last_carry,2)[1])
-                    seqnucs += seqnuc
-                    seqaas += seqaa
-                    last_carry = end_carry
-                    cdg.addChunk(int(strt),int(stp),strd=="+",seqnuc,seqaa)
-                                    
-
-                seqnuc,seqaa,end_carry = codons.getAA(seqnuc)
-                print("** NUC SEQ**")
-                print(seqnuc)
-                print("** AA SEQ**")
-                print(seqaa)
-                print("** NUC SEQS**")
-                print(seqnucs)
-                print("** AA SEQS**")
-                print(seqaas)
-                cdg.nucs = seqnucs
-                cdg.aas = seqaas
-                coding_genes.append(cdg)
         
-            return coding_genes
+        chunks = []   
+        for strt,tpl in trans_starts.items():
+            print(strt,tpl)                                                           
+            chme,strt,stp,strd,frm = tpl
+            if loglevel > 1:
+                print("Seek chme", chme,strt,stp,strd=="-")                       
+            seq_chunk = self.fasta.getSeq(chme,int(strt),int(stp),strd=="-")
+            if loglevel > 1:
+                print("seq chunk", strd=="-",seq_chunk)
+                print("3 either side", self.fasta.getSeq(chme,int(strt)-3,int(stp)+3,strd=="-"))
+            if strd=="-":
+                chunks.insert(0,[seq_chunk,tpl])
+            else:
+                chunks.append([seq_chunk,tpl])
+        
+        if loglevel > 1:
+            print("---------------------------------------------")                        
+        last_carry = ""
+        for seq_chunk, tpl in chunks:                
+            if loglevel > -1:
+                print("## Chunk",tpl,"last_carry=",last_carry)
+            chme,strt,stp,strd,frm = tpl
+            # frame includes push from last carry
+            # frame is 3- for reverse            
+            if False:
+                if strd == "-" and int(frm) > 0:
+                    frm = 3-int(frm)
+                    frm = frm - len(last_carry)
+            # match off the carry and the frameshift.
+            #If forward and a carry of 2 then there is no frameshift
+            if int(frm) == 2 and len(last_carry) == 1 and strd == "+":
+                frm = 0
+            if loglevel > -1:
+                print("Chunk ends=",seq_chunk[:12],"...",seq_chunk[-5:])                                
+            seqnuc,seqaa,end_carry = codons.getAA(seq_chunk,last_carry,int(frm))
+            if loglevel > 1:
+                print("Seq ends=",seqnuc[:12],"...",seqnuc[-12:])                                                
+                print("-------------Sequences---------------")
+                print(seqaa)     
+                print("----------------------------")
+                print(seqnuc)      
+                print("-------------Try all phases---------------")
+                print(codons.getAA(seq_chunk,last_carry,0)[1])
+                print(codons.getAA(seq_chunk,last_carry,1)[1])
+                print(codons.getAA(seq_chunk,last_carry,2)[1])
+            seqnucs += seqnuc                
+            seqaas += seqaa
+            last_carry = end_carry                
+            cdg.addChunk(int(strt),int(stp),strd=="+",seqnuc,seqaa)                                    
+        
+        # the whole thing ######################
+        seqnuc,seqaa,end_carry = codons.getAA(seqnuc)
+        if loglevel > 1:
+            print("** NUC SEQ**")
+            print(seqnuc)
+            print("** AA SEQ**")
+            print(seqaa)
+            print("** NUC SEQS**")
+            print(seqnucs)
+            print("** AA SEQS**")
+            print(seqaas)
+        cdg.nucs = seqnucs
+        if seqaas[-1]=="X":
+            cdg.aas = seqaas[:-1]
+        else:
+            cdg.aas = seqaas
+                
+        return cdg
         
     def findMatchingRegion(self,gene,seq_in,gene_key,preferred_source=""):                        
         have_gene = False        

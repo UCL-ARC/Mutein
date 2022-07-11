@@ -59,3 +59,7 @@ def aggVtasks(args):
 
 def aggGene(args):
     print("!!!ERROR irrelevant")
+
+def clean(args):        
+    import mod_pdbclean as ppx
+    ppx.run_pipeline(args)

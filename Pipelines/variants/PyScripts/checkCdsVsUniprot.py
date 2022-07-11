@@ -44,7 +44,7 @@ with open(hardcoded_gene_path, mode='r') as org:
 
 
 ##### Or replace with chosen genes ###
-genes = ["NOTCH1"]
+genes = ["APOE"]
 
 matches = []
 not_matches = []
@@ -53,24 +53,10 @@ not_matches = []
 for gene in genes:
     print(gene)
     seq = cm_search.seqFromUniProt(gene)
-    found = False
-    seqs = fstCds.getSeqPep(gene.upper())
-    for seqi in seqs:
-        seqo = seqi[0]
-        if seqo == seq: 
-            if not found:
-                found = True    
-                ids = seqi[1].split(" ")
-                trs = ""
-                for ide in ids:
-                    if "transcript:" in ide:
-                        trss = ide.split(":")
-                        trs = trss[1].split(".")
-                        tr = trs[0]
-                print(trs)
-                matches.append([gene,seq,tr])
-    
-    if not found:                    
+    found,gene_name,seq,tr = fstCds.getSeqDetailsPep(gene.upper(),seq)
+    if found:
+        matches.append([gene,tr,seq])
+    else:
         not_matches.append(gene)
 
     
@@ -87,17 +73,17 @@ fstGen = FastaGenome.FastaGenome(fasta_path)
 anno = Annotation.Annotation(gff3_path,fstGen)
 
 print("########  Creating the CDS #############")
-transcripts = []
-for gene, seq,transcript in matches:
-    print(gene, transcript)
-    transcripts.append(transcript)
-    #print(fstGen.getSeq(1,500,520,False))
-    #print(fstGen.getSeq(19,44906625,44906667,False))
-    #print(fstGen.getSeq(19,44907760,44907952,False))
-    #print(fstGen.getSeq(19,44908533,44909250,False))
-for transcript in transcripts:
-    #maybe I want to get the regions out of anno and only after that ask for fasta anf the AFTER that get the protein seqeunce
-    anno.getCdsRegions(transcripts)
+for gene,tr,seq in matches:
+    coding_gene = anno.getCdsRegions(tr)
+    print(coding_gene.getString(loglevel=0))
+    print(coding_gene.aas)
+    if not seq==coding_gene.aas:
+        #print("Correct=",seq)
+        print(gene,"Found=",coding_gene.aas)
+    else:
+        print(gene,"FOUND A MATCH :-)")
+
+    
     
 
 

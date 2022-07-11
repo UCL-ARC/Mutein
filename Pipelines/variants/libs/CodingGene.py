@@ -10,19 +10,21 @@ import codons
 
 
 class CodingGene:
-    def __init__(self, gene_name):
-        self.gene = gene_name        
+    def __init__(self, transcript):
+        self.transcript = transcript    
         self.chunks = {}
         self.aas = ""
         self.nucs = ""
                                 
-    def getString(self):
-        ret = self.gene + "/n"
+    def getString(self,loglevel=0):
+        ret = self.transcript + "\nPositions"
         for pos,tpl in self.chunks.items():
-            ret += str(tpl)
+            ret += "\n" + str(tpl[0]) + ":" + str(tpl[1])
+        if loglevel>1:
+            ret += "\nNucSeq:"+self.nucs
+        if loglevel>0:            
+            ret += "\nAASeq:"+self.aas
         return ret
-
-
 
     def addChunk(self,start,end,fwd,nucleotides,aminos):
         # we add a position with start and end

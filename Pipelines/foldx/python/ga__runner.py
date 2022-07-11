@@ -62,6 +62,9 @@ def run_pipeline(args):
     if "j" in runs:        
         print("Mutein: Aggregating gene tasks")
         runner.aggGene(args)
+    if "x" in runs:        
+        print("Mutein: Cleaning data")
+        runner.clean(args)
 
     print("### COMPLETED Mutein script ###")
     print("MUTEIN SCRIPT ENDED")

@@ -23,7 +23,7 @@ class FastaGenome:
                 cid = str(seq_record.id).upper()
                 if cid not in self.seqs:                                                      
                     self.seqs[cid] = str(seq_record.seq)
-                    print("Storing",str(cid))
+                    #print("Storing",str(cid))
                     
                 
     def getSeq(self,chme,start,end,reverse=False):

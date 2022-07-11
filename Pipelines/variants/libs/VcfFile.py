@@ -15,7 +15,7 @@ class VcfFile:
         dic_vcf = {}
         callset = allel.read_vcf(self.vcf_file,fields="*")        
         vshp = callset["variants/POS"].shape
-        print(vshp)        
+        #print(vshp)        
         for key,arr in callset.items():                                    
             shp = arr.shape
             if "variants" in key:

@@ -50,3 +50,7 @@ def aggVtasks(args):
 def aggGene(args):    
     import mod_datasetstitch as ppi
     ppi.run_pipeline(args)
+
+def clean(args):        
+    import mod_datasetclean as ppx
+    ppx.run_pipeline(args)

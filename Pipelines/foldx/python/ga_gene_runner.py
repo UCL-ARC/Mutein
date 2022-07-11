@@ -60,3 +60,7 @@ def aggVtasks(args):
 def aggGene(args):
     import mod_genestitch as ppi
     ppi.run_pipeline(args)
+
+def clean(args):        
+    import mod_geneclean as ppx
+    ppx.run_pipeline(args)

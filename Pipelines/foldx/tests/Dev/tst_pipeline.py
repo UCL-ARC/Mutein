@@ -21,8 +21,8 @@ def addpath(inputs):
 
 ######################################################################
 ### INPUTS
-dataset="mouse"
-gene="psme4"
+dataset="cutdown"#"mouse"
+gene=""#'"psme4"
 pdb=""#smexp_6swa_3_213"
 
 repairs="x"
@@ -30,7 +30,7 @@ repair_from = "x"
 split=500
 vsplit=10
 task=1
-runs = "g"
+runs = "x"
 missing="Y"
 """ 
     if "a" in runs:        print("Mutein: Preparing genes")        
@@ -43,6 +43,7 @@ missing="Y"
     if "h" in runs:        print("Mutein: Aggregating background tasks")        
     if "i" in runs:        print("Mutein: Aggregating variant tasks")        
     if "j" in runs:        print("Mutein: Aggregating gene tasks")        
+    if "x" in runs:        print("Mutein: Cleaning data")        
 """
 
 # which steps of the pipeline to run

@@ -20,7 +20,23 @@ class FastaCds:
                 seqs.append([seq_record.seq,seq_record.description])
         return seqs
 
-    def getSeqPep(self,gene_name):
+    def getSeqDetailsPep(self,gene_name,seq):
+        seqs = self.getSeqsPep(gene_name.upper())
+        for seqi in seqs:
+            seqo = seqi[0]
+            if seqo == seq:                                     
+                ids = seqi[1].split(" ")
+                trs = ""
+                for ide in ids:
+                    if "transcript:" in ide:
+                        trss = ide.split(":")
+                        trs = trss[1].split(".")
+                        tr = trs[0]
+                        return [True,gene_name,seq,tr]
+        return False,"",seq,""
+            
+        
+    def getSeqsPep(self,gene_name):
         seqs = []
         gid = f"gene_symbol:{gene_name.upper()} description"                
         for seq_record in SeqIO.parse(self.fasta_file_pep, "fasta"):

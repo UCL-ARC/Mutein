@@ -10,7 +10,6 @@ array: 0
 inputs: "runs=a"
 active: 'Y'
 ---
----
 id: 'PD'
 qsub_id: 'pdbs'
 pipe_dir: 'Pipelines/foldx/python/'

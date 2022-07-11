@@ -1,0 +1,12 @@
+---
+id: 'clean'
+qsub_id: 'clean'
+pipe_dir: 'Pipelines/foldx/python/'
+script: 'ga__runner'
+time: '1:00:0'
+cores: "1"
+dependency: '-1'
+array: 0
+inputs: "runs=x"
+active: 'Y'
+--- 
