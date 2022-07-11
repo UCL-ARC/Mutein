@@ -60,8 +60,12 @@ class BatchStatus:
                     patho = Paths.Paths(self.data_dir, self.pipe_dir, dataset=dataset, gene=geneo)
                     ## dir size
                     #size = "xyz MB"
-                    size = self.getDirSize(patho.gene_inputs)
-                    line_string += size + "\t\t      "
+                    try:
+                        size = self.getDirSize(patho.gene_inputs)
+                        line_string += size + "\t\t      "
+                    except:
+                        size = "xyz MB"
+                        line_string += size + "\t\t      "
                     ###################
                     filenameC = patho.outputs + "pdb_tasklist.csv"                                        
                     existsfile, time = self.checkFile(filenameC)
