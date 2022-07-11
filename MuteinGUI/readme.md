@@ -4,7 +4,7 @@ The MuteinGI is in the Mutein github in the MuteinGUI directory. It is compeltel
 
 It is a pure client, accessing the servers using ssh calls. Via ssh calls it submits qsub or python scripts.
 
-All actions done by the GUI can also be done in the standard bioinformatics way of ssh-ing onto the server and running the approriate scripts. Full documentation is given for this here (in this currently doesn't exist document).
+All actions done by the GUI can also be done in the standard bioinformatics way of ssh-ing onto the server and running the approriate scripts. Full documentation is given for this here (in this currently doesn't exist document). The GUI does not cover the variant calling part of the pipeline.
 
 ### INSTALLING MuteinGUI
 Initially, simply run the muteingui.py from the directory from github. Note that it doesn;t work from WSL as WSL has no windows frame interface (unless you are on Windows 11).
