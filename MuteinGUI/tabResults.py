@@ -5,6 +5,7 @@ import tabConfig as rs
 from io import StringIO as sio
 import Analysis
 import pandas as pd
+import os
 
 def binaryToDataFrame(binary):
     resA = str(binary,"utf-8")
@@ -80,11 +81,46 @@ def show_plots(txtBox,txtDataset,txtGene,txtPdb,mode):
     else:
         ana.createPdbSummary()        
         ana.show()    
-    
-    
-    
-    
 
+def save_dataframes(txtBox,txtPath, txtDataset,txtGene,txtPdb):
+    dataset = txtDataset.get().strip()
+    gene = txtGene.get().strip()    
+    pdb = ""   
+    path = txtPath.get().strip()
+    genes = []    
+    if gene == "" or gene.lower()== "x":
+        ret = rs.RunScript("DS_GENES",dataset+":"+gene+":"+pdb)
+        df = binaryToDataFrame(ret)
+        try:
+            genes = df["gene"]
+        except:
+            pass
+    else:
+        genes.append(gene)
+
+    for gene in genes:
+        ret_back = rs.RunScript("PDB_BACK",dataset+":"+gene+":"+pdb)
+        ret_var = rs.RunScript("PDB_BM",dataset+":"+gene+":"+pdb)
+        df_back = binaryToDataFrame(ret_back)
+        df_var = binaryToDataFrame(ret_var)
+        out_path = path + dataset.lower() + "_" + gene.lower() + ".csv"
+        out_path_var = path + dataset.lower() + "_" + gene.lower() + "_var.csv"
+        try:
+            df_back.to_csv(out_path,index=False)
+        except:
+            print("Error saving",out_path)
+        try:
+            df_var.to_csv(out_path_var,index=False)
+        except:
+            print("Error saving",out_path_var)
+
+        txtBox.delete(1.0,tk.END)
+        txtBox.insert(tk.END, out_path)        
+        txtBox.insert(tk.END, out_path_var)        
+        txtBox.insert(tk.END, df_back)        
+        txtBox.insert(tk.END, df_var)        
+     
+                
         
 class tabResults:
 
@@ -127,6 +163,7 @@ class tabResults:
         # RIGHT HAND SIDE ##
         header2 = tk.Label(rhs,bg=clra,text="Results to choose",width=60)                        
 
+                
         lblDataset = tk.Label(rhs,bg=clra,text="dataset",width=20)
         lblGene = tk.Label(rhs,bg=clra,text="gene",width=20)
         lblPdb = tk.Label(rhs,bg=clra,text="pdb",width=20)        
@@ -143,20 +180,33 @@ class tabResults:
         
         btnBG = tk.Button(rhs, text="View background ddg", command=partial(show_background,self.txtBox,text_dataset,text_gene,text_pdb,"PDB_BACK"),borderwidth=5, relief="groove",width=20,bg="goldenrod")
         btnBM = tk.Button(rhs, text="View variant ddg", command=partial(show_background,self.txtBox,text_dataset,text_gene,text_pdb,"PDB_BM"),borderwidth=5, relief="groove",width=20,bg="goldenrod")
-        
-        
-        header.grid(row=0,column=0, padx=2, pady=2,columnspan=3)
+
+        # save the dataframes to the path given
+        lblPath = tk.Label(rhs,bg=clra,text="local path",width=20)        
+        text_path = tk.Entry(rhs,width=20,borderwidth=5, relief="sunken")                
+        filepatha = os.path.dirname(os.path.realpath(__file__))
+        filepath = filepatha.replace("\\","/")
+        dir = os.path.dirname(filepath).split("/")[:-1]
+        retpath = "/".join(dir) + "/Mutein/Results/"
+        text_path.insert(0,retpath)
+        btnPath = tk.Button(rhs, text="Save DataFrames", command=partial(save_dataframes,self.txtBox,text_path, text_dataset,text_gene,text_pdb),borderwidth=5, relief="groove",width=20,bg="coral")
+                
+        header.grid(row=0,column=0, padx=2, pady=2,columnspan=3)        
         btnGene.grid(row=1,column=0, padx=2, pady=2)                
         btnPdb.grid(row=1,column=1, padx=2, pady=2)                
         btnBG.grid(row=2,column=0, padx=2, pady=2)                
-        btnBM.grid(row=2,column=1, padx=2, pady=2)                
-        
+        btnBM.grid(row=2,column=1, padx=2, pady=2)              
+            
         lblDataset.grid(row=3,column=0, padx=2, pady=2)    
         lblGene.grid(row=3,column=1, padx=2, pady=2)
         lblPdb.grid(row=3,column=2, padx=2, pady=2)        
         text_dataset.grid(row=4,column=0, padx=2, pady=2)      
         text_gene.grid(row=4,column=1, padx=10, pady=2)
         text_pdb.grid(row=4,column=2, padx=2, pady=2)
+
+        btnPath.grid(row=5,column=0, padx=2, pady=2)                  
+        lblPath.grid(row=5,column=1, padx=2, pady=2)                  
+        text_path.grid(row=5,column=2, padx=2, pady=2)                  
         
                         
                  

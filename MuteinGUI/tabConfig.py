@@ -13,10 +13,40 @@ global data_dir
 username = "ucbxxxx"
 password = "xyz"
 server = "myriad"
-pipeline_dir = "/home/ucbtlcr/Mutein/Pipelines/geneanalysis/"
-working_dir = "/home/ucbtlcr/Scratch/workspace/"
-install_dir = "/home/ucbtlcr/Mutein/"
-data_dir = "/home/ucbtlcr/MuteinData/"
+# Directories on the server
+pipeline_trunc = "/Mutein/Pipelines/foldx/"
+scripts_trunc = "/Mutein/Pipelines/foldx/scripts/"
+working_trunc = "/Scratch/workspace/"
+install_trunc = "/Mutein/"
+#data_trunc = "/Scratch/MuteinData/Foldx/"
+data_trunc = "/MuteinData/"
+# global dir variables
+pipeline_dir = "/home/"+username+pipeline_trunc
+scripts_dir = "/home/"+username+scripts_trunc
+working_dir = "/home/"+username+working_trunc
+install_dir = "/home/"+username+install_trunc
+data_dir = "/home/"+username+data_trunc
+# scripts on the server
+remove_script = "REM_errors.sh"
+view_script = "REM_view.sh"
+remote_script = "REMOTE.sh"
+scriptname_ds_pdb = "REMOTE_foldx_dataset_pdbs.sh"
+scriptname_gene_pdb = "REMOTE_foldx_gene_pdbs.sh"
+scriptname_gene_rep = "REMOTE_foldx_gene_rep.sh"    
+scriptname_gene_unrep = "REMOTE_foldx_gene_unrep.sh"    
+scriptname_gene_tasks = "REMOTE_foldx_gene_tasks.sh"    
+scriptname_gene_untasks = "REMOTE_foldx_gene_untasks.sh" 
+scriptname_gene_split = "REMOTE_foldx_gene_split.sh"    
+scriptname_gene_agg = "REMOTE_foldx_gene_agg.sh"    
+scriptname_pdb_pdb = "REMOTE_foldx_pdb_pdb.sh"    
+scriptname_pdb_rep = "REMOTE_foldx_pdb_rep.sh"    
+scriptname_pdb_split = "REMOTE_foldx_pdb_split.sh"    
+scriptname_pdb_tasks = "REMOTE_foldx_pdb_tasks.sh"    
+scriptname_pdb_un = "REMOTE_foldx_pdb_untasks.sh"    
+scriptname_pdb_agg = "REMOTE_foldx_pdb_agg.sh"        
+scriptname_ds_clean = "REMOTE_foldx_dataset_clean.sh"        
+scriptname_gene_clean = "REMOTE_foldx_gene_clean.sh"        
+scriptname_pdb_clean = "REMOTE_foldx_pdb_clean.sh"        
 
 
 def getSshShell():
@@ -30,29 +60,60 @@ def getSshShell():
     except:
         return None
 
+def sendSshShell(script,cmds):
+    global username
+    global password
+    global server
+    import spur
+    try:
+        shell = spur.SshShell(hostname= server + ".rc.ucl.ac.uk", username=username, password=password)
+        result = shell.run(["chmod","+x",script])
+        cms = [script]
+        for cmd in cmds:
+            cms.append(cmd)        
+        print("SHELL",cms)
+        result = shell.run(cms)        
+        return result
+    except:
+        return None
+
 def RunClean():    
-        shell = getSshShell()   
+        #shell = getSshShell()   
         global pipeline_dir
+        global scripts_dir
         global install_dir      
-        scriptname = pipeline_dir + "REM_errors.sh"
-        result = shell.run(["chmod","+x",scriptname])
-        result = shell.run([scriptname, "CLEAN",install_dir])
-        return result.output
+        scriptname = scripts_dir + remove_script
+        #result = shell.run(["chmod","+x",scriptname])
+        #result = shell.run([scriptname, "CLEAN",install_dir])
+        #return result.output
+        return sendSshShell(scriptname,["CLEAN",install_dir]).output
 
 def RunRerun():    
         shell = getSshShell()   
         global pipeline_dir
+        global scripts_dir
         global install_dir      
-        scriptname = pipeline_dir + "REM_errors.sh"
+        scriptname = scripts_dir + remove_script
         result = shell.run(["chmod","+x",scriptname])
         result = shell.run([scriptname, "RERUNERROR",install_dir])
+        return result.output
+
+def RunRerunO():    
+        shell = getSshShell()   
+        global pipeline_dir
+        global scripts_dir
+        global install_dir      
+        scriptname = scripts_dir + remove_script
+        result = shell.run(["chmod","+x",scriptname])
+        result = shell.run([scriptname, "RERUNORPHANS",install_dir])
         return result.output
 
 def RunCleanAll():    
         shell = getSshShell()                
         global pipeline_dir
+        global scripts_dir
         global install_dir      
-        scriptname = pipeline_dir + "REM_errors.sh"
+        scriptname = scripts_dir + remove_script
         result = shell.run(["chmod","+x",scriptname])
         result = shell.run([scriptname, "ALL",install_dir])
         return result.output
@@ -60,14 +121,16 @@ def RunCleanAll():
 def RunView(jobid):        
         shell = getSshShell()
         global pipeline_dir
+        global scripts_dir
         global install_dir      
-        scriptname = pipeline_dir + "REM_view.sh"
+        scriptname = scripts_dir + view_script
         result = shell.run(["chmod","+x",scriptname])        
         result = shell.run([scriptname, jobid,install_dir])
         return result.output
 
 def SubmitJob(command,dataset,gene,pdb):        
     global pipeline_dir
+    global scripts_dir
     global working_dir
     global install_dir
     global data_dir
@@ -78,39 +141,53 @@ def SubmitJob(command,dataset,gene,pdb):
     if pdb == "":
         pdb = "x"
     #mode, pattern, WorkDir, DataDir, InstallDir, PipelineDir
-    shell = getSshShell()
-    scriptname = ""
-    if command == "DATASET_PDBS":
-        scriptname = pipeline_dir + "REMOTE_foldx_dataset_pdbs.sh"
-    elif command == "GENE_PDBS":
-        scriptname = pipeline_dir + "REMOTE_foldx_gene_pdbs.sh"
-    elif command == "GENE_REP":
-        scriptname = pipeline_dir + "REMOTE_foldx_gene_rep.sh"
-    elif command == "GENE_TASKS":
-        scriptname = pipeline_dir + "REMOTE_foldx_gene_tasks.sh"
-    elif command == "GENE_SPLIT":
-        scriptname = pipeline_dir + "REMOTE_foldx_gene_split.sh"
-    elif command == "GENE_AGG":
-        scriptname = pipeline_dir + "REMOTE_foldx_gene_agg.sh"
-    elif command == "PDB_PDB":
-        scriptname = pipeline_dir + "REMOTE_foldx_pdb_pdb.sh"
-    elif command == "PDB_REP":
-        scriptname = pipeline_dir + "REMOTE_foldx_pdb_rep.sh"
-    elif command == "PDB_SPLIT":
-        scriptname = pipeline_dir + "REMOTE_foldx_pdb_split.sh"
-    elif command == "PDB_TASKS":
-        scriptname = pipeline_dir + "REMOTE_foldx_pdb_tasks.sh"
-    elif command == "PDB_UNTASKS":
-        scriptname = pipeline_dir + "REMOTE_foldx_pdb_untasks.sh"
-    elif command == "PDB_AGG":
-        scriptname = pipeline_dir + "REMOTE_foldx_pdb_agg.sh"        
-    if scriptname != "":
-        result = shell.run(["chmod","+x",scriptname])
-        result = shell.run([scriptname, dataset,gene,pdb,working_dir,data_dir,install_dir,pipeline_dir])
-        return result.output
-        #return scriptname
-    else:
-        return "Script not yet implemented " + command
+    genes = gene.split(",")
+    ret = ""
+    for gene in genes:
+        shell = getSshShell()
+        scriptname = ""
+        if command == "DATASET_PDBS":
+            scriptname = scripts_dir + scriptname_ds_pdb
+        elif command == "DS_CLEAN":
+            scriptname = scripts_dir + scriptname_ds_clean
+        elif command == "GENE_PDBS":
+            scriptname = scripts_dir + scriptname_gene_pdb
+        elif command == "GENE_REP":
+            scriptname = scripts_dir + scriptname_gene_rep
+        elif command == "GENE_UNREP":
+            scriptname = scripts_dir + scriptname_gene_unrep
+        elif command == "GENE_TASKS":
+            scriptname = scripts_dir + scriptname_gene_tasks
+        elif command == "GENE_UNTASKS":
+            scriptname = scripts_dir + scriptname_gene_untasks
+        elif command == "GENE_SPLIT":
+            scriptname = scripts_dir + scriptname_gene_split
+        elif command == "GENE_AGG":
+            scriptname = scripts_dir + scriptname_gene_agg
+        elif command == "GENE_CLEAN":
+            scriptname = scripts_dir + scriptname_gene_clean
+        elif command == "PDB_PDB":
+            scriptname = scripts_dir + scriptname_pdb_pdb
+        elif command == "PDB_REP":
+            scriptname = scripts_dir + scriptname_pdb_rep
+        elif command == "PDB_SPLIT":
+            scriptname = scripts_dir + scriptname_pdb_split
+        elif command == "PDB_TASKS":
+            scriptname = scripts_dir + scriptname_pdb_tasks
+        elif command == "PDB_UNTASKS":
+            scriptname = scripts_dir + scriptname_pdb_un
+        elif command == "PDB_AGG":
+            scriptname = scripts_dir + scriptname_pdb_agg
+        elif command == "PDB_CLEAN":
+            scriptname = scripts_dir + scriptname_pdb_clean
+        if scriptname != "":
+            result = shell.run(["chmod","+x",scriptname])
+            result = shell.run([scriptname, dataset,gene,pdb,working_dir,data_dir,install_dir,pipeline_dir])
+            ret += (result.output).decode('utf-8')
+            #return scriptname
+        else:
+            ret += "Script not yet implemented " + command
+    return ret
 
 def RunScript(mode,pattern):    
     global pipeline_dir
@@ -118,28 +195,27 @@ def RunScript(mode,pattern):
     global install_dir
     global data_dir
     #mode, pattern, WorkDir, DataDir, InstallDir, PipelineDir
-    scriptname = pipeline_dir + "REMOTE.sh"
-    shell = getSshShell()                
-    result = shell.run(["chmod","+x",scriptname])
-    result = shell.run([scriptname, mode,pattern,working_dir,data_dir,install_dir,pipeline_dir])
+    scriptname = scripts_dir + remote_script    
+    result = sendSshShell(scriptname,[mode,pattern,working_dir,data_dir,install_dir,pipeline_dir])
     return result.output
     
-
 def make_paths(txtBox,txtUser,txtPwd,txtServer):
     global username
     global password
     global server
     global pipeline_dir
+    global scripts_dir
     global working_dir
     global install_dir
     global data_dir
     username = txtUser.get().strip().lower()
     password = txtPwd.get().strip()
     server = txtServer.get().strip()
-    pipeline_dir = "/home/"+username+"/Mutein/Pipelines/geneanalysis/"
-    working_dir = "/home/"+username+"/Scratch/workspace/"
-    install_dir = "/home/"+username+"/Mutein/"
-    data_dir = "/home/"+username+"/MuteinData/"
+    pipeline_dir = "/home/"+username+pipeline_trunc
+    scripts_dir = "/home/"+username+scripts_trunc
+    working_dir = "/home/"+username+working_trunc
+    install_dir = "/home/"+username+install_trunc
+    data_dir = "/home/"+username+data_trunc
     
     path_show = "USER =\t\t\t"+username
     ssh_path = server + ".rc.ucl.ac.uk"
