@@ -147,10 +147,10 @@ class BatchStatus:
                     if pdbo[0] != "#":
                         patho = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset, gene=gene, pdb=pdbo)
                         
-                        pdb_file = patho.thruputs + pdbo.lower() + "_repx.pdb"
-                        bg_split = patho.thruputs + "params_background.txt"
+                        pdb_file = patho.inputs + pdbo.lower() + "_repx.pdb"
+                        bg_split = patho.inputs + "params_background.txt"
                         bg_results = patho.outputs + "ddg_background.csv"
-                        var_split = patho.thruputs + "params_variants.txt"                     
+                        var_split = patho.inputs + "params_variants.txt"                     
                         var_results = patho.outputs + "ddg_buildmodel.csv"                     
                                                                         
                         existsfileA, timeResA = self.checkFile(pdb_file)
@@ -222,7 +222,7 @@ class BatchStatus:
                         if pdbo[0] != "#":
                             num_pdbs += 1
                             patho = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset, gene=gene, pdb=pdbo)                        
-                            pdb_file = patho.thruputs + pdbo.lower() + "_repx.pdb"
+                            pdb_file = patho.inputs + pdbo.lower() + "_repx.pdb"
                             existsfile, timeRes = self.checkFile(pdb_file)
                             if existsfile:
                                 num_done += 1
@@ -237,9 +237,9 @@ class BatchStatus:
 
     def getPdbNumTasksComplete(self,gene,pdb,isvariant):
         pdb_path = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset,gene=gene,pdb=pdb)
-        filenameo = pdb_path.thruputs + "params_background.txt"
+        filenameo = pdb_path.inputs + "params_background.txt"
         if isvariant:
-            filenameo = pdb_path.thruputs + "params_variants.txt"
+            filenameo = pdb_path.inputs + "params_variants.txt"
         existso, timeo = self.checkFile(filenameo)        
         nums = 0
         if existso:                            
@@ -275,9 +275,9 @@ class BatchStatus:
 
     def getPdbNumTasks(self,gene,pdb,isvariant):
         pdb_path = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset,gene=gene,pdb=pdb)
-        filenameo = pdb_path.thruputs + "params_background.txt"
+        filenameo = pdb_path.inputs + "params_background.txt"
         if isvariant:
-            filenameo = pdb_path.thruputs + "params_variants.txt"
+            filenameo = pdb_path.inputs + "params_variants.txt"
         existso, timeo = self.checkFile(filenameo)        
         numtasks = "0"
         if existso:                            
@@ -288,11 +288,11 @@ class BatchStatus:
 
     def getPdbProgressReport(self,gene,pdb):
         pdb_path = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset,gene=gene,pdb=pdb)                        
-        filenameA = pdb_path.thruputs + pdb + "_repx.pdb"
+        filenameA = pdb_path.inputs + pdb + "_repx.pdb"
         filenameB = pdb_path.outputs + "ddg_background.csv"
         filenameC = pdb_path.outputs + "ddg_buildmodel.csv"                        
-        filenameD = pdb_path.thruputs + "params_background.txt"
-        filenameE = pdb_path.thruputs + "params_variants.txt"
+        filenameD = pdb_path.inputs + "params_background.txt"
+        filenameE = pdb_path.inputs + "params_variants.txt"
         
         existsfileA, timeA = self.checkFile(filenameA)
         existsfileB, timeB = self.checkFile(filenameB)
@@ -380,8 +380,8 @@ class BatchStatus:
         self.checkFile(filenameB) 
         
         # Check the background
-        filenameP = path.thruputs + "params_background.txt"
-        filename_incomplete = path.thruputs + "params_background_incomplete.txt"
+        filenameP = path.inputs + "params_background.txt"
+        filename_incomplete = path.inputs + "params_background_incomplete.txt"
         count = 0
         print("\nChecking the background tasks")
         if exists(filenameP):
@@ -410,8 +410,8 @@ class BatchStatus:
             print("Missing parameters file, the data needs preparation")
 
         # Check the background
-        filenameP = path.thruputs + "params_variants.txt"
-        filename_incomplete = path.thruputs + "params_variants_incomplete.txt"
+        filenameP = path.inputs + "params_variants.txt"
+        filename_incomplete = path.inputs + "params_variants_incomplete.txt"
         print("\nChecking the variant tasks")
         count = 0
         if exists(filenameP):
@@ -460,7 +460,7 @@ class BatchStatus:
         returns if it is completed and the filestamp
         '''
         pdb_path = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset,gene=gene,pdb=pdb)
-        filenameo = pdb_path.thruputs + pdb.lower() + "_repx.pdb"
+        filenameo = pdb_path.inputs + pdb.lower() + "_repx.pdb"
         exists,dt = self.checkFile(filenameo)
         return exists        
        
@@ -469,9 +469,9 @@ class BatchStatus:
         returns if it is completed and the filestamp
         '''
         pdb_path = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset,gene=gene,pdb=pdb)
-        filenameo = pdb_path.thruputs + "params_background.txt"
+        filenameo = pdb_path.inputs + "params_background.txt"
         if isvariant:
-            filenameo = pdb_path.thruputs + "params_variants.txt"
+            filenameo = pdb_path.inputs + "params_variants.txt"
         existso, timeo = self.checkFile(filenameo)
         count = 0
         lasttime = ""                  
