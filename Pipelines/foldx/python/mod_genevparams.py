@@ -63,7 +63,7 @@ def run_pipeline(args):
         import mod_pdbvparams as ppl
 
         ppl.run_pipeline(argsgn)
-        filename = pdb_path.pdb_thruputs + "params_variants.txt"
+        filename = pdb_path.pdb_inputs + "params_variants.txt"
         if exists(
             filename
         ):  # TODO we might want to make it optional to fail if there is a missing file
@@ -71,7 +71,7 @@ def run_pipeline(args):
             csv = fdf.openDataFrame()
             all_params.append(csv)
 
-    all_path = gene_path.gene_thruputs + "params_variants.txt"
+    all_path = gene_path.gene_inputs + "params_variants.txt"
     if len(all_params) > 0:
         all_df = pd.concat(all_params, axis=0)
         all_df.to_csv(all_path, index=False, sep=" ", header=True)

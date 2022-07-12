@@ -99,9 +99,9 @@ class BatchStatus:
                         if num_tsks == 0:                        
                             line_string += "----\t\t"
                         elif num_tsks == num_done:
-                            line_string += f"     {num_tsks}\t\t"      
+                            line_string += f"{num_tsks}\t\t"      
                         else:
-                            line_string += f"     {num_done}/{num_tsks}\t\t"      
+                            line_string += f"{num_done}/{num_tsks}\t\t"      
                     print(line_string)
         else:
             print("Gene has not been prepped")
