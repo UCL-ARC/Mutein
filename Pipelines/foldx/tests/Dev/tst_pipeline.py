@@ -26,7 +26,7 @@ def addpath(inputs):
 #pdb="1pb5"
 
 dataset="small"#"mouse"
-gene="bcas3"#'"psme4"
+gene="b2m"#'"psme4"
 pdb=""#af-q8ccn5-f1-model_v2"#smexp_6swa_3_213"
 
 repairs="x"
@@ -34,7 +34,7 @@ repair_from = "0"
 split=100
 vsplit=10
 task=1
-runs = "x"
+runs = "b"
 missing="N"
 """ 
     if "a" in runs:        print("Mutein: Preparing genes")        

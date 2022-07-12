@@ -58,7 +58,7 @@ def pdbs_from_accession_uniprot(accession):
     for x in res:
         db = x["database"]
         pdb = x["id"]
-        if x == "PDB":
+        if db == "PDB":
             pdb_path = getPDBLink(pdb)
             pdb_paths.append({"pdb": pdb.lower(), "path": pdb_path})                        
     return pdb_paths

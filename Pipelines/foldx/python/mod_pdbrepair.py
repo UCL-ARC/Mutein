@@ -63,13 +63,21 @@ def run_pipeline(args):
     mostRecentRep = 1
     base_pdbfile = pdb_path.pdb_inputs + "/" + pdbfile
     # find all the existing repair files
+    
     while found:        
         name = repair_path + pdbcode + "_" + str(mostRecentRep) + ".pdb"
+        name_in = pdb_path.pdb_inputs + pdbcode + "_" + str(mostRecentRep) + ".pdb"
         #name = pdb_path.pdb_inputs + "/" + pdbcode + "_rep" + str(mostRecentRep) + ".pdb"
         if exists(name):
             found = True
             base_pdbfile = name                
             mostRecentRep += 1
+        
+        elif exists(name_in):
+            found = True
+            base_pdbfile = name                
+            mostRecentRep += 1
+            copyfile(name_in,name)        
         else:
             mostRecentRep -=1
             found = False
