@@ -168,10 +168,12 @@ def run_pipeline(args):
                         pdb_path.pdb_thruputs + "agg/" + str(row) + "_ddg_background.csv"                
                     )
                     fx_runner.createPosscanCsv(row_path, pdb, mut.split(","), [], cov_df, ddg_file, df_file)                    
+                
+                import mod_cleaning as cleaner        
+                cleaner.deletePath(row_path,remPath=True)
         
         
-        import mod_cleaning as cleaner        
-        cleaner.cleanPdbThruBack(args)
+        
         #print("MUTEIN SCRIPT ENDED")
 
 
