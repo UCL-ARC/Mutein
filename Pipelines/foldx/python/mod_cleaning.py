@@ -42,20 +42,45 @@ def cleanGene(args):
     install_dir = argus.arg("install_dir")    
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
-    gene = argus.arg("gene")    
-    gene_path = Paths.Paths(data_dir, install_dir, dataset=dataset,gene=gene,readonly=False)    
-    mypath = gene_path.gene_inputs    
-    deletePath(mypath)
+    gene = argus.arg("gene","x")
+    genes = []
+    if gene!= "x":
+        genes = [gene]
+    else:
+        dataset_path = Paths.Paths(data_dir, install_dir, dataset=dataset,readonly=False)
+        # load the list of the genes
+        genes_fd = FileDf.FileDf(dataset_path.dataset_inputs + "genes_list.csv")
+        genes_csv = genes_fd.openDataFrame()
+        for g in range(len(genes_csv.index)):
+            gn = genes_csv["gene"][g]
+            genes.append(gn)
+    
+    for gene in genes:
+        gene_path = Paths.Paths(data_dir, install_dir, dataset=dataset,gene=gene,readonly=False)    
+        mypath = gene_path.gene_inputs    
+        deletePath(mypath)
 
 def cleanGeneThruputs(args):
     argus = Arguments.Arguments(args)
     install_dir = argus.arg("install_dir")    
     data_dir = argus.arg("data_dir")
     dataset = argus.arg("dataset")
-    gene = argus.arg("gene")    
-    gene_path = Paths.Paths(data_dir, install_dir, dataset=dataset,gene=gene,readonly=False)    
-    mypath = gene_path.gene_thruputs
-    deletePath(mypath)
+    gene = argus.arg("gene","x")
+    genes = []
+    if gene!= "x":
+        genes = [gene]
+    else:
+        dataset_path = Paths.Paths(data_dir, install_dir, dataset=dataset,readonly=False)
+        # load the list of the genes
+        genes_fd = FileDf.FileDf(dataset_path.dataset_inputs + "genes_list.csv")
+        genes_csv = genes_fd.openDataFrame()
+        for g in range(len(genes_csv.index)):
+            gn = genes_csv["gene"][g]
+            genes.append(gn)
+    for gene in genes:
+        gene_path = Paths.Paths(data_dir, install_dir, dataset=dataset,gene=gene,readonly=False)    
+        mypath = gene_path.gene_thruputs
+        deletePath(mypath)
 
 def cleanPdbThruputs(args):
     argus = Arguments.Arguments(args)
