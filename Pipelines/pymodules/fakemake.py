@@ -6,6 +6,7 @@ import os
 import glob
 import datetime
 import time
+import shutil
 
 #regex patterns to match non nested {placeholders} and {$environment variables}
 ph_regx = r'\{[^\$=].*?\}'
@@ -22,35 +23,23 @@ rule_keys = ['name','input','output','shell']
 
 #placeholder first characters with special meaning
 #$ environment variable
-#= file glob: creates separate jobs
-###* file glob: creates file list within single job <= not implemented
+#= file glob: creates separate jobs from the same rule
+###* file glob: creates file list within single job: not yet implemented
 reserved_chrs = ['$','=']       #,'*']
 
-#default conda and exec values
-default_conda = 'fm_default_env'
-default_exec = 'local'
-default_job_dir = 'fakemake_jobs'
+default_global_config =\
+{
+    'temp_job_dir':'fakemake_jobs',
+    'exec':'local',
+    'conda':'fm_default_env',
+    'stale_output_file':'ignore',   #ignore,delete,recycle also applies to symlinks
+    'stale_output_dir':'ignore',    #ignore,delete,recycle
+    'missing_parent_dir':'create',     #ignore,create
+    'recycle_bin':'recycle_bin',
+    'array_size_variable':'FM_ARRAY_SIZE', #how many jobs in current array
+    #'normalize_paths':'true',               #true,false
+}
 
-# def _sub_vars(config,extra=None):
-#     'substitute all simple placeholders or fail trying'
-#     counter = 10
-#     while True:
-#         counter -= 1
-#         finished = True
-#         for key,value in config.items():
-#             for m in re.finditer(ph_regx,value):
-#                 name = m.group(0)[1:-1]
-#                 #if name[0] in reserved_chrs: continue #ignore special placeholders
-
-#                 if extra == None or name in config:
-#                     new_value = config[name]
-#                 else:
-#                     new_value = extra[name]
-#                 config[key] = value[:m.start(0)] + new_value + value[m.end(0):]
-#                 finished = False
-#         if finished: break
-#         assert counter > 0, 'unable to resolve all placeholders'
-        
 def sub_vars(config,extra=None):
     'substitute all simple placeholders or fail trying'
 
@@ -96,36 +85,6 @@ def show(item,label,indent=2):
     print(json.dumps(item,sort_keys=False,indent=indent))
     print()
 
-def process_rule(config,rule):
-    #validate rule and substitute placeholders
-    input,output,shell = setup_rule(config,rule)
-
-    print('------------------------')
-    show(rule,"rule")
-    show(input,"input")
-    show(output,"output")
-    show(shell,"shell")
-
-    #fill in any globbing placeholders in inputs and outputs
-    #return list of values, one per job
-    job_list = generate_job_list(rule,input,output)
-    show(job_list,"jobs")
-
-    if len(job_list) == 0:
-        print(f"rule {rule['name']} no jobs generated")
-        return
-
-    #determine if all inputs are present
-    #and if outputs need to be regenerated
-    shell_list = generate_final_shell_commands(rule,job_list,shell)
-
-    timestamp = datetime.datetime.fromtimestamp(time.time()).strftime(".%Y%m%d-%H%M%S.%f")
-    jobfile = os.path.join(config['temp_job_dir'],rule['name']+timestamp)
-    with open(jobfile,'w') as f:
-        json.dump(shell_list,f,sort_keys=False,indent=2)
-        f.write('\n')
-
-    execute_jobs(rule,jobfile)
 
 def check_cwd(config):
     if 'expected_working_dir' in config:
@@ -156,10 +115,6 @@ def find_duplicates(dict_list):
 
 def setup_rule(config,rule):
     assert type(rule) == dict
-
-    #insert any missing defaults
-    if not 'exec' in rule: rule['exec'] = default_exec
-    if not 'conda' in rule: rule['conda'] = default_conda
 
     #check all keys and values are simple strings
     #check for forbidden keys
@@ -216,7 +171,7 @@ def split_rule(rule):
     del rule['output']
     del rule['shell']
 
-    #convert simple form input/output into ordered list form
+    #convert simple form input/output into dictionary form
     if type(input) == str: input = {'input':input}
     if type(output) == str: output = {'output':output}
     shell = {'shell':shell}
@@ -224,8 +179,7 @@ def split_rule(rule):
     return input,output,shell
 
 def setup_config(pipeline):
-    #set any defaults here
-    config = {'temp_job_dir':default_job_dir}
+    config = copy.deepcopy(default_global_config)
 
     #include the config from the pipeline yaml file if present
     item = pipeline[0]
@@ -392,6 +346,13 @@ def generate_final_shell_commands(rule,job_list,shell):
             job_list[job_numb] = None
             continue
 
+        #remove and stale output files/symlinks/directories
+        handle_stale_outputs(rule,job['output'])
+
+        #create any missing output *parent* directories
+        if rule['missing_parent_dir'] == 'create':
+            create_output_dirs(rule,job['output'])
+
     #filter out deleted jobs
     job_list = [job for job in job_list if job is not None]
     shell_list = []
@@ -410,8 +371,86 @@ def generate_final_shell_commands(rule,job_list,shell):
 
     return shell_list
 
+def recycle_item(config,path):
+    'move the path into the recycle bin'
+    
+    recycle_bin = config['recycle_bin']
+
+    assert path != recycle_bin
+
+    new_name = os.path.join(recycle_bin,os.path.basename(path))
+
+    #make sure not to overwrite existing recycle bin file
+    if os.path.exists(new_name):
+        new_name += ".%d"%random.randrange(1000000)
+        if os.path.exists(new_name):
+            raise Exception(f"File {new_name} already in recycle bin")
+
+    #move to recycle bin
+    shutil.move(path,new_name)
+
+def create_output_dirs(config,outputs):
+    '''
+    if the parent folder of any output is missing create it
+    '''
+
+    for item in outputs:
+        path = outputs[item]
+        print(path)
+        parent = os.path.dirname(path)
+        if os.path.exists(parent): continue
+        print(f"creating {parent}")
+        os.makedirs(parent)
+
+def handle_stale_outputs(config,outputs):
+    '''
+    the job is going to be rerun therefore any output already present
+    is treated as stale and recycled or deleted
+    '''
+
+    print("handle stale outputs")
+
+    for item in outputs:
+        path = outputs[item]
+        print(path)
+        if not os.path.exists(path): continue
+
+        if os.path.islink(path) or os.path.isfile(path):
+            if config['stale_output_file'] == 'delete':
+                print(f"remove file {path}")
+                os.remove(path)
+            elif config['stale_output_file'] == 'recycle':
+                print(f"recycle file {path}")
+                recycle_item(config,path)
+            elif config['stale_output_file'] == 'ignore':
+                print(f"ignore file {path}")
+                continue
+            else:
+                raise Exception(f'unknown option for stale_output_file: {config["stale_output_file"]}')
+
+        elif os.path.isdir(path):
+            if config['stale_output_dir'] == 'delete':
+                print(f"remove dir {path}")
+                shutil.rmtree(path)
+            elif config['stale_output_dir'] == 'recycle':
+                print(f"recycle dir {path}")
+                recycle_item(config,path)
+            elif config['stale_output_dir'] == 'ignore':
+                print(f"ignore dir {path}")
+                continue
+            else:
+                raise Exception(f'unknown option for stale_output_dir: {config["stale_output_dir"]}')
+                
+        else:
+            raise Exception(f'unsupported output type {path}')
+
 def execute_jobs(rule,jobfile):
+    with open(jobfile) as f:
+        shell_list = json.load(f)
+
     if rule['exec'] == 'local':
+        for item in shell_list:
+            print("local exec:\n",item)
         pass
         #local execution
     elif rule['exec'] == 'qsub':
@@ -419,3 +458,42 @@ def execute_jobs(rule,jobfile):
         #qsub execution
     else:
         raise Exception(f"unsupported execution method {rule['exec']}")
+
+def write_joblist(rule,shell_list):
+    timestamp = datetime.datetime.fromtimestamp(time.time()).strftime(".%Y%m%d-%H%M%S.%f")
+    jobfile = os.path.join(rule['temp_job_dir'],rule['name']+timestamp)
+
+    with open(jobfile,'w') as f:
+        json.dump(shell_list,f,sort_keys=False,indent=2)
+        f.write('\n')
+
+    return jobfile
+
+def process_rule(config,rule):
+    #validate rule and substitute placeholders
+    input,output,shell = setup_rule(config,rule)
+
+    print('------------------------')
+    show(rule,"rule")
+    show(input,"input")
+    show(output,"output")
+    show(shell,"shell")
+
+    #fill in any globbing placeholders in inputs and outputs
+    #return list of values, one per job
+    job_list = generate_job_list(rule,input,output)
+    show(job_list,"jobs")
+
+    if len(job_list) == 0:
+        print(f"rule {rule['name']} no jobs generated")
+        return
+
+    #determine if all inputs are present
+    #and if outputs need to be regenerated
+    shell_list = generate_final_shell_commands(rule,job_list,shell)
+
+    #write list of shell commands to jobfile
+    jobfile = write_joblist(rule,shell_list)
+
+    #execute jobs locally or remotely
+    execute_jobs(rule,jobfile)
