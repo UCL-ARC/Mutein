@@ -114,8 +114,8 @@ def run_pipeline(args):
         pdblist = batch_stat.getGenePdbs(gene)#
         #We also need to create the genes level incomplete file
         path = Paths.Paths(DataDir, PipelineDir, dataset=dataset, gene=gene)
-        filename_incomplete_b = path.thruputs + "params_background_incomplete.txt"
-        filename_incomplete_v = path.thruputs + "params_variants_incomplete.txt"
+        filename_incomplete_b = path.inputs + "params_background_incomplete.txt"
+        filename_incomplete_v = path.inputs + "params_variants_incomplete.txt"
         count = 0                
         with open(filename_incomplete_b, "w") as fw_back:
             with open(filename_incomplete_v, "w") as fw_var:

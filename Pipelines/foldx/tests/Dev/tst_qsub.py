@@ -21,6 +21,7 @@ data_dir="/home/rachel/UCL/github/MuteinData/"
 install_dir="/home/rachel/UCL/github/Mutein/"
 
 config=config_path + "/batch_gene_4_tasks.yml"
+config=config_path + "/batch_gene_3_prep.yml"
 
 dataset = "small"
 gene = "b2m"
@@ -28,7 +29,7 @@ pdb=""
 
 import pipeline_qsubber as pq
 #install_dir, working_dir, yaml_file, py_or_sh, dataset, gene, pdb
-pq.pipeline_qsubber(["",install_dir,data_dir,config,"qsub",dataset,gene,pdb])
+pq.pipeline_qsubber(["",install_dir,data_dir,config,"py",dataset,gene,pdb])
 
 
 
