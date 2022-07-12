@@ -148,22 +148,22 @@ def pipeline_qsubber(args):
             with open(pdb_tasks_file_missing) as fr:
                 lines = fr.readlines()
                 pdb_tasks_missing = len(lines) - 1
-        params_tasks_file = path.thruputs + "params_background.txt"
+        params_tasks_file = path.inputs + "params_background.txt"
         if exists(params_tasks_file):
             with open(params_tasks_file) as fr:
                 lines = fr.readlines()
                 params_tasks = len(lines) - 1
-        unparams_tasks_file = path.thruputs + "params_background_incomplete.txt"
+        unparams_tasks_file = path.inputs + "params_background_incomplete.txt"
         if exists(unparams_tasks_file):
             with open(unparams_tasks_file) as fr:
                 lines = fr.readlines()
                 unparams_tasks = len(lines) - 1
-        vparams_tasks_file = path.thruputs + "params_variants.txt"
+        vparams_tasks_file = path.inputs + "params_variants.txt"
         if exists(vparams_tasks_file):
             with open(vparams_tasks_file) as fr:
                 lines = fr.readlines()
                 vparams_tasks = len(lines) - 1
-        vunparams_tasks_file = path.thruputs + "params_variants_incomplete.txt"
+        vunparams_tasks_file = path.inputs + "params_variants_incomplete.txt"
         if exists(vunparams_tasks_file):
             with open(vunparams_tasks_file) as fr:
                 lines = fr.readlines()
