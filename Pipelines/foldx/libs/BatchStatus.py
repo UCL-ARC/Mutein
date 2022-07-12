@@ -65,7 +65,7 @@ class BatchStatus:
                         line_string += size + "\t\t      "
                     except:
                         size = "xyz MB"
-                    line_string += size + "\t\t      "
+                        line_string += size + "\t\t      "
                     ###################
                     filenameC = patho.outputs + "pdb_tasklist.csv"                                        
                     existsfile, time = self.checkFile(filenameC)
