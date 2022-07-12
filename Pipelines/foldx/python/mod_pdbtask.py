@@ -165,9 +165,13 @@ def run_pipeline(args):
                     filename = pdb_path.pdb_inputs + "Coverage.csv"
                     ddg_file = row_path + "PS_" + pdb + "_scanning_output.txt"
                     df_file = (
-                        pdb_path.pdb_thruputs + "agg/" + str(row) + "_ddg_background.csv"
+                        pdb_path.pdb_thruputs + "agg/" + str(row) + "_ddg_background.csv"                
                     )
                     fx_runner.createPosscanCsv(row_path, pdb, mut.split(","), [], cov_df, ddg_file, df_file)                    
+        
+        
+        import mod_cleaning as cleaner        
+        cleaner.cleanPdbThruBack(args)
         #print("MUTEIN SCRIPT ENDED")
 
 

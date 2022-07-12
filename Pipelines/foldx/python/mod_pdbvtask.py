@@ -172,6 +172,8 @@ def run_pipeline(args):
                 fx_runner.createBuildCsv(
                     row_path, pdb, pdb_muts, gene_muts, cov_df, ddg_files, df_file,allAtOnce
                 )
+    import mod_cleaning as cleaner        
+    cleaner.cleanPdbThruVar(args)
     #print("MUTEIN SCRIPT ENDED")
 
 

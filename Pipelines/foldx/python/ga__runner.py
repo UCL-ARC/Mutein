@@ -54,8 +54,7 @@ def run_pipeline(args):
         cleaner.cleanPdbThruputs(args)
     if "f" in runs:
         print("Mutein: Running background tasks")
-        runner.runTasks(args)
-        cleaner.cleanPdbThruBack(args)
+        runner.runTasks(args)        
     if "g" in runs:
         print("Mutein: Running variant tasks")
         runner.runVtasks(args)
