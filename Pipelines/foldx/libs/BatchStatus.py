@@ -49,8 +49,10 @@ class BatchStatus:
     def createDatasetProgressReport(self,dataset):
         ds_path = Paths.Paths(self.data_dir, self.pipe_dir, dataset=dataset)                
         filename = ds_path.inputs + "genes_pdb_list.csv"        
-        print("GENE      \t\tSIZE       \t\tPDBS   \t\tBACKGROUND  \t\tVARIANTS  ")
-        print("----------\t\t-----------\t\t-------\t\t------------\t\t----------")
+        #print("GENE      \t\tSIZE       \t\tPDBS   \t\tBACKGROUND  \t\tVARIANTS  ")
+        #print("----------\t\t-----------\t\t-------\t\t------------\t\t----------")
+        print("GENE      \t\tPDBS   \t\tBACKGROUND  \t\tVARIANTS  ")
+        print("-----------\t\t-------\t\t------------\t\t----------")
         if exists(filename):
             with open(filename, "r") as fr:
                 lines = fr.readlines()
@@ -60,12 +62,12 @@ class BatchStatus:
                     line_string = geneo+"  \t\t"
                     patho = Paths.Paths(self.data_dir, self.pipe_dir, dataset=dataset, gene=geneo)
                     ## dir size                    
-                    try:
-                        size = self.getDirSize(patho.gene_inputs)
-                        line_string += size + "\t\t      "
-                    except:
-                        size = "xyz MB"
-                        line_string += size + "\t\t      "
+                    #try:
+                    #    size = self.getDirSize(patho.gene_inputs)
+                    #    line_string += size + "\t\t      "
+                    #except:
+                    #    size = "xyz MB"
+                    #    line_string += size + "\t\t      "
                     ###################
                     filenameC = patho.outputs + "pdb_tasklist.csv"                                        
                     existsfile, time = self.checkFile(filenameC)
