@@ -97,6 +97,8 @@ def run_pipeline(args):
             dfv = gn.getVariantCandidatesDataFrame()
             dfv.to_csv(gene_path.gene_outputs + "/pdb_candidates.csv", index=False)
 
+    import mod_cleaning as cleaner
+    cleaner.cleanGeneThruputs(args)
     print("### COMPLETED gene to proteins pipeline ###")
     #print("MUTEIN SCRIPT ENDED")
     return pdbs

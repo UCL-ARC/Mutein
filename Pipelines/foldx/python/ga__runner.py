@@ -40,7 +40,6 @@ def run_pipeline(args):
     if "b" in runs:
         print("Mutein: Preparing pdbs")
         runner.preparePdbs(args)
-        cleaner.cleanGeneThruputs(args)
     if "c" in runs:
         print("Mutein: Repairing pdbs")
         runner.repairPdbs(args)
