@@ -8,6 +8,6 @@ cores: "4"
 dependency: '-1'
 array: -1
 arrayfile: "unpdbs"
-inputs: "runs=c@repairs=10@missing=Y"
+inputs: "runs=cde@repairs=10@missing=Y@chunk=500@vchunk=500@variant=*"
 active: 'Y'
 ---
