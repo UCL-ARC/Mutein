@@ -50,9 +50,9 @@ def run_pipeline(args):
         gene=gene,
         pdb=pdb,
     )
-    all_tasks = gene_path.thruputs + "params_variants.txt"
+    all_tasks = gene_path.inputs + "params_variants.txt"
     if missing.upper() == "Y":
-        all_tasks = gene_path.thruputs + "params_variants_incomplete.txt"
+        all_tasks = gene_path.inputs + "params_variants_incomplete.txt"
     fio = FileDf.FileDf(all_tasks, sep=" ", header=True)
     df = fio.openDataFrame()
 
@@ -107,7 +107,7 @@ def run_pipeline(args):
                 pdb_path.pdb_thruputs + pdbfile,
                 row_path + pdbfile,
             )
-            copyfile(pdb_path.pdb_thruputs + pdbfile, row_path + pdbfile)
+            copyfile(pdb_path.pdb_inputs + pdbfile, row_path + pdbfile)
 
             #### TEMPORARILY DO BOTH POSCAN AND BUILD #####################
             fx_runner = Foldx.Foldx(argus.arg("foldxe"))

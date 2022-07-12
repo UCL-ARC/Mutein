@@ -21,29 +21,35 @@ def addpath(inputs):
 
 ######################################################################
 ### INPUTS
-dataset="cutdown"#"mouse"
-gene=""#'"psme4"
-pdb=""#smexp_6swa_3_213"
+#dataset=""
+#gene=""
+#pdb="1pb5"
+
+dataset="small"#"mouse"
+gene="bcas3"#'"psme4"
+pdb=""#af-q8ccn5-f1-model_v2"#smexp_6swa_3_213"
 
 repairs="x"
-repair_from = "x"
-split=500
+repair_from = "0"
+split=100
 vsplit=10
 task=1
 runs = "x"
-missing="Y"
+missing="N"
 """ 
     if "a" in runs:        print("Mutein: Preparing genes")        
     if "b" in runs:        print("Mutein: Preparing pdbs")        
-    if "c" in runs:        print("Mutein: Repairing pdbs")        
+    if "c" in runs:        print("Mutein: Repairing pdbs")            
     if "d" in runs:        print("Mutein: Making background param file")        
     if "e" in runs:        print("Mutein: Making variant param file")        
-    if "f" in runs:        print("Mutein: Running background tasks")        
-    if "g" in runs:        print("Mutein: Running variant tasks")        
-    if "h" in runs:        print("Mutein: Aggregating background tasks")        
-    if "i" in runs:        print("Mutein: Aggregating variant tasks")        
-    if "j" in runs:        print("Mutein: Aggregating gene tasks")        
-    if "x" in runs:        print("Mutein: Cleaning data")        
+    if "f" in runs:        print("Mutein: Running background tasks")            
+    if "g" in runs:        print("Mutein: Running variant tasks")            
+    if "h" in runs:        print("Mutein: Aggregating background tasks")            
+    if "i" in runs:        print("Mutein: Aggregating variant tasks")            
+    if "j" in runs:        print("Mutein: Aggregating gene tasks")            
+    if "k" in runs:        print("Mutein: Aggregating dataset")        
+    
+    if "x" in runs:        print("Mutein: Cleaning data aggressively and packaging batch")        
 """
 
 # which steps of the pipeline to run

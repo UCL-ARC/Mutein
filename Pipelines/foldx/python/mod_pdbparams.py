@@ -51,8 +51,8 @@ def run_pipeline(args):
     ##### Open the pdb file ################################
     # pdb_file = pdbcode + ".pdb"
     pdb_file = pdbcode + "_rep" + reps + ".pdb"
-    if exists(pdb_path.pdb_thruputs + pdb_file):
-        with open(pdb_path.pdb_thruputs + pdb_file) as f:
+    if exists(pdb_path.pdb_inputs + pdb_file):
+        with open(pdb_path.pdb_inputs + pdb_file) as f:
             pdbcontent = f.readlines()
 
         ##### Amino acid dictionary to convert between 3 and 1 codes
@@ -161,7 +161,7 @@ def run_pipeline(args):
         print(total_muts, rows, chunk, row)
         ##### Turn the dictionary into a dataframe
         data_params = pd.DataFrame.from_dict(param_dic)
-        filename = pdb_path.pdb_thruputs + "params_background.txt"
+        filename = pdb_path.pdb_inputs + "params_background.txt"
         print("### foldx02: ... savig df", filename)
         data_params.to_csv(filename, index=False, sep=" ", header=True)
 

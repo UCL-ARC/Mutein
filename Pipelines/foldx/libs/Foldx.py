@@ -27,6 +27,7 @@ class Foldx:
         self.pdbHydroges = False
         self.AA = AA.AA()
         self.numRuns = 1  # use in BuildModel
+        self.outPdb = False
 
     def makeDefaultsString(self):
         repairB = " --ionStrength=0.05 --pH=7 --vdwDesign=2 --pdbHydrogens=false"
@@ -62,6 +63,10 @@ class Foldx:
         foldxcommand += self.makeDefaultsString()
         foldxcommand += " --numberOfRuns=" + str(self.numRuns)
         foldxcommand += " --mutant-file=" + mut_fl
+        if self.outPdb:
+            foldxcommand += " --out-pdb=true"
+        else:
+            foldxcommand += " --out-pdb=false"
         foldxcommand += " --output-file=" + str(tag)
         foldxcommand += " --pdb=" + pdb
         foldxcommand += " > " + mut_log

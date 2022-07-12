@@ -31,6 +31,8 @@ def run_pipeline(args):
         import ga_gene_runner as runner
     else:
         import ga_dataset_runner as runner
+    
+    import mod_cleaning as cleaner
 
     if "a" in runs:        
         print("Mutein: Preparing genes")
@@ -38,21 +40,27 @@ def run_pipeline(args):
     if "b" in runs:
         print("Mutein: Preparing pdbs")
         runner.preparePdbs(args)
+        cleaner.cleanGeneThruputs(args)
     if "c" in runs:
         print("Mutein: Repairing pdbs")
         runner.repairPdbs(args)
+        cleaner.cleanPdbThruputs(args)
     if "d" in runs:
         print("Mutein: Making background param file")
         runner.makeParams(args)
+        cleaner.cleanPdbThruputs(args)
     if "e" in runs:
         print("Mutein: Making variant param file")
         runner.makeVparams(args)
+        cleaner.cleanPdbThruputs(args)
     if "f" in runs:
         print("Mutein: Running background tasks")
         runner.runTasks(args)
+        cleaner.cleanPdbThruBack(args)
     if "g" in runs:
         print("Mutein: Running variant tasks")
         runner.runVtasks(args)
+        cleaner.cleanPdbThruVar(args)
     if "h" in runs:
         print("Mutein: Aggregating background tasks")
         runner.aggTasks(args)
@@ -64,7 +72,7 @@ def run_pipeline(args):
         runner.aggGene(args)
     if "x" in runs:        
         print("Mutein: Cleaning data")
-        runner.clean(args)
+        cleaner.cleanGene(args)
 
     print("### COMPLETED Mutein script ###")
     print("MUTEIN SCRIPT ENDED")

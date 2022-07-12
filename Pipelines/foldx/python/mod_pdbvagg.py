@@ -95,7 +95,7 @@ def run_pipeline(args):
             ]
         )
 
-        params_file = gene_path.thruputs + "params_variants.txt"
+        params_file = gene_path.inputs + "params_variants.txt"
         if exists(params_file):
             fdfp = FileDf.FileDf(params_file, sep=" ", header=True)
             pm_df = fdfp.openDataFrame()

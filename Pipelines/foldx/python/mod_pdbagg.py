@@ -68,7 +68,7 @@ def run_pipeline(args):
         argus.params["work_path"] = work_path
         pdb_path.goto_job_dir(argus.arg("work_path"), args, argus.params, "_inputs05a")
         ############################################
-        params_file = gene_path.thruputs + "params_background.txt"
+        params_file = gene_path.inputs + "params_background.txt"
         if exists(params_file):
             fdfp = FileDf.FileDf(
                 params_file, sep=" ", cols=["pdb", "mut", "task"], header=False

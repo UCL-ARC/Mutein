@@ -128,7 +128,7 @@ def run_pipeline(args):
     print(total_muts, splitrows, chunk, row)
     ##### Turn the dictionary into a dataframe
     data_params = pd.DataFrame.from_dict(param_dic)
-    filename = pdb_path.pdb_thruputs + "params_variants.txt"
+    filename = pdb_path.pdb_inputs + "params_variants.txt"
     print("### foldx05: ... savig df", filename)
     data_params.to_csv(filename, index=False, sep=" ", header=True)
 

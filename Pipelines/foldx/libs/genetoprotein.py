@@ -51,6 +51,7 @@ def pdbs_from_accession_uniprot(accession):
     # next uniprot PBS experiemntal structures
     url = f"https://rest.uniprot.org/uniprotkb/search?query=accession:{accession}"            
     print(url)      
+    pdb_paths.append({"pdb": af_name, "path": af_path})                        
     r = requests.get(url=url)    
     data = r.json()  
     res = data["results"][0]["uniProtKBCrossReferences"]

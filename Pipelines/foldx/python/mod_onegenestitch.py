@@ -72,7 +72,7 @@ def run_pipeline(args):
         )        
         
         
-        file_lst_var = pdb_path.pdb_thruputs + "params_variants.txt"
+        file_lst_var = pdb_path.pdb_inputs + "params_variants.txt"
         file_var_bm = pdb_path.pdb_outputs + "ddg_buildmodel.csv"        
         file_back_bm = pdb_path.pdb_outputs + "ddg_background.csv"
         
@@ -104,11 +104,11 @@ def run_pipeline(args):
         ddg_df_back_bm['method'] = ddg_df_back_bm.apply(lambda row: metric.getScore(row['pdb'])[1], axis=1)
         ddg_df_back_bm['resolution'] = ddg_df_back_bm.apply(lambda row: metric.getScore(row['pdb'])[2], axis=1)
         ddg_df_back_bm['coverage'] = ddg_df_back_bm.apply(lambda row: metric.getScore(row['pdb'])[3], axis=1)
-        ddg_df_back_bm.to_csv(gene_path.gene_outputs + "ddg_bm_background.csv", index=False)
+        ddg_df_back_bm.to_csv(gene_path.gene_outputs + "ddg_background_bm.csv", index=False)
         # DB Coverage reports
-        plot_file = gene_path.gene_outputs + "ALL_coverage.png"
-        anav = Analysis.Analysis(ddg_df_back_bm, gene)
-        anav.createPdbSummary(plot_file, "PDB Coverage")
+        #plot_file = gene_path.gene_outputs + "ALL_coverage.png"
+        #anav = Analysis.Analysis(ddg_df_back_bm, gene)
+        #anav.createPdbSummary(plot_file, "PDB Coverage")
     else:
         print("Gene stitch: not all pdb background files present for aggregation")
 

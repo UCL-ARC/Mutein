@@ -54,9 +54,9 @@ def run_pipeline(args):
             gene=gene,
             pdb=pdb,
         )
-        all_tasks = gene_path.thruputs + "params_background.txt"
+        all_tasks = gene_path.inputs + "params_background.txt"
         if missing.upper() == "Y":
-            all_tasks = gene_path.thruputs + "params_background_incomplete.txt"
+            all_tasks = gene_path.inputs + "params_background_incomplete.txt"
         print("Opening file", all_tasks)
         fio = FileDf.FileDf(all_tasks, sep=" ", header=True)
         df = fio.openDataFrame()
@@ -108,7 +108,7 @@ def run_pipeline(args):
                     pdb_path.pdb_thruputs + pdbfile,
                     row_path + pdbfile,
                 )
-                copyfile(pdb_path.pdb_thruputs + pdbfile, row_path + pdbfile)
+                copyfile(pdb_path.pdb_inputs + pdbfile, row_path + pdbfile)
 
                 fx_runner = Foldx.Foldx(argus.arg("foldxe"))                
                 filename = pdb_path.pdb_inputs + "Coverage.csv"
