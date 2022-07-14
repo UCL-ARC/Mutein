@@ -1,10 +1,13 @@
 - config:
     expected_working_dir: "/lustre/scratch/scratch/{$USER}/549_mutein"
-    test_dir: test
-    mut_prefix: "{$MUT_PREFIX}"
-    user: "{mut_prefix}{$USER}_{test_dir}"
-    temp_job_dir: "fakemake_jobs"
-    stale_output_file: "recycle"
+    test_dir:             "test"
+    mut_prefix:           "{$MUT_PREFIX}"
+    user:                 "{mut_prefix}{$USER}_{test_dir}"
+    temp_job_dir:         "fakemake_jobs"
+    stale_output_file:    "recycle"
+    stale_output_dir:     "ignore"
+    missing_parent_dir:   "create"
+    #conda_setup_command:  "source /home/{$USER}/.bashrc"
 - rule:
     name:     "step1"
     exec:     "local"
@@ -14,18 +17,18 @@
     output:   "{test_dir}/output/{=sample}.step1"
     shell: |
       cat {input} > {output}
-      echo processed >> {output}
-- rule:
-    name: step2
-    conda: "{$MUT_PREFIX}main"
-    input:
-      step1: "{test_dir}/output/{=sample}.step1"
-    output:
-      final: "{test_dir}/output/{=sample}.step2"
-    exec: qsub
-    shell: |
-      cat {step1} > {final}
-      echo processed >> {final}
+      echo processed by {name} >> {output}
+# - rule:
+#     name: step2
+#     conda: "{$MUT_PREFIX}main"
+#     input:
+#       step1: "{test_dir}/output/{=sample}.step1"
+#     output:
+#       final: "{test_dir}/output/{=sample}.step2"
+#     exec: qsub
+#     shell: |
+#       cat {step1} > {final}
+#       echo processed >> {final}
 # - rule:
 #     name: step4
 #     conda: "{$MUT_PREFIX}main"

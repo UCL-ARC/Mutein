@@ -7,6 +7,8 @@ import glob
 import datetime
 import time
 import shutil
+import subprocess
+import sys
 
 #regex patterns to match non nested {placeholders} and {$environment variables}
 ph_regx = r'\{[^\$=].*?\}'
@@ -29,15 +31,20 @@ reserved_chrs = ['$','=']       #,'*']
 
 default_global_config =\
 {
-    'temp_job_dir':'fakemake_jobs',
+    'log_dir':'fakemake_logs',
     'exec':'local',
+    'conda_setup_command':  "",
     'conda':'fm_default_env',
-    'stale_output_file':'ignore',   #ignore,delete,recycle also applies to symlinks
-    'stale_output_dir':'ignore',    #ignore,delete,recycle
-    'missing_parent_dir':'create',     #ignore,create
+    'stale_output_file':'ignore',    #ignore,delete,recycle also applies to symlinks
+    'stale_output_dir':'ignore',     #ignore,delete,recycle
+    #'failed_output_file': delete,recycle,oldify,ignore    
+    #'failed_output_dir': delete,recycle,oldify,ignore    
+    'missing_parent_dir':'create',   #ignore,create
     'recycle_bin':'recycle_bin',
-    'array_size_variable':'FM_ARRAY_SIZE', #how many jobs in current array
-    #'normalize_paths':'true',               #true,false
+    'job_size':'FM_JOB_SIZE', #how many jobs in current rule
+    'job_item':'FM_JOB_ITEM', #1 based job number within the current rule
+    #'normalize_paths':'true',                #true,false
+    'bash_prefix':'source ~/.bashrc\nset -euo pipefail\nset +o history'
 }
 
 def sub_vars(config,extra=None):
@@ -84,7 +91,6 @@ def show(item,label,indent=2):
     print(label)
     print(json.dumps(item,sort_keys=False,indent=indent))
     print()
-
 
 def check_cwd(config):
     if 'expected_working_dir' in config:
@@ -200,12 +206,12 @@ def setup_config(pipeline):
     #substitute any fakemake variables
     sub_vars(config)
 
-    show(config,"config")
+    #show(config,"config")
 
     del pipeline[0]
 
-    if not os.path.exists(config['temp_job_dir']):
-        os.makedirs(config['temp_job_dir'])
+    if not os.path.exists(config['log_dir']):
+        os.makedirs(config['log_dir'])
 
     return config
 
@@ -261,15 +267,10 @@ def generate_job_list(rule,input,output):
     input_glob += primary[prev_end:]
     input_regx += esc_regx(primary[prev_end:]) + '$'
 
-    #print(primary)
-    #print(input_glob)
-    #print(input_regx)
-
     job_list = []
 
     #find paths using iglob, match to placeholders using regex
     for path in glob.iglob(input_glob):
-        #print(path)
         m = re.fullmatch(input_regx,path)
         assert m is not None
 
@@ -289,7 +290,6 @@ def check_input_mtimes(input):
     newest_mtime = 0
     for item,path in input.items():
         if not os.path.exists(path):
-            print(f"missing input {path}")
             all_inputs_present = False
             continue
 
@@ -305,7 +305,6 @@ def check_output_mtimes(output):
     oldest_mtime = time.time() + 31e6 #dummy time 1 year in the future
     for item,path in output.items():
         if not os.path.exists(path):
-            print(f"missing output {path}")
             all_outputs_present = False
             continue
 
@@ -316,7 +315,7 @@ def check_output_mtimes(output):
     if all_outputs_present == False: return None
     return oldest_mtime
 
-def generate_final_shell_commands(rule,job_list,shell):
+def generate_shell_commands(rule,job_list,shell):
     name = rule['name']
     for job_numb,job in enumerate(job_list):
         #check all inputs present, returned newest mtime
@@ -329,19 +328,11 @@ def generate_final_shell_commands(rule,job_list,shell):
             continue
 
         #all inputs present
-        print(f"rule:{name} job:{job_numb} all inputs present")
-        newest_datetime = datetime.datetime.fromtimestamp(newest_input)
-        print(f"newest input {newest_datetime}")
-
         #check if any outputs missing or older than newest input
         oldest_output = check_output_mtimes(job['output'])
 
         #all outputs present and newer than newest input: no need to run
         if oldest_output != None and oldest_output > newest_input:
-            print(f"rule:{name} job:{job_numb} all outputs present")
-            oldest_datetime = datetime.datetime.fromtimestamp(oldest_output)
-            print(f"oldest output {oldest_datetime}")
-
             #flag job for removal from the list
             job_list[job_numb] = None
             continue
@@ -366,7 +357,7 @@ def generate_final_shell_commands(rule,job_list,shell):
         #substitute remaining placeholders in shell command
         shell_final = copy.deepcopy(shell)
         sub_vars(shell_final,config)
-        show(shell_final,"shell")
+        #show(shell_final,"shell")
         shell_list.append(shell_final["shell"])
 
     return shell_list
@@ -396,10 +387,8 @@ def create_output_dirs(config,outputs):
 
     for item in outputs:
         path = outputs[item]
-        print(path)
         parent = os.path.dirname(path)
         if os.path.exists(parent): continue
-        print(f"creating {parent}")
         os.makedirs(parent)
 
 def handle_stale_outputs(config,outputs):
@@ -408,35 +397,26 @@ def handle_stale_outputs(config,outputs):
     is treated as stale and recycled or deleted
     '''
 
-    print("handle stale outputs")
-
     for item in outputs:
         path = outputs[item]
-        print(path)
         if not os.path.exists(path): continue
 
         if os.path.islink(path) or os.path.isfile(path):
             if config['stale_output_file'] == 'delete':
-                print(f"remove file {path}")
                 os.remove(path)
             elif config['stale_output_file'] == 'recycle':
-                print(f"recycle file {path}")
                 recycle_item(config,path)
             elif config['stale_output_file'] == 'ignore':
-                print(f"ignore file {path}")
                 continue
             else:
                 raise Exception(f'unknown option for stale_output_file: {config["stale_output_file"]}')
 
         elif os.path.isdir(path):
             if config['stale_output_dir'] == 'delete':
-                print(f"remove dir {path}")
                 shutil.rmtree(path)
             elif config['stale_output_dir'] == 'recycle':
-                print(f"recycle dir {path}")
                 recycle_item(config,path)
             elif config['stale_output_dir'] == 'ignore':
-                print(f"ignore dir {path}")
                 continue
             else:
                 raise Exception(f'unknown option for stale_output_dir: {config["stale_output_dir"]}')
@@ -444,24 +424,71 @@ def handle_stale_outputs(config,outputs):
         else:
             raise Exception(f'unsupported output type {path}')
 
+def generate_full_command(config,shell):
+    'generate the bash commands to run before the job commands'
+
+    cmd_list = \
+    [
+        config['bash_prefix'],
+        config['conda_setup_command'],
+        f'conda activate {config["conda"]}',
+        shell,
+    ]
+
+    return '\n'.join(cmd_list)
+
+def generate_job_environment(config,job_numb,njobs):
+    'copy local environment with a few adjustments'
+
+    env = copy.deepcopy(os.environ)
+    env[ config['job_size'] ] = f'{njobs}'
+    env[ config['job_item'] ] = f'{job_numb+1}'
+
+    return env
+
+def execute_command(config,job_numb,cmd,env):
+    fname = f'{timestamp_now()}.{config["name"]}'
+    foutname = os.path.join(config['log_dir'],fname+'.out')
+    ferrname = os.path.join(config['log_dir'],fname+'.err')
+    fout = open(foutname,'w')
+    ferr = open(ferrname,'w')
+
+    failed = False
+    print(f'executing job number {job_numb+1}:',end='')
+    sys.stdout.flush()
+    try:
+        subprocess.run(cmd,env=env,shell=True,check=True,stdout=fout,stderr=ferr)
+    except subprocess.CalledProcessError:
+        failed = True
+
+    fout.close()
+    ferr.close()
+
+    if failed: print(' failed')
+    else:      print(' okay')
+
 def execute_jobs(rule,jobfile):
     with open(jobfile) as f:
         shell_list = json.load(f)
 
     if rule['exec'] == 'local':
-        for item in shell_list:
-            print("local exec:\n",item)
-        pass
-        #local execution
+        #serial local execution
+        for job_numb,item in enumerate(shell_list):
+            cmd = generate_full_command(rule,item)
+            env = generate_job_environment(rule,job_numb,len(shell_list))
+            execute_command(rule,job_numb,cmd,env)
     elif rule['exec'] == 'qsub':
         pass
-        #qsub execution
+        #qsub execution using an array job
     else:
         raise Exception(f"unsupported execution method {rule['exec']}")
 
+def timestamp_now():
+    return datetime.datetime.fromtimestamp(time.time()).strftime("%Y%m%d.%H%M%S.%f")
+
 def write_joblist(rule,shell_list):
-    timestamp = datetime.datetime.fromtimestamp(time.time()).strftime(".%Y%m%d-%H%M%S.%f")
-    jobfile = os.path.join(rule['temp_job_dir'],rule['name']+timestamp)
+    fname = f'{timestamp_now()}.{rule["name"]}.jobs'
+    jobfile = os.path.join(rule['log_dir'],fname)
 
     with open(jobfile,'w') as f:
         json.dump(shell_list,f,sort_keys=False,indent=2)
@@ -473,27 +500,22 @@ def process_rule(config,rule):
     #validate rule and substitute placeholders
     input,output,shell = setup_rule(config,rule)
 
-    print('------------------------')
-    show(rule,"rule")
-    show(input,"input")
-    show(output,"output")
-    show(shell,"shell")
+    print(f'\nrule: {rule["name"]}')
 
     #fill in any globbing placeholders in inputs and outputs
-    #return list of values, one per job
+    #return list of values, one per potential job
     job_list = generate_job_list(rule,input,output)
-    show(job_list,"jobs")
-
-    if len(job_list) == 0:
-        print(f"rule {rule['name']} no jobs generated")
-        return
 
     #determine if all inputs are present
     #and if outputs need to be regenerated
-    shell_list = generate_final_shell_commands(rule,job_list,shell)
+    shell_list = generate_shell_commands(rule,job_list,shell)
+
+    print(f'{len(shell_list)} jobs generated')
+
+    if len(shell_list) == 0: return
 
     #write list of shell commands to jobfile
     jobfile = write_joblist(rule,shell_list)
 
-    #execute jobs locally or remotely
+    #execute jobs locally or remotely from the jobfile
     execute_jobs(rule,jobfile)
