@@ -7,10 +7,10 @@
     stale_output_file:    "recycle"
     stale_output_dir:     "ignore"
     missing_parent_dir:   "create"
-    #conda_setup_command:  "source /home/{$USER}/.bashrc"
+    #conda_setup_command:  ""
 - rule:
     name:     "step1"
-    exec:     "local"
+    exec:     "qsub"
     conda:    "{mut_prefix}main"
     data_dir: "{test_dir}/input"
     input:    "{data_dir}/{=sample}.input"
@@ -18,17 +18,19 @@
     shell: |
       cat {input} > {output}
       echo processed by {name} >> {output}
-# - rule:
-#     name: step2
-#     conda: "{$MUT_PREFIX}main"
-#     input:
-#       step1: "{test_dir}/output/{=sample}.step1"
-#     output:
-#       final: "{test_dir}/output/{=sample}.step2"
-#     exec: qsub
-#     shell: |
-#       cat {step1} > {final}
-#       echo processed >> {final}
+      echo "hello"
+- rule:
+    name: "step2"
+    conda: "{$MUT_PREFIX}main"
+    input:
+      step1: "{test_dir}/output/{=sample}.step1"
+    output:
+      final: "{test_dir}/output/{=sample}.step2"
+    exec: "qsub"
+    shell: |
+      cat {step1} > {final}
+      echo processed by {name} >> {final}
+      echo "hello"
 # - rule:
 #     name: step4
 #     conda: "{$MUT_PREFIX}main"

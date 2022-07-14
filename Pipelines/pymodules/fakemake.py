@@ -467,34 +467,73 @@ def execute_command(config,job_numb,cmd,env):
     if failed: print(' failed')
     else:      print(' okay')
 
-def execute_jobs(rule,jobfile):
-    with open(jobfile) as f:
-        shell_list = json.load(f)
+def submit_job_qsub(rule,shell_list):
+    #rule['python_executable'] = sys.executable
+    rule['python_path'] = sys.path
+    fname = write_jobfile(rule,shell_list)
+    qsub_script = os.path.join(rule['log_dir'],fname+'.qsub')
+    fakemake_exe = sys.argv[0]
 
+    tasks = len(shell_list)
+
+    cmd   = "qsub -cwd -V"
+    cmd += f" -o {rule['log_dir']}/{fname}.\$TASK_ID.out"
+    cmd += f" -e {rule['log_dir']}/{fname}.\$TASK_ID.err"
+
+    cmd += f" -N {fname} -t 1-{tasks}"
+    #cmd += f" -l h_rt={args.time} -l mem={args.mem} -l tmpfs={args.tmpfs} -pe smp {args.cores}"
+    cmd += f" {qsub_script}"
+
+    with open(qsub_script,'w') as f:
+        f.write("#!/bin/bash -l\n")
+        f.write(f"{sys.executable} {fakemake_exe} --qsub {fname}.jobs\n")
+
+    print(cmd)
+
+def qsub(jobfile):
+    'execute one task of an array job spawned by qsub'
+
+def execute_jobs(rule,shell_list):
     if rule['exec'] == 'local':
-        #serial local execution
+        #local serial execution
         for job_numb,item in enumerate(shell_list):
             cmd = generate_full_command(rule,item)
             env = generate_job_environment(rule,job_numb,len(shell_list))
             execute_command(rule,job_numb,cmd,env)
+
     elif rule['exec'] == 'qsub':
-        pass
         #qsub execution using an array job
+        submit_job_qsub(rule,shell_list)
+
     else:
         raise Exception(f"unsupported execution method {rule['exec']}")
 
 def timestamp_now():
     return datetime.datetime.fromtimestamp(time.time()).strftime("%Y%m%d.%H%M%S.%f")
 
-def write_joblist(rule,shell_list):
-    fname = f'{timestamp_now()}.{rule["name"]}.jobs'
-    jobfile = os.path.join(rule['log_dir'],fname)
+def read_jobfile(fname):
+    'load the rule config and shell_list from json'
+
+    if not fname.endswith('.jobs'):
+        fname += '.jobs'
+
+    with open(fname) as f:
+         payload = json.load(f)
+
+    return payload['rule'], payload['shell_list']
+
+def write_jobfile(rule,shell_list):
+    'save rule config and shell_list as json'
+
+    fnamebase = f'{timestamp_now()}.{rule["name"]}'
+    jobfile = os.path.join(rule['log_dir'],fnamebase+'.jobs')
+    payload = {'rule':rule,'shell_list':shell_list}
 
     with open(jobfile,'w') as f:
-        json.dump(shell_list,f,sort_keys=False,indent=2)
+        json.dump(payload,f,sort_keys=False,indent=2)
         f.write('\n')
 
-    return jobfile
+    return fnamebase
 
 def process_rule(config,rule):
     #validate rule and substitute placeholders
@@ -514,8 +553,5 @@ def process_rule(config,rule):
 
     if len(shell_list) == 0: return
 
-    #write list of shell commands to jobfile
-    jobfile = write_joblist(rule,shell_list)
-
     #execute jobs locally or remotely from the jobfile
-    execute_jobs(rule,jobfile)
+    execute_jobs(rule,shell_list)
