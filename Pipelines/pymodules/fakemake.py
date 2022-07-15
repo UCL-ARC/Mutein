@@ -9,6 +9,7 @@ import time
 import shutil
 import subprocess
 import sys
+import random
 
 #regex patterns to match non nested {placeholders} and {$environment variables}
 ph_regx = r'\{[^\$=].*?\}'
@@ -32,6 +33,7 @@ reserved_chrs = ['$','=']       #,'*']
 default_global_config =\
 {
     'log_dir':'fakemake_logs',
+    'log_prefix':'fm', #qsub doesn't allow timestamp at start of job names
     'exec':'local',
     'conda_setup_command':  "",
     'conda':'fm_default_env',
@@ -442,12 +444,25 @@ def generate_job_environment(config,job_numb,njobs):
 
     env = copy.deepcopy(os.environ)
     env[ config['job_size'] ] = f'{njobs}'
-    env[ config['job_item'] ] = f'{job_numb+1}'
+    env[ config['job_item'] ] = f'{job_numb+1}' # convert from 0 to 1 based to match SGE_TASK_ID
 
     return env
 
+def write_jobfile(rule,shell_list):
+    'save rule config and shell_list as json'
+
+    fnamebase = f'{rule["log_prefix"]}{timestamp_now()}.{rule["name"]}'
+    jobfile = os.path.join(rule['log_dir'],fnamebase+'.jobs')
+    payload = {'rule':rule,'shell_list':shell_list}
+
+    with open(jobfile,'w') as f:
+        json.dump(payload,f,sort_keys=False,indent=2)
+        f.write('\n')
+
+    return fnamebase
+
 def execute_command(config,job_numb,cmd,env):
-    fname = f'{timestamp_now()}.{config["name"]}'
+    fname = f'{config["log_prefix"]}{timestamp_now()}.{config["name"]}'
     foutname = os.path.join(config['log_dir'],fname+'.out')
     ferrname = os.path.join(config['log_dir'],fname+'.err')
     fout = open(foutname,'w')
@@ -469,29 +484,68 @@ def execute_command(config,job_numb,cmd,env):
 
 def submit_job_qsub(rule,shell_list):
     #rule['python_executable'] = sys.executable
-    rule['python_path'] = sys.path
+    #rule['python_path'] = sys.path
     fname = write_jobfile(rule,shell_list)
     qsub_script = os.path.join(rule['log_dir'],fname+'.qsub')
-    fakemake_exe = sys.argv[0]
-
-    tasks = len(shell_list)
-
-    cmd   = "qsub -cwd -V"
-    cmd += f" -o {rule['log_dir']}/{fname}.\$TASK_ID.out"
-    cmd += f" -e {rule['log_dir']}/{fname}.\$TASK_ID.err"
-
-    cmd += f" -N {fname} -t 1-{tasks}"
-    #cmd += f" -l h_rt={args.time} -l mem={args.mem} -l tmpfs={args.tmpfs} -pe smp {args.cores}"
-    cmd += f" {qsub_script}"
+    jobfile = os.path.join(rule['log_dir'],fname+'.jobs')
+    ntasks = len(shell_list)
 
     with open(qsub_script,'w') as f:
         f.write("#!/bin/bash -l\n")
-        f.write(f"{sys.executable} {fakemake_exe} --qsub {fname}.jobs\n")
+        f.write(f"#$ -N {fname}\n")
+        f.write(f"#$ -cwd\n")
+        f.write(f"#$ -V\n")
+        f.write(f"#$ -t 1-{ntasks}\n")
+        f.write(f"#$ -o {rule['log_dir']}/{fname}.$TASK_ID.out\n")
+        f.write(f"#$ -e {rule['log_dir']}/{fname}.$TASK_ID.err\n")
+        #f.write(f"#$ -l h_rt={args.time}\n")
+        #f.write(f"#$ -l mem={args.mem}\n")
+        #f.write(f"#$ -l tmpfs={args.tmpfs}\n")
+        #f.write(f"#$ -pe smp {args.cores}\n")
+        f.write(f"{sys.executable} {sys.argv[0]} --qsub {jobfile}\n")
 
+    cmd = f"qsub -sync y {qsub_script}"
     print(cmd)
 
-def qsub(jobfile):
+    env = copy.deepcopy(os.environ)
+
+    foutname = os.path.join(rule['log_dir'],fname+'.out')
+    ferrname = os.path.join(rule['log_dir'],fname+'.err')
+    fout = open(foutname,'w')
+    ferr = open(ferrname,'w')
+
+    failed = False
+    print(f'executing qsub array job with {ntasks} tasks:',end='')
+    sys.stdout.flush()
+    try:
+        subprocess.run(cmd,env=env,shell=True,check=True,stdout=fout,stderr=ferr)
+    except subprocess.CalledProcessError:
+        failed = True
+
+    fout.close()
+    ferr.close()
+
+    if failed: print(' failed')
+    else:      print(' okay')
+
+def qsub_execute_task(jobfile):
     'execute one task of an array job spawned by qsub'
+    rule,shell_list = read_jobfile(jobfile)
+
+    job_numb = int(os.environ["SGE_TASK_ID"]) - 1 #convert from 1 to 0 based
+    item = shell_list[job_numb]
+
+    cmd = generate_full_command(rule,item)
+    env = generate_job_environment(rule,job_numb,len(shell_list))
+
+    failed = False
+    try:
+        subprocess.run(cmd,env=env,shell=True,check=True)
+    except subprocess.CalledProcessError:
+        failed = True
+
+    if failed: sys.exit(1)
+    else:      sys.exit(0)
 
 def execute_jobs(rule,shell_list):
     if rule['exec'] == 'local':
@@ -521,19 +575,6 @@ def read_jobfile(fname):
          payload = json.load(f)
 
     return payload['rule'], payload['shell_list']
-
-def write_jobfile(rule,shell_list):
-    'save rule config and shell_list as json'
-
-    fnamebase = f'{timestamp_now()}.{rule["name"]}'
-    jobfile = os.path.join(rule['log_dir'],fnamebase+'.jobs')
-    payload = {'rule':rule,'shell_list':shell_list}
-
-    with open(jobfile,'w') as f:
-        json.dump(payload,f,sort_keys=False,indent=2)
-        f.write('\n')
-
-    return fnamebase
 
 def process_rule(config,rule):
     #validate rule and substitute placeholders

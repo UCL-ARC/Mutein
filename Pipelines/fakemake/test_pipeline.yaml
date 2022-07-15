@@ -1,5 +1,6 @@
 - config:
     expected_working_dir: "/lustre/scratch/scratch/{$USER}/549_mutein"
+    log_prefix:           "mut."
     test_dir:             "test"
     mut_prefix:           "{$MUT_PREFIX}"
     user:                 "{mut_prefix}{$USER}_{test_dir}"
