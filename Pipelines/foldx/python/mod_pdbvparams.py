@@ -103,8 +103,8 @@ def run_pipeline(args):
     row = 0
     for i in range(len(mut_list)):
         mut, pdb_mut, chain = mut_list[i]
-        mutscan = mut[0] + chain + mut[1:]  # format for posscan
-        pdb_mutscan = pdb_mut[0] + chain + pdb_mut[1:]  # format for posscan
+        mutscan = mut[0] + str(chain) + mut[1:]  # format for posscan
+        pdb_mutscan = pdb_mut[0] + str(chain) + pdb_mut[1:]  # format for posscan
         if row_size == 0:
             param_dic["pdb"].append(pdbcode)
             # param_dic["chain"].append(chainid)

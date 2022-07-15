@@ -171,11 +171,11 @@ class PdbFile:
             fdf = FileDf.FileDf(variant_file, sep=" ")
             csv = fdf.openDataFrame()                        
             pdb_muts = csv["pdb_mut"]
-            all_muts = []
+            #all_muts = []
             for pmut in pdb_muts:
                 muts = pmut.split(",")
                 for mut in muts:
-                    all_muts.append(mut)
+                    self.variants.append(mut)
 
     def existsVariants(self):
         return len(self.variants) > 0

@@ -25,17 +25,18 @@ def addpath(inputs):
 #gene=""
 #pdb="1pb5"
 
-dataset="small"#"mouse"
-gene="b2m"#'"psme4"
-pdb=""#af-q8ccn5-f1-model_v2"#smexp_6swa_3_213"
+dataset="mouse"
+gene="nup214"
+pdb=""#smhom_4ll7_3_b_805_882"
 
-repairs="x"
-repair_from = "0"
+repairs="4"
+repair_from = "x"
 split=100
 vsplit=10
-task=1
-runs = "b"
+task=3
+runs = "e"
 missing="N"
+variant="*"
 """ 
     if "a" in runs:        print("Mutein: Preparing genes")        
     if "b" in runs:        print("Mutein: Preparing pdbs")        
@@ -59,5 +60,5 @@ def runPPL(inputs):
     args = ["", inputs]
     ppl.run_pipeline(args)
 
-runPPL("runs="+runs+"@dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@repairs="+str(repairs)+"@repair_from="+str(repair_from)+"@task=" +str(task)+"@chunk="+str(split)+"@variant=*@vchunk="+str(vsplit)+"@missing="+missing)
+runPPL("runs="+runs+"@dataset="+dataset+"@gene="+gene+"@pdb="+pdb+"@repairs="+str(repairs)+"@repair_from="+str(repair_from)+"@task=" +str(task)+"@chunk="+str(split)+"@variant=*@vchunk="+str(vsplit)+"@missing="+missing+"@variant="+variant)
 

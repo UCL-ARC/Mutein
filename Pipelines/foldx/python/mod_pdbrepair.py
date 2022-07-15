@@ -59,35 +59,34 @@ def run_pipeline(args):
     # Set up files (retain copy of original)
     numRepairs = int(argus.arg("repairs"))
     repair_alreadynames = []
-    found = True
-    mostRecentRep = 1
+    found = False
+    mostRecentRep = numRepairs
     base_pdbfile = pdb_path.pdb_inputs + "/" + pdbfile
     # find all the existing repair files
     
-    while found:        
-        name = repair_path + pdbcode + "_" + str(mostRecentRep) + ".pdb"
-        name_in = pdb_path.pdb_inputs + pdbcode + "_" + str(mostRecentRep) + ".pdb"
+    while not found:        
+        name = repair_path + pdbcode + "_rep" + str(mostRecentRep) + ".pdb"
+        name_in = pdb_path.pdb_inputs + pdbcode + "_rep" + str(mostRecentRep) + ".pdb"
         #name = pdb_path.pdb_inputs + "/" + pdbcode + "_rep" + str(mostRecentRep) + ".pdb"
         if exists(name):
             found = True
-            base_pdbfile = name                
-            mostRecentRep += 1
-        
+            base_pdbfile = name                            
+            #mostRecentRep += 1        
         elif exists(name_in):
             found = True
             base_pdbfile = name                
-            mostRecentRep += 1
             copyfile(name_in,name)        
+            #mostRecentRep += 1            
+        elif mostRecentRep == 0:
+            found = True
         else:
             mostRecentRep -=1
             found = False
 
     # We are going to start rebuilding as effieciently as possibly from the most recent unless we specifically want to redo
     startRep = mostRecentRep
-    if repair_from.lower() != "x":
-        startRep = int(repair_from)        
-        if startRep > mostRecentRep:            
-            startRep = mostRecentRep            
+    if str(repair_from).lower() != "x":        
+        startRep = int(repair_from)                    
         base_pdbfile = repair_path + pdbcode + "_" + str(startRep) + ".pdb"
 
     #repairinnames = []
@@ -119,11 +118,11 @@ def run_pipeline(args):
     num_repairs_applied = 0
     lastgoodrepair = numRepairs
     for r in range(startRep, numRepairs):
-        pdb = pdbcode + "_" + str(r) + ".pdb"
+        pdb = pdbcode + "_rep" + str(r) + ".pdb"
         output_file = "repair_" + str(r) + ".txt"
         fx_runner.runRepair(pdb, output_file)
-        return_pdb = pdbcode + "_" + str(r) + "_Repair.pdb"
-        rename_pdb = pdbcode + "_" + str(r+1) + ".pdb"
+        return_pdb = pdbcode + "_rep" + str(r) + "_Repair.pdb"
+        rename_pdb = pdbcode + "_rep" + str(r+1) + ".pdb"
 
         print(
             "### foldx03:  ... copying file",
@@ -132,7 +131,7 @@ def run_pipeline(args):
         )
         copyfile(repair_path+return_pdb, repair_path+rename_pdb)
         # After every repair check that all the variants exists, if not the last version was our best and we should stop
-        filename = pdb_path.pdb_thruputs + "params_variants.txt"
+        filename = pdb_path.pdb_inputs + "params_variants.txt"
         all_variants_exists = True
         pdbobj = Pdb.PdbFile(pdbcode, repair_path + rename_pdb)
         pdbobj.addVariants(filename)
@@ -151,7 +150,7 @@ def run_pipeline(args):
     copy_over = True
     if num_repairs_applied == 0:
         # still copy the good file through if it is good
-        filename = pdb_path.pdb_thruputs + "params_variants.txt"
+        filename = pdb_path.pdb_inputs + "params_variants.txt"
         last_good_pdb = pdbcode + "_" + str(lastgoodrepair) + ".pdb"
         all_variants_exists = True
         pdbobj = Pdb.PdbFile(pdbcode, last_good_pdb)
@@ -162,7 +161,7 @@ def run_pipeline(args):
                 copy_over = False    
     if copy_over:
         # copy the final repaired file to our main interim directory
-        last_good_pdb = pdbcode + "_" + str(lastgoodrepair) + ".pdb"
+        last_good_pdb = pdbcode + "_rep" + str(lastgoodrepair) + ".pdb"
         save_pdb = pdbcode + "_rep" + str(lastgoodrepair) + ".pdb"
         save_latest_pdb = pdbcode + "_repx.pdb"
         
