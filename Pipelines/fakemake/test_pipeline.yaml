@@ -11,7 +11,7 @@
     #conda_setup_command:  ""
 - rule:
     name:     "step1"
-    exec:     "qsub"
+    exec:     "local"
     conda:    "{mut_prefix}main"
     data_dir: "{test_dir}/input"
     input:    "{data_dir}/{=sample}.input"
@@ -19,7 +19,7 @@
     shell: |
       cat {input} > {output}
       echo processed by {name} >> {output}
-      echo "hello"
+      echo "{input}" | grep -v -e '1\.input' #should cause task1 to fail
 - rule:
     name: "step2"
     conda: "{$MUT_PREFIX}main"
@@ -27,7 +27,7 @@
       step1: "{test_dir}/output/{=sample}.step1"
     output:
       final: "{test_dir}/output/{=sample}.step2"
-    exec: "qsub"
+    exec: "local"
     shell: |
       cat {step1} > {final}
       echo processed by {name} >> {final}

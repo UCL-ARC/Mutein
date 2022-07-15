@@ -14,7 +14,7 @@ def run_main():
 
     elif args.qsub != None:
         #carry out a job on a compute node spawned from qsub (gridengine)
-        fm.qsub_execute_task(args.qsub)
+        fm.qsub_execute_job(args.qsub)
 
     else:
         parser.print_help()

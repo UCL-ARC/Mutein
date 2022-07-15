@@ -32,21 +32,22 @@ reserved_chrs = ['$','=']       #,'*']
 
 default_global_config =\
 {
-    'log_dir':'fakemake_logs',
-    'log_prefix':'fm', #qsub doesn't allow timestamp at start of job names
-    'exec':'local',
-    'conda_setup_command':  "",
-    'conda':'fm_default_env',
-    'stale_output_file':'ignore',    #ignore,delete,recycle also applies to symlinks
+    'log_dir':'fakemake_logs',       #name of subfolder for logging
+    'log_prefix':'fm',               #log file/job name  prefix: qsub doesn't like numerical names
+    'remote_delay_secs':'10',        #wait this long after remote jobs incase of latency
+    'exec':'local',                  #default execution environment
+    'conda_setup_command':  '',      #bash command to setup conda
+    'conda':'fm_default_env',        #conda environment to activate if none specified by the rule
+    'stale_output_file':'ignore',    #ignore,delete,recycle (also applies to symlinks)
     'stale_output_dir':'ignore',     #ignore,delete,recycle
-    #'failed_output_file': delete,recycle,oldify,ignore    
-    #'failed_output_dir': delete,recycle,oldify,ignore    
+    'failed_output_file':'stale',  #delete,recycle,stale,ignore (also applies to symlinks)
+    'failed_output_dir':'stale',   #delete,recycle,stale,ignore    
     'missing_parent_dir':'create',   #ignore,create
-    'recycle_bin':'recycle_bin',
-    'job_size':'FM_JOB_SIZE', #how many jobs in current rule
-    'job_item':'FM_JOB_ITEM', #1 based job number within the current rule
-    #'normalize_paths':'true',                #true,false
+    'recycle_bin':'recycle_bin',     #name of recycle bin folder
+    'job_count':'FM_NJOBS',          #env variable: how many jobs spawned by current rule
+    'job_number':'FM_JOB_NUMBER',    #env variable: 1 based job numbering within the current rule
     'bash_prefix':'source ~/.bashrc\nset -euo pipefail\nset +o history'
+    #'normalize_paths':'true',                #true,false
 }
 
 def sub_vars(config,extra=None):
@@ -291,7 +292,7 @@ def check_input_mtimes(input):
     all_inputs_present = True
     newest_mtime = 0
     for item,path in input.items():
-        if not os.path.exists(path):
+        if not os.path.exists(path) or is_stale(path):
             all_inputs_present = False
             continue
 
@@ -320,7 +321,7 @@ def check_output_mtimes(output):
 def generate_shell_commands(rule,job_list,shell):
     name = rule['name']
     for job_numb,job in enumerate(job_list):
-        #check all inputs present, returned newest mtime
+        #check all inputs present, return newest mtime
         newest_input = check_input_mtimes(job['input'])
 
         #one or more inputs missing, job not runnable
@@ -363,6 +364,23 @@ def generate_shell_commands(rule,job_list,shell):
         shell_list.append(shell_final["shell"])
 
     return shell_list
+
+def is_stale(path):
+    'return true if mtime is set to the special stale flag'
+
+    if os.path.getmtime(path) < datetime.datetime.fromisoformat('1981-01-01').timestamp():
+        return True
+    else:
+        return False
+
+def make_stale(path):
+    '''
+    set mtime of the item to special value to mark it as stale
+    without deleting it (incase the contents need to be inspected first)
+    '''
+
+    dt_old = datetime.datetime.fromisoformat('1980-01-01').timestamp()
+    os.utime(path, (dt_old, dt_old))
 
 def recycle_item(config,path):
     'move the path into the recycle bin'
@@ -426,6 +444,49 @@ def handle_stale_outputs(config,outputs):
         else:
             raise Exception(f'unsupported output type {path}')
 
+def handle_failed_outputs(config,outputs):
+    '''
+    the job has failed therefore any outputs present are untrustworthy
+    and should be removed, recycled, flagged as old etc
+    '''
+
+    for item in outputs:
+        path = outputs[item]
+        print("handle_failed_outputs",path)
+        if not os.path.exists(path): continue
+
+        if os.path.islink(path) or os.path.isfile(path):
+            print('file or symlink')
+            if config['failed_output_file'] == 'delete':
+                print('delete')
+                os.remove(path)
+            elif config['failed_output_file'] == 'recycle':
+                print('recycle')
+                recycle_item(config,path)
+            elif config['failed_output_file'] == 'stale':
+                print('stale')
+                make_stale(path)
+            elif config['failed_output_file'] == 'ignore':
+                print('ignore')
+                continue
+            else:
+                raise Exception(f'unknown option for failed_output_file: {config["failed_output_file"]}')
+
+        elif os.path.isdir(path):
+            if config['failed_output_dir'] == 'delete':
+                shutil.rmtree(path)
+            elif config['failed_output_dir'] == 'recycle':
+                recycle_item(config,path)
+            elif config['failed_output_dir'] == 'stale':
+                make_stale(path)
+            elif config['failed_output_dir'] == 'ignore':
+                continue
+            else:
+                raise Exception(f'unknown option for failed_output_dir: {config["failed_output_dir"]}')
+                
+        else:
+            raise Exception(f'unsupported output type {path}')
+
 def generate_full_command(config,shell):
     'generate the bash commands to run before the job commands'
 
@@ -443,8 +504,8 @@ def generate_job_environment(config,job_numb,njobs):
     'copy local environment with a few adjustments'
 
     env = copy.deepcopy(os.environ)
-    env[ config['job_size'] ] = f'{njobs}'
-    env[ config['job_item'] ] = f'{job_numb+1}' # convert from 0 to 1 based to match SGE_TASK_ID
+    env[ config['job_count'] ] = f'{njobs}'
+    env[ config['job_number'] ] = f'{job_numb+1}' # convert from 0 to 1 based to match SGE_TASK_ID
 
     return env
 
@@ -462,6 +523,7 @@ def write_jobfile(rule,shell_list):
     return fnamebase
 
 def execute_command(config,job_numb,cmd,env):
+    'execute command locally'
     fname = f'{config["log_prefix"]}{timestamp_now()}.{config["name"]}'
     foutname = os.path.join(config['log_dir'],fname+'.out')
     ferrname = os.path.join(config['log_dir'],fname+'.err')
@@ -482,40 +544,50 @@ def execute_command(config,job_numb,cmd,env):
     if failed: print(' failed')
     else:      print(' okay')
 
-def submit_job_qsub(rule,shell_list):
-    #rule['python_executable'] = sys.executable
-    #rule['python_path'] = sys.path
-    fname = write_jobfile(rule,shell_list)
-    qsub_script = os.path.join(rule['log_dir'],fname+'.qsub')
-    jobfile = os.path.join(rule['log_dir'],fname+'.jobs')
-    ntasks = len(shell_list)
+    return failed
 
+def write_qsub_file(rule,qsub_script,jobname,njobs,jobfile):
     with open(qsub_script,'w') as f:
         f.write("#!/bin/bash -l\n")
-        f.write(f"#$ -N {fname}\n")
+        f.write(f"#$ -N {jobname}\n")
         f.write(f"#$ -cwd\n")
         f.write(f"#$ -V\n")
-        f.write(f"#$ -t 1-{ntasks}\n")
-        f.write(f"#$ -o {rule['log_dir']}/{fname}.$TASK_ID.out\n")
-        f.write(f"#$ -e {rule['log_dir']}/{fname}.$TASK_ID.err\n")
+        f.write(f"#$ -t 1-{njobs}\n")
+        f.write(f"#$ -o {rule['log_dir']}/{jobname}.$TASK_ID.out\n")
+        f.write(f"#$ -e {rule['log_dir']}/{jobname}.$TASK_ID.err\n")
         #f.write(f"#$ -l h_rt={args.time}\n")
         #f.write(f"#$ -l mem={args.mem}\n")
         #f.write(f"#$ -l tmpfs={args.tmpfs}\n")
         #f.write(f"#$ -pe smp {args.cores}\n")
+
+        #run payload through fakemake
         f.write(f"{sys.executable} {sys.argv[0]} --qsub {jobfile}\n")
 
+def submit_job_qsub(rule,shell_list,job_list):
+    '''
+    issue the qsub command to spawn an array of jobs
+    wait for completion before checking the status of each job
+    '''
+    #rule['python_executable'] = sys.executable
+    #rule['python_path'] = sys.path
+    jobname = write_jobfile(rule,shell_list)
+    qsub_script = os.path.join(rule['log_dir'],jobname+'.qsub')
+    jobfile = os.path.join(rule['log_dir'],jobname+'.jobs')
+    njobs = len(shell_list)
+
+    write_qsub_file(rule,qsub_script,jobname,njobs,jobfile)
+
     cmd = f"qsub -sync y {qsub_script}"
-    print(cmd)
 
     env = copy.deepcopy(os.environ)
 
-    foutname = os.path.join(rule['log_dir'],fname+'.out')
-    ferrname = os.path.join(rule['log_dir'],fname+'.err')
+    foutname = os.path.join(rule['log_dir'],jobname+'.out')
+    ferrname = os.path.join(rule['log_dir'],jobname+'.err')
     fout = open(foutname,'w')
     ferr = open(ferrname,'w')
 
     failed = False
-    print(f'executing qsub array job with {ntasks} tasks:',end='')
+    print(f'executing qsub job array with {njobs} jobs:',end='')
     sys.stdout.flush()
     try:
         subprocess.run(cmd,env=env,shell=True,check=True,stdout=fout,stderr=ferr)
@@ -525,18 +597,50 @@ def submit_job_qsub(rule,shell_list):
     fout.close()
     ferr.close()
 
+    #delay to allow for shared filesystem latency on status files
+    time.sleep(int(rule['remote_delay_secs']))
+
     if failed: print(' failed')
     else:      print(' okay')
 
-def qsub_execute_task(jobfile):
-    'execute one task of an array job spawned by qsub'
+    #check each individual job's status file
+    for job_numb,item in enumerate(shell_list):
+        status_file = f'{rule["log_dir"]}/{jobname}.{job_numb+1}.status'
+
+        job_failed = False
+        if not os.path.exists(status_file):
+            print(f"job {job_numb+1} probably failed to start")
+            job_failed = True
+        else:
+            with open(status_file) as f: status = f.read().strip()
+            print(f"job {job_numb+1} status: {status}")
+            if status != "okay": job_failed= True
+
+        if not job_failed: continue
+
+        #deal with output of failed job
+        handle_failed_outputs(rule,job_list[job_numb]["output"])
+
+def qsub_execute_job(jobfile):
+    '''
+    runs on a compute node under grid engine control
+    execute one job of a job array spawned by qsub
+    invoked automatically by fakemake using the --qsub option
+    '''
     rule,shell_list = read_jobfile(jobfile)
 
+    assert jobfile.endswith('.jobs')
+
+    status_file = f'{jobfile[:-5]}.{os.environ["SGE_TASK_ID"]}.status'
     job_numb = int(os.environ["SGE_TASK_ID"]) - 1 #convert from 1 to 0 based
     item = shell_list[job_numb]
 
     cmd = generate_full_command(rule,item)
     env = generate_job_environment(rule,job_numb,len(shell_list))
+
+    #created/truncate to record that the job is starting
+    f = open(status_file,'w')
+    f.close()
 
     failed = False
     try:
@@ -544,20 +648,30 @@ def qsub_execute_task(jobfile):
     except subprocess.CalledProcessError:
         failed = True
 
-    if failed: sys.exit(1)
-    else:      sys.exit(0)
+    #record outcome of the job
+    f = open(status_file,'w')
+    if failed:
+        f.write('failed\n')
+        f.close()
+        sys.exit(1)
+    else:
+        f.write('okay\n')
+        f.close()
+        sys.exit(0)
 
-def execute_jobs(rule,shell_list):
+def execute_jobs(rule,shell_list,job_list):
     if rule['exec'] == 'local':
         #local serial execution
         for job_numb,item in enumerate(shell_list):
             cmd = generate_full_command(rule,item)
             env = generate_job_environment(rule,job_numb,len(shell_list))
-            execute_command(rule,job_numb,cmd,env)
+            failed = execute_command(rule,job_numb,cmd,env)
+
+            if failed: handle_failed_outputs(rule,job_list[job_numb]["output"])
 
     elif rule['exec'] == 'qsub':
         #qsub execution using an array job
-        submit_job_qsub(rule,shell_list)
+        submit_job_qsub(rule,shell_list,job_list)
 
     else:
         raise Exception(f"unsupported execution method {rule['exec']}")
@@ -595,4 +709,4 @@ def process_rule(config,rule):
     if len(shell_list) == 0: return
 
     #execute jobs locally or remotely from the jobfile
-    execute_jobs(rule,shell_list)
+    execute_jobs(rule,shell_list,job_list)
