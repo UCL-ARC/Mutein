@@ -27,14 +27,14 @@ def addpath(inputs):
 
 dataset="mouse"
 gene="nup214"
-pdb=""#smhom_4ll7_3_b_805_882"
+pdb="smhom_7vop_1_0_684_897"
 
-repairs="4"
+repairs="1"
 repair_from = "x"
 split=100
 vsplit=10
 task=3
-runs = "e"
+runs = "c"
 missing="N"
 variant="*"
 """ 

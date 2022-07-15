@@ -104,11 +104,11 @@ def run_pipeline(args):
         print(
             "### foldx03: ... copying file",
             base_pdbfile,
-            pdb_path.pdb_inputs + "/" + pdbcode + "_0.pdb"            
+            pdb_path.pdb_inputs + "/" + pdbcode + "_rep0.pdb"            
         )
         copyfile(
             base_pdbfile,
-            repair_path + pdbcode + "_0.pdb"
+            repair_path + pdbcode + "_rep0.pdb"
         )
 
     # Create Foldx class
