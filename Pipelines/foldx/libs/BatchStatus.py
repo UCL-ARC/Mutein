@@ -78,10 +78,17 @@ class BatchStatus:
                         line_string += "----\t\t"                        
                     ####################
                     filenameA = patho.outputs + "ddg_background.csv"
-                    existsfile, time = self.checkFile(filenameA)
+                    filenameA_ds = ds_path.outputs + f"{geneo}_ddg_background.csv"
+                    
+                    existsfile, time = self.checkFile(filenameA_ds)
                     if existsfile:
-                        line_string += time + "\t\t"
+                        line_string += "DS:"+time + "\t\t"
                     else:
+                        existsfile, time = self.checkFile(filenameA)
+                        if existsfile:
+                            line_string += "Ge:"+time + "\t\t"
+                    
+                    if not existsfile:
                         num_done,num_tsks = self.getGeneNumTasks(geneo,False)
                         if num_tsks == 0:                        
                             line_string += "----\t\t"
@@ -90,11 +97,17 @@ class BatchStatus:
                         else:
                             line_string += f"{num_done}/{num_tsks}\t\t"      
                     #######################
-                    filenameB = patho.outputs + "ddg_variant_bm.csv"                    
-                    existsfile, time = self.checkFile(filenameB)
+                    filenameB = patho.outputs + "ddg_variants.csv"
+                    filenameB_ds = ds_path.outputs + f"{geneo}_ddg_variants.csv"    
+                    existsfile, time = self.checkFile(filenameB_ds)
                     if existsfile:
-                        line_string += time + "\t\t"
+                        line_string += "DS:"+time + "\t\t"
                     else:
+                        existsfile, time = self.checkFile(filenameB)
+                        if existsfile:
+                            line_string += "Ge:"+time + "\t\t"
+                    
+                    if not existsfile:                    
                         num_done,num_tsks = self.getGeneNumTasks(geneo,True)
                         if num_tsks == 0:                        
                             line_string += "----\t\t"
