@@ -82,13 +82,10 @@ def run_pipeline(args):
             if len(lstvardf.index) > 0: 
                 if exists(file_var_bm):
                     fdf = FileDf.FileDf(file_var_bm)                    
-                    all_var_build.append(fdf.openDataFrame())                
-                    exists_all_var = False
+                    all_var_build.append(fdf.openDataFrame())                                    
                 else:
-                    exists_all_var = True
-                    print("No variants to aggregate",gene,pdb)                    
-            else:
-                exists_all_var = True
+                    exists_all_var = False                    
+            else:                
                 print("No variants to aggregate",gene,pdb)                    
         else:
             exists_all_var = False
