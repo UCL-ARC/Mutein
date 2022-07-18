@@ -56,7 +56,13 @@ class BatchStatus:
         if exists(filename):
             with open(filename, "r") as fr:
                 lines = fr.readlines()
+                genes = []
                 for line in lines[1:]:
+                    geneo = line.strip().split(",")[1]
+                    genes.append(geneo)
+                genes.sort()
+
+                for geneo in genes:
                     geneo = line.strip().split(",")[1]
                     ####################
                     line_string = geneo+"  \t\t"

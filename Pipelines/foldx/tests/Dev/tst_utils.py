@@ -29,7 +29,7 @@ GENES
 def test_clean():    
     #python ${script} $mode $pattern $WorkDir $DataDir $InstallDir $PipelineDir
     args = ["",
-            'DSINCOMPLETEPDB', 
+            'GENES', 
             'one:x:x', 
             '/home/ucbtlcr/Scratch/workspace/', 
             '/home/rachel/UCL/github/MuteinData/', 
