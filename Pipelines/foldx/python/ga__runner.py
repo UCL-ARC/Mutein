@@ -57,8 +57,7 @@ def run_pipeline(args):
         runner.runTasks(args)        
     if "g" in runs:
         print("Mutein: Running variant tasks")
-        runner.runVtasks(args)
-        cleaner.cleanPdbThruVar(args)
+        runner.runVtasks(args)        
     if "h" in runs:
         print("Mutein: Aggregating background tasks")
         runner.aggTasks(args)

@@ -265,7 +265,7 @@ class BatchStatus:
                     no = n+1
                     filenamet = pdb_path.thruputs + f"agg/{no}_ddg_background.csv"
                     if isvariant:
-                        filenamet = pdb_path.thruputs + f"vagg/{no}_ddg_buildmodel.csv"
+                        filenamet = pdb_path.thruputs + f"vagg/{no}_ddg_variants.csv"
                     existst, timeo = self.checkFile(filenamet)      
                     if existst:
                         nums+=1  
@@ -371,7 +371,7 @@ class BatchStatus:
             with open(filenameE, "r") as fr:
                 lines = fr.readlines()                                
                 for i in range(1, len(lines)):
-                    filenameo = pdb_path.thruputs + "vagg/" + str(i) + "_ddg_buildmodel.csv"
+                    filenameo = pdb_path.thruputs + "vagg/" + str(i) + "_ddg_variants.csv"
                     existsfile, time = self.checkFile(filenameo)
                     if existsfile:
                         count += 1
@@ -438,7 +438,7 @@ class BatchStatus:
                         gene_var_writer.write((lines[0]).strip() + "\n")                    
                     for i in range(1, len(lines)):
                         filenameo = (
-                            path.thruputs + "vagg/" + str(i) + "_ddg_buildmodel.csv"
+                            path.thruputs + "vagg/" + str(i) + "_ddg_variants.csv"
                         )
                         existsfile, time = self.checkFile(filenameo)
                         if existsfile:
@@ -498,7 +498,7 @@ class BatchStatus:
                 for i in range(1, len(lines)):
                     filenameoo = pdb_path.thruputs + "agg/" + str(i) + "_ddg_background.csv"
                     if isvariant:
-                        filenameoo = pdb_path.thruputs + "vagg/" + str(i) + "_ddg_buildmodel.csv"
+                        filenameoo = pdb_path.thruputs + "vagg/" + str(i) + "_ddg_variants.csv"
                     existst, timet = self.checkFile(filenameoo)
                     if existst:
                         count += 1

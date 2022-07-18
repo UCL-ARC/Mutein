@@ -167,7 +167,7 @@ def run_pipeline(args):
                 # create them all into 1 ddg file
                 # df_file = row_path + "ddg_variants.csv"
                 df_file = (
-                    pdb_path.pdb_thruputs + "vagg/" + str(row) + "_ddg_buildmodel.csv"
+                    pdb_path.pdb_thruputs + "vagg/" + str(row) + "_ddg_variants.csv"
                 )
                 fx_runner.createBuildCsv(
                     row_path, pdb, pdb_muts, gene_muts, cov_df, ddg_files, df_file,allAtOnce
