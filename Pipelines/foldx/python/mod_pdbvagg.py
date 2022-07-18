@@ -113,6 +113,7 @@ def run_pipeline(args):
                             all_df.append(fdf.openDataFrame())
                         else:
                             exists_all = False
+                            print("Missing",in_csv_i)
                 if len(all_df) > 0 and exists_all:
                     ddg_df = pd.concat(all_df, ignore_index=True)
                     ddg_df.to_csv(out_csv, index=False)
