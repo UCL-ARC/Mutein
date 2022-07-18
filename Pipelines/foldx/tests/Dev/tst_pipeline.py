@@ -26,15 +26,15 @@ def addpath(inputs):
 #pdb="1pb5"
 
 dataset="one"
-gene="brca2"
-pdb="1miu"
+gene=""
+pdb=""
 
 repairs="x"
 repair_from = "x"
 split=100
 vsplit=10
 task=1
-runs = "fg"
+runs = "k"
 missing="N"
 variant="*"
 """ 

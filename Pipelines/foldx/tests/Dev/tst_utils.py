@@ -22,7 +22,7 @@ def test_clean():
     #python ${script} $mode $pattern $WorkDir $DataDir $InstallDir $PipelineDir
     args = ["",
             'GENES', 
-            'one:fat1:x', 
+            'one:x:x', 
             '/home/ucbtlcr/Scratch/workspace/', 
             '/home/rachel/UCL/github/MuteinData/', 
             '/home/rachel/UCL/github/Mutein/', 
