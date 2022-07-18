@@ -292,6 +292,8 @@ def pipeline_qsubber(args):
                     dependencies[id] = dep
                     names_and_ids.append([qsubid, dep])
             elif py_or_sh == "py":
+                if isarray:
+                    inputs += "@task=1"
                 runner = sub.SubRunner(
                     argus.arg("pythonexe"),
                     install_dir,

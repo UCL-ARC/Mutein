@@ -17,11 +17,19 @@ sys.path.append(python_path)
 sys.path.append(lib_path)
 import Paths
 import remote
-        
+
+# Possible COMMANDS
+"""
+GENEINCOMPLETEPDB
+DSINCOMPLETEPDB
+GENES
+"""
+
+
 def test_clean():    
     #python ${script} $mode $pattern $WorkDir $DataDir $InstallDir $PipelineDir
     args = ["",
-            'GENES', 
+            'DSINCOMPLETEPDB', 
             'one:x:x', 
             '/home/ucbtlcr/Scratch/workspace/', 
             '/home/rachel/UCL/github/MuteinData/', 
