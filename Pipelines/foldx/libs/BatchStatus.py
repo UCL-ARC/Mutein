@@ -77,7 +77,7 @@ class BatchStatus:
                     else:                        
                         line_string += "----\t\t"                        
                     ####################
-                    filenameA = patho.outputs + "ddg_bm_background.csv"
+                    filenameA = patho.outputs + "ddg_background.csv"
                     existsfile, time = self.checkFile(filenameA)
                     if existsfile:
                         line_string += time + "\t\t"
@@ -122,8 +122,8 @@ class BatchStatus:
     
     def getGeneProgressReport(self,gene):
         gene_path = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset,gene=gene)                        
-        filenameA = gene_path.outputs + "ddg_bm_background.csv"
-        filenameB = gene_path.outputs + "ddg_variant_bm.csv"        
+        filenameA = gene_path.outputs + "ddg_background.csv"
+        filenameB = gene_path.outputs + "ddg_variant.csv"        
         existsfileA, timeA = self.checkFile(filenameA)
         existsfileB, timeB = self.checkFile(filenameB)
         print("SUMMARY BACKGROUND\t\tSUMMARY VARIANTS")
