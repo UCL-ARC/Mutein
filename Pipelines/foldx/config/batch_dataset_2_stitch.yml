@@ -1,6 +1,6 @@
 ---
-id: 'clean'
-qsub_id: 'clean'
+id: 'stitch'
+qsub_id: 'stitch'
 pipe_dir: 'Pipelines/foldx/python/'
 script: 'ga__runner'
 time: '5:00:0'
