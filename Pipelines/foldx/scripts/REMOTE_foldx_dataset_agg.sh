@@ -11,7 +11,7 @@ DataDir=$5			#/home/ucbtlcr/MuteinData/
 InstallDir=$6		#/home/ucbtlcr/Mutein/
 PipelineDir=$7		#/home/ucbtlcr/Mutein/Pipelines/geneanalysis/
 
-config=${PipelineDir}config/batch_ds_2_stitch.yml
+config=${PipelineDir}config/batch_dataset_2_stitch.yml
 script=${InstallDir}Pipelines/foldx/libs/pipeline_qsubber.py
 
 cd $DataDir
