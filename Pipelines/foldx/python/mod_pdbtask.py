@@ -147,7 +147,7 @@ def run_pipeline(args):
                             ddg_files.append([ddg_file, pm])
 
                     # create them all into 1 ddg file
-                    # df_file = row_path + "ddg_buildmodel.csv"
+                    # df_file = row_path + "ddg_variants.csv"
                     df_file = (
                         pdb_path.pdb_thruputs + "agg/" + str(row) + "_ddg_background.csv"
                     )

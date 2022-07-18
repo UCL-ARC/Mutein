@@ -153,7 +153,7 @@ class BatchStatus:
                         bg_split = patho.inputs + "params_background.txt"
                         bg_results = patho.outputs + "ddg_background.csv"
                         var_split = patho.inputs + "params_variants.txt"                     
-                        var_results = patho.outputs + "ddg_buildmodel.csv"                     
+                        var_results = patho.outputs + "ddg_variants.csv"                     
                                                                         
                         existsfileA, timeResA = self.checkFile(pdb_file)
                         existsfileB, timeResB = self.checkFile(bg_split)
@@ -292,7 +292,7 @@ class BatchStatus:
         pdb_path = Paths.Paths(self.data_dir, self.pipe_dir, dataset=self.dataset,gene=gene,pdb=pdb)                        
         filenameA = pdb_path.inputs + pdb + "_repx.pdb"
         filenameB = pdb_path.outputs + "ddg_background.csv"
-        filenameC = pdb_path.outputs + "ddg_buildmodel.csv"                        
+        filenameC = pdb_path.outputs + "ddg_variants.csv"                        
         filenameD = pdb_path.inputs + "params_background.txt"
         filenameE = pdb_path.inputs + "params_variants.txt"
         
@@ -377,7 +377,7 @@ class BatchStatus:
         print("Check results files for pdb",pdb)
         #print(path.outputs)
         filenameA = path.outputs + "ddg_background.csv"
-        filenameB = path.outputs + "ddg_buildmodel.csv"       
+        filenameB = path.outputs + "ddg_variants.csv"       
         self.checkFile(filenameA) 
         self.checkFile(filenameB) 
         

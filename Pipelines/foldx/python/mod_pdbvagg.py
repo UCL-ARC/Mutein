@@ -85,8 +85,8 @@ def run_pipeline(args):
         )
         analyses.append(
             [
-                "ddg_buildmodel.csv",
-                pdb_path.pdb_outputs + "ddg_buildmodel.csv",
+                "ddg_variants.csv",
+                pdb_path.pdb_outputs + "ddg_variants.csv",
                 pdb_path.pdb_outputs
                 + argus.arg("pdb")
                 + "_bm_"

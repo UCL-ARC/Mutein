@@ -165,7 +165,7 @@ def run_pipeline(args):
 
 
                 # create them all into 1 ddg file
-                # df_file = row_path + "ddg_buildmodel.csv"
+                # df_file = row_path + "ddg_variants.csv"
                 df_file = (
                     pdb_path.pdb_thruputs + "vagg/" + str(row) + "_ddg_buildmodel.csv"
                 )

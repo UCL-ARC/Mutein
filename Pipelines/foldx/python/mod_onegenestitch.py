@@ -73,7 +73,7 @@ def run_pipeline(args):
         
         
         file_lst_var = pdb_path.pdb_inputs + "params_variants.txt"
-        file_var_bm = pdb_path.pdb_outputs + "ddg_buildmodel.csv"        
+        file_var_bm = pdb_path.pdb_outputs + "ddg_variants.csv"        
         file_back_bm = pdb_path.pdb_outputs + "ddg_background.csv"
         
         if exists(file_lst_var):

@@ -151,7 +151,7 @@ def run_pipeline(args):
             dataset_gene_pdb[2],
         )
         path = Paths.Paths(DataDir, PipelineDir, dataset=dataset, gene=gene, pdb=pdb)
-        filename = path.outputs + "ddg_buildmodel.csv"
+        filename = path.outputs + "ddg_variants"
         if pdb == "":
             filename = path.outputs + "ddg_variant_bm.csv"
         print(filename)
