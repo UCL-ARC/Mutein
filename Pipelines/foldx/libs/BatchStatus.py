@@ -111,7 +111,7 @@ class BatchStatus:
                     else:
                         existsfile, time = self.checkFile(filenameB)
                         if existsfile:
-                            line_string += "Ge:"+time + "\t\t"
+                            line_string += "G:"+time + "\t\t"
                     
                     if not existsfile:                    
                         num_done,num_tsks = self.getGeneNumTasks(geneo,True)
