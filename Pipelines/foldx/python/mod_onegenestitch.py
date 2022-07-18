@@ -83,9 +83,12 @@ def run_pipeline(args):
                 if exists(file_var_bm):
                     fdf = FileDf.FileDf(file_var_bm)                    
                     all_var_build.append(fdf.openDataFrame())                
-                else:
                     exists_all_var = False
+                else:
+                    exists_all_var = True
+                    print("No variants to aggregate",gene,pdb)                    
             else:
+                exists_all_var = True
                 print("No variants to aggregate",gene,pdb)                    
         else:
             exists_all_var = False
@@ -104,7 +107,7 @@ def run_pipeline(args):
         ddg_df_back_bm['method'] = ddg_df_back_bm.apply(lambda row: metric.getScore(row['pdb'])[1], axis=1)
         ddg_df_back_bm['resolution'] = ddg_df_back_bm.apply(lambda row: metric.getScore(row['pdb'])[2], axis=1)
         ddg_df_back_bm['coverage'] = ddg_df_back_bm.apply(lambda row: metric.getScore(row['pdb'])[3], axis=1)
-        ddg_df_back_bm.to_csv(gene_path.gene_outputs + "ddg_background_bm.csv", index=False)
+        ddg_df_back_bm.to_csv(gene_path.gene_outputs + "ddg_background.csv", index=False)
         # DB Coverage reports
         #plot_file = gene_path.gene_outputs + "ALL_coverage.png"
         #anav = Analysis.Analysis(ddg_df_back_bm, gene)
@@ -121,7 +124,7 @@ def run_pipeline(args):
             ddg_df_var_build['resolution'] = ddg_df_var_build.apply(lambda row: metric.getScore(row['pdb'])[2], axis=1)
             ddg_df_var_build['coverage'] = ddg_df_var_build.apply(lambda row: metric.getScore(row['pdb'])[3], axis=1)
             ddg_df_var_build.to_csv(
-                gene_path.gene_outputs + "ddg_variant_bm.csv", index=False
+                gene_path.gene_outputs + "ddg_variants.csv", index=False
             )
         else:
             print("Gene stitch: no files available for aggreation")

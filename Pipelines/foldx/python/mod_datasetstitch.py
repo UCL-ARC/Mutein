@@ -11,6 +11,8 @@ import os
 import sys
 import yaml
 import pandas as pd
+from os.path import exists
+from shutil import copyfile
 
 import _helper
 import Paths
@@ -39,6 +41,17 @@ def run_pipeline(args):
         argsgn[1] = arglist
         import mod_genestitch as ppi
         ppi.run_pipeline(argsgn)
+        # now copy all available gene+results to dataset results
+        gene_path = Paths.Paths(data_dir, install_dir, dataset=dataset,gene=gn,readonly=False)        
+        filenameA = gene_path.outputs + "ddg_background.csv"
+        filenameA_ds = dataset_path.outputs + f"{gn}_ddg_background.csv"
+        filenameB = gene_path.outputs + "ddg_variants.csv"
+        filenameB_ds = dataset_path.outputs + f"{gn}_ddg_variants.csv"
+        if exists(filenameA):
+            copyfile(filenameA, filenameA_ds)
+        if exists(filenameB):
+            copyfile(filenameB, filenameB_ds)
+
         
     #print("### COMPLETED dataset preparation ###")
     #print("MUTEIN SCRIPT ENDED")

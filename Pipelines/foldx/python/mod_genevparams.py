@@ -48,28 +48,29 @@ def run_pipeline(args):
 
     for t in range(len(df.index)):
         pdbcode = df["pdb"][t].lower()
+        if pdbcode[0] != "#":
 
-        pdb_path = Paths.Paths(
-            data_dir,
-            install_dir,
-            dataset=dataset,
-            gene=gene,
-            pdb=pdbcode,
-        )
-        argsgn = args
-        arglist = args[1]
-        arglist += "@pdb=" + pdbcode
-        argsgn[1] = arglist
-        import mod_pdbvparams as ppl
+            pdb_path = Paths.Paths(
+                data_dir,
+                install_dir,
+                dataset=dataset,
+                gene=gene,
+                pdb=pdbcode,
+            )
+            argsgn = args
+            arglist = args[1]
+            arglist += "@pdb=" + pdbcode
+            argsgn[1] = arglist
+            import mod_pdbvparams as ppl
 
-        ppl.run_pipeline(argsgn)
-        filename = pdb_path.pdb_inputs + "params_variants.txt"
-        if exists(
-            filename
-        ):  # TODO we might want to make it optional to fail if there is a missing file
-            fdf = FileDf.FileDf(filename, sep=" ")
-            csv = fdf.openDataFrame()
-            all_params.append(csv)
+            ppl.run_pipeline(argsgn)
+            filename = pdb_path.pdb_inputs + "params_variants.txt"
+            if exists(
+                filename
+            ):  # TODO we might want to make it optional to fail if there is a missing file
+                fdf = FileDf.FileDf(filename, sep=" ")
+                csv = fdf.openDataFrame()
+                all_params.append(csv)
 
     all_path = gene_path.gene_inputs + "params_variants.txt"
     if len(all_params) > 0:
