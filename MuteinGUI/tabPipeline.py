@@ -71,9 +71,9 @@ def run_ds_untasks(txtBox,txtDataset,txtGene,txtPdb):
     txtBox.insert('end', ret)
 def run_ds_agg(txtBox,txtDataset,txtGene,txtPdb):        
     dataset = txtDataset.get().strip()
-    gene = "ALL"
+    gene = ""
     pdb = ""
-    ret = rs.SubmitJob("GENE_AGG",dataset,gene,pdb)
+    ret = rs.SubmitJob("DS_AGG",dataset,gene,pdb)
     txtBox.delete(1.0,tk.END)
     txtBox.insert('end', ret)
 def run_ds_clean(txtBox,txtDataset,txtGene,txtPdb):        
@@ -110,6 +110,13 @@ def run_gene_split(txtBox,txtDataset,txtGene,txtPdb):
     gene = txtGene.get().strip()
     pdb = ""
     ret = rs.SubmitJob("GENE_SPLIT",dataset,gene,pdb)
+    txtBox.delete(1.0,tk.END)
+    txtBox.insert('end', ret)
+def run_gene_tac(txtBox,txtDataset,txtGene,txtPdb):        
+    dataset = txtDataset.get().strip()
+    gene = txtGene.get().strip()
+    pdb = ""
+    ret = rs.SubmitJob("GENE_TAC",dataset,gene,pdb)
     txtBox.delete(1.0,tk.END)
     txtBox.insert('end', ret)
 def run_gene_tasks(txtBox,txtDataset,txtGene,txtPdb):        
@@ -293,7 +300,8 @@ class tabPipeline:
         btnSubmit_grep = tk.Button(rhs, text="Submit repair", command=partial(run_gene_rep,self.txtBox,text_dataset,text_gene,text_pdb),borderwidth=5, relief="groove",width=20, bg=clrAlertAlert)
         btnSubmit_gmrep = tk.Button(rhs, text="Submit missing repair", command=partial(run_gene_unrep,self.txtBox,text_dataset,text_gene,text_pdb),borderwidth=5, relief="groove",width=20, bg=clrAlertAlert)
         btnSubmit_gprep = tk.Button(rhs, text="Submit splits prepare", command=partial(run_gene_split,self.txtBox,text_dataset,text_gene,text_pdb),borderwidth=5, relief="groove",width=20, bg=clrMaybe)
-        btnSubmit_gtasks = tk.Button(rhs, text="Submit tasks", command=partial(run_gene_tasks,self.txtBox,text_dataset,text_gene,text_pdb),borderwidth=5, relief="groove",width=20, bg=clrAlert)
+        btnSubmit_gtac = tk.Button(rhs, text="Tasks/Agg/Clean", command=partial(run_gene_tac,self.txtBox,text_dataset,text_gene,text_pdb),borderwidth=5, relief="groove",width=20, bg=clrAlert)
+        btnSubmit_gtasks = tk.Button(rhs, text="Submit tasks", command=partial(run_gene_tasks,self.txtBox,text_dataset,text_gene,text_pdb),borderwidth=5, relief="groove",width=20, bg="orange")
         btnSubmit_guntasks = tk.Button(rhs, text="Submit missing tasks", command=partial(run_gene_untasks,self.txtBox,text_dataset,text_gene,text_pdb),borderwidth=5, relief="groove",width=20, bg=clrAlert)
         btnSubmit_gagg = tk.Button(rhs, text="Submit aggregation", command=partial(run_gene_agg,self.txtBox,text_dataset,text_gene,text_pdb),borderwidth=5, relief="groove",width=20, bg=clrMaybe)
         btnSubmit_gclean = tk.Button(rhs, text="Submit clean", command=partial(run_gene_clean,self.txtBox,text_dataset,text_gene,text_pdb),borderwidth=5, relief="groove",width=20, bg="orange")
@@ -325,32 +333,33 @@ class tabPipeline:
         btnSubmit_dspdbs.grid(row=5,column=0, padx=2, pady=2)
         btnSubmit_dsrep.grid(row=6,column=0, padx=2, pady=2)        
         btnSubmit_dssplit.grid(row=7,column=0, padx=2, pady=2)
-        btnSubmit_dstasks.grid(row=8,column=0, padx=2, pady=2)                
-        btnSubmit_dsagg.grid(row=9,column=0, padx=2, pady=2)
+        btnSubmit_dstasks.grid(row=9,column=0, padx=2, pady=2)                
+        btnSubmit_dsagg.grid(row=10,column=0, padx=2, pady=2)
          
         btnSubmit_gppdbs.grid(row=5,column=1, padx=2, pady=2)
         btnSubmit_grep.grid(row=6,column=1, padx=2, pady=2)
         btnSubmit_gprep.grid(row=7,column=1, padx=2, pady=2)
-        btnSubmit_gtasks.grid(row=8,column=1, padx=2, pady=2)
-        btnSubmit_gagg.grid(row=9,column=1, padx=2, pady=2)
+        btnSubmit_gtac.grid(row=8,column=1, padx=2, pady=2)
+        btnSubmit_gtasks.grid(row=9,column=1, padx=2, pady=2)
+        btnSubmit_gagg.grid(row=10,column=1, padx=2, pady=2)
                 
         btnSubmit_pdbpdb.grid(row=5,column=2, padx=2, pady=2)
         btnSubmit_rep.grid(row=6,column=2, padx=2, pady=2)
         btnSubmit_prep.grid(row=7,column=2, padx=2, pady=2)
-        btnSubmit_ptasks.grid(row=8,column=2, padx=2, pady=2)                
-        btnSubmit_pagg.grid(row=9,column=2, padx=2, pady=2)
+        btnSubmit_ptasks.grid(row=9,column=2, padx=2, pady=2)                
+        btnSubmit_pagg.grid(row=10,column=2, padx=2, pady=2)
 
-        lblMissing.grid(row=10,column=0, padx=2, pady=2,columnspan=3)
-        btnSubmit_dsmrep.grid(row=11,column=0, padx=2, pady=2)
-        btnSubmit_duntasks.grid(row=12,column=0, padx=2, pady=2)
-        btnSubmit_gmrep.grid(row=11,column=1, padx=2, pady=2)
-        btnSubmit_guntasks.grid(row=12,column=1, padx=2, pady=2)
-        btnSubmit_puntasks.grid(row=12,column=2, padx=2, pady=2)
+        lblMissing.grid(row=11,column=0, padx=2, pady=2,columnspan=3)
+        btnSubmit_dsmrep.grid(row=12,column=0, padx=2, pady=2)
+        btnSubmit_duntasks.grid(row=13,column=0, padx=2, pady=2)
+        btnSubmit_gmrep.grid(row=12,column=1, padx=2, pady=2)
+        btnSubmit_guntasks.grid(row=13,column=1, padx=2, pady=2)
+        btnSubmit_puntasks.grid(row=13,column=2, padx=2, pady=2)
         # the cleaning which deletes all interim results
-        lblClean.grid(row=13,column=0, padx=2, pady=2,columnspan=3)
-        btnSubmit_dsclean.grid(row=14,column=0, padx=2, pady=2)
-        btnSubmit_gclean.grid(row=14,column=1, padx=2, pady=2)
-        btnSubmit_pclean.grid(row=14,column=2, padx=2, pady=2)
+        lblClean.grid(row=14,column=0,padx=2, pady=2,columnspan=3)
+        btnSubmit_dsclean.grid(row=15,column=0, padx=2, pady=2)
+        btnSubmit_gclean.grid(row=15,column=1, padx=2, pady=2)
+        btnSubmit_pclean.grid(row=15,column=2, padx=2, pady=2)
                         
                  
         

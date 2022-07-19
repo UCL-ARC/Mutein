@@ -14,12 +14,12 @@ username = "ucbxxxx"
 password = "xyz"
 server = "myriad"
 # Directories on the server
-pipeline_trunc = "/Mutein/Pipelines/foldx/"
-scripts_trunc = "/Mutein/Pipelines/foldx/scripts/"
+pipeline_trunc = "/Scratch/Mutein/Pipelines/foldx/"
+scripts_trunc = "/Scratch/Mutein/Pipelines/foldx/scripts/"
 working_trunc = "/Scratch/workspace/"
-install_trunc = "/Mutein/"
-#data_trunc = "/Scratch/MuteinData/Foldx/"
-data_trunc = "/MuteinData/"
+install_trunc = "/Scratch/Mutein/"
+data_trunc = "/Scratch/MuteinData/Foldx/"
+#data_trunc = "/MuteinData/"
 # global dir variables
 pipeline_dir = "/home/"+username+pipeline_trunc
 scripts_dir = "/home/"+username+scripts_trunc
@@ -31,6 +31,7 @@ remove_script = "REM_errors.sh"
 view_script = "REM_view.sh"
 remote_script = "REMOTE.sh"
 scriptname_ds_pdb = "REMOTE_foldx_dataset_pdbs.sh"
+scriptname_ds_agg = "REMOTE_foldx_dataset_agg.sh"    
 scriptname_gene_pdb = "REMOTE_foldx_gene_pdbs.sh"
 scriptname_gene_rep = "REMOTE_foldx_gene_rep.sh"    
 scriptname_gene_unrep = "REMOTE_foldx_gene_unrep.sh"    
@@ -164,6 +165,8 @@ def SubmitJob(command,dataset,gene,pdb):
             scriptname = scripts_dir + scriptname_gene_split
         elif command == "GENE_AGG":
             scriptname = scripts_dir + scriptname_gene_agg
+        elif command == "DS_AGG":
+            scriptname = scripts_dir + scriptname_ds_agg
         elif command == "GENE_CLEAN":
             scriptname = scripts_dir + scriptname_gene_clean
         elif command == "PDB_PDB":
