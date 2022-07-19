@@ -40,13 +40,19 @@ default_global_config =\
     'conda':'fm_default_env',        #conda environment to activate if none specified by the rule
     'stale_output_file':'ignore',    #ignore,delete,recycle (also applies to symlinks)
     'stale_output_dir':'ignore',     #ignore,delete,recycle
-    'failed_output_file':'stale',  #delete,recycle,stale,ignore (also applies to symlinks)
-    'failed_output_dir':'stale',   #delete,recycle,stale,ignore    
+    'failed_output_file':'stale',    #delete,recycle,stale,ignore (also applies to symlinks)
+    'failed_output_dir':'stale',     #delete,recycle,stale,ignore    
     'missing_parent_dir':'create',   #ignore,create
     'recycle_bin':'recycle_bin',     #name of recycle bin folder
     'job_count':'FM_NJOBS',          #env variable: how many jobs spawned by current rule
     'job_number':'FM_JOB_NUMBER',    #env variable: 1 based job numbering within the current rule
-    'bash_prefix':'source ~/.bashrc\nset -euo pipefail\nset +o history'
+    'bash_prefix':'source ~/.bashrc\nset -euo pipefail\nset +o history',
+    'time':'02:00:00',          #$ -l h_rt={args.time}
+    'mem':'4G',                 #$ -l mem={args.mem}
+    'tmpfs':'10G',              #$ -l tmpfs={args.tmpfs}
+    'pe':'smp',                 #$ -pe smp {threads}
+    'cores':'1',
+    'qsub_template':'default'   #default or path to your own
     #'normalize_paths':'true',                #true,false
 }
 
@@ -363,7 +369,7 @@ def generate_shell_commands(rule,job_list,shell):
         #show(shell_final,"shell")
         shell_list.append(shell_final["shell"])
 
-    return shell_list
+    return job_list,shell_list
 
 def is_stale(path):
     'return true if mtime is set to the special stale flag'
@@ -546,22 +552,44 @@ def execute_command(config,job_numb,cmd,env):
 
     return failed
 
-def write_qsub_file(rule,qsub_script,jobname,njobs,jobfile):
-    with open(qsub_script,'w') as f:
-        f.write("#!/bin/bash -l\n")
-        f.write(f"#$ -N {jobname}\n")
-        f.write(f"#$ -cwd\n")
-        f.write(f"#$ -V\n")
-        f.write(f"#$ -t 1-{njobs}\n")
-        f.write(f"#$ -o {rule['log_dir']}/{jobname}.$TASK_ID.out\n")
-        f.write(f"#$ -e {rule['log_dir']}/{jobname}.$TASK_ID.err\n")
-        #f.write(f"#$ -l h_rt={args.time}\n")
-        #f.write(f"#$ -l mem={args.mem}\n")
-        #f.write(f"#$ -l tmpfs={args.tmpfs}\n")
-        #f.write(f"#$ -pe smp {args.cores}\n")
+# def write_qsub_file(rule,qsub_script,jobname,njobs,jobfile):
+#     with open(qsub_script,'w') as f:
+#         f.write("#!/bin/bash -l\n")
+#         f.write(f"#$ -N {jobname}\n")
+#         f.write(f"#$ -cwd\n")
+#         f.write(f"#$ -V\n")
+#         f.write(f"#$ -t 1-{njobs}\n")
+#         f.write(f"#$ -o {rule['log_dir']}/{jobname}.$TASK_ID.out\n")
+#         f.write(f"#$ -e {rule['log_dir']}/{jobname}.$TASK_ID.err\n")
+#         f.write(f"#$ -l h_rt={rule['time']}\n")
+#         f.write(f"#$ -l mem={rule['mem']}\n")
+#         f.write(f"#$ -l tmpfs={rule['tmpfs']}\n")
+#         f.write(f"#$ -pe {rule['pe']} {rule['cores']}\n")
 
-        #run payload through fakemake
-        f.write(f"{sys.executable} {sys.argv[0]} --qsub {jobfile}\n")
+#         #run payload through fakemake
+#         f.write(f"{sys.executable} {sys.argv[0]} --qsub {jobfile}\n")
+
+def write_qsub_file(rule,qsub_script,jobname,njobs,jobfile):
+    'fill out the qsub job script template and write to file ready to pass to qsub'
+
+    if rule['qsub_template'] == 'default':
+        f_in = open(os.path.join(os.path.dirname(__file__),"qsub_template.sh"))
+    else:
+        f_in = open(rule['qsub_template'])
+
+    f_out = open(qsub_script,'w')
+
+    env = copy.deepcopy(rule)
+    env["njobs"] = njobs
+    env["jobname"] = jobname
+    env["jobfile"] = jobfile
+    env["python"] = sys.executable
+    env["fakemake"] = sys.argv[0]
+
+    for line in f_in: f_out.write(line.format(**env))
+
+    f_out.close()
+    f_in.close()
 
 def submit_job_qsub(rule,shell_list,job_list):
     '''
@@ -702,7 +730,7 @@ def process_rule(config,rule):
 
     #determine if all inputs are present
     #and if outputs need to be regenerated
-    shell_list = generate_shell_commands(rule,job_list,shell)
+    job_list,shell_list = generate_shell_commands(rule,job_list,shell)
 
     print(f'{len(shell_list)} jobs generated')
 
