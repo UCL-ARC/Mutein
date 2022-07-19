@@ -20,8 +20,8 @@ script=lib_path + "/pipeline_qsubber.py"
 data_dir="/home/rachel/UCL/github/MuteinData/"
 install_dir="/home/rachel/UCL/github/Mutein/"
 
-#config=config_path + "/batch_gene_4_tasks.yml"
-config=config_path + "/batch_gene_4_untasks.yml"
+config=config_path + "/batch_gene_4_tasks.yml"
+#config=config_path + "/batch_gene_4_untasks.yml"
 #config=config_path + "/batch_gene_3_prep.yml"
 #config=config_path + "/batch_dataset_2_stitch.yml"
 

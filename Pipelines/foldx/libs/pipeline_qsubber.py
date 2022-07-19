@@ -138,7 +138,8 @@ def pipeline_qsubber(args):
             gene=gene,
             pdb=pdb,
         )
-        pdb_tasks_file = path.outputs + "pdb_tasklist.csv"
+        print("Paths:",path.inputs,path.outputs)        
+        pdb_tasks_file = path.outputs + "pdb_tasklist.csv"        
         if exists(pdb_tasks_file):
             with open(pdb_tasks_file) as fr:
                 lines = fr.readlines()
