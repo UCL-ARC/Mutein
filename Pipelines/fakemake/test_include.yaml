@@ -1,0 +1,2 @@
+- config:
+    test_variable: "test_include_value"

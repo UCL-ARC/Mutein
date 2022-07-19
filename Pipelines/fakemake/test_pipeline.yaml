@@ -9,9 +9,14 @@
     stale_output_dir:     "ignore"
     missing_parent_dir:   "create"
     #conda_setup_command:  ""
+
+- include: "test_include.yaml"
+
+- module: "test_module/module.yaml"
+
 - rule:
     name:     "step1"
-    exec:     "qsub"
+    exec:     "local"
     time:     "1:00:00"
     mem:      "2G"
     cores:    "1"
@@ -26,15 +31,15 @@
       
 - rule:
     name: "step2"
+    exec: "local"
+    time:     "0:30:00"
+    mem:      "2G"
+    cores:    "2"
     conda: "{$MUT_PREFIX}main"
     input:
       step1: "{test_dir}/output/{=sample}.step1"
     output:
       final: "{test_dir}/output/{=sample}.step2"
-    exec: "qsub"
-    time:     "0:30:00"
-    mem:      "2G"
-    cores:    "2"
     shell: |
       cat {step1} > {final}
       echo processed by {name} >> {final}

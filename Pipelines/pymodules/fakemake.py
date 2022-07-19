@@ -108,17 +108,53 @@ def check_cwd(config):
             print(f"expecting: {config['expected_working_dir']}")
             print(f"but found {os.path.realpath(os.getcwd())}")
 
-def process(config,pipeline):
-    check_cwd(config)
+def process(pipeline,path,config=None):
+    #initially set config to default values if none provided
+    if config == None:
+        config = {}
+        update_config(config,copy.deepcopy(default_global_config))
 
-    #pipeline yaml must be a list of items all called "rule"
-    for i,item in enumerate(pipeline):
+    counter = 0
+
+    while counter < len(pipeline):
+        item = pipeline[counter]
+        counter += 1
         assert type(item) == dict
         assert len(item) == 1
         item_type = list(item.keys())[0]
-        assert item_type == 'rule'
-        #show(item[item_type],item_type)
-        process_rule(config,item[item_type])
+
+        if item_type == 'rule':
+            #show(item[item_type],item_type)
+            process_rule(config,item[item_type])
+
+        elif item_type == 'config':
+            #add new config to the existing one, overriding any shared keys
+            update_config(config,item[item_type])
+
+        elif item_type == 'include':
+            #load and insert the yaml items in place of the include item
+            new_pipeline,new_path = load_pipeline(item[item_type],path) #new_path ignored
+            counter -= 1
+            del pipeline[counter]
+            pipeline = pipeline[:counter] + new_pipeline + pipeline[counter:]
+
+        elif item_type == 'module':
+            #process a nested pipeline without affecting the config of any
+            #following items
+            new_pipeline,new_path = load_pipeline(item[item_type],path)
+            new_config = copy.deepcopy(config)
+            process(new_pipeline,new_path,config=new_config)
+
+        #show(config,"config")
+
+def load_pipeline(path,parent_file):
+    'path is relative to the parent path'
+
+    parent_path = os.path.dirname(parent_file)
+    full_path = os.path.join(parent_path,path)
+
+    assert full_path != parent_file
+    return parse_yaml(full_path),full_path
 
 def find_duplicates(dict_list):
     all_keys = set()
@@ -193,36 +229,26 @@ def split_rule(rule):
 
     return input,output,shell
 
-def setup_config(pipeline):
-    config = copy.deepcopy(default_global_config)
-
-    #include the config from the pipeline yaml file if present
-    item = pipeline[0]
-    assert type(item) == dict and len(item) == 1
-    item_type = list(item.keys())[0]
-    if item_type == 'config': config.update(item[item_type])
-
+def update_config(config,new_config):
     #check all keys and values are simple strings
     #check for forbidden keys
-    for key,value in config.items():
+    for key,value in new_config.items():
         assert type(key) == str
         assert type(value) == str
         assert key not in nonconfig_keys
 
     #substitute any environment variables
-    sub_environ(config)
+    sub_environ(new_config)
 
     #substitute any fakemake variables
-    sub_vars(config)
+    sub_vars(new_config)
 
-    #show(config,"config")
+    #create log directory if not already present
+    if 'log_dir' in new_config:
+        if not os.path.exists(new_config['log_dir']):
+            os.makedirs(new_config['log_dir'])
 
-    del pipeline[0]
-
-    if not os.path.exists(config['log_dir']):
-        os.makedirs(config['log_dir'])
-
-    return config
+    config.update(new_config)
 
 def parse_yaml(fname):
     'parse yaml into list of items'
@@ -458,22 +484,22 @@ def handle_failed_outputs(config,outputs):
 
     for item in outputs:
         path = outputs[item]
-        print("handle_failed_outputs",path)
+        #print("handle_failed_outputs",path)
         if not os.path.exists(path): continue
 
         if os.path.islink(path) or os.path.isfile(path):
-            print('file or symlink')
+            #print('file or symlink')
             if config['failed_output_file'] == 'delete':
-                print('delete')
+                #print('delete')
                 os.remove(path)
             elif config['failed_output_file'] == 'recycle':
-                print('recycle')
+                #print('recycle')
                 recycle_item(config,path)
             elif config['failed_output_file'] == 'stale':
-                print('stale')
+                #print('stale')
                 make_stale(path)
             elif config['failed_output_file'] == 'ignore':
-                print('ignore')
+                #print('ignore')
                 continue
             else:
                 raise Exception(f'unknown option for failed_output_file: {config["failed_output_file"]}')
@@ -537,7 +563,7 @@ def execute_command(config,job_numb,cmd,env):
     ferr = open(ferrname,'w')
 
     failed = False
-    print(f'executing job number {job_numb+1}:',end='')
+    print(f'executing job number {job_numb+1} locally:',end='')
     sys.stdout.flush()
     try:
         subprocess.run(cmd,env=env,shell=True,check=True,stdout=fout,stderr=ferr)
@@ -735,6 +761,9 @@ def process_rule(config,rule):
     print(f'{len(shell_list)} jobs generated')
 
     if len(shell_list) == 0: return
+
+    #check current working directory agrees with configured value
+    check_cwd(rule)
 
     #execute jobs locally or remotely from the jobfile
     execute_jobs(rule,shell_list,job_list)

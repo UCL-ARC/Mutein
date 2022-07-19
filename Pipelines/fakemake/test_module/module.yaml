@@ -1,0 +1,2 @@
+- config:
+    test_module: "test_module_value"
