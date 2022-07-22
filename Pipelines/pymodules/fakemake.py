@@ -315,7 +315,7 @@ def generate_job_list(rule,input,output):
         sub_globs(job_input,m.groupdict())
         sub_globs(job_output,m.groupdict())
 
-        job_list.append({"input":job_input,"output":job_output})
+        job_list.append({"input":job_input,"output":job_output,"matches":m.groupdict()})
 
     return job_list
 
@@ -384,10 +384,11 @@ def generate_shell_commands(rule,job_list,shell):
     shell_list = []
 
     for job_numb,job in enumerate(job_list):
-        #merge input and output filenames into rule variables
+        #merge input and output filenames and placeholders into rule variables
         config = copy.deepcopy(rule)
         config.update(job['input'])
         config.update(job['output'])
+        config.update(job['matches'])
 
         #substitute remaining placeholders in shell command
         shell_final = copy.deepcopy(shell)

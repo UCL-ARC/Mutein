@@ -9,6 +9,10 @@
     stale_output_dir:     "ignore"
     missing_parent_dir:   "create"
     #conda_setup_command:  ""
+    # test_list:
+    #   - "{item1}"
+    #   - "{item2}"
+    #   - "longer string"
 
 - include: "test_include.yaml"
 
@@ -26,6 +30,7 @@
     output:   "{test_dir}/output/{=sample}.step1"
     shell: |
       cat {input} > {output}
+      echo file {input} sample {sample} >> {output}
       echo processed by {name} >> {output}
       echo "{input}" | grep -v -e '1\.input' #should cause task1 to fail
       
