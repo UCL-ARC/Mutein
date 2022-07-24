@@ -28,12 +28,12 @@ class CodingGene:
 
     def addChunk(self,start,end,fwd,nucleotides,aminos):
         # we add a position with start and end
-        if fwd:
-            self.chunks[int(start)] = [int(start),int(end),nucleotides,aminos]
-        else:
+        #if fwd:
+        self.chunks[int(start)] = [int(start),int(end),nucleotides,aminos,fwd]
+        #else:
             # it is kind of horrible that it needs to be reversed back
             # it is the only way to get the position correctly
-            self.chunks[int(start)] = [int(start),int(end),nucleotides[::-1],aminos[::-1]]            
+            #self.chunks[int(start)] = [int(start),int(end),nucleotides[::-1],aminos[::-1]]            
     
     def getAminoAcid(self,chmepos):
         start,end,nucs,aas = self.getTuple(chmepos)
@@ -42,14 +42,18 @@ class CodingGene:
         return aas[div+1]
 
     def getNucleotide(self,chmepos):
-        start,end,nucs,aas = self.getTuple(chmepos)
+        start,end,nucs,aas,fwd = self.getTuple(chmepos)
         relative_pos = chmepos-start
         return nucs[relative_pos]
 
     def getVariant(self,chmepos,mut,fwd=True):
-        start,end,nucs,aas = self.getTuple(chmepos)
+        start,end,nucs,aas,fwd = self.getTuple(chmepos)
+        print("tup ret",start,end,nucs,aas,fwd)
         relative_pos = chmepos-start
-        div,rem = divmod(len(relative_pos),3)
+        orig_nuc = nucs[relative_pos]
+        print("orig nuc",orig_nuc)
+        div,rem = divmod(relative_pos,3)
+        print("div rem",div,rem)
         orig_aa = aas[div+1]
         if rem == 0:
             triple = nucs[relative_pos:relative_pos+3]
@@ -60,14 +64,19 @@ class CodingGene:
         if not fwd:
             triple = triple[::-1]
         #def getAA(triple_seq,append_first="", phase=0):
+        print("triple",triple)
         new_aa = codons.getAA(triple)
+        print("new aa",new_aa)
+        #nuc, nuc_mut, aa, aa_mu, aa_num
         return orig_aa,new_aa
         
     def getTuple(self,chmepos):
-        for pos,tpl in self.chunks.items():
-            if int(chmepos) >= pos:
-                return tpl
-        return [0,0,"",""]
+        for pos,tpl in self.chunks.items(): #tpl=[int(start),int(end),nucleotides,aminos,fwd]
+            start,end,nucleotides,aminos,fwd = tpl
+            print("Seek",chmepos,"from",start,end,nucleotides,aminos,fwd)
+            if int(chmepos) >= start and int(chmepos) <= end:
+                return start,end,nucleotides,aminos,fwd
+        return [0,0,"","",True]
 
     
 

@@ -8,6 +8,7 @@ import os
 import subprocess
 import Paths
 import FileDf
+from os.path import exists
 
 
 class ScoringMetric:
@@ -16,29 +17,30 @@ class ScoringMetric:
         self.gene=gene
         self.path = gene_path
         pdb_file = self.path.outputs + "Coverage_all.csv"
-        fdf = FileDf.FileDf(pdb_file,header=True)
-        self.df = fdf.openDataFrame()        
-        self.score_dict = {}                
-        for i in range(len(self.df.index)):
-            try:
-                src = self.df["source"][i]
-                pdb = self.df["pdb"][i]
-                mth = self.df["method"][i]
-                res = self.df["resolution"][i]
-                cov = self.df["coverage"][i]
-                #print(src,pdb,mth,res,cov)
-                metric = 0.8
-                if src == "SMHOM":
-                    metric = 0.5
-                elif src == "AF":
-                    metric = 0.01
-                elif src == "EXP" and "x-ray" in mth:
-                    metric = 1 * 2/5/float(res)            
-                metric *= float(cov) * 1000
-                self.score_dict[pdb.lower()] = [round(metric,2),mth,res,cov] #score,method,resolution.coverage
-            except:
-                pass
-        
+        if exists(pdb_file):
+            fdf = FileDf.FileDf(pdb_file,header=True)
+            self.df = fdf.openDataFrame()        
+            self.score_dict = {}                
+            for i in range(len(self.df.index)):
+                try:
+                    src = self.df["source"][i]
+                    pdb = self.df["pdb"][i]
+                    mth = self.df["method"][i]
+                    res = self.df["resolution"][i]
+                    cov = self.df["coverage"][i]
+                    #print(src,pdb,mth,res,cov)
+                    metric = 0.8
+                    if src == "SMHOM":
+                        metric = 0.5
+                    elif src == "AF":
+                        metric = 0.01
+                    elif src == "EXP" and "x-ray" in mth:
+                        metric = 1 * 2/5/float(res)            
+                    metric *= float(cov) * 1000
+                    self.score_dict[pdb.lower()] = [round(metric,2),mth,res,cov] #score,method,resolution.coverage
+                except:
+                    pass
+            
     def cutPdb(self,pdb):
         if "_rep" in pdb:
             pos = pdb.find("_rep")

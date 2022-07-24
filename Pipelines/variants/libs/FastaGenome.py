@@ -14,7 +14,7 @@ class FastaGenome:
         if is_dir:
             for chm in self.chmes:
                 cid = f"CHR{chm}"       
-                chm_file = f"fasta_file/chr{chm}.fna" 
+                chm_file = f"{fasta_file}/chr{chm}.fna" 
                 for seq_record in SeqIO.parse(chm_file, "fasta"):
                     self.seqs[cid] = seq_record.seq
                     #print(str(seq_record.seq))

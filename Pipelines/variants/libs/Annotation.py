@@ -83,23 +83,23 @@ class Annotation:
         last_carry = ""
         for seq_chunk, tpl in chunks:                
             if loglevel > -1:
-                print("## Chunk",tpl,"last_carry=",last_carry)
+                divm = divmod(len(seq_chunk),3)
+                print("## Chunk",tpl,"last_carry=",last_carry,"divmod=",divm)
             chme,strt,stp,strd,frm = tpl
+            #### match off the carry and the frameshift.####
             # frame includes push from last carry
-            # frame is 3- for reverse            
-            if False:
-                if strd == "-" and int(frm) > 0:
-                    frm = 3-int(frm)
-                    frm = frm - len(last_carry)
-            # match off the carry and the frameshift.
-            #If forward and a carry of 2 then there is no frameshift
-            if int(frm) == 2 and len(last_carry) == 1 and strd == "+":
+            # frame is 3- for reverse                                    
+            if int(frm) == 2 and len(last_carry) == 1:
                 frm = 0
+            if int(frm) == 1 and len(last_carry) == 2:
+                frm = 0                            
             if loglevel > -1:
                 print("Chunk ends=",seq_chunk[:12],"...",seq_chunk[-5:])                                
             seqnuc,seqaa,end_carry = codons.getAA(seq_chunk,last_carry,int(frm))
+            if loglevel > -1:
+                print("Seq ends=",seqnuc[:12],"...",seqnuc[-5:])                                                
+                print("AA ends=",seqaa[:5])                                                
             if loglevel > 1:
-                print("Seq ends=",seqnuc[:12],"...",seqnuc[-12:])                                                
                 print("-------------Sequences---------------")
                 print(seqaa)     
                 print("----------------------------")

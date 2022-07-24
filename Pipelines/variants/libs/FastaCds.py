@@ -21,7 +21,7 @@ class FastaCds:
         return seqs
 
     def getSeqDetailsPep(self,gene_name,seq):
-        seqs = self.getSeqsPep(gene_name.upper())
+        seqs = self.getSeqsPep(gene_name.upper(),seq)
         for seqi in seqs:
             seqo = seqi[0]
             if seqo == seq:                                     
@@ -36,11 +36,12 @@ class FastaCds:
         return False,"",seq,""
             
         
-    def getSeqsPep(self,gene_name):
+    def getSeqsPep(self,gene_name,seq):
         seqs = []
         gid = f"gene_symbol:{gene_name.upper()} description"                
         for seq_record in SeqIO.parse(self.fasta_file_pep, "fasta"):
-            if gid in seq_record.description:                
+            if seq == seq_record.seq:
+            #if gid in seq_record.description:                
                 seqs.append([seq_record.seq,seq_record.description])
         return seqs
                 
