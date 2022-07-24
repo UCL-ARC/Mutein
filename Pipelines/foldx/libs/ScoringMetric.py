@@ -18,11 +18,12 @@ class ScoringMetric:
         self.path = gene_path
         pdb_file = self.path.outputs + "Coverage_all.csv"
         if exists(pdb_file):
-            fdf = FileDf.FileDf(pdb_file,header=True)
-            self.df = fdf.openDataFrame()        
-            self.score_dict = {}                
-            for i in range(len(self.df.index)):
-                try:
+            try:
+                fdf = FileDf.FileDf(pdb_file,header=True)
+                self.df = fdf.openDataFrame()        
+                self.score_dict = {}                
+                for i in range(len(self.df.index)):
+                
                     src = self.df["source"][i]
                     pdb = self.df["pdb"][i]
                     mth = self.df["method"][i]
@@ -38,8 +39,8 @@ class ScoringMetric:
                         metric = 1 * 2/5/float(res)            
                     metric *= float(cov) * 1000
                     self.score_dict[pdb.lower()] = [round(metric,2),mth,res,cov] #score,method,resolution.coverage
-                except:
-                    pass
+            except:
+                pass
             
     def cutPdb(self,pdb):
         if "_rep" in pdb:
