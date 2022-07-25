@@ -58,7 +58,7 @@ class BatchStatus:
                 lines = fr.readlines()
                 genes = []
                 for line in lines[1:]:
-                    geneo = line.strip().split(",")[1]
+                    geneo = line.strip().split(",")[1].lower()
                     genes.append(geneo)
                 genes.sort()
 
