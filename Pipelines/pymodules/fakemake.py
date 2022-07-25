@@ -56,6 +56,23 @@ default_global_config =\
     #'normalize_paths':'true',                #true,false
 }
 
+class Conf:
+    def __init__(self,src=None):
+        if src == None:
+            self.d = {}
+        elif type(src) == Conf:
+            self.d = copy.deepcopy(src.d)
+        elif type(src) == dict:
+            self.d = copy.deepcopy(src)
+        else:
+            raise Exception(f"unsupported source class {type(src)}")
+
+    def __getitem__(self,key):
+        return self.d[key]
+
+    def __setitem__(self,key,value):
+        self.d[key] = value
+
 def sub_vars(config,extra=None):
     'substitute all simple placeholders or fail trying'
 
