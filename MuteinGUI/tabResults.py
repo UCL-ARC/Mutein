@@ -6,6 +6,7 @@ from io import StringIO as sio
 import Analysis
 import pandas as pd
 import os
+from os.path import exists
 
 def binaryToDataFrame(binary):
     resA = str(binary,"utf-8")
@@ -87,7 +88,7 @@ def save_dataframes(txtBox,txtPath, txtDataset,txtGene,txtPdb):
     gene = txtGene.get().strip()    
     pdb = ""   
     path = txtPath.get().strip()
-    genes = []    
+    genes = []     
     if gene == "" or gene.lower()== "x":
         ret = rs.RunScript("DS_GENES",dataset+":"+gene+":"+pdb)
         df = binaryToDataFrame(ret)
@@ -97,28 +98,44 @@ def save_dataframes(txtBox,txtPath, txtDataset,txtGene,txtPdb):
             pass
     else:
         genes.append(gene)
-
+        
     for gene in genes:
-        ret_back = rs.RunScript("PDB_BACK",dataset+":"+gene+":"+pdb)
-        ret_var = rs.RunScript("PDB_BM",dataset+":"+gene+":"+pdb)
-        df_back = binaryToDataFrame(ret_back)
-        df_var = binaryToDataFrame(ret_var)
+        txtBox.delete(1.0,tk.END)
+        print("Retrieving data for",gene)
+                
         out_path = path + dataset.lower() + "_" + gene.lower() + ".csv"
         out_path_var = path + dataset.lower() + "_" + gene.lower() + "_var.csv"
-        try:
-            df_back.to_csv(out_path,index=False)
-        except:
-            print("Error saving",out_path)
-        try:
-            df_var.to_csv(out_path_var,index=False)
-        except:
-            print("Error saving",out_path_var)
+        if not exists(out_path):
+            ret_back = rs.RunScript("GENE_BACK",dataset+":"+gene+":"+pdb)
+            df_back = binaryToDataFrame(ret_back)
+            try:
+                df_back.to_csv(out_path,index=False)
+                print("Saved to",out_path)
+                txtBox.insert(tk.END, out_path)        
+                txtBox.insert(tk.END, df_back)        
+            except:
+                print("Error saving",out_path)
+                print(df_back)
+        else:
+            print("File already exists",out_path)
+                        
+        if not exists(out_path_var):
+            ret_var = rs.RunScript("GENE_VAR",dataset+":"+gene+":"+pdb)
+            df_var = binaryToDataFrame(ret_var)
+            try:
+                df_var.to_csv(out_path_var,index=False)
+                print("Saved to",out_path_var)
+                txtBox.insert(tk.END, out_path_var)                
+                txtBox.insert(tk.END, df_var)        
+            except:
+                print("Error saving",out_path_var)
+                print(df_var)
+        else:
+            print("File already exists",out_path_var)
 
-        txtBox.delete(1.0,tk.END)
-        txtBox.insert(tk.END, out_path)        
-        txtBox.insert(tk.END, out_path_var)        
-        txtBox.insert(tk.END, df_back)        
-        txtBox.insert(tk.END, df_var)        
+        
+        
+        
      
                 
         
@@ -189,8 +206,8 @@ class tabResults:
         dir = os.path.dirname(filepath).split("/")[:-1]
         retpath = "/".join(dir) + "/Mutein/Results/"
         text_path.insert(0,retpath)
-        btnPath = tk.Button(rhs, text="Save DataFrames", command=partial(save_dataframes,self.txtBox,text_path, text_dataset,text_gene,text_pdb),borderwidth=5, relief="groove",width=20,bg="coral")
-                
+        btnPath = tk.Button(rhs, text="Save Dataset data", command=partial(save_dataframes,self.txtBox,text_path, text_dataset,text_gene,text_pdb),borderwidth=5, relief="groove",width=20,bg="coral")
+                        
         header.grid(row=0,column=0, padx=2, pady=2,columnspan=3)        
         btnGene.grid(row=1,column=0, padx=2, pady=2)                
         btnPdb.grid(row=1,column=1, padx=2, pady=2)                

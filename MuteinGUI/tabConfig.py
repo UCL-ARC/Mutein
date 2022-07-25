@@ -186,6 +186,7 @@ def SubmitJob(command,dataset,gene,pdb):
         if scriptname != "":
             result = shell.run(["chmod","+x",scriptname])
             result = shell.run([scriptname, dataset,gene,pdb,working_dir,data_dir,install_dir,pipeline_dir])
+            print("SENDING COMMAND",scriptname, dataset,gene,pdb,working_dir,data_dir,install_dir,pipeline_dir)
             ret += (result.output).decode('utf-8')
             #return scriptname
         else:
@@ -198,9 +199,12 @@ def RunScript(mode,pattern):
     global install_dir
     global data_dir
     #mode, pattern, WorkDir, DataDir, InstallDir, PipelineDir
-    scriptname = scripts_dir + remote_script    
+    scriptname = scripts_dir + remote_script
     result = sendSshShell(scriptname,[mode,pattern,working_dir,data_dir,install_dir,pipeline_dir])
-    return result.output
+    try:
+        return result.output
+    except:
+        return ""
     
 def make_paths(txtBox,txtUser,txtPwd,txtServer):
     global username
