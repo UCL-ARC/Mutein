@@ -1,2 +1,2 @@
 - config:
-    test_variable: "test_include_value"
+    test_variable: "data_dir={%data_dir}"

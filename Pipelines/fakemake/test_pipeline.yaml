@@ -3,16 +3,20 @@
     log_prefix:           "mut."
     test_dir:             "test"
     mut_prefix:           "{$MUT_PREFIX}"
-    user:                 "{mut_prefix}{$USER}_{test_dir}"
+    user:                 "{%mut_prefix}{$USER}_{%test_dir}"
     temp_job_dir:         "fakemake_jobs"
     stale_output_file:    "recycle"
     stale_output_dir:     "ignore"
     missing_parent_dir:   "create"
-    #conda_setup_command:  ""
-    # test_list:
-    #   - "{item1}"
-    #   - "{item2}"
-    #   - "longer string"
+    test_list_index1:     "{&test_list[-1]}"
+    test_list_index2:     "{&test_list[0]}"
+    test_list_length:     "{&test_list[N]}"
+    test_list_join:       "{&test_list[ ]}"
+    test_shell_var:       "${leave_alone}"
+    test_list:
+      - "{%log_prefix}test_string"
+      - "{&test_list[0]}"
+      - "third_item"
 
 - include: "test_include.yaml"
 
@@ -24,15 +28,15 @@
     time:     "1:00:00"
     mem:      "2G"
     cores:    "1"
-    conda:    "{mut_prefix}main"
-    data_dir: "{test_dir}/input"
-    input:    "{data_dir}/{=sample}.input"
-    output:   "{test_dir}/output/{=sample}.step1"
+    conda:    "{%mut_prefix}main"
+    data_dir: "{%test_dir}/input"
+    input:    "{%data_dir}/{*sample}.input"
+    output:   "{%test_dir}/output/{*sample}.step1"
     shell: |
-      cat {input} > {output}
-      echo file {input} sample {sample} >> {output}
-      echo processed by {name} >> {output}
-      echo "{input}" | grep -v -e '1\.input' #should cause task1 to fail
+      cat {%input} > {%output}
+      echo file {%input} sample {*sample} >> {%output}
+      echo processed by {%name} >> {%output}
+      echo "{%input}" | grep -v -e '1\.input' #should cause task1 to fail
       
 - rule:
     name: "step2"
@@ -42,12 +46,12 @@
     cores:    "2"
     conda: "{$MUT_PREFIX}main"
     input:
-      step1: "{test_dir}/output/{=sample}.step1"
+      step1: "{%test_dir}/output/{*sample}.step1"
     output:
-      final: "{test_dir}/output/{=sample}.step2"
+      final: "{%test_dir}/output/{*sample}.step2"
     shell: |
-      cat {step1} > {final}
-      echo processed by {name} >> {final}
+      cat {%step1} > {%final}
+      echo processed by {%name} >> {%final}
       echo "hello"
 
 # - rule:
@@ -55,10 +59,10 @@
 #     conda: "{$MUT_PREFIX}main"
 #     input:
 #       read1: "datasets/{=dataset}/{=subset}/{=accession}/{=accession}_1.fastq.gz"
-#       read2: "datasets/{=dataset}/{=subset}/{=accession}/{=accession}_2.fastq.gz"
+#       read2: "datasets/{%dataset}/{%subset}/{%accession}/{%accession}_2.fastq.gz"
 #     output:
-#       info: "datasets/{=dataset}/{=subset}/{=accession}/{=accession}.info"
+#       info: "datasets/{%dataset}/{%subset}/{%accession}/{%accession}.info"
 #     exec: qsub
 #     shell: |
-#       file {read1} {read2} > {info}
-#       echo {$USER} processed >> {info}
+#       file {%read1} {%read2} > {%info}
+#       echo {$USER} processed >> {%info}

@@ -90,7 +90,7 @@ class Conf:
 
         if src == None:
             #initialise to defaults
-            self.add(default_global_config,create_log_dir=False)
+            self.add(default_global_config)
 
         elif type(src) == Conf:
             #incorporate another config, overwriting any existing common keys
@@ -110,6 +110,12 @@ class Conf:
     def __setitem__(self,key,value):
         'default setitem only sets scalars'
         self.scalars[key] = value
+
+    def show(self,label,indent=2):
+        print(label)
+        print(json.dumps(self.scalars,sort_keys=False,indent=indent))
+        print(json.dumps(self.lists,sort_keys=False,indent=indent))
+        print()
 
     def items(self):
         return self.scalars.items()
@@ -149,18 +155,13 @@ class Conf:
             else:
                 raise Exception(f'unsupported config item type {type(value)}')
 
-        #self.check()
-        #self.sub_environ()
-        #self.sub_vars()
-        #if create_log_dir: self.make_log_dir()
-
     def update(self,src_config):
         '''
-        add all key:value pairs from another conf object
+        add all key:value pairs from another Conf object
         values of src_config take priority (overwrite) any duplicate keys in self
         '''
 
-        assert type(src) == Conf
+        assert type(src_config) == Conf
 
         self.scalars.update(src_config.scalars)
 
@@ -173,7 +174,7 @@ class Conf:
         values of self take priority (are retained) for any duplicate keys
         '''
 
-        assert type(src) == Conf
+        assert type(src_config) == Conf
 
         tmp_scalars = copy.deepcopy(src_config.scalars)
         tmp_scalars.update(self.scalars)
@@ -195,6 +196,15 @@ class Conf:
         if allow_lists[self.kind] == False:
             assert len(self.lists) == 0
 
+    def sub_input_output(self,src):
+        '''
+        substitute only {=...} and {*...} placeholders
+        or throw exception
+        '''
+
+        self.sub_values(src,glob_regx)
+        self.sub_values(src,listjob_regx)
+
     def sub_vars2(self,src=None):
         '''
         substitute all placeholders except {=...} and {*...} 
@@ -214,12 +224,6 @@ class Conf:
             if not changed: break
             assert counter > 0, 'unable to resolve all placeholders in 10 iterations'
 
-    # environ_regx  = r'\{\$.+?\}' #{$name}
-    # scalar_regx   = r'\{%.+?\}'  #{%scalar}
-    # list_regx     = r'\{&.+?\}'  #{&list[]}
-    # glob_regx     = r'\{\*.+?\}' #{*glob} ==> job scalar
-    # listjob_regx  = r'\{=.+?\}'  #{=list} ==> job scalar
-
     def sub_values(self,src,regx):
         '''
         substitute placeholders
@@ -228,12 +232,12 @@ class Conf:
 
         changed = False
         for key,value in self.scalars.items():
-            self.scalars[key],flag = do_sub2(src,regx,value)
+            self.scalars[key],flag = self.do_sub2(src,regx,value)
             if flag: changed = True
 
         for key,vlist in self.lists.items():
             for i,value in enumerate(vlist):
-                vlist[i],flag = do_sub2(src,regx,value)
+                vlist[i],flag = self.do_sub2(src,regx,value)
                 if flag: changed = True
 
         return changed
@@ -250,9 +254,9 @@ class Conf:
             m = re.search(regx,value)
             if m == None: break #no more matches
 
-            if m.group(0)[0] != '&':
+            if m.group(0)[1] != '&':
                 #not a list type placeholder
-                name = m.group(0)[2:-1]   #{%name} or {$name}
+                name = m.group(0)[2:-1]   #{%name}, {$name}, {*name} or {=name}
                 sub = src[name]
             else:
                 #list type placeholder
@@ -262,12 +266,15 @@ class Conf:
                 name = tmp_name[:ind]        # name[*]
                 subscript = tmp_name[ind+1:-1]
 
-                if subscript in ['N','n']:
+                if subscript in ['N']:
                     sub = str(len(src.getlist(name)))
-                elif validate_subscript(subscript,len(src.getlist(name))):
+                elif self.validate_subscript(subscript,len(src.getlist(name))):
                     sub = src.getlist(name)[int(subscript)]
                 elif len(subscript) == 1:
-                    sub = subscript.join(src.getlist(name))
+                    if subscript == 't':   sub = '\t'.join(src.getlist(name))
+                    elif subscript == 'n': sub = '\n'.join(src.getlist(name))
+                    else:                  sub = subscript.join(src.getlist(name))
+                    print(sub)
                 else:
                     raise Exception(f"invalid list placeholder {tmp_name}")
 
@@ -276,7 +283,7 @@ class Conf:
 
         return value,changed
 
-    def validate_subscript(subscript,list_length):
+    def validate_subscript(self,subscript,list_length):
         try:
             i = int(subscript)
         except:
@@ -286,9 +293,9 @@ class Conf:
 
         return True
 
-    def sub_globs(self,extra):
-        'substitute in any globbing placeholders from extra'
-        return self.sub_pholders(extra,'=',gl_regx)
+    # def sub_globs(self,extra):
+    #     'substitute in any globbing placeholders from extra'
+    #     return self.sub_pholders(extra,'=',gl_regx)
 
     def make_log_dir(self):
         if not os.path.exists(self['log_dir']):
@@ -349,11 +356,9 @@ def check_cwd(config):
 def process(pipeline,path,config=None):
     #initially set config to default values if none provided
     if config == None:
-        #config = {}
-        #update_config(config,copy.deepcopy(default_global_config))
-
-        #set conf to defaults, do not create log_dir yet (to avoid always creating the default)
+        #set conf to defaults
         config = Conf()
+        config.show("default config")
 
     counter = 0
 
@@ -371,6 +376,7 @@ def process(pipeline,path,config=None):
         elif item_type == 'config':
             #add new config to the existing one, overriding any shared keys
             config.add(item[item_type])
+            config.show("loaded config")
 
         elif item_type == 'include':
             #load and insert the yaml items in place of the include item
@@ -384,7 +390,7 @@ def process(pipeline,path,config=None):
             #following items
             new_pipeline,new_path = load_pipeline(item[item_type],path)
             sub_config = Conf(config)
-            process(new_pipeline,new_path,conf=sub_config)
+            process(new_pipeline,new_path,config=sub_config)
 
         #show(config,"config")
 
@@ -420,6 +426,9 @@ def setup_rule(config,rule):
     rule.sub_vars2()
     input.sub_vars2(src=rule)
     output.sub_vars2(src=rule)
+
+    #create log dir if missing
+    rule.make_log_dir()
 
     return rule,input,output,shell
 
@@ -488,27 +497,55 @@ def esc_regx(value):
 
 def generate_job_list(rule,input,output):
     '''
-    glob the first input pattern to file names
+    glob or list expand the first input pattern to final file names if required
     fill out remaining input and output patterns with the matched names
     '''
 
+    #the first input pattern triggers to glob/list expansion
     primary_key = list(input.keys())[0]
     primary = input[primary_key]
 
+    #determine whether there are glob {*name} or list {=name} placeholders
+    mlist = re.search(listjob_regx,primary)
+    mglob = re.search(glob_regx,primary)
+
+    #cannot have both in same input pattern
+    assert not (mlist and mglob), "cannot use both globbing and list expansion together"
+
+    if mglob:
+        #generate one job per glob match in primary input file pattern
+        job_list = generate_glob_jobs(rule,input,output,primary)
+    elif mlist:
+        #generate one job per list item in primary input file pattern
+        job_list = generate_list_jobs(rule,input,output,primary)
+    else:
+        #no expansion required, only one job is possible
+        job_list = []
+
+    exit()
+
+    return job_list
+
+def generate_list_jobs(rule,input,output,primary):
+    'generate one job per list item in primary input file pattern'
+    pass
+
+def generate_glob_jobs(rule,input,output,primary):
+    'generate one job per glob match in primary input file pattern'
     input_glob = ''
     input_regx = '^'
     ditems = {}
     prev_end = 0
 
     #convert fakemake placeholders into glob and regex query formats
-    for m in re.finditer(gl_regx,primary):
-        name = m.group(0)[1:-1]
+    for m in re.finditer(glob_regx,primary):
+        name = m.group(0)[1:-1]   #{*name}
         start = m.start(0)
 
         input_glob += primary[prev_end:start] + '*'
         input_regx += esc_regx(primary[prev_end:start])
 
-        #{=placeholder} defines a set of separate jobs
+        #{*name} defines a set of separate jobs
         name = name[1:]
         if name not in ditems:
             ditems[name] = True
@@ -529,11 +566,14 @@ def generate_job_list(rule,input,output):
         m = re.fullmatch(input_regx,path)
         assert m is not None
 
-        job_input = copy.deepcopy(input)
-        job_output = copy.deepcopy(output)
+        job_input = Conf(input)
+        job_output = Conf(output)
 
-        sub_globs(job_input,m.groupdict())
-        sub_globs(job_output,m.groupdict())
+        job_input.sub_input_output(m.groupdict())
+        job_output.sub_input_output(m.groupdict())
+
+        job_input.show("job_input")
+        job_output.show("job_output")
 
         job_list.append({"input":job_input,"output":job_output,"matches":m.groupdict()})
 
@@ -968,6 +1008,7 @@ def read_jobfile(fname):
 def process_rule(config,rule):
     #validate rule and substitute placeholders
     rule,input,output,shell = setup_rule(config,rule)
+    rule.show("setup rule")
 
     print(f'\nrule: {rule["name"]}')
 

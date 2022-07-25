@@ -1,2 +1,2 @@
 - config:
-    test_module: "test_module_value"
+    test_module: "test_list[1]={&test_list[1]}"
