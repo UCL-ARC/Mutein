@@ -40,6 +40,10 @@ class Foldx:
         print("### ... FOLDX:Repair: ", repairCommand)
         os.system(repairCommand)
         print("### ......... FOLDX:Repair: completed")
+        if exists(output_file):
+            return True
+        else:
+            return False        
 
     def runPosscan(self, pdb, mutation_string):
         foldxcommand = self.exe + " --command=PositionScan "

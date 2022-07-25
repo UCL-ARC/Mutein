@@ -120,32 +120,37 @@ def run_pipeline(args):
     for r in range(startRep, numRepairs):
         pdb = pdbcode + "_rep" + str(r) + ".pdb"
         output_file = "repair_" + str(r) + ".txt"
-        fx_runner.runRepair(pdb, output_file)
-        return_pdb = pdbcode + "_rep" + str(r) + "_Repair.pdb"
-        rename_pdb = pdbcode + "_rep" + str(r+1) + ".pdb"
+        success = fx_runner.runRepair(pdb, output_file)
+        if success:
+            return_pdb = pdbcode + "_rep" + str(r) + "_Repair.pdb"
+            rename_pdb = pdbcode + "_rep" + str(r+1) + ".pdb"
 
-        print(
-            "### foldx03:  ... copying file",
-            repair_path + return_pdb,
-            repair_path + rename_pdb
-        )
-        copyfile(repair_path+return_pdb, repair_path+rename_pdb)
-        # After every repair check that all the variants exists, if not the last version was our best and we should stop
-        filename = pdb_path.pdb_inputs + "params_variants.txt"
-        all_variants_exists = True
-        pdbobj = Pdb.PdbFile(pdbcode, repair_path + rename_pdb)
-        pdbobj.addVariants(filename)
-        if pdbobj.existsVariants():            
-            all_variants_exists = pdbobj.containsAllVariant()
-            
-            if not all_variants_exists:
-                lastgoodrepair = r-1
-                break
-            num_repairs_applied += 1
+            print(
+                "### foldx03:  ... copying file",
+                repair_path + return_pdb,
+                repair_path + rename_pdb
+            )
+            copyfile(repair_path+return_pdb, repair_path+rename_pdb)
+            # After every repair check that all the variants exists, if not the last version was our best and we should stop
+            filename = pdb_path.pdb_inputs + "params_variants.txt"
+            all_variants_exists = True
+            pdbobj = Pdb.PdbFile(pdbcode, repair_path + rename_pdb)
+            pdbobj.addVariants(filename)
+            if pdbobj.existsVariants():            
+                all_variants_exists = pdbobj.containsAllVariant()
+                
+                if not all_variants_exists:
+                    lastgoodrepair = r-1
+                    break
+                num_repairs_applied += 1
+            else:
+                num_repairs_applied += 1
+        
         else:
-            num_repairs_applied += 1
-                                
-    
+            lastgoodrepair = r-1
+            break
+
+                                                
     # only copy anything if we have been through a loop at all otherwise we have done nothing
     copy_over = True
     if num_repairs_applied == 0:

@@ -26,10 +26,10 @@ def addpath(inputs):
 #pdb="1pb5"
 
 dataset="mouse"
-gene="psme4"
-pdb="smhom_6rey_1_2_26_1843"
+gene="ryr2"
+pdb="smhom_5l1d_1_a_10_4962"
 
-repairs="10"
+repairs="1"
 repair_from = "x"
 split=100
 vsplit=10
