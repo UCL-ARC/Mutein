@@ -10,6 +10,7 @@ https://pypi.org/project/bioservices/
 import os
 import sys
 import shutil
+from os.path import exists
 
 import _helper
 import Paths
@@ -57,8 +58,10 @@ def cleanGene(args):
     
     for gene in genes:
         gene_path = Paths.Paths(data_dir, install_dir, dataset=dataset,gene=gene,readonly=False)    
-        mypath = gene_path.gene_inputs    
-        deletePath(mypath)
+        filename_ds = dataset_path.outputs + f"{gn}_ddg_variants.csv"
+        if exists(filename_ds):
+            mypath = gene_path.gene_inputs    
+            deletePath(mypath)
 
 def cleanGeneThruputs(args):
     argus = Arguments.Arguments(args)

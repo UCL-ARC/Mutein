@@ -115,7 +115,7 @@ def run_pipeline(args):
             batch_stat = BatchStatus.BatchStatus(DataDir, PipelineDir,dataset,gene,pdb)
             batch_stat.createUntasksForPdb(gene,pdb)                
             break
-        elif mode == "GENEINCOMPLETE":
+        elif mode == "GENEINCOMPLETE":            
             batch_stat = BatchStatus.BatchStatus(DataDir, PipelineDir,dataset,gene,"")
             pdblist = batch_stat.getGenePdbs(gene)#
             #We also need to create the genes level incomplete file
@@ -128,21 +128,48 @@ def run_pipeline(args):
                     for pdb in pdblist:          
                         batch_stat.createUntasksForPdb(gene,pdb,True,fw_back,fw_var,count)    
                         count += 1
-        elif mode == "PDB_BACK" or mode == "GENE_BACK":
+        elif mode == "PDB_BACK":            
+            dataset_gene_pdb = pattern.split(":")
+            dataset, gene, pdb = (
+                dataset_gene_pdb[0],
+                dataset_gene_pdb[1],
+                dataset_gene_pdb[2],
+            )            
+            path = Paths.Paths(DataDir, PipelineDir, dataset=dataset, gene=gene,pdb=pdb)
+            if "GENE" in mode or pdb == "":            
+                filename = path.outputs + "ddg_variants.csv"
+            else:
+                filename = path.outputs + "ddg_background.csv"
+            print(filename)
+            mexists, time = checkResult(filename)
+            if mexists:
+                print("DATAFRAME_START")
+                with open(filename, "r") as fr:
+                    lines = fr.readlines()
+                    for line in lines:
+                        print(line.strip())
+                print("DATAFRAME_END")
+        elif mode == "GENE_BACK" or mode=="GENE_VAR":            
             dataset_gene_pdb = pattern.split(":")
             dataset, gene, pdb = (
                 dataset_gene_pdb[0],
                 dataset_gene_pdb[1],
                 dataset_gene_pdb[2],
             )
-            path = Paths.Paths(DataDir, PipelineDir, dataset=dataset, gene=gene, pdb=pdb)
-            if "GENE" in mode or pdb == "":
-                filename = path.outputs + "ddg_bm_background.csv"
-            else:
-                filename = path.outputs + "ddg_background.csv"
+            ds_path = Paths.Paths(DataDir,PipelineDir,dataset=dataset)
+            ge_path = Paths.Paths(DataDir,PipelineDir,dataset=dataset,gene=gene)
+            if "VAR" in mode:                                
+                filename = ds_path.outputs + f"{gene.lower()}_ddg_variants.csv"
+            else:                
+                filename = ds_path.outputs + f"{gene.lower()}_ddg_background.csv"
             print(filename)
             mexists, time = checkResult(filename)
-            if mexists:
+            if not mexists:
+                if "VAR" in mode:                
+                    filename = ge_path.outputs + "ddg_variants.csv"
+                else:
+                    filename = ge_path.outputs + "ddg_background.csv"
+            if mexists:                
                 print("DATAFRAME_START")
                 with open(filename, "r") as fr:
                     lines = fr.readlines()
@@ -157,9 +184,7 @@ def run_pipeline(args):
                 dataset_gene_pdb[2],
             )
             path = Paths.Paths(DataDir, PipelineDir, dataset=dataset, gene=gene, pdb=pdb)
-            filename = path.outputs + "ddg_variants"
-            if pdb == "":
-                filename = path.outputs + "ddg_variant_bm.csv"
+            filename = path.outputs + "ddg_variants"            
             print(filename)
             mexists, time = checkResult(filename)
             if mexists:

@@ -34,7 +34,7 @@ def run_pipeline(args):
     genes_csv = genes_fd.openDataFrame()
         
     for g in range(len(genes_csv.index)):
-        gn = genes_csv["gene"][g]
+        gn = genes_csv["gene"][g].lower()
         argsgn = args
         arglist = args[1]
         arglist += "@gene=" + gn
