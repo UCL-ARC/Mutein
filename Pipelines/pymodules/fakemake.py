@@ -12,17 +12,36 @@ import sys
 import random
 
 #regex patterns to match non nested {placeholders} and {$environment variables}
-ph_regx = r'\{[^\$=].*?\}'
-#ph_regx = r'\{.+?\}'
-en_regx = r'\{\$.+?\}'
-gl_regx = r'\{=.+?\}'
+environ_regx  = r'\{\$.+?\}' #{$name}
+scalar_regx   = r'\{%.+?\}'  #{%scalar}
+list_regx     = r'\{&.+?\}'  #{&list[]}
+glob_regx     = r'\{\*.+?\}' #{*glob} ==> job scalar
+listjob_regx  = r'\{=.+?\}'  #{=list} ==> job scalar
 
-#keys not allowed in config
-nonconfig_keys = ['input','output','name']
+#required and forbidden keys (after input/output/shell are removed from rule)
+required_keys = {
+    "config": [  ],
+    "rule":   [ "name" ],
+    "input":  [  ],
+    "output": [  ],
+    "shell":  [ "shell" ],
+}
 
-#keys not allowed or required in rules
-nonrule_keys = []
-rule_keys = ['name','input','output','shell']
+forbidden_keys = {
+    "config": [ 'input','output','name','rule','config','module','include','import' ],
+    "rule":   [ "config" ],
+    "input":  [  ],
+    "output": [  ],
+    "shell":  [  ],
+}
+
+allow_lists = {
+    "config": True,
+    "rule":   True,
+    "input":  False,
+    "output": False,
+    "shell":  False,
+}
 
 #placeholder first characters with special meaning
 #$ environment variable
@@ -57,61 +76,263 @@ default_global_config =\
 }
 
 class Conf:
-    def __init__(self,src=None):
+    def __init__(self,src=None,kind="config"):
+        #note both scalars and lists should be ordered dictionaries
+        #(requires python 3.7 or later)
+
+        self.kind = kind
+
+        #config values that are all simple strings
+        self.scalars = {}
+
+        #config values that are lists of strings
+        self.lists = {}
+
         if src == None:
-            self.d = {}
+            #initialise to defaults
+            self.add(default_global_config,create_log_dir=False)
+
         elif type(src) == Conf:
-            self.d = copy.deepcopy(src.d)
+            #incorporate another config, overwriting any existing common keys
+            self.update(src)
+
         elif type(src) == dict:
-            self.d = copy.deepcopy(src)
+            #add the raw dict, overwriting any existing common keys
+            self.add(src)
+
         else:
             raise Exception(f"unsupported source class {type(src)}")
 
     def __getitem__(self,key):
-        return self.d[key]
+        'default getitem looks only in scalars'
+        return self.scalars[key]
 
     def __setitem__(self,key,value):
-        self.d[key] = value
+        'default setitem only sets scalars'
+        self.scalars[key] = value
 
-def sub_vars(config,extra=None):
-    'substitute all simple placeholders or fail trying'
+    def items(self):
+        return self.scalars.items()
 
-    if extra == None: extra = config
+    def keys(self):
+        return self.scalars.keys()
 
-    counter = 10
-    while True:
-        counter -= 1
-        changed = sub_pholders(config,extra,'',ph_regx)
-        if not changed: break
-        assert counter > 0, 'unable to resolve all placeholders'
+    def getlist(self,key):
+        return self.lists[key]
 
-def sub_environ(config):
-    'substitute in any placeholders for environment variables'
-    return sub_pholders(config,os.environ,'$',en_regx)
+    def setlist(self,key,value):
+        self.lists[key] = value
 
-def sub_globs(config,extra):
-    'substitute in any globbing placeholders from extra'
-    return sub_pholders(config,extra,'=',gl_regx)
+        #self.check()
 
-def sub_pholders(config,extra,prefix,regx):
-    '''
-    find all placeholders in config values that match regx
-    substitute in the corresponding value from extra
-    raises exception if not found
-    '''
+    def listitems(self):
+        return self.lists.items()
 
-    changed = False
-    for key,value in config.items():
+    def add(self,src_dict):
+        '''
+        add all key:value pairs from a raw yaml dictionary
+        values of src take priority (overwrite) any shared keys in self
+        check for validity and substitute placeholders
+        split into scalars and lists
+        '''
+
+        assert type(src_dict) == dict
+
+        for key,value in src_dict.items():
+            assert type(key) == str
+
+            if type(value) == str:
+                self.scalars[key] = value
+            elif type(value) == list:
+                for x in value: assert type(x) == str
+                self.lists[key] = value.copy()
+            else:
+                raise Exception(f'unsupported config item type {type(value)}')
+
+        #self.check()
+        #self.sub_environ()
+        #self.sub_vars()
+        #if create_log_dir: self.make_log_dir()
+
+    def update(self,src_config):
+        '''
+        add all key:value pairs from another conf object
+        values of src_config take priority (overwrite) any duplicate keys in self
+        '''
+
+        assert type(src) == Conf
+
+        self.scalars.update(src_config.scalars)
+
+        for key,value in src_config.lists.items():
+            self.lists[key] = value.copy()
+
+    def override(self,src_config):
+        '''
+        add all key:value pairs from another conf object
+        values of self take priority (are retained) for any duplicate keys
+        '''
+
+        assert type(src) == Conf
+
+        tmp_scalars = copy.deepcopy(src_config.scalars)
+        tmp_scalars.update(self.scalars)
+        self.scalars = tmp_scalars
+
+        for key,value in src_config.lists.items():
+            if not key in self.lists:
+                self.lists[key] = value.copy()
+
+    def check(self):
+        'check we have all the required keys and no forbidden ones'
+
+        for key in self.scalars.keys():
+            assert key not in forbidden_keys[self.kind]
+
+        for key in required_keys[self.kind]:
+            assert key in self.scalars.keys()
+
+        if allow_lists[self.kind] == False:
+            assert len(self.lists) == 0
+
+    def sub_vars2(self,src=None):
+        '''
+        substitute all placeholders except {=...} and {*...} 
+        or throw exception
+        '''
+
+        #where to get the replacement values from
+        if src == None: src = self
+
+        counter = 10
+        while True:
+            changed = False
+            counter -= 1
+            if self.sub_values(os.environ,environ_regx): changed = True
+            if self.sub_values(src,scalar_regx):         changed = True
+            if self.sub_values(src,list_regx):           changed = True
+            if not changed: break
+            assert counter > 0, 'unable to resolve all placeholders in 10 iterations'
+
+    # environ_regx  = r'\{\$.+?\}' #{$name}
+    # scalar_regx   = r'\{%.+?\}'  #{%scalar}
+    # list_regx     = r'\{&.+?\}'  #{&list[]}
+    # glob_regx     = r'\{\*.+?\}' #{*glob} ==> job scalar
+    # listjob_regx  = r'\{=.+?\}'  #{=list} ==> job scalar
+
+    def sub_values(self,src,regx):
+        '''
+        substitute placeholders
+        ie {$environ}, {%scalars} or {&lists[i]}
+        '''
+
+        changed = False
+        for key,value in self.scalars.items():
+            self.scalars[key],flag = do_sub2(src,regx,value)
+            if flag: changed = True
+
+        for key,vlist in self.lists.items():
+            for i,value in enumerate(vlist):
+                vlist[i],flag = do_sub2(src,regx,value)
+                if flag: changed = True
+
+        return changed
+
+    def do_sub2(self,src,regx,value):
+        '''
+        sub all simple placeholders in value from src
+        src can be a dict (os.environ) or a Conf (ie Conf.scalars via __getitem__)
+        '''
+
+        changed = False
+
         while True:
             m = re.search(regx,value)
-            if m == None: break
+            if m == None: break #no more matches
 
-            name = m.group(0)[1:-1]
-            if len(prefix) > 0: assert name.startswith(prefix)
-            value = value[:m.start(0)] + extra[name[len(prefix):]] + value[m.end(0):]
+            if m.group(0)[0] != '&':
+                #not a list type placeholder
+                name = m.group(0)[2:-1]   #{%name} or {$name}
+                sub = src[name]
+            else:
+                #list type placeholder
+                tmp_name = m.group(0)[2:-1]  # {&name[*]}
+                assert tmp_name[-1] == ']'
+                ind = tmp_name.index('[')
+                name = tmp_name[:ind]        # name[*]
+                subscript = tmp_name[ind+1:-1]
+
+                if subscript in ['N','n']:
+                    sub = str(len(src.getlist(name)))
+                elif validate_subscript(subscript,len(src.getlist(name))):
+                    sub = src.getlist(name)[int(subscript)]
+                elif len(subscript) == 1:
+                    sub = subscript.join(src.getlist(name))
+                else:
+                    raise Exception(f"invalid list placeholder {tmp_name}")
+
+            value = value[:m.start(0)] + sub + value[m.end(0):]
             changed = True
-        config[key] = value
-    return changed
+
+        return value,changed
+
+    def validate_subscript(subscript,list_length):
+        try:
+            i = int(subscript)
+        except:
+            return False
+
+        if i < -list_length or i >= list_length: return False
+
+        return True
+
+    def sub_globs(self,extra):
+        'substitute in any globbing placeholders from extra'
+        return self.sub_pholders(extra,'=',gl_regx)
+
+    def make_log_dir(self):
+        if not os.path.exists(self['log_dir']):
+            os.makedirs(self['log_dir'])
+
+# def sub_vars(config,extra=None):
+#     'substitute all simple placeholders or fail trying'
+
+#     if extra == None: extra = config
+
+#     counter = 10
+#     while True:
+#         counter -= 1
+#         changed = sub_pholders(config,extra,'',ph_regx)
+#         if not changed: break
+#         assert counter > 0, 'unable to resolve all placeholders'
+
+# def sub_environ(config):
+#     'substitute in any placeholders for environment variables'
+#     return sub_pholders(config,os.environ,'$',en_regx)
+
+# def sub_globs(config,extra):
+#     'substitute in any globbing placeholders from extra'
+#     return sub_pholders(config,extra,'=',gl_regx)
+
+# def sub_pholders(config,extra,prefix,regx):
+#     '''
+#     find all placeholders in config values that match regx
+#     substitute in the corresponding value from extra
+#     raises exception if not found
+#     '''
+
+#     changed = False
+#     for key,value in config.items():
+#         while True:
+#             m = re.search(regx,value)
+#             if m == None: break
+
+#             name = m.group(0)[1:-1]
+#             if len(prefix) > 0: assert name.startswith(prefix)
+#             value = value[:m.start(0)] + extra[name[len(prefix):]] + value[m.end(0):]
+#             changed = True
+#         config[key] = value
+#     return changed
 
 def show(item,label,indent=2):
     print(label)
@@ -128,8 +349,11 @@ def check_cwd(config):
 def process(pipeline,path,config=None):
     #initially set config to default values if none provided
     if config == None:
-        config = {}
-        update_config(config,copy.deepcopy(default_global_config))
+        #config = {}
+        #update_config(config,copy.deepcopy(default_global_config))
+
+        #set conf to defaults, do not create log_dir yet (to avoid always creating the default)
+        config = Conf()
 
     counter = 0
 
@@ -146,7 +370,7 @@ def process(pipeline,path,config=None):
 
         elif item_type == 'config':
             #add new config to the existing one, overriding any shared keys
-            update_config(config,item[item_type])
+            config.add(item[item_type])
 
         elif item_type == 'include':
             #load and insert the yaml items in place of the include item
@@ -159,8 +383,8 @@ def process(pipeline,path,config=None):
             #process a nested pipeline without affecting the config of any
             #following items
             new_pipeline,new_path = load_pipeline(item[item_type],path)
-            new_config = copy.deepcopy(config)
-            process(new_pipeline,new_path,config=new_config)
+            sub_config = Conf(config)
+            process(new_pipeline,new_path,conf=sub_config)
 
         #show(config,"config")
 
@@ -173,68 +397,42 @@ def load_pipeline(path,parent_file):
     assert full_path != parent_file
     return parse_yaml(full_path),full_path
 
-def find_duplicates(dict_list):
+def find_duplicates(conf_list):
     all_keys = set()
 
-    for config in dict_list:
+    for config in conf_list:
         for key in config.keys():
             assert not key in all_keys, f"duplicate key {key}"
             all_keys.add(key)
 
 def setup_rule(config,rule):
-    assert type(rule) == dict
-
-    #check all keys and values are simple strings
-    #check for forbidden keys
-    for key,value in rule.items():
-        assert key not in nonrule_keys
-        assert type(key) == str
-        if key not in ['input','output']:
-            #general rule options must be simple strings
-            assert type(value) == str
-        else:
-            #input and output can be simple strings or dictionaries of strings
-            if type(value) != str:
-                assert type(value) == dict
-                for k,v in value.items():
-                    assert type(k) == str
-                    assert type(v) == str
-    
-    #check for required keys
-    for key in rule_keys:
-        assert key in rule
-
     #separate out and canonicalise input, output and shell
-    input,output,shell = split_rule(rule)
+    rule,input,output,shell = split_rule(rule)
 
-    #merge temporary copy of config into the rule
-    #such that rule keys overwrite any matching config keys
-    _config = copy.deepcopy(config)
-    _config.update(rule)
-    rule.update(_config)
+    #merge config into rule but rule has priority
+    rule.override(config)
 
-    #verify that rule, input and output do not share any keys
+    #try to ensure placeholder subtitution is not ambiguous
     find_duplicates([rule,input,output])
 
-    #substitute any environment variables
-    sub_environ(rule)
-    sub_environ(input)
-    sub_environ(output)
-    sub_environ(shell)
+    #substitute all placeholders except for shell
+    #which likely contains input/output variables yet to be determined
+    rule.sub_vars2()
+    input.sub_vars2(src=rule)
+    output.sub_vars2(src=rule)
 
-    #substitute any fakemake variables except for the shell dict
-    #which contains input/output variables yet to be determined
-    sub_vars(rule)
-    sub_vars(input,extra=rule)
-    sub_vars(output,extra=rule)
-
-    return input,output,shell
+    return rule,input,output,shell
 
 def split_rule(rule):
-    #separate input and output from rule
+    '''
+    separate out input, output and shell from rule
+    convert all to Conf
+    '''
+
     input = rule['input']
     output = rule['output']
     shell = rule['shell']
+
     del rule['input']
     del rule['output']
     del rule['shell']
@@ -242,9 +440,14 @@ def split_rule(rule):
     #convert simple form input/output into dictionary form
     if type(input) == str: input = {'input':input}
     if type(output) == str: output = {'output':output}
-    shell = {'shell':shell}
+    shell = { 'shell':shell }
 
-    return input,output,shell
+    rule = Conf(rule,kind="rule")
+    input = Conf(input,kind="input")
+    output = Conf(output,kind="output")
+    shell = Conf(shell,kind="shell")
+
+    return rule,input,output,shell
 
 def update_config(config,new_config):
     #check all keys and values are simple strings
@@ -764,7 +967,7 @@ def read_jobfile(fname):
 
 def process_rule(config,rule):
     #validate rule and substitute placeholders
-    input,output,shell = setup_rule(config,rule)
+    rule,input,output,shell = setup_rule(config,rule)
 
     print(f'\nrule: {rule["name"]}')
 
