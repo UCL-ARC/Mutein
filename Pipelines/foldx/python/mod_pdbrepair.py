@@ -146,8 +146,8 @@ def run_pipeline(args):
                 num_repairs_applied += 1
         
         else:
-            lastgoodrepair = r
-            break
+            print("Something has gone wrong")
+            return False
 
                                                 
     # only copy anything if we have been through a loop at all otherwise we have done nothing
@@ -203,6 +203,7 @@ def run_pipeline(args):
     
 
     print("### COMPLETED FoldX repair job ###")
+    return True
     #print("MUTEIN SCRIPT ENDED")
 
 

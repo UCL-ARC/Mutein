@@ -42,8 +42,9 @@ def run_pipeline(args):
         runner.preparePdbs(args)
     if "c" in runs:
         print("Mutein: Repairing pdbs")
-        runner.repairPdbs(args)
-        cleaner.cleanPdbThruputs(args)
+        success = runner.repairPdbs(args)
+        if success:
+            cleaner.cleanPdbThruputs(args)
     if "d" in runs:
         print("Mutein: Making background param file")
         runner.makeParams(args)
