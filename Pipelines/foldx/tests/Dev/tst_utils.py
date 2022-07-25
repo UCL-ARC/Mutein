@@ -23,13 +23,14 @@ import remote
 GENEINCOMPLETEPDB
 DSINCOMPLETEPDB
 GENES
+GENE_BACK
 """
 
 
 def test_clean():    
     #python ${script} $mode $pattern $WorkDir $DataDir $InstallDir $PipelineDir
     args = ["",
-            'GENES', 
+            'GENE_BACK', 
             'one:x:x', 
             '/home/ucbtlcr/Scratch/workspace/', 
             '/home/rachel/UCL/github/MuteinData/', 

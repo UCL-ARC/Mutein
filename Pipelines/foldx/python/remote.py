@@ -177,7 +177,7 @@ def run_pipeline(args):
                         print(line.strip())
                 print("DATAFRAME_END")
             else:
-                print(filename "does not exist")
+                print(filename, "does not exist")
 
         elif mode == "PDB_BM":
             dataset_gene_pdb = pattern.split(":")
