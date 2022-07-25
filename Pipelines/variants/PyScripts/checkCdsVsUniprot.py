@@ -76,7 +76,7 @@ for gene in genes:
     found,gene_name,seq,tr = fstCds.getSeqDetailsPep(gene.upper(),seq)
     if found:
         matches.append([gene,tr,seq])
-        #print("Gene found",gene,f"\n{seq}")
+        print("Gene found",gene_name,tr)
     else:
         not_matches.append(gene)
 
@@ -112,13 +112,13 @@ for gene,tr,seq in matches:
             207647013	C	T	1 207647013 C T	0.000374065	CR2	CCDS31007.1	r.2291c>u	c.2102C>T	p.S701F
             """
             retsA= coding_gene.getVariant(207640071,"G",True)            
+            print("Found variant",retsA)
             retsB= coding_gene.getVariant(207642037,"A",True)            
+            print("Found variant",retsB)
             retsC= coding_gene.getVariant(207646227,"A",True)
-            retsD= coding_gene.getVariant(207647013,"T",True)
-            print(retsA)
-            print(retsB)
-            print(retsC)
-            print(retsD)
+            print("Found variant",retsC)
+            #retsD= coding_gene.getVariant(207647013,"T",True)                        
+            #print(retsD)
 
 
     
