@@ -38,7 +38,7 @@ class Foldx:
         repairB = self.makeDefaultsString()
         repairCommand = repairA + pdb + repairB + " > " + output_file
         print("### ... FOLDX:Repair: ", repairCommand)
-        return False
+        #return False
         os.system(repairCommand)        
         if exists(return_pdb):
             print("### ......... FOLDX:Repair: completed")
