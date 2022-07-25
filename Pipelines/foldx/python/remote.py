@@ -161,21 +161,24 @@ def run_pipeline(args):
             if "VAR" in mode:                                
                 filename = ds_path.outputs + f"{gene.lower()}_ddg_variants.csv"
             else:                
-                filename = ds_path.outputs + f"{gene.lower()}_ddg_background.csv"
-            print(filename)
+                filename = ds_path.outputs + f"{gene.lower()}_ddg_background.csv"            
             mexists, time = checkResult(filename)
             if not mexists:
                 if "VAR" in mode:                
                     filename = ge_path.outputs + "ddg_variants.csv"
                 else:
                     filename = ge_path.outputs + "ddg_background.csv"
-            if mexists:                
+            if mexists:
+                print(filename,"contains results")
                 print("DATAFRAME_START")
                 with open(filename, "r") as fr:
                     lines = fr.readlines()
                     for line in lines:
                         print(line.strip())
                 print("DATAFRAME_END")
+            else:
+                print(filename "does not exist")
+
         elif mode == "PDB_BM":
             dataset_gene_pdb = pattern.split(":")
             dataset, gene, pdb = (
@@ -184,10 +187,10 @@ def run_pipeline(args):
                 dataset_gene_pdb[2],
             )
             path = Paths.Paths(DataDir, PipelineDir, dataset=dataset, gene=gene, pdb=pdb)
-            filename = path.outputs + "ddg_variants"            
-            print(filename)
+            filename = path.outputs + "ddg_variants"                        
             mexists, time = checkResult(filename)
             if mexists:
+                print(filename)
                 print("DATAFRAME_START")
                 with open(filename, "r") as fr:
                     lines = fr.readlines()
