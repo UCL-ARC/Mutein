@@ -79,7 +79,7 @@ def run_pipeline(args):
         if exists(file_lst_var):
             fdf = FileDf.FileDf(file_lst_var)
             lstvardf = fdf.openDataFrame()
-            if len(lstvardf.index) > 0: 
+            if len(lstvardf.index) > 0:                 
                 if exists(file_var_bm):
                     fdf = FileDf.FileDf(file_var_bm)                    
                     all_var_build.append(fdf.openDataFrame())                                    
@@ -97,7 +97,7 @@ def run_pipeline(args):
         
 
     metric = ScoringMetric.ScoringMetric(gene_path,dataset,gene)
-    if exists_all_back:        
+    if exists_all_back and len(all_back_bm) > 0:        
         ddg_df_back_bm = pd.concat(all_back_bm, ignore_index=True)
         ddg_df_back_bm['pdb'] = ddg_df_back_bm.apply(lambda row: metric.cutPdb(row['pdb']), axis=1)
         ddg_df_back_bm['score'] = ddg_df_back_bm.apply(lambda row: metric.getScore(row['pdb'])[0], axis=1)
