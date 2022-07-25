@@ -121,11 +121,9 @@ def run_pipeline(args):
         pdb = pdbcode + "_rep" + str(r) + ".pdb"
         output_file = "repair_" + str(r) + ".txt"
         return_pdb = pdbcode + "_rep" + str(r) + "_Repair.pdb"
-        success = fx_runner.runRepair(pdb, output_file,return_pdb)
-        if success:
-            
+        success = fx_runner.runRepair(pdb, output_file,return_pdb)        
+        if success:                        
             rename_pdb = pdbcode + "_rep" + str(r+1) + ".pdb"
-
             print(
                 "### foldx03:  ... copying file",
                 repair_path + return_pdb,
@@ -141,14 +139,14 @@ def run_pipeline(args):
                 all_variants_exists = pdbobj.containsAllVariant()
                 
                 if not all_variants_exists:
-                    lastgoodrepair = r-1
+                    lastgoodrepair = r
                     break
                 num_repairs_applied += 1
             else:
                 num_repairs_applied += 1
         
         else:
-            lastgoodrepair = r-1
+            lastgoodrepair = r
             break
 
                                                 

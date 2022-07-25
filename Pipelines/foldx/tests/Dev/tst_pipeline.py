@@ -29,7 +29,7 @@ dataset="mouse"
 gene="ryr2"
 pdb="smhom_5l1d_1_a_10_4962"
 
-repairs="1"
+repairs="2"
 repair_from = "x"
 split=100
 vsplit=10
