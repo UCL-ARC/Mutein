@@ -120,9 +120,10 @@ def run_pipeline(args):
     for r in range(startRep, numRepairs):
         pdb = pdbcode + "_rep" + str(r) + ".pdb"
         output_file = "repair_" + str(r) + ".txt"
-        success = fx_runner.runRepair(pdb, output_file)
+        return_pdb = pdbcode + "_rep" + str(r) + "_Repair.pdb"
+        success = fx_runner.runRepair(pdb, output_file,return_pdb)
         if success:
-            return_pdb = pdbcode + "_rep" + str(r) + "_Repair.pdb"
+            
             rename_pdb = pdbcode + "_rep" + str(r+1) + ".pdb"
 
             print(

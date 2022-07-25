@@ -33,16 +33,21 @@ class Foldx:
         repairB = " --ionStrength=0.05 --pH=7 --vdwDesign=2 --pdbHydrogens=false"
         return repairB
 
-    def runRepair(self, pdb, output_file):
+    def runRepair(self, pdb, output_file,return_pdb):
         repairA = self.exe + " --command=RepairPDB --pdb="
         repairB = self.makeDefaultsString()
         repairCommand = repairA + pdb + repairB + " > " + output_file
         print("### ... FOLDX:Repair: ", repairCommand)
         os.system(repairCommand)
         print("### ......... FOLDX:Repair: completed")
-        if exists(output_file):
+        if exists(return_pdb):
             return True
         else:
+            if exists(output_file):
+                with open(output_file, "r") as fr:
+                    lines= fr.readlines()
+                    for line in lines:
+                        print(line.strip())
             return False        
 
     def runPosscan(self, pdb, mutation_string):
