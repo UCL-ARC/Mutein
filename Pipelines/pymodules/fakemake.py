@@ -502,62 +502,100 @@ def generate_job_list(rule,input,output):
     '''
 
     #the first input pattern triggers to glob/list expansion
-    primary_key = list(input.keys())[0]
-    primary = input[primary_key]
+    # primary_key = list(input.keys())[0]
+    # primary = input[primary_key]
 
     #determine whether there are glob {*name} or list {=name} placeholders
-    mlist = re.search(listjob_regx,primary)
-    mglob = re.search(glob_regx,primary)
+    # mlist = re.search(listjob_regx,primary)
+    # mglob = re.search(glob_regx,primary)
 
-    #cannot have both in same input pattern
-    assert not (mlist and mglob), "cannot use both globbing and list expansion together"
+    # #cannot have both in same input pattern
+    # assert not (mlist and mglob), "cannot use both globbing and list expansion together"
 
-    if mglob:
-        #generate one job per glob match in primary input file pattern
-        job_list = generate_glob_jobs(rule,input,output,primary)
-    elif mlist:
-        #generate one job per list item in primary input file pattern
-        job_list = generate_list_jobs(rule,input,output,primary)
-    else:
-        #no expansion required, only one job is possible
-        job_list = []
+    #seed job "list" containing just the unexpanded input(s) and output(s)
+    #which may have placeholders in need of expansion
+    job_list = [{"input":input,"output":output,"matches":{}}]
+
+    #expand input pattern lists
+    new_list = []
+    for job in job_list: new_list += generate_list_jobs(rule,job)
+    job_list = new_list
+
+    #expanded input pattern globs
+    new_list = []
+    for job in job_list: new_list += generate_glob_jobs(rule,job)
+    job_list = new_list
+
+    for job in job_list:
+        job['input'].show('job input')
+        job['output'].show('job output')
+        job['matches'].show('job matches')
 
     exit()
 
     return job_list
 
-def generate_list_jobs(rule,input,output,primary):
-    'generate one job per list item in primary input file pattern'
+def generate_list_jobs(rule,job):
+    'expand job list to one item per input file pattern match (combo)'
 
-    #identify all listjob type placeholders {=name} in first input pattern
+    new_list = []
+
+    #identify all listjob type placeholders {=name} in input patterns
     ph_leng = {}
 
-    for m in re.finditer(listjob_regx,primary):
-        name = m.group(0)[2:-1]   #"{=name}" ==> "name"
+    for key,value in job["input"].items():
+        print(key,value)
+        for m in re.finditer(listjob_regx,value):
+            name = m.group(0)[2:-1]   #"{=name}" ==> "name"
 
-        if name not in ph_leng:
-            #store the list length
-            ph_leng[name] = len(rule.getlist(name))
+            if name not in ph_leng:
+                #store the list length
+                ph_leng[name] = len(rule.getlist(name))
 
-    #expand the primary input pattern into a list of complete paths
+    #nothing to do if no list patterns present in input patterns
+    if len(ph_leng) == 0: return [ job ]
+
+    #expand input and output patterns into complete paths
     #filled out with the values from the list(s)
     #where multiple lists are present expand to all combinations of the lists
-    job_list = []
     ph_index = {key:0 for key in ph_leng}
 
-    while True:
+    loop = True
+    while loop:
         #substitute in values from the rule Conf list variables
         src = {}
         for key in ph_leng:
             src[key] = rule.getlist(key)[ph_index[key]]
 
-        sub_values(src,listjob_regx)
+        for val in ph_index.values():
+            print(val,end=' ')
+        print()
+        show(src,"src")
 
-        job_list.append({"input":job_input,"output":job_output,"matches":m.groupdict()})
+        new_input = Conf(job["input"])
+        new_output = Conf(job["output"])
+        new_matches = Conf(job["matches"])
+        new_matches.update(src)
 
+        new_input.sub_values(src,listjob_regx)
+        new_output.sub_values(src,listjob_regx)
 
-def generate_glob_jobs(rule,input,output,primary):
-    'generate one job per glob match in primary input file pattern'
+        new_list.append({"input":new_input,"output":new_output,"matches":new_matches})
+
+        #increment to the next input pattern combo if multiple placeholders present
+        for i,key in enumerate(ph_index):
+            ph_index[key] += 1
+            if ph_index[key] < ph_leng[key]: break
+            if i == len(ph_index)-1:
+                loop = False
+                break
+            ph_index[key] = 0
+
+    return new_list
+
+def generate_glob_jobs(rule,job):
+    'expand job list to one item per input file pattern match (combo)'
+
     input_glob = ''
     input_regx = '^'
     ditems = {}

@@ -1,2 +1,2 @@
 - config:
-    test_variable: "data_dir={%data_dir}"
+    test_variable: "test_dir={%test_dir}"

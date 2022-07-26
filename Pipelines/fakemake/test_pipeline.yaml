@@ -23,36 +23,53 @@
 - module: "test_module/module.yaml"
 
 - rule:
-    name:     "step1"
+    name:     "test1"
     exec:     "local"
-    time:     "1:00:00"
-    mem:      "2G"
-    cores:    "1"
-    conda:    "{%mut_prefix}main"
-    data_dir: "{%test_dir}/input"
-    input:    "{%data_dir}/{*sample}.input"
-    output:   "{%test_dir}/output/{*sample}.step1"
-    shell: |
-      cat {%input} > {%output}
-      echo file {%input} sample {*sample} >> {%output}
-      echo processed by {%name} >> {%output}
-      echo "{%input}" | grep -v -e '1\.input' #should cause task1 to fail
-      
-- rule:
-    name: "step2"
-    exec: "local"
-    time:     "0:30:00"
-    mem:      "2G"
-    cores:    "2"
-    conda: "{$MUT_PREFIX}main"
+    sample_subset:
+      - subset1
+      - subset2
+    treatment_class:
+      - prenormify
+      - subexpansification
     input:
-      step1: "{%test_dir}/output/{*sample}.step1"
-    output:
-      final: "{%test_dir}/output/{*sample}.step2"
+      samp_file: "{%test_dir}/samples/{=sample_subset}/{*sample}.data"
+      treat_meta: "{%test_dir}/treatment_class/{=treatment_class}/{*treatment}"
+    output: "{%test_dir}/output/{=sample_subset}/{=treatment_class}/{*sample}_{*treatment}.step1"
     shell: |
-      cat {%step1} > {%final}
-      echo processed by {%name} >> {%final}
-      echo "hello"
+      echo samp_file={%samp_file} treat_meta={%treat_meta} > {%output}
+      echo {=sample_subset} {*sample} {=treatment_class} {*treatment} >> {%output}
+      
+# - rule:
+#     name:     "step1"
+#     exec:     "local"
+#     time:     "1:00:00"
+#     mem:      "2G"
+#     cores:    "1"
+#     conda:    "{%mut_prefix}main"
+#     data_dir: "{%test_dir}/input"
+#     input:    "{%data_dir}/{*sample}.input"
+#     output:   "{%test_dir}/output/{*sample}.step1"
+#     shell: |
+#       cat {%input} > {%output}
+#       echo file {%input} sample {*sample} >> {%output}
+#       echo processed by {%name} >> {%output}
+#       echo "{%input}" | grep -v -e '1\.input' #should cause task1 to fail
+      
+# - rule:
+#     name: "step2"
+#     exec: "local"
+#     time:     "0:30:00"
+#     mem:      "2G"
+#     cores:    "2"
+#     conda: "{$MUT_PREFIX}main"
+#     input:
+#       step1: "{%test_dir}/output/{*sample}.step1"
+#     output:
+#       final: "{%test_dir}/output/{*sample}.step2"
+#     shell: |
+#       cat {%step1} > {%final}
+#       echo processed by {%name} >> {%final}
+#       echo "hello"
 
 # - rule:
 #     name: step4
