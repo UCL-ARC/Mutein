@@ -528,7 +528,33 @@ def generate_job_list(rule,input,output):
 
 def generate_list_jobs(rule,input,output,primary):
     'generate one job per list item in primary input file pattern'
-    pass
+
+    #identify all listjob type placeholders {=name} in first input pattern
+    ph_leng = {}
+
+    for m in re.finditer(listjob_regx,primary):
+        name = m.group(0)[2:-1]   #"{=name}" ==> "name"
+
+        if name not in ph_leng:
+            #store the list length
+            ph_leng[name] = len(rule.getlist(name))
+
+    #expand the primary input pattern into a list of complete paths
+    #filled out with the values from the list(s)
+    #where multiple lists are present expand to all combinations of the lists
+    job_list = []
+    ph_index = {key:0 for key in ph_leng}
+
+    while True:
+        #substitute in values from the rule Conf list variables
+        src = {}
+        for key in ph_leng:
+            src[key] = rule.getlist(key)[ph_index[key]]
+
+        sub_values(src,listjob_regx)
+
+        job_list.append({"input":job_input,"output":job_output,"matches":m.groupdict()})
+
 
 def generate_glob_jobs(rule,input,output,primary):
     'generate one job per glob match in primary input file pattern'
@@ -539,14 +565,13 @@ def generate_glob_jobs(rule,input,output,primary):
 
     #convert fakemake placeholders into glob and regex query formats
     for m in re.finditer(glob_regx,primary):
-        name = m.group(0)[1:-1]   #{*name}
+        name = m.group(0)[2:-1]   #{*name}
         start = m.start(0)
 
         input_glob += primary[prev_end:start] + '*'
         input_regx += esc_regx(primary[prev_end:start])
 
         #{*name} defines a set of separate jobs
-        name = name[1:]
         if name not in ditems:
             ditems[name] = True
             input_regx += '(?P<' + name + '>[^/]+)'
