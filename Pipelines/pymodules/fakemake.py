@@ -10,6 +10,7 @@ import shutil
 import subprocess
 import sys
 import random
+import itertools
 
 #regex patterns to match non nested {placeholders} and {$environment variables}
 environ_regx  = r'\{\$.+?\}' #{$name}
@@ -76,11 +77,9 @@ default_global_config =\
 }
 
 class Conf:
-    def __init__(self,src=None,kind="config"):
+    def __init__(self,src=None):
         #note both scalars and lists should be ordered dictionaries
         #(requires python 3.7 or later)
-
-        self.kind = kind
 
         #config values that are all simple strings
         self.scalars = {}
@@ -89,16 +88,15 @@ class Conf:
         self.lists = {}
 
         if src == None:
+            #initialise to empty
+            pass
+        elif src == "defaults":
             #initialise to defaults
-            self.add(default_global_config)
+            self.update(default_global_config)
 
-        elif type(src) == Conf:
-            #incorporate another config, overwriting any existing common keys
+        elif type(src) == Conf or type(src) == dict:
+            #copy another config or dict
             self.update(src)
-
-        elif type(src) == dict:
-            #add the raw dict, overwriting any existing common keys
-            self.add(src)
 
         else:
             raise Exception(f"unsupported source class {type(src)}")
@@ -134,12 +132,11 @@ class Conf:
     def listitems(self):
         return self.lists.items()
 
-    def add(self,src_dict):
+    def update_dict(self,src_dict):
         '''
         add all key:value pairs from a raw yaml dictionary
-        values of src take priority (overwrite) any shared keys in self
-        check for validity and substitute placeholders
-        split into scalars and lists
+        values of src overwrite any shared keys in self
+        check for validity and split into scalars and lists
         '''
 
         assert type(src_dict) == dict
@@ -155,18 +152,28 @@ class Conf:
             else:
                 raise Exception(f'unsupported config item type {type(value)}')
 
-    def update(self,src_config):
-        '''
-        add all key:value pairs from another Conf object
-        values of src_config take priority (overwrite) any duplicate keys in self
-        '''
+    def update_conf(self,src):
+        'add all key:value pairs from src, overwriting any shared keys'
 
-        assert type(src_config) == Conf
+        assert type(src) == Conf
 
-        self.scalars.update(src_config.scalars)
+        self.scalars.update(src.scalars)
 
-        for key,value in src_config.lists.items():
+        for key,value in src.lists.items():
             self.lists[key] = value.copy()
+
+    def update(self,src):
+        '''
+        add all key:value pairs from another Conf object or dict
+        values of src take priority (overwrite) any duplicate keys in self
+        '''
+
+        if type(src) == Conf:
+            self.update_conf(src)
+        elif type(src) == dict:
+            self.update_dict(src)
+        else:
+            raise Exception(f"unsuported object type {type(src)}")
 
     def override(self,src_config):
         '''
@@ -183,18 +190,6 @@ class Conf:
         for key,value in src_config.lists.items():
             if not key in self.lists:
                 self.lists[key] = value.copy()
-
-    def check(self):
-        'check we have all the required keys and no forbidden ones'
-
-        for key in self.scalars.keys():
-            assert key not in forbidden_keys[self.kind]
-
-        for key in required_keys[self.kind]:
-            assert key in self.scalars.keys()
-
-        if allow_lists[self.kind] == False:
-            assert len(self.lists) == 0
 
     def sub_input_output(self,src):
         '''
@@ -301,46 +296,6 @@ class Conf:
         if not os.path.exists(self['log_dir']):
             os.makedirs(self['log_dir'])
 
-# def sub_vars(config,extra=None):
-#     'substitute all simple placeholders or fail trying'
-
-#     if extra == None: extra = config
-
-#     counter = 10
-#     while True:
-#         counter -= 1
-#         changed = sub_pholders(config,extra,'',ph_regx)
-#         if not changed: break
-#         assert counter > 0, 'unable to resolve all placeholders'
-
-# def sub_environ(config):
-#     'substitute in any placeholders for environment variables'
-#     return sub_pholders(config,os.environ,'$',en_regx)
-
-# def sub_globs(config,extra):
-#     'substitute in any globbing placeholders from extra'
-#     return sub_pholders(config,extra,'=',gl_regx)
-
-# def sub_pholders(config,extra,prefix,regx):
-#     '''
-#     find all placeholders in config values that match regx
-#     substitute in the corresponding value from extra
-#     raises exception if not found
-#     '''
-
-#     changed = False
-#     for key,value in config.items():
-#         while True:
-#             m = re.search(regx,value)
-#             if m == None: break
-
-#             name = m.group(0)[1:-1]
-#             if len(prefix) > 0: assert name.startswith(prefix)
-#             value = value[:m.start(0)] + extra[name[len(prefix):]] + value[m.end(0):]
-#             changed = True
-#         config[key] = value
-#     return changed
-
 def show(item,label,indent=2):
     print(label)
     print(json.dumps(item,sort_keys=False,indent=indent))
@@ -357,7 +312,7 @@ def process(pipeline,path,config=None):
     #initially set config to default values if none provided
     if config == None:
         #set conf to defaults
-        config = Conf()
+        config = Conf(src="defaults")
         config.show("default config")
 
     counter = 0
@@ -375,8 +330,13 @@ def process(pipeline,path,config=None):
 
         elif item_type == 'config':
             #add new config to the existing one, overriding any shared keys
-            config.add(item[item_type])
+            config.update(item[item_type])
             config.show("loaded config")
+
+        elif item_type == 'load':
+            #read in a list variable from a text file
+            load_list(config,item[item_type])
+            config.show("loaded list")
 
         elif item_type == 'include':
             #load and insert the yaml items in place of the include item
@@ -393,6 +353,16 @@ def process(pipeline,path,config=None):
             process(new_pipeline,new_path,config=sub_config)
 
         #show(config,"config")
+
+def load_list(config,item):
+    'load a list of values from a text file'
+    
+    name: "score"
+    file: "filename"
+    comment: "#"
+    header: "0"
+    sep: ","
+    row: "2" | col: "score"
 
 def load_pipeline(path,parent_file):
     'path is relative to the parent path'
@@ -451,10 +421,10 @@ def split_rule(rule):
     if type(output) == str: output = {'output':output}
     shell = { 'shell':shell }
 
-    rule = Conf(rule,kind="rule")
-    input = Conf(input,kind="input")
-    output = Conf(output,kind="output")
-    shell = Conf(shell,kind="shell")
+    rule = Conf(rule)
+    input = Conf(input)
+    output = Conf(output)
+    shell = Conf(shell)
 
     return rule,input,output,shell
 
@@ -523,6 +493,12 @@ def generate_job_list(rule,input,output):
 
     if len(job_list) == 0: return []
 
+    print("after generate_list_jobs")
+    for job in job_list:
+        job['input'].show('job input')
+        job['output'].show('job output')
+        job['matches'].show('job matches')
+
     #expanded input pattern globs
     new_list = []
     for job in job_list: new_list += generate_glob_jobs(rule,job)
@@ -530,6 +506,7 @@ def generate_job_list(rule,input,output):
 
     if len(job_list) == 0: return []
 
+    print("after generate_glob_jobs")
     for job in job_list:
         job['input'].show('job input')
         job['output'].show('job output')
@@ -542,60 +519,69 @@ def generate_job_list(rule,input,output):
 def generate_list_jobs(rule,job):
     'expand job list to one item per input file pattern match (combo)'
 
-    new_list = []
-
     #identify all listjob type placeholders {=name} in input patterns
-    ph_leng = {}
-
+    ph_names = {}
     for key,value in job["input"].items():
-        #print(key,value)
         for m in re.finditer(listjob_regx,value):
             name = m.group(0)[2:-1]   #"{=name}" ==> "name"
+            if name not in ph_names: ph_names[name] = True
 
-            if name not in ph_leng:
-                #store the list length
-                ph_leng[name] = len(rule.getlist(name))
-
-    #nothing to do if no list patterns present in input patterns
-    if len(ph_leng) == 0: return [ job ]
+    #nothing to expand if no list patterns present in input patterns
+    if len(ph_names) == 0: return [ job ]
 
     #expand input and output patterns into complete paths
+    #(excepting any remaining glob placeholders)
     #filled out with the values from the list(s)
     #where multiple lists are present expand to all combinations of the lists
-    ph_index = {key:0 for key in ph_leng}
+    new_list = []
+    meta_list = [rule.getlist(key) for key in ph_names]
 
-    loop = True
-    while loop:
-        #substitute in values from the rule Conf list variables
-        src = {}
-        for key in ph_leng:
-            src[key] = rule.getlist(key)[ph_index[key]]
-
-        for val in ph_index.values():
-            print(val,end=' ')
-        print()
-        show(src,"src")
+    #product implements nested for loops over all the lists
+    for value_list in itertools.product(*meta_list):
+        src = { name:value_list[i] for i,name in enumerate(ph_names.keys()) }
 
         new_input = Conf(job["input"])
         new_output = Conf(job["output"])
-        new_matches = Conf(job["matches"])
-        new_matches.update(src)
 
+        #substitute in the correct values from the list variables
         new_input.sub_values(src,listjob_regx)
         new_output.sub_values(src,listjob_regx)
 
+        #add new matches to any existing ones
+        new_matches = Conf(job["matches"])
+        new_matches.update(src)
         new_list.append({"input":new_input,"output":new_output,"matches":new_matches})
 
-        #increment to the next input pattern combo if multiple placeholders present
-        for i,key in enumerate(ph_index):
-            ph_index[key] += 1
-            if ph_index[key] < ph_leng[key]: break
-            if i == len(ph_index)-1:
-                loop = False
-                break
-            ph_index[key] = 0
-
     return new_list
+
+def build_glob_and_regx(pattern):
+    input_glob = ''
+    input_regx = '^'
+    ph_dict = {}
+    prev_end = 0
+
+    #convert glob-type placeholders into proper glob and regex query formats
+    for m in re.finditer(glob_regx,pattern):
+        name = m.group(0)[2:-1]   #{*name}
+        start = m.start(0)
+
+        input_glob += pattern[prev_end:start] + '*'
+        input_regx += re.escape(pattern[prev_end:start])
+
+        #{*name} defines a set of separate jobs
+        if name not in ph_dict:
+            ph_dict[name] = True
+            input_regx += '(?P<' + name + '>[^/]+)'
+        else:
+            #back reference to previous job or list placeholder
+            input_regx += '(?P=' + name + ')'
+
+        prev_end = m.end(0)
+
+    input_glob += pattern[prev_end:]
+    input_regx += re.escape(pattern[prev_end:]) + '$'
+    
+    return input_glob,input_regx
 
 def generate_glob_jobs(rule,job):
     'expand job list to one item per input file pattern match (combo)'
@@ -606,65 +592,67 @@ def generate_glob_jobs(rule,job):
     for key,pattern in job["input"].items():
         print(key,pattern)
 
-        input_glob = ''
-        input_regx = '^'
-        ph_dict = {}
-        prev_end = 0
+        #convert the pattern-with-placeholders into a glob and regex string
+        input_glob,input_regx = build_glob_and_regx(pattern)
 
-        #convert glob-type placeholders into proper glob and regex query formats
-        for m in re.finditer(glob_regx,pattern):
-            name = m.group(0)[2:-1]   #{*name}
-            start = m.start(0)
+        print(input_glob,input_regx)
 
-            input_glob += pattern[prev_end:start] + '*'
-            input_regx += re.escape(pattern[prev_end:start])
-
-            #{*name} defines a set of separate jobs
-            if name not in ph_dict:
-                ph_dict[name] = True
-                input_regx += '(?P<' + name + '>[^/]+)'
-            else:
-                #back reference to previous job or list placeholder
-                input_regx += '(?P=' + name + ')'
-
-            prev_end = m.end(0)
-
-        input_glob += pattern[prev_end:]
-        input_regx += re.escape(pattern[prev_end:]) + '$'
-
-        #find paths using iglob, match to placeholders using regex
         glob_matches[key] = []
         
+        #find paths using iglob, match to placeholders using regex
         for path in glob.iglob(input_glob):
             m = re.fullmatch(input_regx,path)
             assert m is not None,"regex cannot extract placeholders from the globbed path!"
 
+            print(path,m.group(0))
+
             #store the match as the completed path plus the placeholder values
-            glob_matches[key].append([path,m.groupdict()])
+            glob_matches[key].append([key,path,m.groupdict()])
         
-        #no jobs generated if any input pattern has zero matches
-        if len(glob_matches[key]) == 0: return []
+        #no jobs are generated if any input pattern has zero matches
+        if len(glob_matches[key]) == 0:
+            print("no matches")
+            return []
 
-    #used to count through all matches for all input patterns
-    key_index = {key:0 for key in glob_matches}
-
-    #find the glob_matches where the placeholders have matching values
-    #across all input patterns
+    #find glob_matches where the placeholders
+    #have matching values across all input patterns
+    #reject all others
     new_list = []
-    loop = True
-    while loop:
+    meta_list = [ glob_matches[key] for key in glob_matches ]
 
+    #product implements nested for loops over all the lists in meta_list
+    for value_list in itertools.product(*meta_list):
+        #build the potential new input and matches objects
+        #check any shared placeholder values match
+        #across all input patterns
+        matches = {}
+        inputs = {}
+
+        conflict = False
+        for key,path,groupdict in value_list:
+            for name in groupdict:
+                if name not in matches:
+                    matches[name] = groupdict[name]
+                elif matches[name] != groupdict[name]:
+                    conflict = True
+                    break
+            if conflict: break
+            inputs[key] = path
+
+        #mismatching combo of input paths therefore no job generated
+        if conflict: continue
+
+        new_input = Conf(inputs)
+
+        #substitute in the correct values from the matches
+        new_output = Conf(job["output"])
+        new_output.sub_values(matches,glob_regx)
+
+        #add new matches to any existing ones from listjob generator
+        new_matches = Conf(job["matches"])
+        new_matches.update(matches)
 
         new_list.append({"input":new_input,"output":new_output,"matches":new_matches})
-
-        #increment to the next input pattern combo if multiple placeholders present
-        for i,key in enumerate(ph_index):
-            ph_index[key] += 1
-            if ph_index[key] < ph_leng[key]: break
-            if i == len(ph_index)-1:
-                loop = False
-                break
-            ph_index[key] = 0
 
     return new_list
 

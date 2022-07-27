@@ -26,14 +26,15 @@
     name:     "test1"
     exec:     "local"
     sample_subset:
-      - subset1
-      - subset2
+      - "subset1"
+      - "subset2"
     treatment_class:
-      - prenormify
-      - subexpansification
+      - "prenormify"
+      - "subexpansification"
     input:
       samp_file: "{%test_dir}/samples/{=sample_subset}/{*sample}.data"
-      treat_meta: "{%test_dir}/treatment_class/{=treatment_class}/{*treatment}"
+      treat_meta: "{%test_dir}/treatments/{=treatment_class}/{*treatment}"
+      combo_file: "{%test_dir}/combos/{*sample}_{*treatment}"
     output: "{%test_dir}/output/{=sample_subset}/{=treatment_class}/{*sample}_{*treatment}.step1"
     shell: |
       echo samp_file={%samp_file} treat_meta={%treat_meta} > {%output}
