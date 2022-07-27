@@ -521,10 +521,14 @@ def generate_job_list(rule,input,output):
     for job in job_list: new_list += generate_list_jobs(rule,job)
     job_list = new_list
 
+    if len(job_list) == 0: return []
+
     #expanded input pattern globs
     new_list = []
     for job in job_list: new_list += generate_glob_jobs(rule,job)
     job_list = new_list
+
+    if len(job_list) == 0: return []
 
     for job in job_list:
         job['input'].show('job input')
@@ -544,7 +548,7 @@ def generate_list_jobs(rule,job):
     ph_leng = {}
 
     for key,value in job["input"].items():
-        print(key,value)
+        #print(key,value)
         for m in re.finditer(listjob_regx,value):
             name = m.group(0)[2:-1]   #"{=name}" ==> "name"
 
@@ -596,51 +600,73 @@ def generate_list_jobs(rule,job):
 def generate_glob_jobs(rule,job):
     'expand job list to one item per input file pattern match (combo)'
 
-    input_glob = ''
-    input_regx = '^'
-    ditems = {}
-    prev_end = 0
+    glob_matches = {}
 
-    #convert fakemake placeholders into glob and regex query formats
-    for m in re.finditer(glob_regx,primary):
-        name = m.group(0)[2:-1]   #{*name}
-        start = m.start(0)
+    #glob each input file pattern separately
+    for key,pattern in job["input"].items():
+        print(key,pattern)
 
-        input_glob += primary[prev_end:start] + '*'
-        input_regx += esc_regx(primary[prev_end:start])
+        input_glob = ''
+        input_regx = '^'
+        ph_dict = {}
+        prev_end = 0
 
-        #{*name} defines a set of separate jobs
-        if name not in ditems:
-            ditems[name] = True
-            input_regx += '(?P<' + name + '>[^/]+)'
-        else:
-            #back reference to previous job or list placeholder
-            input_regx += '(?P=' + name + ')'
+        #convert glob-type placeholders into proper glob and regex query formats
+        for m in re.finditer(glob_regx,pattern):
+            name = m.group(0)[2:-1]   #{*name}
+            start = m.start(0)
 
-        prev_end = m.end(0)
+            input_glob += pattern[prev_end:start] + '*'
+            input_regx += re.escape(pattern[prev_end:start])
 
-    input_glob += primary[prev_end:]
-    input_regx += esc_regx(primary[prev_end:]) + '$'
+            #{*name} defines a set of separate jobs
+            if name not in ph_dict:
+                ph_dict[name] = True
+                input_regx += '(?P<' + name + '>[^/]+)'
+            else:
+                #back reference to previous job or list placeholder
+                input_regx += '(?P=' + name + ')'
 
-    job_list = []
+            prev_end = m.end(0)
 
-    #find paths using iglob, match to placeholders using regex
-    for path in glob.iglob(input_glob):
-        m = re.fullmatch(input_regx,path)
-        assert m is not None
+        input_glob += pattern[prev_end:]
+        input_regx += re.escape(pattern[prev_end:]) + '$'
 
-        job_input = Conf(input)
-        job_output = Conf(output)
+        #find paths using iglob, match to placeholders using regex
+        glob_matches[key] = []
+        
+        for path in glob.iglob(input_glob):
+            m = re.fullmatch(input_regx,path)
+            assert m is not None,"regex cannot extract placeholders from the globbed path!"
 
-        job_input.sub_input_output(m.groupdict())
-        job_output.sub_input_output(m.groupdict())
+            #store the match as the completed path plus the placeholder values
+            glob_matches[key].append([path,m.groupdict()])
+        
+        #no jobs generated if any input pattern has zero matches
+        if len(glob_matches[key]) == 0: return []
 
-        job_input.show("job_input")
-        job_output.show("job_output")
+    #used to count through all matches for all input patterns
+    key_index = {key:0 for key in glob_matches}
 
-        job_list.append({"input":job_input,"output":job_output,"matches":m.groupdict()})
+    #find the glob_matches where the placeholders have matching values
+    #across all input patterns
+    new_list = []
+    loop = True
+    while loop:
 
-    return job_list
+
+        new_list.append({"input":new_input,"output":new_output,"matches":new_matches})
+
+        #increment to the next input pattern combo if multiple placeholders present
+        for i,key in enumerate(ph_index):
+            ph_index[key] += 1
+            if ph_index[key] < ph_leng[key]: break
+            if i == len(ph_index)-1:
+                loop = False
+                break
+            ph_index[key] = 0
+
+    return new_list
 
 def check_input_mtimes(input):
     #verify all input paths present
@@ -1078,6 +1104,8 @@ def process_rule(config,rule):
     #fill in any globbing placeholders in inputs and outputs
     #return list of values, one per potential job
     job_list = generate_job_list(rule,input,output)
+
+    if len(job_list) == 0: return
 
     #determine if all inputs are present
     #and if outputs need to be regenerated
