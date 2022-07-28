@@ -19,18 +19,18 @@ list_regx     = r'\{&.+?\}'  #{&list[]}
 glob_regx     = r'\{\*.+?\}' #{*glob} ==> job scalar
 listjob_regx  = r'\{=.+?\}'  #{=list} ==> job scalar
 
-#required and forbidden keys (after input/output/shell are removed from rule)
+#required and forbidden keys (after input/output/shell are removed from action)
 required_keys = {
     "config": [  ],
-    "rule":   [ "name" ],
+    "action":   [ "name" ],
     "input":  [  ],
     "output": [  ],
     "shell":  [ "shell" ],
 }
 
 forbidden_keys = {
-    "config": [ 'input','output','name','rule','config','module','include','import' ],
-    "rule":   [ "config" ],
+    "config": [ 'input','output','name','action','config','module','include','import' ],
+    "action":   [ "config" ],
     "input":  [  ],
     "output": [  ],
     "shell":  [  ],
@@ -38,7 +38,7 @@ forbidden_keys = {
 
 allow_lists = {
     "config": True,
-    "rule":   True,
+    "action":   True,
     "input":  False,
     "output": False,
     "shell":  False,
@@ -46,7 +46,7 @@ allow_lists = {
 
 #placeholder first characters with special meaning
 #$ environment variable
-#= file glob: creates separate jobs from the same rule
+#= file glob: creates separate jobs from the same action
 ###* file glob: creates file list within single job: not yet implemented
 reserved_chrs = ['$','=']       #,'*']
 
@@ -57,15 +57,15 @@ default_global_config =\
     'remote_delay_secs':'10',        #wait this long after remote jobs incase of latency
     'exec':'local',                  #default execution environment
     'conda_setup_command':  '',      #bash command to setup conda
-    'conda':'fm_default_env',        #conda environment to activate if none specified by the rule
+    'conda':'fm_default_env',        #conda environment to activate if none specified by the action
     'stale_output_file':'ignore',    #ignore,delete,recycle (also applies to symlinks)
     'stale_output_dir':'ignore',     #ignore,delete,recycle
     'failed_output_file':'stale',    #delete,recycle,stale,ignore (also applies to symlinks)
     'failed_output_dir':'stale',     #delete,recycle,stale,ignore    
     'missing_parent_dir':'create',   #ignore,create
     'recycle_bin':'recycle_bin',     #name of recycle bin folder
-    'job_count':'FM_NJOBS',          #env variable: how many jobs spawned by current rule
-    'job_number':'FM_JOB_NUMBER',    #env variable: 1 based job numbering within the current rule
+    'job_count':'FM_NJOBS',          #env variable: how many jobs spawned by current action
+    'job_number':'FM_JOB_NUMBER',    #env variable: 1 based job numbering within the current action
     'bash_prefix':'source ~/.bashrc\nset -euo pipefail\nset +o history',
     'time':'02:00:00',          #$ -l h_rt={args.time}
     'mem':'4G',                 #$ -l mem={args.mem}
@@ -324,16 +324,16 @@ def process(pipeline,path,config=None):
         assert len(item) == 1
         item_type = list(item.keys())[0]
 
-        if item_type == 'rule':
+        if item_type == 'action':
             #show(item[item_type],item_type)
-            process_rule(config,item[item_type])
+            process_action(config,item[item_type])
 
         elif item_type == 'config':
             #add new config to the existing one, overriding any shared keys
             config.update(item[item_type])
             config.show("loaded config")
 
-        elif item_type == 'load':
+        elif item_type == 'load_list':
             #read in a list variable from a text file
             load_list(config,item[item_type])
             config.show("loaded list")
@@ -352,17 +352,40 @@ def process(pipeline,path,config=None):
             sub_config = Conf(config)
             process(new_pipeline,new_path,config=sub_config)
 
+        else:
+            raise Exception(f"unsupported item type {item_type}")
+
         #show(config,"config")
 
 def load_list(config,item):
     'load a list of values from a text file'
-    
-    name: "score"
-    file: "filename"
-    comment: "#"
-    header: "0"
-    sep: ","
-    row: "2" | col: "score"
+
+    list_data = []
+    sep = ','
+    row = None
+    col = None
+
+    if "sep" in item: sep = item["sep"] #use this as the column separator
+    if "row" in item: row = int(item["row"])
+    if "col" in item: col = int(item["col"])
+    assert not ("row" in item and "col" in item)
+
+    counter = -1
+    with open(item["file"]) as f:
+        for line in f:
+            counter += 1
+
+            if row != None and row == counter:
+                config.setlist(item["name"],line.strip().split(sep))
+                return
+
+            if col != None:
+                values = line.strip().split(sep)
+                list_data.append(values[col])
+
+    assert row == None, "not enough rows in file"
+    assert col != None
+    config.setlist(item["name"],list_data)
 
 def load_pipeline(path,parent_file):
     'path is relative to the parent path'
@@ -381,52 +404,52 @@ def find_duplicates(conf_list):
             assert not key in all_keys, f"duplicate key {key}"
             all_keys.add(key)
 
-def setup_rule(config,rule):
+def setup_action(config,action):
     #separate out and canonicalise input, output and shell
-    rule,input,output,shell = split_rule(rule)
+    action,input,output,shell = split_action(action)
 
-    #merge config into rule but rule has priority
-    rule.override(config)
+    #merge config into action but action has priority
+    action.override(config)
 
     #try to ensure placeholder subtitution is not ambiguous
-    find_duplicates([rule,input,output])
+    find_duplicates([action,input,output])
 
     #substitute all placeholders except for shell
     #which likely contains input/output variables yet to be determined
-    rule.sub_vars2()
-    input.sub_vars2(src=rule)
-    output.sub_vars2(src=rule)
+    action.sub_vars2()
+    input.sub_vars2(src=action)
+    output.sub_vars2(src=action)
 
     #create log dir if missing
-    rule.make_log_dir()
+    action.make_log_dir()
 
-    return rule,input,output,shell
+    return action,input,output,shell
 
-def split_rule(rule):
+def split_action(action):
     '''
-    separate out input, output and shell from rule
+    separate out input, output and shell from action
     convert all to Conf
     '''
 
-    input = rule['input']
-    output = rule['output']
-    shell = rule['shell']
+    input = action['input']
+    output = action['output']
+    shell = action['shell']
 
-    del rule['input']
-    del rule['output']
-    del rule['shell']
+    del action['input']
+    del action['output']
+    del action['shell']
 
     #convert simple form input/output into dictionary form
     if type(input) == str: input = {'input':input}
     if type(output) == str: output = {'output':output}
     shell = { 'shell':shell }
 
-    rule = Conf(rule)
+    action = Conf(action)
     input = Conf(input)
     output = Conf(output)
     shell = Conf(shell)
 
-    return rule,input,output,shell
+    return action,input,output,shell
 
 def update_config(config,new_config):
     #check all keys and values are simple strings
@@ -465,30 +488,20 @@ def esc_regx(value):
 
     return value
 
-def generate_job_list(rule,input,output):
+def generate_job_list(action,input,output):
     '''
-    glob or list expand the first input pattern to final file names if required
-    fill out remaining input and output patterns with the matched names
+    expand list and glob placeholders in input patterns to final file names
+    this also expands the job list to one job per matching combination
+    fill out output patterns with the matched names
     '''
-
-    #the first input pattern triggers to glob/list expansion
-    # primary_key = list(input.keys())[0]
-    # primary = input[primary_key]
-
-    #determine whether there are glob {*name} or list {=name} placeholders
-    # mlist = re.search(listjob_regx,primary)
-    # mglob = re.search(glob_regx,primary)
-
-    # #cannot have both in same input pattern
-    # assert not (mlist and mglob), "cannot use both globbing and list expansion together"
 
     #seed job "list" containing just the unexpanded input(s) and output(s)
     #which may have placeholders in need of expansion
-    job_list = [{"input":input,"output":output,"matches":{}}]
+    job_list = [{"input":input,"output":output}]
 
     #expand input pattern lists
     new_list = []
-    for job in job_list: new_list += generate_list_jobs(rule,job)
+    for job in job_list: new_list += generate_list_jobs(action,job)
     job_list = new_list
 
     if len(job_list) == 0: return []
@@ -497,11 +510,11 @@ def generate_job_list(rule,input,output):
     for job in job_list:
         job['input'].show('job input')
         job['output'].show('job output')
-        job['matches'].show('job matches')
+        job['lists'].show('list variables')
 
     #expanded input pattern globs
     new_list = []
-    for job in job_list: new_list += generate_glob_jobs(rule,job)
+    for job in job_list: new_list += generate_glob_jobs(action,job)
     job_list = new_list
 
     if len(job_list) == 0: return []
@@ -510,13 +523,12 @@ def generate_job_list(rule,input,output):
     for job in job_list:
         job['input'].show('job input')
         job['output'].show('job output')
-        job['matches'].show('job matches')
-
-    exit()
+        job['lists'].show('list variables')
+        job['globs'].show('glob variables')
 
     return job_list
 
-def generate_list_jobs(rule,job):
+def generate_list_jobs(action,job):
     'expand job list to one item per input file pattern match (combo)'
 
     #identify all listjob type placeholders {=name} in input patterns
@@ -534,7 +546,7 @@ def generate_list_jobs(rule,job):
     #filled out with the values from the list(s)
     #where multiple lists are present expand to all combinations of the lists
     new_list = []
-    meta_list = [rule.getlist(key) for key in ph_names]
+    meta_list = [action.getlist(key) for key in ph_names]
 
     #product implements nested for loops over all the lists
     for value_list in itertools.product(*meta_list):
@@ -547,10 +559,9 @@ def generate_list_jobs(rule,job):
         new_input.sub_values(src,listjob_regx)
         new_output.sub_values(src,listjob_regx)
 
-        #add new matches to any existing ones
-        new_matches = Conf(job["matches"])
-        new_matches.update(src)
-        new_list.append({"input":new_input,"output":new_output,"matches":new_matches})
+        #add new matches to job
+        new_lists = Conf(src)
+        new_list.append({"input":new_input,"output":new_output,"lists":new_lists})
 
     return new_list
 
@@ -583,7 +594,7 @@ def build_glob_and_regx(pattern):
     
     return input_glob,input_regx
 
-def generate_glob_jobs(rule,job):
+def generate_glob_jobs(action,job):
     'expand job list to one item per input file pattern match (combo)'
 
     glob_matches = {}
@@ -648,11 +659,11 @@ def generate_glob_jobs(rule,job):
         new_output = Conf(job["output"])
         new_output.sub_values(matches,glob_regx)
 
-        #add new matches to any existing ones from listjob generator
-        new_matches = Conf(job["matches"])
-        new_matches.update(matches)
+        #add new matches to job
+        new_lists = Conf(job["lists"])
+        new_globs = Conf(matches)
 
-        new_list.append({"input":new_input,"output":new_output,"matches":new_matches})
+        new_list.append({"input":new_input,"output":new_output,"lists":new_lists,"globs":new_globs})
 
     return new_list
 
@@ -687,8 +698,8 @@ def check_output_mtimes(output):
     if all_outputs_present == False: return None
     return oldest_mtime
 
-def generate_shell_commands(rule,job_list,shell):
-    name = rule['name']
+def generate_shell_commands(action,job_list,shell):
+    name = action['name']
     for job_numb,job in enumerate(job_list):
         #check all inputs present, return newest mtime
         newest_input = check_input_mtimes(job['input'])
@@ -700,7 +711,8 @@ def generate_shell_commands(rule,job_list,shell):
             continue
 
         #all inputs present
-        #check if any outputs missing or older than newest input
+        #check if any outputs missing, older than newest input
+        #more marked as stale
         oldest_output = check_output_mtimes(job['output'])
 
         #all outputs present and newer than newest input: no need to run
@@ -709,28 +721,30 @@ def generate_shell_commands(rule,job_list,shell):
             job_list[job_numb] = None
             continue
 
-        #remove and stale output files/symlinks/directories
-        handle_stale_outputs(rule,job['output'])
+        #remove stale output files/symlinks/directories before action is run
+        handle_stale_outputs(action,job['output'])
 
         #create any missing output *parent* directories
-        if rule['missing_parent_dir'] == 'create':
-            create_output_dirs(rule,job['output'])
+        if action['missing_parent_dir'] == 'create':
+            create_output_dirs(action,job['output'])
 
-    #filter out deleted jobs
+    #remove non-runable jobs
     job_list = [job for job in job_list if job is not None]
     shell_list = []
 
     for job_numb,job in enumerate(job_list):
-        #merge input and output filenames and placeholders into rule variables
-        config = copy.deepcopy(rule)
+        #merge input and output filenames and placeholders into action variables
+        config = Conf(action)
         config.update(job['input'])
         config.update(job['output'])
-        config.update(job['matches'])
 
         #substitute remaining placeholders in shell command
-        shell_final = copy.deepcopy(shell)
-        sub_vars(shell_final,config)
-        #show(shell_final,"shell")
+        shell_final = Conf(shell)
+        shell_final.sub_values(os.environ,environ_regx)
+        shell_final.sub_values(config,scalar_regx)
+        shell_final.sub_values(config,list_regx)
+        shell_final.sub_values(job['lists'],listjob_regx)
+        shell_final.sub_values(job['globs'],glob_regx)
         shell_list.append(shell_final["shell"])
 
     return job_list,shell_list
@@ -775,7 +789,7 @@ def create_output_dirs(config,outputs):
     if the parent folder of any output is missing create it
     '''
 
-    for item in outputs:
+    for item in outputs.keys():
         path = outputs[item]
         parent = os.path.dirname(path)
         if os.path.exists(parent): continue
@@ -787,7 +801,7 @@ def handle_stale_outputs(config,outputs):
     is treated as stale and recycled or deleted
     '''
 
-    for item in outputs:
+    for item in outputs.keys():
         path = outputs[item]
         if not os.path.exists(path): continue
 
@@ -820,7 +834,7 @@ def handle_failed_outputs(config,outputs):
     and should be removed, recycled, flagged as old etc
     '''
 
-    for item in outputs:
+    for item in outputs.keys():
         path = outputs[item]
         #print("handle_failed_outputs",path)
         if not os.path.exists(path): continue
@@ -879,12 +893,12 @@ def generate_job_environment(config,job_numb,njobs):
 
     return env
 
-def write_jobfile(rule,shell_list):
-    'save rule config and shell_list as json'
+def write_jobfile(action,shell_list):
+    'save action config and shell_list as json'
 
-    fnamebase = f'{rule["log_prefix"]}{timestamp_now()}.{rule["name"]}'
-    jobfile = os.path.join(rule['log_dir'],fnamebase+'.jobs')
-    payload = {'rule':rule,'shell_list':shell_list}
+    fnamebase = f'{action["log_prefix"]}{timestamp_now()}.{action["name"]}'
+    jobfile = os.path.join(action['log_dir'],fnamebase+'.jobs')
+    payload = {'action':action,'shell_list':shell_list}
 
     with open(jobfile,'w') as f:
         json.dump(payload,f,sort_keys=False,indent=2)
@@ -916,34 +930,34 @@ def execute_command(config,job_numb,cmd,env):
 
     return failed
 
-# def write_qsub_file(rule,qsub_script,jobname,njobs,jobfile):
+# def write_qsub_file(action,qsub_script,jobname,njobs,jobfile):
 #     with open(qsub_script,'w') as f:
 #         f.write("#!/bin/bash -l\n")
 #         f.write(f"#$ -N {jobname}\n")
 #         f.write(f"#$ -cwd\n")
 #         f.write(f"#$ -V\n")
 #         f.write(f"#$ -t 1-{njobs}\n")
-#         f.write(f"#$ -o {rule['log_dir']}/{jobname}.$TASK_ID.out\n")
-#         f.write(f"#$ -e {rule['log_dir']}/{jobname}.$TASK_ID.err\n")
-#         f.write(f"#$ -l h_rt={rule['time']}\n")
-#         f.write(f"#$ -l mem={rule['mem']}\n")
-#         f.write(f"#$ -l tmpfs={rule['tmpfs']}\n")
-#         f.write(f"#$ -pe {rule['pe']} {rule['cores']}\n")
+#         f.write(f"#$ -o {action['log_dir']}/{jobname}.$TASK_ID.out\n")
+#         f.write(f"#$ -e {action['log_dir']}/{jobname}.$TASK_ID.err\n")
+#         f.write(f"#$ -l h_rt={action['time']}\n")
+#         f.write(f"#$ -l mem={action['mem']}\n")
+#         f.write(f"#$ -l tmpfs={action['tmpfs']}\n")
+#         f.write(f"#$ -pe {action['pe']} {action['cores']}\n")
 
 #         #run payload through fakemake
 #         f.write(f"{sys.executable} {sys.argv[0]} --qsub {jobfile}\n")
 
-def write_qsub_file(rule,qsub_script,jobname,njobs,jobfile):
+def write_qsub_file(action,qsub_script,jobname,njobs,jobfile):
     'fill out the qsub job script template and write to file ready to pass to qsub'
 
-    if rule['qsub_template'] == 'default':
+    if action['qsub_template'] == 'default':
         f_in = open(os.path.join(os.path.dirname(__file__),"qsub_template.sh"))
     else:
-        f_in = open(rule['qsub_template'])
+        f_in = open(action['qsub_template'])
 
     f_out = open(qsub_script,'w')
 
-    env = copy.deepcopy(rule)
+    env = copy.deepcopy(action)
     env["njobs"] = njobs
     env["jobname"] = jobname
     env["jobfile"] = jobfile
@@ -955,26 +969,26 @@ def write_qsub_file(rule,qsub_script,jobname,njobs,jobfile):
     f_out.close()
     f_in.close()
 
-def submit_job_qsub(rule,shell_list,job_list):
+def submit_job_qsub(action,shell_list,job_list):
     '''
     issue the qsub command to spawn an array of jobs
     wait for completion before checking the status of each job
     '''
-    #rule['python_executable'] = sys.executable
-    #rule['python_path'] = sys.path
-    jobname = write_jobfile(rule,shell_list)
-    qsub_script = os.path.join(rule['log_dir'],jobname+'.qsub')
-    jobfile = os.path.join(rule['log_dir'],jobname+'.jobs')
+    #action['python_executable'] = sys.executable
+    #action['python_path'] = sys.path
+    jobname = write_jobfile(action,shell_list)
+    qsub_script = os.path.join(action['log_dir'],jobname+'.qsub')
+    jobfile = os.path.join(action['log_dir'],jobname+'.jobs')
     njobs = len(shell_list)
 
-    write_qsub_file(rule,qsub_script,jobname,njobs,jobfile)
+    write_qsub_file(action,qsub_script,jobname,njobs,jobfile)
 
     cmd = f"qsub -sync y {qsub_script}"
 
     env = copy.deepcopy(os.environ)
 
-    foutname = os.path.join(rule['log_dir'],jobname+'.out')
-    ferrname = os.path.join(rule['log_dir'],jobname+'.err')
+    foutname = os.path.join(action['log_dir'],jobname+'.out')
+    ferrname = os.path.join(action['log_dir'],jobname+'.err')
     fout = open(foutname,'w')
     ferr = open(ferrname,'w')
 
@@ -990,14 +1004,14 @@ def submit_job_qsub(rule,shell_list,job_list):
     ferr.close()
 
     #delay to allow for shared filesystem latency on status files
-    time.sleep(int(rule['remote_delay_secs']))
+    time.sleep(int(action['remote_delay_secs']))
 
     if failed: print(' failed')
     else:      print(' okay')
 
     #check each individual job's status file
     for job_numb,item in enumerate(shell_list):
-        status_file = f'{rule["log_dir"]}/{jobname}.{job_numb+1}.status'
+        status_file = f'{action["log_dir"]}/{jobname}.{job_numb+1}.status'
 
         job_failed = False
         if not os.path.exists(status_file):
@@ -1011,7 +1025,7 @@ def submit_job_qsub(rule,shell_list,job_list):
         if not job_failed: continue
 
         #deal with output of failed job
-        handle_failed_outputs(rule,job_list[job_numb]["output"])
+        handle_failed_outputs(action,job_list[job_numb]["output"])
 
 def qsub_execute_job(jobfile):
     '''
@@ -1019,7 +1033,7 @@ def qsub_execute_job(jobfile):
     execute one job of a job array spawned by qsub
     invoked automatically by fakemake using the --qsub option
     '''
-    rule,shell_list = read_jobfile(jobfile)
+    action,shell_list = read_jobfile(jobfile)
 
     assert jobfile.endswith('.jobs')
 
@@ -1027,8 +1041,8 @@ def qsub_execute_job(jobfile):
     job_numb = int(os.environ["SGE_TASK_ID"]) - 1 #convert from 1 to 0 based
     item = shell_list[job_numb]
 
-    cmd = generate_full_command(rule,item)
-    env = generate_job_environment(rule,job_numb,len(shell_list))
+    cmd = generate_full_command(action,item)
+    env = generate_job_environment(action,job_numb,len(shell_list))
 
     #created/truncate to record that the job is starting
     f = open(status_file,'w')
@@ -1051,28 +1065,28 @@ def qsub_execute_job(jobfile):
         f.close()
         sys.exit(0)
 
-def execute_jobs(rule,shell_list,job_list):
-    if rule['exec'] == 'local':
+def execute_jobs(action,shell_list,job_list):
+    if action['exec'] == 'local':
         #local serial execution
         for job_numb,item in enumerate(shell_list):
-            cmd = generate_full_command(rule,item)
-            env = generate_job_environment(rule,job_numb,len(shell_list))
-            failed = execute_command(rule,job_numb,cmd,env)
+            cmd = generate_full_command(action,item)
+            env = generate_job_environment(action,job_numb,len(shell_list))
+            failed = execute_command(action,job_numb,cmd,env)
 
-            if failed: handle_failed_outputs(rule,job_list[job_numb]["output"])
+            if failed: handle_failed_outputs(action,job_list[job_numb]["output"])
 
-    elif rule['exec'] == 'qsub':
+    elif action['exec'] == 'qsub':
         #qsub execution using an array job
-        submit_job_qsub(rule,shell_list,job_list)
+        submit_job_qsub(action,shell_list,job_list)
 
     else:
-        raise Exception(f"unsupported execution method {rule['exec']}")
+        raise Exception(f"unsupported execution method {action['exec']}")
 
 def timestamp_now():
     return datetime.datetime.fromtimestamp(time.time()).strftime("%Y%m%d.%H%M%S.%f")
 
 def read_jobfile(fname):
-    'load the rule config and shell_list from json'
+    'load the action config and shell_list from json'
 
     if not fname.endswith('.jobs'):
         fname += '.jobs'
@@ -1080,31 +1094,36 @@ def read_jobfile(fname):
     with open(fname) as f:
          payload = json.load(f)
 
-    return payload['rule'], payload['shell_list']
+    return payload['action'], payload['shell_list']
 
-def process_rule(config,rule):
-    #validate rule and substitute placeholders
-    rule,input,output,shell = setup_rule(config,rule)
-    rule.show("setup rule")
+def process_action(config,action):
+    #validate action and substitute placeholders
+    action,input,output,shell = setup_action(config,action)
+    action.show("setup action")
 
-    print(f'\nrule: {rule["name"]}')
+    print(f'\naction: {action["name"]}')
 
     #fill in any globbing placeholders in inputs and outputs
     #return list of values, one per potential job
-    job_list = generate_job_list(rule,input,output)
+    job_list = generate_job_list(action,input,output)
 
     if len(job_list) == 0: return
 
     #determine if all inputs are present
     #and if outputs need to be regenerated
-    job_list,shell_list = generate_shell_commands(rule,job_list,shell)
+    job_list,shell_list = generate_shell_commands(action,job_list,shell)
+
+    for cmd in shell_list:
+        show(cmd,"cmd")
+
+    exit()
 
     print(f'{len(shell_list)} jobs generated')
 
     if len(shell_list) == 0: return
 
     #check current working directory agrees with configured value
-    check_cwd(rule)
+    check_cwd(action)
 
     #execute jobs locally or remotely from the jobfile
-    execute_jobs(rule,shell_list,job_list)
+    execute_jobs(action,shell_list,job_list)

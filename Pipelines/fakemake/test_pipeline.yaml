@@ -22,7 +22,13 @@
 
 - module: "test_module/module.yaml"
 
-- rule:
+- load_list:
+    name: "load_test"
+    file: "test/load_test.txt"
+    sep: "\t"
+    row: "1"
+
+- action:
     name:     "test1"
     exec:     "local"
     sample_subset:
@@ -32,7 +38,8 @@
       - "prenormify"
       - "subexpansification"
     input:
-      samp_file: "{%test_dir}/samples/{=sample_subset}/{*sample}.data"
+      #meaningful comment
+      samp_file:  "{%test_dir}/samples/{=sample_subset}/{*sample}.data"
       treat_meta: "{%test_dir}/treatments/{=treatment_class}/{*treatment}"
       combo_file: "{%test_dir}/combos/{*sample}_{*treatment}"
     output: "{%test_dir}/output/{=sample_subset}/{=treatment_class}/{*sample}_{*treatment}.step1"
@@ -40,7 +47,7 @@
       echo samp_file={%samp_file} treat_meta={%treat_meta} > {%output}
       echo {=sample_subset} {*sample} {=treatment_class} {*treatment} >> {%output}
       
-# - rule:
+# - action:
 #     name:     "step1"
 #     exec:     "local"
 #     time:     "1:00:00"
@@ -56,7 +63,7 @@
 #       echo processed by {%name} >> {%output}
 #       echo "{%input}" | grep -v -e '1\.input' #should cause task1 to fail
       
-# - rule:
+# - action:
 #     name: "step2"
 #     exec: "local"
 #     time:     "0:30:00"
@@ -72,7 +79,7 @@
 #       echo processed by {%name} >> {%final}
 #       echo "hello"
 
-# - rule:
+# - action:
 #     name: step4
 #     conda: "{$MUT_PREFIX}main"
 #     input:
