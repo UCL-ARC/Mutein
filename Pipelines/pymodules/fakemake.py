@@ -470,7 +470,6 @@ class Conf:
             counter -= 1
             if self.sub_values(os.environ,environ_regx): changed = True
             if self.sub_values(src,scalar_regx):         changed = True
-            #if self.sub_values(src,list_regx):           changed = True
             if not changed: break
             assert counter > 0, 'unable to resolve all placeholders in 10 iterations'
 
@@ -493,7 +492,7 @@ class Conf:
     def do_sub2(self,src,regx,value):
         '''
         sub all simple placeholders in value from src
-        src can be a dict (os.environ) or a Conf (ie Conf.scalars via __getitem__)
+        src can be a dict (os.environ) or a Conf 
         '''
 
         changed = False
@@ -502,31 +501,8 @@ class Conf:
             m = re.search(regx,value)
             if m == None: break #no more matches
 
-            if not '[' in m.group(0)[1]:
-                #not a list type placeholder
-                key = m.group(0)[2:-1]   #{%key}, {$key}
-                sub = src[key]
-            else:
-                #list type placeholder
-                tmp_name = m.group(0)[2:-1]  # {%name[*]}
-                assert tmp_name[-1] == ']'
-                ind = tmp_name.index('[')
-                key = tmp_name[:ind]        # name[*]
-                subscript = tmp_name[ind+1:-1]
-
-                if subscript in ['N']:
-                    #evaluates to the length of the list
-                    sub = str(len(src[key]))
-
-                elif self.validate_subscript(subscript,len(src[key])):
-                    sub = src[key][int(subscript)]
-
-                elif len(subscript) == 1:
-                    if subscript == 't':   sub = '\t'.join(src[key])
-                    elif subscript == 'n': sub = '\n'.join(src[key])
-                    else:                  sub = subscript.join(src[key])
-                else:
-                    raise Exception(f"invalid list placeholder {tmp_name}")
+            key = m.group(0)[2:-1]   #{%key}, {$key}
+            sub = src[key]
 
             value = value[:m.start(0)] + sub + value[m.end(0):]
             changed = True
@@ -542,10 +518,6 @@ class Conf:
         if i < -list_length or i >= list_length: return False
 
         return True
-
-    # def sub_globs(self,extra):
-    #     'substitute in any globbing placeholders from extra'
-    #     return self.sub_pholders(extra,'=',gl_regx)
 
     def make_log_dir(self):
         if not os.path.exists(self['fm/log_dir']):
