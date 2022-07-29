@@ -14,437 +14,190 @@ import itertools
 
 #regex patterns to match non nested {placeholders} and {$environment variables}
 environ_regx  = r'\{\$.+?\}' #{$name}
-scalar_regx   = r'\{%.+?\}'  #{%scalar} or {%list[]}
-#list_regx     = r'\{&.+?\}'  #{&list[]}
+scalar_regx   = r'\{%.+?\}'  #{%scalar}
+list_regx     = r'\{&.+?\}'  #{&list[]}
 glob_regx     = r'\{\*.+?\}' #{*glob} ==> job scalar
 listjob_regx  = r'\{=.+?\}'  #{=list} ==> job scalar
 
+#required and forbidden keys (after input/output/shell are removed from action)
+required_keys = {
+    "config": [  ],
+    "action":   [ "name" ],
+    "input":  [  ],
+    "output": [  ],
+    "shell":  [ "shell" ],
+}
+
+forbidden_keys = {
+    "config": [ 'input','output','name','action','config','module','include','import' ],
+    "action":   [ "config" ],
+    "input":  [  ],
+    "output": [  ],
+    "shell":  [  ],
+}
+
+allow_lists = {
+    "config": True,
+    "action":   True,
+    "input":  False,
+    "output": False,
+    "shell":  False,
+}
+
+#placeholder first characters with special meaning
+#$ environment variable
+#= file glob: creates separate jobs from the same action
+###* file glob: creates file list within single job: not yet implemented
+reserved_chrs = ['$','=']       #,'*']
+
 default_global_config =\
 {
-    'fm':{
-        'prefix':'fm',                   #log file/job name  prefix: qsub doesn't like numerical names
-        'log_dir':'fakemake_logs',       #name of subfolder for logging
-        'remote_delay_secs':'10',        #wait this long after remote jobs incase of latency
-        'stale_output_file':'ignore',    #ignore,delete,recycle (also applies to symlinks)
-        'stale_output_dir':'ignore',     #ignore,delete,recycle
-        'failed_output_file':'stale',    #delete,recycle,stale,ignore (also applies to symlinks)
-        'failed_output_dir':'stale',     #delete,recycle,stale,ignore    
-        'missing_parent_dir':'create',   #ignore,create
-        'recycle_bin':'recycle_bin',     #name of recycle bin folder
-        'job_count':'FM_NJOBS',          #env variable: how many jobs spawned by current action
-        'job_number':'FM_JOB_NUMBER',    #env variable: 1 based job numbering within the current action
-        'bash_setup':'source ~/.bashrc\nset -euo pipefail\nset +o history',
-        'conda_setup':'',
-    },
-    'qsub':{
-        'time':'02:00:00',          #$ -l h_rt={args.time}
-        'mem':'4G',                 #$ -l mem={args.mem}
-        'tmpfs':'10G',              #$ -l tmpfs={args.tmpfs}
-        'pe':'smp',                 #$ -pe smp {threads}
-        'cores':'1',
-        'template':'default',       #default or path to your own
-    },
+    'log_dir':'fakemake_logs',       #name of subfolder for logging
+    'log_prefix':'fm',               #log file/job name  prefix: qsub doesn't like numerical names
+    'remote_delay_secs':'10',        #wait this long after remote jobs incase of latency
     'exec':'local',                  #default execution environment
+    'conda_setup_command':  '',      #bash command to setup conda
+    'stale_output_file':'ignore',    #ignore,delete,recycle (also applies to symlinks)
+    'stale_output_dir':'ignore',     #ignore,delete,recycle
+    'failed_output_file':'stale',    #delete,recycle,stale,ignore (also applies to symlinks)
+    'failed_output_dir':'stale',     #delete,recycle,stale,ignore    
+    'missing_parent_dir':'create',   #ignore,create
+    'recycle_bin':'recycle_bin',     #name of recycle bin folder
+    'job_count':'FM_NJOBS',          #env variable: how many jobs spawned by current action
+    'job_number':'FM_JOB_NUMBER',    #env variable: 1 based job numbering within the current action
+    'bash_prefix':'source ~/.bashrc\nset -euo pipefail\nset +o history',
+    'time':'02:00:00',          #$ -l h_rt={args.time}
+    'mem':'4G',                 #$ -l mem={args.mem}
+    'tmpfs':'10G',              #$ -l tmpfs={args.tmpfs}
+    'pe':'smp',                 #$ -pe smp {threads}
+    'cores':'1',
+    'qsub_template':'default'   #default or path to your own
+    #'normalize_paths':'true',                #true,false
 }
 
 class Conf:
     def __init__(self,src=None):
-        self.d = {}
+        #note both scalars and lists should be ordered dictionaries
+        #(requires python 3.7 or later)
+
+        #config values that are all simple strings
+        self.scalars = {}
+
+        #config values that are lists of strings
+        self.lists = {}
 
         if src == None:
             #initialise to empty
             pass
-
         elif src == "defaults":
             #initialise to defaults
-            self.d = copy.deepcopy(default_global_config)
+            self.update(default_global_config)
 
-        elif type(src) == dict:
-            #copy another dict
-            self.d = copy.deepcopy(src)
-
-        elif type(src) == Conf:
-            #copy another Conf
-            self.d = copy.deepcopy(src.getdict())
+        elif type(src) == Conf or type(src) == dict:
+            #copy another config or dict
+            self.update(src)
 
         else:
             raise Exception(f"unsupported source class {type(src)}")
 
-    def includes(self,parent_file):
-        'action any includes or file loads'
+    def __contains__(self,key):
+        return key in self.keys()
 
-        parent_path = os.path.dirname(parent_file)
+    def __getitem__(self,key):
+        'default getitem looks only in scalars'
+        return self.scalars[key]
 
-        while True:
-            #find next remaining include, process it, then start again
-            #to avoid changing dict while iterating it
-            load_type = None
+    def __setitem__(self,key,value):
+        'default setitem only sets scalars'
+        self.scalars[key] = value
 
-            for subkeys,value in self.subkey_items():
-                if 'includes' in subkeys:
-                    load_type = 'include'
+    def show(self,label,indent=2):
+        print(label)
+        print(json.dumps(self.scalars,sort_keys=False,indent=indent))
+        print(json.dumps(self.lists,sort_keys=False,indent=indent))
+        print()
 
-                    if not subkeys[-2] == 'includes':
-                        raise Exception(f'misplaced "includes" directive at {"/".join(subkeys)}')
+    def items(self):
+        return self.scalars.items()
 
-                    if not value.endswith('.yml'):
-                        raise Exception(f'all "includes" must be .yml files for {"/".join(subkeys)}')
+    def keys(self):
+        return self.scalars.keys()
 
-                    filename = value
+    def getlist(self,key):
+        return self.lists[key]
 
-                elif value.startswith('{>'):
-                    load_type = 'file'
-                    assert value.endswith('}'),f'misformed file load placeholder {value} at {"/".join(subkeys)}'
+    def setlist(self,key,value):
+        self.lists[key] = value
 
-                    filename = value[2:-1]
+        #self.check()
 
-                #exit loop as soon as we find an include or file load
-                if load_type != None: break
+    def listitems(self):
+        return self.lists.items()
 
-            #got to the end without finding anything therefore we are done
-            if load_type == None: return
+    def to_dict(self):
+        d = {}
+        for key in self.scalars: d[key] = self.scalars[key]
+        for key in self.lists:   d[key] = self.lists[key]
+        return d
 
-            #action the include or load
-            if load_type == 'include':
-                self.do_include(subkeys,filename,parent_path)
+    def update_dict(self,src_dict):
+        '''
+        add all key:value pairs from a raw yaml dictionary
+        values of src overwrite any shared keys in self
+        check for validity and split into scalars and lists
+        '''
+
+        assert type(src_dict) == dict
+
+        for key,value in src_dict.items():
+            assert type(key) == str
+
+            if type(value) == str:
+                self.scalars[key] = value
+            elif type(value) == list:
+                for x in value: assert type(x) == str
+                self.lists[key] = value.copy()
             else:
-                self.do_load(subkeys,filename,parent_path)
-    
-    def do_load(self,subkeys,filename,parent_path):
-        'load a list of values from the file'
-        key = '/'.join(subkeys)
+                raise Exception(f'unsupported config item type {type(value)}')
 
-        #extract any parameters
-        sep = None
-        row = None
-        col = None
+    def update_conf(self,src):
+        'add all key:value pairs from src, overwriting any shared keys'
 
-        fname = filename        
-        if '[' in filename:
-            assert filename[-1] == ']',f'misformed load parameters in {filename} at {key}'
-            params = filename.split('[')[-1][:-1]
-            fname = filename.split('[')[0]
+        assert type(src) == Conf
 
-            if 'R' in params:
-                tok = params.split('R')
-                assert len(tok) == 2,f'misformed load parameters in {filename} at {key}'
-                sep = tok[0]
-                row = int(tok[1])
+        self.scalars.update(src.scalars)
 
-            elif 'C' in params:
-                tok = params.split('C')
-                assert len(tok) == 2,f'misformed load parameters in {filename} at {key}'
-                sep = tok[0]
-                col = int(tok[1])
-
-            else:
-                raise Exception(f'misformed load parameters in {filename} at {key}')
-
-        #full path to the included file
-        if fname.startswith('./'):
-            #wrt current working directory
-            full_path = fname
-        else:
-            #wrt main yaml file
-            full_path = os.path.join(parent_path,fname)
-
-        if not os.path.exists(full_path):
-            raise Exception(f"missing file {full_path} at {key}")
-
-        data = []
-
-        counter = -1
-        with open(full_path) as f:
-            if sep == None:
-                data = f.read().strip()
-            else:
-                for line in f:
-                    counter += 1
-
-                    if row != None and row == counter:
-                        data = line.strip().split(sep)
-                        break
-
-                    if col != None:
-                        values = line.strip().split(sep)
-                        data.append(values[col])
-
-        assert data != [],f'failed to extract any data from {filename}'
-
-        self.setitem(subkeys,data)
-
-        # #transfer all the items from tmp to self
-        # for key,value in tmp.items():
-        #     full_key = base_keys+[key]
-        #     print(full_key,value)
-        #     self.setitem(full_key,value,truncate=True)
-
-    def delete(self,key):
-        #delete the include item so it won't be actioned a second time
-        self.getitem(key,delete=True)
-
-    def do_include(self,subkeys,filename,parent_path):
-        #where to put the loaded variables
-        base_keys = subkeys[:-2]
-
-        #full path to the included file
-        if filename.startswith('./'):
-            #wrt current working directory
-            full_path = filename
-        else:
-            #wrt main yaml file
-            full_path = os.path.join(parent_path,filename)
-
-        #delete the include item so it won't be actioned a second time
-        self.getitem(subkeys,delete=True)
-
-        #delete the includes list if now empty
-        if len(self.getitem(subkeys[:-1])) == 0:
-            self.getitem(subkeys[:-1],delete=True)
-
-        #load the YAML
-        with open(full_path) as f:
-            yml = yaml.safe_load(f)
-            assert type(yml) == dict
-            tmp = Conf(yml)
-
-        #transfer all the items from tmp to self
-        for key,value in tmp.items():
-            full_key = base_keys+[key]
-            print(full_key,value)
-            self.setitem(full_key,value,truncate=True)
+        for key,value in src.lists.items():
+            self.lists[key] = value.copy()
 
     def update(self,src):
         '''
-        deepcopy all key:value pairs from another Conf object or dict
+        add all key:value pairs from another Conf object or dict
         values of src take priority (overwrite) any duplicate keys in self
         '''
 
-        if type(src) == dict: src = Conf(src)
-
         if type(src) == Conf:
-            for key,value in src.items():
-                #truncate any existing lists to prevent old items surviving
-                self.setitem(key,value,truncate=True)
-
+            self.update_conf(src)
+        elif type(src) == dict:
+            self.update_dict(src)
         else:
             raise Exception(f"unsuported object type {type(src)}")
 
-    def override(self,src):
+    def override(self,src_config):
         '''
-        add all items from another conf object
-        values of self take priority for any duplicate keys
-        '''
-
-        tmp = Conf(src)
-        tmp.update(self)
-        self.update(tmp)
-
-    def getdict(self):
-        return self.d
-
-    def show(self,label=None,indent=2):
-        if label: print(label)
-        print(json.dumps(self.d,sort_keys=False,indent=indent))
-        print()
-
-    # def __contains__(self,key):
-    #     return key in self.keys()
-
-    def keys(self,item=None):
-        'generator function to crawl through all leaf keys'
-
-        for key,value in self.items(): yield key
-
-    def items(self,item=None):
-        '''
-        generator function to crawl through all leaf key:value pairs
-        return key as '/'.join(subkey_list)
-        rather than a list of subkeys
+        add all key:value pairs from another conf object
+        values of self take priority (are retained) for any duplicate keys
         '''
 
-        for subkeys,value in self.subkey_items(item):
-            yield '/'.join(subkeys),value
+        assert type(src_config) == Conf
 
-    def subkey_items(self,item=None):
-        'generator function to crawl through all leaf key:value pairs'
+        tmp_scalars = copy.deepcopy(src_config.scalars)
+        tmp_scalars.update(self.scalars)
+        self.scalars = tmp_scalars
 
-        if item == None: item = self.d
-
-        if type(item) == dict:
-            for key in item:
-                if type(item[key]) == str:
-                    yield [key],item[key]
-                else:
-                    for subkey,value in self.subkey_items(item[key]):
-                        yield [key]+subkey,value
-        elif type(item) == list:
-            for i in range(len(item)):
-                if type(item[i]) == str:
-                    yield [str(i)],item[i]
-                else:
-                    for subkey,value in self.subkey_items(item[i]):
-                        yield [str(i)]+subkey,value
-
-    def __getitem__(self,key):
-        '''
-        lookup an item by hierachical key
-        error if key does not exist
-        '''
-
-        return self.getitem(key,delete=False)
-
-    def getitem(self,key,delete=False):
-        '''
-        lookup an item by hierachical key
-        key can be as 'subkey1/subkey2...'
-        or '{%subkey1/subkey2...}'
-        for lists the "subkey" is the normal python index
-        for dicts the "subkey" is a normal key string
-        error if key does not exist
-        delete=True means delete instead of returning value
-        '''
-
-        #convert a list of subkeys into a single string-type key
-        if type(key) == list: key = '/'.join(key)
-
-        #strip off any surrounding placeholder characters
-        if key.startswith('{'):
-            assert key.endswith('}'),f"malformed placeholder {key}"
-            assert key[1] == '%',f"malformed placeholder {key}"
-            key = key[2:-1]
-
-        subkeys = key.split('/')
-
-        assert len(subkeys) > 0, f"invalid empty key {key}"
-
-        item = self.d
-        leaf = False
-        for i,sk in enumerate(subkeys):
-            if i == len(subkeys)-1: leaf = True
-
-            if type(item) == dict:
-                assert sk in item, f"key error for {sk} within {key}"
-
-            elif type(item) == list:
-                if len(sk) == 1 and not sk.isdigit():
-                    #special subscript meaning
-                    assert leaf and not delete,f'invalid use of special subscript {sk} at {key}'
-                    return self.special_subscript(sk,item)
-                try:
-                    item[int(sk)]
-                except:
-                    raise Exception(f"key error for {sk} within {key}")
-
-                sk = int(sk)
-
-            else:
-                raise Exception(f"unsupported data type in {key}")
-
-            if not leaf:
-                item = item[sk]
-
-        if delete:
-            del item[sk]
-            return None
-        else:
-            return item[sk]
-
-    def special_subscript(self,sk,item):
-        if sk == 'N':
-            return str(len(item))
-        else:
-            return sk.join(item)
-
-    def __setitem__(self,key,value):
-        'set item assuming lists should not be truncated'
-        self.setitem(key,value,truncate=False)
-
-    def setitem(self,key,value,truncate=False):
-        '''
-        set item by hierachical key
-        creating any parent nodes required
-        '''
-
-        #convert a list of subkeys into a single string-type key
-        if type(key) == list: key = '/'.join(key)
-
-        #strip off any surrounding placeholder characters
-        if key.startswith('{'):
-            assert key.endswith('}'),f"malformed placeholder {key}"
-            assert key[1] == '%',f"malformed placeholder {key}"
-            key = key[2:-1]
-
-        subkeys = key.split('/')
-
-        assert len(subkeys) > 0, f"invalid empty key {key}"
-
-        item = self.d
-
-        assign = False
-        for i,sk in enumerate(subkeys):
-            if i == len(subkeys) - 1: #leaf reached, time to assign the new value
-                assign = True
-
-            if type(item) == dict:
-                if assign:
-                    item[sk] = value
-                    return
-
-                if not sk in item:
-                    #need to create an empty container
-                    try:
-                        int(subkeys[i+1]) #see if next subkey implies a list or a dict
-                        item[sk] = []
-                    except:
-                        item[sk] = {}
-
-                item = item[sk]
-            elif type(item) == list:
-                try:
-                    #validate the list index
-                    sk = int(sk)
-                except:
-                    raise Exception(f"key error for {sk} within {key}")
-
-                if truncate == False:
-                    #assigning single new item in existing list
-                    assert sk < len(item) and sk >= -len(item)
-
-                    if assign:
-                        item[sk] = value
-                        return
-
-                    item = item[sk]
-                else:
-                    #sequentially assigning all items in a list
-                    #therefore drop any existing items
-                    assert sk >= 0,f"negative index {sk} for sequential update within {key}"
-
-                    if assign:
-                        #assign leaf node value within list
-                        #first assignment erases old list first
-                        if sk == 0: item.clear()
-                        assert len(item) == sk
-                        item.append(value)
-                        return
-
-                    #not a leaf node, clear only on the first time we visit
-                    if sk == 0 and len(item) > 1:
-                        item.clear()
-
-                    if sk >= len(item) - 1:
-                        #need to create next list item
-                        try:
-                            int(subkeys[i+1]) #see if next subkey implies a list or a dict
-                            item.append([])
-                        except:
-                            item.append({})
-
-                    item = item[sk]
-
-            else:
-                raise Exception(f"unsupported data type in {key}")
+        for key,value in src_config.lists.items():
+            if not key in self.lists:
+                self.lists[key] = value.copy()
 
     def sub_input_output(self,src):
         '''
@@ -470,7 +223,7 @@ class Conf:
             counter -= 1
             if self.sub_values(os.environ,environ_regx): changed = True
             if self.sub_values(src,scalar_regx):         changed = True
-            #if self.sub_values(src,list_regx):           changed = True
+            if self.sub_values(src,list_regx):           changed = True
             if not changed: break
             assert counter > 0, 'unable to resolve all placeholders in 10 iterations'
 
@@ -481,12 +234,14 @@ class Conf:
         '''
 
         changed = False
+        for key,value in self.scalars.items():
+            self.scalars[key],flag = self.do_sub2(src,regx,value)
+            if flag: changed = True
 
-        for key,value in self.items():
-            new_val,flag = self.do_sub2(src,regx,value)
-            if flag:
-                self[key] = new_val
-                changed = True
+        for key,vlist in self.lists.items():
+            for i,value in enumerate(vlist):
+                vlist[i],flag = self.do_sub2(src,regx,value)
+                if flag: changed = True
 
         return changed
 
@@ -502,29 +257,26 @@ class Conf:
             m = re.search(regx,value)
             if m == None: break #no more matches
 
-            if not '[' in m.group(0)[1]:
+            if m.group(0)[1] != '&':
                 #not a list type placeholder
-                key = m.group(0)[2:-1]   #{%key}, {$key}
-                sub = src[key]
+                name = m.group(0)[2:-1]   #{%name}, {$name}, {*name} or {=name}
+                sub = src[name]
             else:
                 #list type placeholder
-                tmp_name = m.group(0)[2:-1]  # {%name[*]}
+                tmp_name = m.group(0)[2:-1]  # {&name[*]}
                 assert tmp_name[-1] == ']'
                 ind = tmp_name.index('[')
-                key = tmp_name[:ind]        # name[*]
+                name = tmp_name[:ind]        # name[*]
                 subscript = tmp_name[ind+1:-1]
 
                 if subscript in ['N']:
-                    #evaluates to the length of the list
-                    sub = str(len(src[key]))
-
-                elif self.validate_subscript(subscript,len(src[key])):
-                    sub = src[key][int(subscript)]
-
+                    sub = str(len(src.getlist(name)))
+                elif self.validate_subscript(subscript,len(src.getlist(name))):
+                    sub = src.getlist(name)[int(subscript)]
                 elif len(subscript) == 1:
-                    if subscript == 't':   sub = '\t'.join(src[key])
-                    elif subscript == 'n': sub = '\n'.join(src[key])
-                    else:                  sub = subscript.join(src[key])
+                    if subscript == 't':   sub = '\t'.join(src.getlist(name))
+                    elif subscript == 'n': sub = '\n'.join(src.getlist(name))
+                    else:                  sub = subscript.join(src.getlist(name))
                 else:
                     raise Exception(f"invalid list placeholder {tmp_name}")
 
@@ -548,11 +300,11 @@ class Conf:
     #     return self.sub_pholders(extra,'=',gl_regx)
 
     def make_log_dir(self):
-        if not os.path.exists(self['fm/log_dir']):
-            os.makedirs(self['fm/log_dir'])
+        if not os.path.exists(self['log_dir']):
+            os.makedirs(self['log_dir'])
 
-def show(item,label=None,indent=2):
-    if label: print(label)
+def show(item,label,indent=2):
+    print(label)
     print(json.dumps(item,sort_keys=False,indent=indent))
     print()
 
@@ -568,6 +320,7 @@ def process(pipeline,path,config=None):
     if config == None:
         #set conf to defaults
         config = Conf(src="defaults")
+        config.show("default config")
 
     counter = 0
 
@@ -585,8 +338,19 @@ def process(pipeline,path,config=None):
         elif item_type == 'config':
             #add new config to the existing one, overriding any shared keys
             config.update(item[item_type])
-            config.includes(path)
             config.show("loaded config")
+
+        elif item_type == 'load_list':
+            #read in a list variable from a text file
+            load_list(config,item[item_type])
+            config.show("loaded list")
+
+        elif item_type == 'include':
+            #load and insert the yaml items in place of the include item
+            new_pipeline,new_path = load_pipeline(item[item_type],path) #new_path ignored
+            counter -= 1
+            del pipeline[counter]
+            pipeline = pipeline[:counter] + new_pipeline + pipeline[counter:]
 
         elif item_type == 'module':
             #process a nested pipeline without affecting the config of any
@@ -597,6 +361,38 @@ def process(pipeline,path,config=None):
 
         else:
             raise Exception(f"unsupported item type {item_type}")
+
+        #show(config,"config")
+
+def load_list(config,item):
+    'load a list of values from a text file'
+
+    list_data = []
+    sep = ','
+    row = None
+    col = None
+
+    if "sep" in item: sep = item["sep"] #use this as the column separator
+    if "row" in item: row = int(item["row"])
+    if "col" in item: col = int(item["col"])
+    assert not ("row" in item and "col" in item)
+
+    counter = -1
+    with open(item["file"]) as f:
+        for line in f:
+            counter += 1
+
+            if row != None and row == counter:
+                config.setlist(item["name"],line.strip().split(sep))
+                return
+
+            if col != None:
+                values = line.strip().split(sep)
+                list_data.append(values[col])
+
+    assert row == None, "not enough rows in file"
+    assert col != None
+    config.setlist(item["name"],list_data)
 
 def load_pipeline(path,parent_file):
     'path is relative to the parent path'
@@ -622,10 +418,8 @@ def setup_action(config,action):
     #merge config into action but action has priority
     action.override(config)
 
-    action.show()
-
     #try to ensure placeholder subtitution is not ambiguous
-    #find_duplicates([action,input,output])
+    find_duplicates([action,input,output])
 
     #substitute all placeholders except for shell
     #which likely contains input/output variables yet to be determined
@@ -642,7 +436,6 @@ def split_action(action):
     '''
     separate out input, output and shell from action
     convert all to Conf
-    note:action begins as a simple dict
     '''
 
     input = action['input']
@@ -654,7 +447,7 @@ def split_action(action):
     del action['shell']
 
     #convert simple form input/output into dictionary form
-    if type(input) == str:  input = {'input':input}
+    if type(input) == str: input = {'input':input}
     if type(output) == str: output = {'output':output}
     shell = { 'shell':shell }
 
@@ -694,6 +487,13 @@ def parse_yaml(fname):
     assert type(result) == list
     
     return result
+
+def esc_regx(value):
+    'escape a literal that is being inserted into a regex'
+
+    value = value.replace('.','\.')
+
+    return value
 
 def generate_job_list(action,input,output):
     '''
@@ -1282,8 +1082,6 @@ def process_action(config,action):
     action.show("setup action")
 
     print(f'\naction: {action["name"]}')
-
-    exit()
 
     #fill in any globbing placeholders in inputs and outputs
     #return list of values, one per potential job

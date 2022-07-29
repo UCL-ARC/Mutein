@@ -1,47 +1,36 @@
 - config:
-    fm:
-      prefix:               "mut."
-      stale_output_file:    "recycle"
-      stale_output_dir:     "ignore"
-      missing_parent_dir:   "create"
-
     working_dir:          "/lustre/scratch/scratch/{$USER}/549_mutein"
+    log_prefix:           "mut."
     test_dir:             "test"
     mut_prefix:           "{$MUT_PREFIX}"
     user:                 "{%mut_prefix}{$USER}_{%test_dir}"
     temp_job_dir:         "fakemake_jobs"
-    test_list_index1:     "{%test_list/-1}"
-    test_list_index2:     "{%test_list/0}"
-    test_list_length:     "{%test_list/N}"
-    test_list_join:       "{%test_list/\t}"
+    stale_output_file:    "recycle"
+    stale_output_dir:     "ignore"
+    missing_parent_dir:   "create"
+    test_list_index1:     "{&test_list[-1]}"
+    test_list_index2:     "{&test_list[0]}"
+    test_list_length:     "{&test_list[N]}"
+    test_list_join:       "{&test_list[ ]}"
     test_shell_var:       "${leave_alone}"
     test_list:
-      - "{%fm/prefix}test_string"
-      - "{%test_list[0]}"
-      - "{>./test/load_test.txt[\tC1]}"
+      - "{%log_prefix}test_string"
+      - "{&test_list[0]}"
+      - "third_item"
 
-    includes:
-      - "test_include.yml"
+- include: "test_include.yml"
 
-    load_test: "{>./test/load_test.txt[\tR1]}"
+- module: "test_module/module.yml"
 
-- config:
-    new_list:
-      - 1
-      - 2
-      - 3
-    test_list:
-      - "one"
-      - "two"
-    includes:
-      - "test_include.yml"
-      - "test_include.yml"
-
-#- module: "test_module/module.yml"
+- load_list:
+    name: "load_test"
+    file: "test/load_test.txt"
+    sep: "\t"
+    row: "1"
 
 - action:
     name:     "test1"
-    exec:     "local"
+    exec:     "qsub"
     conda:    "{%mut_prefix}main"
     sample_subset:
       - "subset1"
