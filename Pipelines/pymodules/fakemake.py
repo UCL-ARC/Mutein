@@ -12,12 +12,13 @@ import sys
 import random
 import itertools
 
-#regex patterns to match non nested {placeholders} and {$environment variables}
-environ_regx  = r'\{\$.+?\}' #{$name}
-scalar_regx   = r'\{%.+?\}'  #{%scalar} or {%list[]}
-#list_regx     = r'\{&.+?\}'  #{&list[]}
-glob_regx     = r'\{\*.+?\}' #{*glob} ==> job scalar
-listjob_regx  = r'\{=.+?\}'  #{=list} ==> job scalar
+#regex patterns to match non nested {%placeholders} and {$environment variables}
+environ_regx  = r'\{\$.+?\}'   #{$name}
+scalar_regx   = r'\{%.+?\}'    #{%scalar} or {%list[]}
+glob2job_regx  = r'\{\*.+?\}'  #{*glob} ==> split into separate jobs
+glob2list_regx  = r'\{\+.+?\}' #{+glob} ==> become in-job list
+list2job_regx  = r'\{=.+?\}'   #{=list} ==> split into separate jobs
+list2list_regx  = r'\{-.+?\}'  #{-list} ==> become in-job list
 
 default_global_config =\
 {
@@ -62,6 +63,7 @@ class Conf:
         elif type(src) == dict:
             #copy another dict
             self.d = copy.deepcopy(src)
+            self.stringify()
 
         elif type(src) == Conf:
             #copy another Conf
@@ -69,6 +71,12 @@ class Conf:
 
         else:
             raise Exception(f"unsupported source class {type(src)}")
+
+    def stringify(self):
+        #make sure any numerical types are converted to string
+        for key,value in self.items():
+            if type(value) != str:
+                self[key] = str(value)
 
     def includes(self,parent_file):
         'action any includes or file loads'
@@ -211,7 +219,7 @@ class Conf:
         #transfer all the items from tmp to self
         for key,value in tmp.items():
             full_key = base_keys+[key]
-            print(full_key,value)
+            print(full_key,key,value,type(value))
             self.setitem(full_key,value,truncate=True)
 
     def update(self,src):
@@ -273,18 +281,20 @@ class Conf:
 
         if type(item) == dict:
             for key in item:
-                if type(item[key]) == str:
+                if type(item[key]) not in (list,dict):
                     yield [key],item[key]
                 else:
                     for subkey,value in self.subkey_items(item[key]):
                         yield [key]+subkey,value
         elif type(item) == list:
             for i in range(len(item)):
-                if type(item[i]) == str:
+                if type(item[i]) not in (list,dict):
                     yield [str(i)],item[i]
                 else:
                     for subkey,value in self.subkey_items(item[i]):
                         yield [str(i)]+subkey,value
+        else:
+            raise Exception(f"cannot generate items from type {type(item)}")
 
     def __getitem__(self,key):
         '''
@@ -327,10 +337,11 @@ class Conf:
                 assert sk in item, f"key error for {sk} within {key}"
 
             elif type(item) == list:
-                if len(sk) == 1 and not sk.isdigit():
+                if leaf and len(sk) == 1 and not sk.isdigit():
                     #special subscript meaning
-                    assert leaf and not delete,f'invalid use of special subscript {sk} at {key}'
+                    assert not delete,f'invalid use of special subscript {sk} at {key}'
                     return self.special_subscript(sk,item)
+
                 try:
                     item[int(sk)]
                 except:
@@ -452,8 +463,8 @@ class Conf:
         or throw exception
         '''
 
-        self.sub_values(src,glob_regx)
-        self.sub_values(src,listjob_regx)
+        self.sub_values(src,glob2job_regx)
+        self.sub_values(src,list2job_regx)
 
     def sub_vars2(self,src=None):
         '''
@@ -552,7 +563,7 @@ def process(pipeline,path,config=None):
 
         if item_type == 'action':
             #show(item[item_type],item_type)
-            process_action(config,item[item_type])
+            process_action(config,item[item_type],path)
 
         elif item_type == 'config':
             #add new config to the existing one, overriding any shared keys
@@ -587,12 +598,13 @@ def find_duplicates(conf_list):
             assert not key in all_keys, f"duplicate key {key}"
             all_keys.add(key)
 
-def setup_action(config,action):
+def setup_action(config,action,path):
     #separate out and canonicalise input, output and shell
     action,input,output,shell = split_action(action)
 
     #merge config into action but action has priority
     action.override(config)
+    action.includes(path)
 
     action.show()
 
@@ -678,18 +690,27 @@ def generate_job_list(action,input,output):
     #which may have placeholders in need of expansion
     job_list = [{"input":input,"output":output}]
 
-    #expand input pattern lists
+    #expand list2list patterns
+    for job in job_list: generate_list2list(action,job)
+
+    print("after generate_list2list")
+    for job in job_list:
+        job['input'].show('job input')
+        job['output'].show('job output')
+
+    #expand lists2job patterns
     new_list = []
     for job in job_list: new_list += generate_list_jobs(action,job)
     job_list = new_list
 
+
     if len(job_list) == 0: return []
 
-    # print("after generate_list_jobs")
-    # for job in job_list:
-    #     job['input'].show('job input')
-    #     job['output'].show('job output')
-    #     job['lists'].show('list variables')
+    print("after generate_list_jobs")
+    for job in job_list:
+        job['input'].show('job input')
+        job['output'].show('job output')
+        job['lists'].show('list variables')
 
     #expanded input pattern globs
     new_list = []
@@ -698,22 +719,65 @@ def generate_job_list(action,input,output):
 
     if len(job_list) == 0: return []
 
-    # print("after generate_glob_jobs")
-    # for job in job_list:
-    #     job['input'].show('job input')
-    #     job['output'].show('job output')
-    #     job['lists'].show('list variables')
-    #     job['globs'].show('glob variables')
+    print("after generate_glob_jobs")
+    for job in job_list:
+        job['input'].show('job input')
+        job['output'].show('job output')
+        job['lists'].show('list variables')
+        job['globs'].show('glob variables')
+
+    exit()
 
     return job_list
 
-def generate_list_jobs(action,job):
-    'expand job list to one item per input file pattern match (combo)'
-
-    #identify all listjob type placeholders {=name} in input patterns
+def expand_lists(action,item,key,value):
     ph_names = {}
+    for m in re.finditer(list2list_regx,value):
+        name = m.group(0)[2:-1]   #"{-name}" ==> "name"
+        if name not in ph_names: ph_names[name] = True
+
+    #expand patterns into lists of patterns
+    #filled out with the values from the list(s)
+    #where multiple lists are present expand to all combinations of the lists
+    meta_list = [action[key] for key in ph_names]
+
+    new_list = []
+
+    #product implements nested for loops over all the lists
+    for value_list in itertools.product(*meta_list):
+        src = { name:value_list[i] for i,name in enumerate(ph_names.keys()) }
+
+        dst = Conf({"value":value})
+        #substitute in the correct values from the list variables
+        dst.sub_values(src,list2list_regx)
+        new_list.append(dst["value"])
+
+    item.setitem(key,new_list)
+
+def generate_list2list(action,job):
+    'expand in-job list placeholders'
+
+    #identify all list2list type placeholders {-name} in input/output patterns
+
     for key,value in job["input"].items():
-        for m in re.finditer(listjob_regx,value):
+        expand_lists(action,job["input"],key,value)
+
+    for key,value in job["output"].items():
+        expand_lists(action,job["output"],key,value)
+
+def generate_list_jobs(action,job):
+    'expand job list to one item per file pattern match combo'
+
+    #identify all listjob type placeholders {=name} in input/output patterns
+    ph_names = {}
+
+    for key,value in job["input"].items():
+        for m in re.finditer(list2job_regx,value):
+            name = m.group(0)[2:-1]   #"{=name}" ==> "name"
+            if name not in ph_names: ph_names[name] = True
+
+    for key,value in job["output"].items():
+        for m in re.finditer(list2job_regx,value):
             name = m.group(0)[2:-1]   #"{=name}" ==> "name"
             if name not in ph_names: ph_names[name] = True
 
@@ -725,7 +789,7 @@ def generate_list_jobs(action,job):
     #filled out with the values from the list(s)
     #where multiple lists are present expand to all combinations of the lists
     new_list = []
-    meta_list = [action.getlist(key) for key in ph_names]
+    meta_list = [action[key] for key in ph_names]
 
     #product implements nested for loops over all the lists
     for value_list in itertools.product(*meta_list):
@@ -735,8 +799,8 @@ def generate_list_jobs(action,job):
         new_output = Conf(job["output"])
 
         #substitute in the correct values from the list variables
-        new_input.sub_values(src,listjob_regx)
-        new_output.sub_values(src,listjob_regx)
+        new_input.sub_values(src,list2job_regx)
+        new_output.sub_values(src,list2job_regx)
 
         #add new matches to job
         new_lists = Conf(src)
@@ -751,7 +815,7 @@ def build_glob_and_regx(pattern):
     prev_end = 0
 
     #convert glob-type placeholders into proper glob and regex query formats
-    for m in re.finditer(glob_regx,pattern):
+    for m in re.finditer(glob2job_regx,pattern):
         name = m.group(0)[2:-1]   #{*name}
         start = m.start(0)
 
@@ -774,7 +838,7 @@ def build_glob_and_regx(pattern):
     return input_glob,input_regx
 
 def generate_glob_jobs(action,job):
-    'expand job list to one item per input file pattern match (combo)'
+    'glob filename to match the two glob type placeholders'
 
     glob_matches = {}
 
@@ -828,7 +892,7 @@ def generate_glob_jobs(action,job):
 
         #substitute in the correct values from the matches
         new_output = Conf(job["output"])
-        new_output.sub_values(matches,glob_regx)
+        new_output.sub_values(matches,glob2job_regx)
 
         #add new matches to job
         new_lists = Conf(job["lists"])
@@ -914,8 +978,8 @@ def generate_shell_commands(action,job_list,shell):
         shell_final.sub_values(os.environ,environ_regx)
         shell_final.sub_values(config,scalar_regx)
         shell_final.sub_values(config,list_regx)
-        shell_final.sub_values(job['lists'],listjob_regx)
-        shell_final.sub_values(job['globs'],glob_regx)
+        shell_final.sub_values(job['lists'],list2job_regx)
+        shell_final.sub_values(job['globs'],glob2job_regx)
         shell_list.append(shell_final["shell"])
 
     return job_list,shell_list
@@ -1248,19 +1312,18 @@ def read_jobfile(fname):
 
     return payload['action'], payload['shell_list']
 
-def process_action(config,action):
+def process_action(config,action,path):
     #validate action and substitute placeholders
-    action,input,output,shell = setup_action(config,action)
+    action,input,output,shell = setup_action(config,action,path)
     action.show("setup action")
 
     print(f'\naction: {action["name"]}')
-
-    exit()
 
     #fill in any globbing placeholders in inputs and outputs
     #return list of values, one per potential job
     job_list = generate_job_list(action,input,output)
 
+    exit()
     if len(job_list) == 0: return
 
     #determine if all inputs are present
