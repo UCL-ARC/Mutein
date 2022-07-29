@@ -57,7 +57,6 @@ default_global_config =\
     'remote_delay_secs':'10',        #wait this long after remote jobs incase of latency
     'exec':'local',                  #default execution environment
     'conda_setup_command':  '',      #bash command to setup conda
-    'conda':'fm_default_env',        #conda environment to activate if none specified by the action
     'stale_output_file':'ignore',    #ignore,delete,recycle (also applies to symlinks)
     'stale_output_dir':'ignore',     #ignore,delete,recycle
     'failed_output_file':'stale',    #delete,recycle,stale,ignore (also applies to symlinks)
@@ -100,6 +99,9 @@ class Conf:
 
         else:
             raise Exception(f"unsupported source class {type(src)}")
+
+    def __contains__(self,key):
+        return key in self.keys()
 
     def __getitem__(self,key):
         'default getitem looks only in scalars'
@@ -269,7 +271,6 @@ class Conf:
                     if subscript == 't':   sub = '\t'.join(src.getlist(name))
                     elif subscript == 'n': sub = '\n'.join(src.getlist(name))
                     else:                  sub = subscript.join(src.getlist(name))
-                    print(sub)
                 else:
                     raise Exception(f"invalid list placeholder {tmp_name}")
 
@@ -302,10 +303,10 @@ def show(item,label,indent=2):
     print()
 
 def check_cwd(config):
-    if 'expected_working_dir' in config:
-        if os.path.realpath(os.getcwd()) != config['expected_working_dir']:
+    if 'working_dir' in config.keys():
+        if os.path.realpath(os.getcwd()) != config['working_dir']:
             print("warning: current path is not the expected working directory")
-            print(f"expecting: {config['expected_working_dir']}")
+            print(f"expecting: {config['working_dir']}")
             print(f"but found {os.path.realpath(os.getcwd())}")
 
 def process(pipeline,path,config=None):
@@ -506,11 +507,11 @@ def generate_job_list(action,input,output):
 
     if len(job_list) == 0: return []
 
-    print("after generate_list_jobs")
-    for job in job_list:
-        job['input'].show('job input')
-        job['output'].show('job output')
-        job['lists'].show('list variables')
+    # print("after generate_list_jobs")
+    # for job in job_list:
+    #     job['input'].show('job input')
+    #     job['output'].show('job output')
+    #     job['lists'].show('list variables')
 
     #expanded input pattern globs
     new_list = []
@@ -519,12 +520,12 @@ def generate_job_list(action,input,output):
 
     if len(job_list) == 0: return []
 
-    print("after generate_glob_jobs")
-    for job in job_list:
-        job['input'].show('job input')
-        job['output'].show('job output')
-        job['lists'].show('list variables')
-        job['globs'].show('glob variables')
+    # print("after generate_glob_jobs")
+    # for job in job_list:
+    #     job['input'].show('job input')
+    #     job['output'].show('job output')
+    #     job['lists'].show('list variables')
+    #     job['globs'].show('glob variables')
 
     return job_list
 
@@ -601,12 +602,8 @@ def generate_glob_jobs(action,job):
 
     #glob each input file pattern separately
     for key,pattern in job["input"].items():
-        print(key,pattern)
-
         #convert the pattern-with-placeholders into a glob and regex string
         input_glob,input_regx = build_glob_and_regx(pattern)
-
-        print(input_glob,input_regx)
 
         glob_matches[key] = []
         
@@ -615,15 +612,11 @@ def generate_glob_jobs(action,job):
             m = re.fullmatch(input_regx,path)
             assert m is not None,"regex cannot extract placeholders from the globbed path!"
 
-            print(path,m.group(0))
-
             #store the match as the completed path plus the placeholder values
             glob_matches[key].append([key,path,m.groupdict()])
         
         #no jobs are generated if any input pattern has zero matches
-        if len(glob_matches[key]) == 0:
-            print("no matches")
-            return []
+        if len(glob_matches[key]) == 0: return []
 
     #find glob_matches where the placeholders
     #have matching values across all input patterns
@@ -836,22 +829,16 @@ def handle_failed_outputs(config,outputs):
 
     for item in outputs.keys():
         path = outputs[item]
-        #print("handle_failed_outputs",path)
         if not os.path.exists(path): continue
 
         if os.path.islink(path) or os.path.isfile(path):
-            #print('file or symlink')
             if config['failed_output_file'] == 'delete':
-                #print('delete')
                 os.remove(path)
             elif config['failed_output_file'] == 'recycle':
-                #print('recycle')
                 recycle_item(config,path)
             elif config['failed_output_file'] == 'stale':
-                #print('stale')
                 make_stale(path)
             elif config['failed_output_file'] == 'ignore':
-                #print('ignore')
                 continue
             else:
                 raise Exception(f'unknown option for failed_output_file: {config["failed_output_file"]}')
@@ -874,13 +861,17 @@ def handle_failed_outputs(config,outputs):
 def generate_full_command(config,shell):
     'generate the bash commands to run before the job commands'
 
-    cmd_list = \
-    [
-        config['bash_prefix'],
-        config['conda_setup_command'],
-        f'conda activate {config["conda"]}',
-        shell,
-    ]
+    cmd_list = []
+
+    if 'bash_prefix' in config and config['bash_prefix'] != '':
+        cmd_list.append(config['bash_prefix'])
+
+    if 'conda' in config and config['conda'] != '':
+        if 'conda_setup_command' in config and config['conda_setup_command'] != '':
+            cmd_list.append(config['conda_setup_command'])
+        cmd_list.append(f'conda activate {config["conda"]}')
+
+    cmd_list.append(shell)
 
     return '\n'.join(cmd_list)
 
@@ -929,23 +920,6 @@ def execute_command(config,job_numb,cmd,env):
     else:      print(' okay')
 
     return failed
-
-# def write_qsub_file(action,qsub_script,jobname,njobs,jobfile):
-#     with open(qsub_script,'w') as f:
-#         f.write("#!/bin/bash -l\n")
-#         f.write(f"#$ -N {jobname}\n")
-#         f.write(f"#$ -cwd\n")
-#         f.write(f"#$ -V\n")
-#         f.write(f"#$ -t 1-{njobs}\n")
-#         f.write(f"#$ -o {action['log_dir']}/{jobname}.$TASK_ID.out\n")
-#         f.write(f"#$ -e {action['log_dir']}/{jobname}.$TASK_ID.err\n")
-#         f.write(f"#$ -l h_rt={action['time']}\n")
-#         f.write(f"#$ -l mem={action['mem']}\n")
-#         f.write(f"#$ -l tmpfs={action['tmpfs']}\n")
-#         f.write(f"#$ -pe {action['pe']} {action['cores']}\n")
-
-#         #run payload through fakemake
-#         f.write(f"{sys.executable} {sys.argv[0]} --qsub {jobfile}\n")
 
 def write_qsub_file(action,qsub_script,jobname,njobs,jobfile):
     'fill out the qsub job script template and write to file ready to pass to qsub'
@@ -1113,10 +1087,7 @@ def process_action(config,action):
     #and if outputs need to be regenerated
     job_list,shell_list = generate_shell_commands(action,job_list,shell)
 
-    for cmd in shell_list:
-        show(cmd,"cmd")
-
-    exit()
+    for cmd in shell_list: show(cmd,"cmd")
 
     print(f'{len(shell_list)} jobs generated')
 

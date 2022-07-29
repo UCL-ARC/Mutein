@@ -1,5 +1,5 @@
 - config:
-    expected_working_dir: "/lustre/scratch/scratch/{$USER}/549_mutein"
+    working_dir:          "/lustre/scratch/scratch/{$USER}/549_mutein"
     log_prefix:           "mut."
     test_dir:             "test"
     mut_prefix:           "{$MUT_PREFIX}"
@@ -18,9 +18,9 @@
       - "{&test_list[0]}"
       - "third_item"
 
-- include: "test_include.yaml"
+- include: "test_include.yml"
 
-- module: "test_module/module.yaml"
+- module: "test_module/module.yml"
 
 - load_list:
     name: "load_test"
@@ -31,6 +31,7 @@
 - action:
     name:     "test1"
     exec:     "local"
+    conda:    "{%mut_prefix}main"
     sample_subset:
       - "subset1"
       - "subset2"
