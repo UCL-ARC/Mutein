@@ -15,8 +15,9 @@ import itertools
 #regex patterns to match non nested {%placeholders} and {$environment variables}
 environ_regx  = r'\{\$.+?\}'   #{$name}
 scalar_regx   = r'\{%.+?\}'    #{%scalar} or {%list[]}
-glob2job_regx  = r'\{\*.+?\}'  #{*glob} ==> split into separate jobs
-glob2list_regx  = r'\{\+.+?\}' #{+glob} ==> become in-job list
+glob2job_regx  = r'\{\*.+?\}'      #{*glob} ==> split into separate jobs
+glob2list_regx  = r'\{\+.+?\}'     #{+glob} ==> become in-job list
+glob2both_regx  = r'\{[\+\*].+?\}' #{+/*glob} ==> either type of glob placeholder
 list2job_regx  = r'\{=.+?\}'   #{=list} ==> split into separate jobs
 list2list_regx  = r'\{-.+?\}'  #{-list} ==> become in-job list
 
@@ -813,10 +814,12 @@ def build_glob_and_regx(pattern):
     input_regx = '^'
     ph_dict = {}
     prev_end = 0
+    names1 = {} # in-job names
+    names2 = {} # between-job names
 
     #convert glob-type placeholders into proper glob and regex query formats
-    for m in re.finditer(glob2job_regx,pattern):
-        name = m.group(0)[2:-1]   #{*name}
+    for m in re.finditer(glob2both_regx,pattern):
+        name = m.group(0)[2:-1]   #{+name} or {*name}
         start = m.start(0)
 
         input_glob += pattern[prev_end:start] + '*'
@@ -830,22 +833,28 @@ def build_glob_and_regx(pattern):
             #back reference to previous job or list placeholder
             input_regx += '(?P=' + name + ')'
 
+        if m.group(0)[1] == '+':
+            names1[name] = True
+        else:
+            names2[name] = True
+
         prev_end = m.end(0)
 
     input_glob += pattern[prev_end:]
     input_regx += re.escape(pattern[prev_end:]) + '$'
     
-    return input_glob,input_regx
+    return input_glob,input_regx,names1,names2
 
 def generate_glob_jobs(action,job):
     'glob filename to match the two glob type placeholders'
 
+    #glob matches keyed by input pattern name
     glob_matches = {}
 
     #glob each input file pattern separately
     for key,pattern in job["input"].items():
         #convert the pattern-with-placeholders into a glob and regex string
-        input_glob,input_regx = build_glob_and_regx(pattern)
+        input_glob,input_regx,names1,names2 = build_glob_and_regx(pattern)
 
         glob_matches[key] = []
         
@@ -854,8 +863,15 @@ def generate_glob_jobs(action,job):
             m = re.fullmatch(input_regx,path)
             assert m is not None,"regex cannot extract placeholders from the globbed path!"
 
+            #split the matches into the two types of placeholder
+            this_names1 = {}
+            this_names2 = {}
+            for name in m.groupdict():
+                if name in names1: this_names1[name] = m.groupdict()[name] #{+name}
+                else:              this_names2[name] = m.groupdict()[name] #{*name}
+
             #store the match as the completed path plus the placeholder values
-            glob_matches[key].append([key,path,m.groupdict()])
+            glob_matches[key].append([key,path,this_names1,this_names2])
         
         #no jobs are generated if any input pattern has zero matches
         if len(glob_matches[key]) == 0: return []
