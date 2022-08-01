@@ -881,14 +881,20 @@ def generate_glob_jobs(action,job):
             injob = {}
             between = {}
             for name in m.groupdict():
-                if name in names1: injob[name] = m.groupdict()[name] #{+name}
-                else:              between[name] = m.groupdict()[name] #{*name}
+                if name in names1:   injob[name] = m.groupdict()[name] #{+name}
+                elif name in names2: between[name] = m.groupdict()[name] #{*name}
+                else:
+                    raise Exception(f"missing name {name}")
 
             #store the match as the completed path plus the placeholder values
             glob_matches[key].append([key,path,injob,between])
         
         #no jobs are generated if any input pattern has zero matches
         if len(glob_matches[key]) == 0: return []
+
+    # print("glob_matches")
+    # for key in glob_matches:
+    #     show(glob_matches[key])
 
     #find glob_matches where the placeholders
     #have matching values across all input patterns (including injob and between)
@@ -899,8 +905,8 @@ def generate_glob_jobs(action,job):
     #product implements nested for loops over all the lists in meta_list
     for value_list in itertools.product(*meta_list):
         #build the potential new jobs
-        all_injob = {}
-        all_between = {}
+        all_injob = {}  #accumulate all injob variables across all input patterns
+        all_between = {}#accumulate all between job variables across all input patterns
         inputs = {}
 
         conflict = False
@@ -926,14 +932,15 @@ def generate_glob_jobs(action,job):
         appending = False
         if not job_key in new_job_dict:
             #this job is the first with this particular combo of between values
-            new_job = {}
+            new_job = {"input":Conf(inputs)}
             new_job_dict[job_key] = new_job
         else:
             #we're added new injob list members to an existing job
             new_job = new_job_dict[job_key]
             appending = True
 
-        new_input = Conf(inputs)
+        new_input = Conf()
+        new_input.update(inputs)
 
         #substitute in the correct values from the matches
         # new_output = Conf(job["output"])
