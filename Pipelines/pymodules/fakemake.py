@@ -846,7 +846,21 @@ def build_glob_and_regx(pattern):
     return input_glob,input_regx,names1,names2
 
 def generate_glob_jobs(action,job):
-    'glob filename to match the two glob type placeholders'
+    '''
+    glob filename to match the two glob type placeholders
+    {+name} are globs that generate in-job lists, eg:
+    info_file: "samples/{+name}.txt"
+    becomes a list within a job like
+    info_file:
+      - "samples/frog.txt"
+      - "samples/toad.txt" etc
+    {*name} are globs that generate separate jobs ("varies between jobs"), eg:
+    info_file: "samples/{*name}.txt"
+    becomes separate jobs where:
+    info_file: "samples/frog.txt"
+    and then
+    info_file: "samples/toad.txt" in the next job etc
+    '''
 
     #glob matches keyed by input pattern name
     glob_matches = {}
@@ -864,59 +878,85 @@ def generate_glob_jobs(action,job):
             assert m is not None,"regex cannot extract placeholders from the globbed path!"
 
             #split the matches into the two types of placeholder
-            this_names1 = {}
-            this_names2 = {}
+            injob = {}
+            between = {}
             for name in m.groupdict():
-                if name in names1: this_names1[name] = m.groupdict()[name] #{+name}
-                else:              this_names2[name] = m.groupdict()[name] #{*name}
+                if name in names1: injob[name] = m.groupdict()[name] #{+name}
+                else:              between[name] = m.groupdict()[name] #{*name}
 
             #store the match as the completed path plus the placeholder values
-            glob_matches[key].append([key,path,this_names1,this_names2])
+            glob_matches[key].append([key,path,injob,between])
         
         #no jobs are generated if any input pattern has zero matches
         if len(glob_matches[key]) == 0: return []
 
     #find glob_matches where the placeholders
-    #have matching values across all input patterns
+    #have matching values across all input patterns (including injob and between)
     #reject all others
-    new_list = []
+    new_job_dict = {}
     meta_list = [ glob_matches[key] for key in glob_matches ]
 
     #product implements nested for loops over all the lists in meta_list
     for value_list in itertools.product(*meta_list):
-        #build the potential new input and matches objects
-        #check any shared placeholder values match
-        #across all input patterns
-        matches = {}
+        #build the potential new jobs
+        all_injob = {}
+        all_between = {}
         inputs = {}
 
         conflict = False
-        for key,path,groupdict in value_list:
-            for name in groupdict:
-                if name not in matches:
-                    matches[name] = groupdict[name]
-                elif matches[name] != groupdict[name]:
-                    conflict = True
-                    break
-            if conflict: break
+        for key,path,injob,between in value_list:
+            #find conflicts for any variables shared between paths
+            if find_conflicts(all_injob,injob) or find_conflicts(all_between,between):
+                conflict = True
+                break
+
             inputs[key] = path
 
-        #mismatching combo of input paths therefore no job generated
+        #mismatching combo of input path variables therefore no job generated
         if conflict: continue
+
+        #store the new job keyed by the list of between values
+        #as we may need to append new injob list items to already created jobs
+        for x in all_injob.values(): assert not '/' in x
+        for x in all_between.values(): assert not '/' in x
+        sorted_keys = list(all_between.keys())
+        sorted_keys.sort()
+        job_key = '/'.join([all_between[key] for key in sorted_keys])
+
+        appending = False
+        if not job_key in new_job_dict:
+            #this job is the first with this particular combo of between values
+            new_job = {}
+            new_job_dict[job_key] = new_job
+        else:
+            #we're added new injob list members to an existing job
+            new_job = new_job_dict[job_key]
+            appending = True
 
         new_input = Conf(inputs)
 
         #substitute in the correct values from the matches
-        new_output = Conf(job["output"])
-        new_output.sub_values(matches,glob2job_regx)
+        # new_output = Conf(job["output"])
+        # new_output.sub_values(matches,glob2job_regx)
 
         #add new matches to job
         new_lists = Conf(job["lists"])
         new_globs = Conf(matches)
 
-        new_list.append({"input":new_input,"output":new_output,"lists":new_lists,"globs":new_globs})
+        #new_jobs[':'.join()] = {"input":new_input,"output":new_output,"lists":new_lists,"globs":new_globs}
 
-    return new_list
+    #convert new_jobs into list
+    #fill in output values
+    #return new_list
+
+def find_conflicts(all_vals,values):
+    'return True upon first conflict found'
+    for name in values:
+        if name not in all_vals:
+            all_vals[name] = values[name]
+        elif all_vals[name] != values[name]:
+            return True #conflict found
+    return False #no conflicts found
 
 def check_input_mtimes(input):
     #verify all input paths present
