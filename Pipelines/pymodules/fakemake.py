@@ -182,12 +182,6 @@ class Conf:
 
         self.setitem(subkeys,data)
 
-        # #transfer all the items from tmp to self
-        # for key,value in tmp.items():
-        #     full_key = base_keys+[key]
-        #     print(full_key,value)
-        #     self.setitem(full_key,value,truncate=True)
-
     def delete(self,key):
         #delete the include item so it won't be actioned a second time
         self.getitem(key,delete=True)
@@ -220,7 +214,7 @@ class Conf:
         #transfer all the items from tmp to self
         for key,value in tmp.items():
             full_key = base_keys+[key]
-            print(full_key,key,value,type(value))
+            #print(full_key,key,value,type(value))
             self.setitem(full_key,value,truncate=True)
 
     def update(self,src):
@@ -570,7 +564,7 @@ def process(pipeline,path,config=None):
             #add new config to the existing one, overriding any shared keys
             config.update(item[item_type])
             config.includes(path)
-            config.show("loaded config")
+            #config.show("loaded config")
 
         elif item_type == 'module':
             #process a nested pipeline without affecting the config of any
@@ -606,8 +600,6 @@ def setup_action(config,action,path):
     #merge config into action but action has priority
     action.override(config)
     action.includes(path)
-
-    action.show()
 
     #try to ensure placeholder subtitution is not ambiguous
     #find_duplicates([action,input,output])
@@ -691,27 +683,33 @@ def generate_job_list(action,input,output):
     #which may have placeholders in need of expansion
     job_list = [{"input":input,"output":output}]
 
+    # print("before generate_list2list")
+    # for job in job_list:
+    #     job['input'].show('job input')
+    #     job['output'].show('job output')
+    # exit()
+
     #expand list2list patterns
     for job in job_list: generate_list2list(action,job)
 
-    print("after generate_list2list")
-    for job in job_list:
-        job['input'].show('job input')
-        job['output'].show('job output')
+    # print("after generate_list2list")
+    # for job in job_list:
+    #     job['input'].show('job input')
+    #     job['output'].show('job output')
+    # exit()
 
     #expand lists2job patterns
     new_list = []
     for job in job_list: new_list += generate_list_jobs(action,job)
     job_list = new_list
 
-
     if len(job_list) == 0: return []
 
-    print("after generate_list_jobs")
-    for job in job_list:
-        job['input'].show('job input')
-        job['output'].show('job output')
-        job['lists'].show('list variables')
+    # print("after generate_list_jobs")
+    # for job in job_list:
+    #     job['input'].show('job input')
+    #     job['output'].show('job output')
+    #     job['lists'].show('list variables')
 
     #expanded input pattern globs
     new_list = []
@@ -720,22 +718,27 @@ def generate_job_list(action,input,output):
 
     if len(job_list) == 0: return []
 
-    print("after generate_glob_jobs")
-    for job in job_list:
-        job['input'].show('job input')
-        job['output'].show('job output')
-        job['lists'].show('list variables')
-        job['globs'].show('glob variables')
+    # print("after generate_glob_jobs")
+    # for job in job_list:
+    #     job['input'].show('job input')
+    #     job['output'].show('job output')
+    #     job['lists'].show('list variables')
+    #     job['globs'].show('glob variables')
 
     exit()
 
     return job_list
 
 def expand_lists(action,item,key,value):
+    #get list of injob list expansion placeholders
     ph_names = {}
     for m in re.finditer(list2list_regx,value):
         name = m.group(0)[2:-1]   #"{-name}" ==> "name"
-        if name not in ph_names: ph_names[name] = True
+        ph_names[name] = True
+
+    #if no injob list placeholders present then this key does
+    #not need to be expanded into a new sublist
+    if(len(ph_names)) == 0: return
 
     #expand patterns into lists of patterns
     #filled out with the values from the list(s)
@@ -744,7 +747,7 @@ def expand_lists(action,item,key,value):
 
     new_list = []
 
-    #product implements nested for loops over all the lists
+    #"product" implements nested for loops over all the lists
     for value_list in itertools.product(*meta_list):
         src = { name:value_list[i] for i,name in enumerate(ph_names.keys()) }
 
@@ -756,7 +759,11 @@ def expand_lists(action,item,key,value):
     item.setitem(key,new_list)
 
 def generate_list2list(action,job):
-    'expand in-job list placeholders'
+    '''
+    expand in-job list placeholders for each job inplace
+    no new jobs are created, only lists within jobs are expanded
+    if they contain {-name} type placeholder(s)
+    '''
 
     #identify all list2list type placeholders {-name} in input/output patterns
 
@@ -783,7 +790,9 @@ def generate_list_jobs(action,job):
             if name not in ph_names: ph_names[name] = True
 
     #nothing to expand if no list patterns present in input patterns
-    if len(ph_names) == 0: return [ job ]
+    if len(ph_names) == 0:
+        job["lists"] = Conf()
+        return [ job ]
 
     #expand input and output patterns into complete paths
     #(excepting any remaining glob placeholders)
@@ -845,6 +854,23 @@ def build_glob_and_regx(pattern):
     
     return input_glob,input_regx,names1,names2
 
+def expand_into_lists(item):
+    '''
+    expand into lists those keys which contain
+    {+name} type placeholders
+    return a dict with all the expanded keys in
+    '''
+
+    key_dict = {}
+    for key,pattern in item.items():
+        if re.search(glob2list_regx,pattern):
+            key_dict[key] = True
+
+    for key in key_dict:
+        item[key] = [ item[key] ]
+
+    return key_dict
+
 def generate_glob_jobs(action,job):
     '''
     glob filename to match the two glob type placeholders
@@ -862,13 +888,31 @@ def generate_glob_jobs(action,job):
     info_file: "samples/toad.txt" in the next job etc
     '''
 
+    # job["input"].show()
+    # exit()
+
+    #expand into lists all input and output keys which contain injob list placeholders
+    expanding_keys = expand_into_lists(job["input"])
+    expand_into_lists(job["output"])
+
+    # job["input"].show()
+    # job["output"].show()
+    # exit()
+
     #glob matches keyed by input pattern name
     glob_matches = {}
 
     #glob each input file pattern separately
     for key,pattern in job["input"].items():
         #convert the pattern-with-placeholders into a glob and regex string
+        #names1 contains all the injob glob keys {+name}
+        #names2 contains all the between job glob keys {*name}
         input_glob,input_regx,names1,names2 = build_glob_and_regx(pattern)
+
+        # print(input_glob,input_regx)
+        # show(names1)
+        # show(names2)
+        # exit()
 
         glob_matches[key] = []
         
@@ -877,7 +921,7 @@ def generate_glob_jobs(action,job):
             m = re.fullmatch(input_regx,path)
             assert m is not None,"regex cannot extract placeholders from the globbed path!"
 
-            #split the matches into the two types of placeholder
+            #split the re matches into the two types of placeholder
             injob = {}
             between = {}
             for name in m.groupdict():
@@ -895,6 +939,7 @@ def generate_glob_jobs(action,job):
     # print("glob_matches")
     # for key in glob_matches:
     #     show(glob_matches[key])
+    # exit()
 
     #find glob_matches where the placeholders
     #have matching values across all input patterns (including injob and between)
@@ -902,7 +947,11 @@ def generate_glob_jobs(action,job):
     new_job_dict = {}
     meta_list = [ glob_matches[key] for key in glob_matches ]
 
-    #product implements nested for loops over all the lists in meta_list
+    # show(meta_list)
+    # exit()
+
+    #do nested for loops over all the lists in meta_list
+    #to generate all-vs-all combinations
     for value_list in itertools.product(*meta_list):
         #build the potential new jobs
         all_injob = {}  #accumulate all injob variables across all input patterns
@@ -911,50 +960,80 @@ def generate_glob_jobs(action,job):
 
         conflict = False
         for key,path,injob,between in value_list:
+            # print(key)
+            # print(path)
+            # print("injob")
+            # show(injob)
+            # print("between")
+            # show(between)
+            # print()
+
             #find conflicts for any variables shared between paths
             if find_conflicts(all_injob,injob) or find_conflicts(all_between,between):
                 conflict = True
                 break
 
-            inputs[key] = path
+            # store completed path under the input file key
+            # note key is in '/'.join(subkeys) format
+            inputs[key] = path 
 
         #mismatching combo of input path variables therefore no job generated
-        if conflict: continue
+        if conflict:
+            print('conflict')
+            continue
 
-        #store the new job keyed by the list of between values
+        # exit()
+
+        #store the new job keyed by the list of "between" values
+        #ie *not* the normal input file key
         #as we may need to append new injob list items to already created jobs
+        #and need to look up by the list of between values
         for x in all_injob.values(): assert not '/' in x
         for x in all_between.values(): assert not '/' in x
         sorted_keys = list(all_between.keys())
         sorted_keys.sort()
         job_key = '/'.join([all_between[key] for key in sorted_keys])
+        #note: job_key will be '' if no between keys present
+
+        # print(job_key)
+        # exit()
 
         appending = False
-        if not job_key in new_job_dict:
-            #this job is the first with this particular combo of between values
-            new_job = {"input":Conf(inputs)}
-            new_job_dict[job_key] = new_job
-        else:
-            #we're added new injob list members to an existing job
-            new_job = new_job_dict[job_key]
-            appending = True
-
         new_input = Conf()
         new_input.update(inputs)
+        if not job_key in new_job_dict:
+            #create new job upon first encounter with this particular combo of "between" values
+            new_job = {"input":new_input}
+            new_job_dict[job_key] = new_job
+
+        else:
+            #we're adding new injob list members to an existing job
+            appending = True
+            new_job = new_job_dict[job_key]
+            for exp_key in expanding_keys:
+                # print(exp_key)
+                # show(new_job['input'][exp_key])
+                # show(new_input[exp_key])
+                new_job['input'][exp_key].append(new_input[exp_key][0])
+
+        new_job_dict[job_key]['input'].show()
+        #exit()
 
         #substitute in the correct values from the matches
         # new_output = Conf(job["output"])
         # new_output.sub_values(matches,glob2job_regx)
 
         #add new matches to job
-        new_lists = Conf(job["lists"])
-        new_globs = Conf(matches)
+        #new_lists = Conf(job["lists"])
+        #new_globs = Conf(matches)
 
         #new_jobs[':'.join()] = {"input":new_input,"output":new_output,"lists":new_lists,"globs":new_globs}
 
+    print("end of func")
+    exit()
     #convert new_jobs into list
     #fill in output values
-    #return new_list
+    return []
 
 def find_conflicts(all_vals,values):
     'return True upon first conflict found'
@@ -1378,7 +1457,7 @@ def read_jobfile(fname):
 def process_action(config,action,path):
     #validate action and substitute placeholders
     action,input,output,shell = setup_action(config,action,path)
-    action.show("setup action")
+    #action.show("setup action")
 
     print(f'\naction: {action["name"]}')
 
