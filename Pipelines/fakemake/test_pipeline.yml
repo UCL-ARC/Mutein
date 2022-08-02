@@ -43,9 +43,9 @@
     name:     "test1"
     exec:     "local"
     input:
-      samp_file: "test/samples/{+sample_subset}/{+sample}.data"
+      samp_file: "test/samples/{*sample_subset}/{*sample}.data"
     output:
-      out_file:  "test/output/{+sample_subset}/{+sample}.step1"
+      out_file:  "test/output/{*sample_subset}/{*sample}.step1"
     shell: |
       echo samp_file={%samp_file} out_file={%out_file}
       

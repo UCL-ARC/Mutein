@@ -871,6 +871,20 @@ def expand_into_lists(item):
 
     return key_dict
 
+def make_alt_key(all_between):
+    #store the new job keyed by the list of "between" values
+    #ie *not* the normal input file key
+    #as we may need to append new injob list items to already created jobs
+    #and need to look up by the list of between values
+    for x in all_between.values(): assert not '/' in x
+    sorted_keys = list(all_between.keys())
+    sorted_keys.sort()
+    job_key = '/'.join([all_between[key] for key in sorted_keys])
+    #note: job_key will be '' if no between keys present
+    #but it's still a usable dict key
+
+    return job_key
+
 def generate_glob_jobs(action,job):
     '''
     glob filename to match the two glob type placeholders
@@ -892,8 +906,8 @@ def generate_glob_jobs(action,job):
     # exit()
 
     #expand into lists all input and output keys which contain injob list placeholders
-    expanding_keys = expand_into_lists(job["input"])
-    expand_into_lists(job["output"])
+    expanding_input_keys = expand_into_lists(job["input"])
+    expanding_output_keys = expand_into_lists(job["output"])
 
     # job["input"].show()
     # job["output"].show()
@@ -925,8 +939,10 @@ def generate_glob_jobs(action,job):
             injob = {}
             between = {}
             for name in m.groupdict():
-                if name in names1:   injob[name] = m.groupdict()[name] #{+name}
-                elif name in names2: between[name] = m.groupdict()[name] #{*name}
+                if name in names1:
+                    injob[name] = m.groupdict()[name] #{+name}
+                elif name in names2:
+                    between[name] = m.groupdict()[name] #{*name}
                 else:
                     raise Exception(f"missing name {name}")
 
@@ -982,58 +998,64 @@ def generate_glob_jobs(action,job):
             print('conflict')
             continue
 
-        # exit()
-
-        #store the new job keyed by the list of "between" values
-        #ie *not* the normal input file key
-        #as we may need to append new injob list items to already created jobs
-        #and need to look up by the list of between values
-        for x in all_injob.values(): assert not '/' in x
-        for x in all_between.values(): assert not '/' in x
-        sorted_keys = list(all_between.keys())
-        sorted_keys.sort()
-        job_key = '/'.join([all_between[key] for key in sorted_keys])
-        #note: job_key will be '' if no between keys present
+        #all_injob and all_between now contain the final placeholder values
+        #with conflicts removed
 
         # print(job_key)
         # exit()
 
-        appending = False
+        #input placeholders are already filled out by the glob
         new_input = Conf()
         new_input.update(inputs)
+
+        #fill in placeholders in output patterns here
+        new_output = Conf(job['output'])
+        for key,pattern in new_output.items():
+            new_output.sub_values(all_between,glob2job_regx)
+            new_output.sub_values(all_injob,glob2list_regx)
+
+        #make alternative job key based on "between"
+        job_key = make_alt_key(all_between)
+        appending = False
         if not job_key in new_job_dict:
             #create new job upon first encounter with this particular combo of "between" values
-            new_job = {"input":new_input}
+            new_job = \
+            {
+                "input":new_input,
+                "output":new_output,
+                "lists":Conf(job["lists"]),
+                "between":Conf(all_between),
+            }
+            new_job["injob"] = Conf({k:[v] for k,v in injob.items()})
             new_job_dict[job_key] = new_job
 
         else:
             #we're adding new injob list members to an existing job
             appending = True
             new_job = new_job_dict[job_key]
-            for exp_key in expanding_keys:
-                # print(exp_key)
-                # show(new_job['input'][exp_key])
-                # show(new_input[exp_key])
+            for exp_key in expanding_input_keys:
                 new_job['input'][exp_key].append(new_input[exp_key][0])
+            for exp_key in expanding_output_keys:
+                new_job['output'][exp_key].append(new_output[exp_key][0])
+            for exp_key in injob:
+                new_job['injob'][exp_key].append(injob[exp_key])
 
-        new_job_dict[job_key]['input'].show()
+        # new_job_dict[job_key]['input'].show()
+        # new_job_dict[job_key]['output'].show()
+        # new_job_dict[job_key]['injob'].show()
+        # new_job_dict[job_key]['between'].show()
         #exit()
 
-        #substitute in the correct values from the matches
-        # new_output = Conf(job["output"])
-        # new_output.sub_values(matches,glob2job_regx)
-
-        #add new matches to job
-        #new_lists = Conf(job["lists"])
-        #new_globs = Conf(matches)
-
-        #new_jobs[':'.join()] = {"input":new_input,"output":new_output,"lists":new_lists,"globs":new_globs}
-
-    print("end of func")
-    exit()
     #convert new_jobs into list
-    #fill in output values
-    return []
+    job_list = [new_job_dict[k] for k in new_job_dict]
+
+    for x in job_list:
+        x['input'].show()
+        x['output'].show()
+        x['injob'].show()
+        x['between'].show()
+
+    return job_list
 
 def find_conflicts(all_vals,values):
     'return True upon first conflict found'
