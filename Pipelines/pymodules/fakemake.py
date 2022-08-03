@@ -51,11 +51,11 @@ default_global_config =\
 
 class Conf:
     def __init__(self,src=None):
-        self.d = {}
+        self.d = None
 
         if src == None:
             #initialise to empty
-            pass
+            self.d = {}
 
         elif src == "defaults":
             #initialise to defaults
@@ -381,8 +381,8 @@ class Conf:
 
         if type(key) == list:
             for x in key: assert type(x) == str
-            subkeys = key
             key = '/'.join(key)
+            subkeys = key.split('/')
         elif type(key) == str:
             subkeys = key.split('/')
         else:
@@ -1076,7 +1076,8 @@ def generate_glob_jobs(action,job):
         #build the potential new jobs
         all_injob = {}  #accumulate all injob variables across all input patterns
         all_between = {}#accumulate all between job variables across all input patterns
-        inputs = {}
+        #inputs = {}
+        new_input = Conf(job["input"])
 
         conflict = False
         for key,path,injob,between in value_list:
@@ -1096,7 +1097,7 @@ def generate_glob_jobs(action,job):
 
             # store completed path under the input file key
             # note key is in '/'.join(subkeys) format
-            inputs[key] = path 
+            new_input[key] = path 
 
         #mismatching combo of input path variables therefore no job generated
         if conflict:
@@ -1110,8 +1111,8 @@ def generate_glob_jobs(action,job):
         # exit()
 
         #input placeholders are already filled out by the glob
-        new_input = Conf()
-        new_input.update(inputs)
+        ##new_input = Conf()
+        ##new_input.update(inputs)
 
         #fill in placeholders in output patterns here
         new_output = Conf(job['output'])
@@ -1177,12 +1178,12 @@ def generate_glob_jobs(action,job):
     #convert new_jobs into list
     job_list = [new_job_dict[k] for k in new_job_dict]
 
-    # for x in job_list:
-    #     print('job')
-    #     x['input'].show()
-    #     x['output'].show()
-    #     x['injob'].show()
-    #     x['between'].show()
+    for x in job_list:
+        print('job')
+        x['input'].show()
+        x['output'].show()
+        x['injob'].show()
+        x['between'].show()
 
     return job_list
 
