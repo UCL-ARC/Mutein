@@ -182,10 +182,6 @@ class Conf:
 
         self[subkeys] = data
 
-    def delete(self,key):
-        #delete the include item so it won't be actioned a second time
-        self.getitem(key,delete=True)
-
     def do_include(self,subkeys,filename,parent_path):
         #where to put the loaded variables
         base_keys = subkeys[:-2]
@@ -365,14 +361,6 @@ class Conf:
         else:
             raise Exception(f"cannot generate items from type {type(item)}")
 
-    def __getitem__(self,key):
-        '''
-        lookup an item by hierachical key
-        error if key does not exist
-        '''
-
-        return self.getitem(key,delete=False)
-
     def get_key_and_subkeys(self,key):
         '''
         given either type of key
@@ -391,6 +379,18 @@ class Conf:
         assert len(subkeys) > 0, f"invalid empty key {key}"
 
         return key,subkeys
+
+    def __getitem__(self,key):
+        '''
+        lookup an item by hierachical key
+        error if key does not exist
+        '''
+
+        return self.getitem(key,delete=False)
+
+    def delete(self,key):
+        'delete the item pointed to by the key'
+        self.getitem(key,delete=True)
 
     def getitem(self,key,delete=False):
         '''
@@ -436,7 +436,7 @@ class Conf:
                 return item[sk]
 
             elif type(item) == list:
-                if final and len(sk) == 1 and not sk.isdigit():
+                if final and len(sk) in (0,1) and not sk.isdigit():
                     #special subscript meaning
                     assert not delete,f'invalid use of special subscript {sk} at {key}'
                     return self.special_subscript(sk,item)
@@ -467,18 +467,10 @@ class Conf:
             return sk.join(item)
 
     def __setitem__(self,key,value):
-        'set item assuming lists should not be truncated'
-        self.setitem(key,value)
-
-    def setitem(self,key,value,truncate=False):
         '''
         set item by hierachical key
         creating any parent nodes required
         '''
-
-        if truncate == True:
-            print("truncate")
-            exit()
 
         key,subkeys = self.get_key_and_subkeys(key)
 
@@ -495,13 +487,17 @@ class Conf:
                     item[sk] = value
                     return
 
-                if not sk in item:
-                    #need to create an empty container
-                    try:
-                        int(subkeys[i+1]) #see if next subkey implies a list or a dict
-                        item[sk] = []
-                    except:
-                        item[sk] = {}
+                assert sk in item, "this implementation doesn't support implicit parent node creation"
+
+                #trying to avoid using the below as it prevents ints being
+                #used as dict keys - since the below assumes they are list indexes
+                # if not sk in item:
+                #     #need to create an empty container
+                #     try:
+                #         int(subkeys[i+1]) #see if next subkey implies a list or a dict
+                #         item[sk] = []
+                #     except:
+                #         item[sk] = {}
 
                 item = item[sk]
             elif type(item) == list:
@@ -511,49 +507,22 @@ class Conf:
                 except:
                     raise Exception(f"key error for {sk} within {key}")
 
-                if truncate == False:
-                    #assigning single new item in existing list
-                    assert sk < len(item) and sk >= -len(item)
+                #assigning single new item in existing list
+                assert sk < len(item) and sk >= -len(item)
 
-                    if assign:
-                        item[sk] = value
-                        return
+                if assign:
+                    item[sk] = value
+                    return
 
-                    item = item[sk]
-                else:
-                    #sequentially assigning all items in a list
-                    #therefore drop any existing items
-                    assert sk >= 0, f"negative index {sk} for sequential update within {key}"
-
-                    if assign:
-                        #assign leaf node value within list
-                        #first assignment erases old list first
-                        if sk == 0: item.clear()
-                        assert len(item) == sk
-                        item.append(value)
-                        return
-
-                    #not a leaf node, clear only on the first time we visit
-                    if sk == 0 and len(item) > 1:
-                        item.clear()
-
-                    if sk >= len(item) - 1:
-                        #need to create next list item
-                        try:
-                            int(subkeys[i+1]) #see if next subkey implies a list or a dict
-                            item.append([])
-                        except:
-                            item.append({})
-
-                    item = item[sk]
+                item = item[sk]
 
             else:
                 raise Exception(f"unsupported data type in {key}")
 
-    def sub_vars2(self,src=None):
+    def sub_vars(self,src=None):
         '''
-        substitute all placeholders except {=...} and {*...} 
-        or throw exception
+        substitute all {$...} and {%...} placeholders
+        or throw exception if 10 iterations is not enough
         '''
 
         #where to get the replacement values from
@@ -570,21 +539,21 @@ class Conf:
 
     def sub_values(self,src,regx):
         '''
-        substitute placeholders
-        ie {$environ}, {%scalars} or {&lists[i]}
+        substitute all placeholders
+        eg {$environ}, {%scalars}
         '''
 
         changed = False
 
         for key,value in self.items():
-            new_val,flag = self.do_sub2(src,regx,value)
+            new_val,flag = self.do_subs(src,regx,value)
             if flag:
                 self[key] = new_val
                 changed = True
 
         return changed
 
-    def do_sub2(self,src,regx,value):
+    def do_subs(self,src,regx,value):
         '''
         sub all simple placeholders in value from src
         src can be a dict (os.environ) or a Conf 
@@ -596,10 +565,8 @@ class Conf:
             m = re.search(regx,value)
             if m == None: break #no more matches
 
-            key = m.group(0)[2:-1]   #{%key}, {$key}
-            sub = src[key]
-
-            value = value[:m.start(0)] + sub + value[m.end(0):]
+            key = m.group(0)[2:-1]   #{+key}, {$key}, {%hierachical/key}, {%list/0}
+            value = value[:m.start(0)] + src[key] + value[m.end(0):]
             changed = True
 
         return value,changed
@@ -697,9 +664,9 @@ def setup_action(config,action,path):
 
     #substitute all placeholders except for shell
     #which likely contains input/output variables yet to be determined
-    action.sub_vars2()
-    input.sub_vars2(src=action)
-    output.sub_vars2(src=action)
+    action.sub_vars()
+    input.sub_vars(src=action)
+    output.sub_vars(src=action)
 
     #create log dir if missing
     action.make_log_dir()
@@ -733,26 +700,26 @@ def split_action(action):
 
     return action,input,output,shell
 
-def update_config(config,new_config):
-    #check all keys and values are simple strings
-    #check for forbidden keys
-    for key,value in new_config.items():
-        assert type(key) == str
-        assert type(value) == str
-        assert key not in nonconfig_keys
+# def update_config(config,new_config):
+#     #check all keys and values are simple strings
+#     #check for forbidden keys
+#     for key,value in new_config.items():
+#         assert type(key) == str
+#         assert type(value) == str
+#         assert key not in nonconfig_keys
 
-    #substitute any environment variables
-    sub_environ(new_config)
+#     #substitute any environment variables
+#     sub_environ(new_config)
 
-    #substitute any fakemake variables
-    sub_vars(new_config)
+#     #substitute any fakemake variables
+#     sub_vars(new_config)
 
-    #create log directory if not already present
-    if 'log_dir' in new_config:
-        if not os.path.exists(new_config['log_dir']):
-            os.makedirs(new_config['log_dir'])
+#     #create log directory if not already present
+#     if 'log_dir' in new_config:
+#         if not os.path.exists(new_config['log_dir']):
+#             os.makedirs(new_config['log_dir'])
 
-    config.update(new_config)
+#     config.update(new_config)
 
 def parse_yaml(fname):
     'parse yaml into list of items'
@@ -801,10 +768,10 @@ def generate_job_list(action,input,output):
 
     if len(job_list) == 0: return []
 
-    # print("after globs")
-    # for job in job_list:
-    #     print(list(job.keys()))
-    #     for key in job: job[key].show()
+    print("after globs")
+    for job in job_list:
+        print(list(job.keys()))
+        for key in job: job[key].show()
 
     exit()
 
@@ -837,7 +804,7 @@ def expand_lists(action,item,key,value):
         dst.sub_values(src,list2list_regx)
         new_list.append(dst["value"])
 
-    item.setitem(key,new_list)
+    item[key] = new_list
 
 def generate_list2list(action,job):
     '''
