@@ -79,7 +79,7 @@ class Conf:
             if type(value) != str:
                 self[key] = str(value)
 
-    def includes(self,parent_file):
+    def includes_and_loads(self,parent_file):
         'action any includes or file loads'
 
         parent_path = os.path.dirname(parent_file)
@@ -180,7 +180,7 @@ class Conf:
 
         assert data != [],f'failed to extract any data from {filename}'
 
-        self.setitem(subkeys,data)
+        self[subkeys] = data
 
     def delete(self,key):
         #delete the include item so it won't be actioned a second time
@@ -199,43 +199,75 @@ class Conf:
             full_path = os.path.join(parent_path,filename)
 
         #delete the include item so it won't be actioned a second time
-        self.getitem(subkeys,delete=True)
+        self.delete(subkeys)
 
         #delete the includes list if now empty
         if len(self.getitem(subkeys[:-1])) == 0:
-            self.getitem(subkeys[:-1],delete=True)
+            self.delete(subkeys[:-1])
 
         #load the YAML
         with open(full_path) as f:
             yml = yaml.safe_load(f)
-            assert type(yml) == dict
-            tmp = Conf(yml)
+            assert type(yml) == dict, f'include {full_path} must be a dict at top level'
+            self.update(yml,base=base_keys)
 
-        #transfer all the items from tmp to self
-        for key,value in tmp.items():
-            full_key = base_keys+[key]
-            #print(full_key,key,value,type(value))
-            self.setitem(full_key,value,truncate=True)
-
-    def update(self,src):
+    def update(self,src,base=None):
         '''
-        deepcopy all key:value pairs from another Conf object or dict
+        merge in all items from another Conf object or dict
         values of src take priority (overwrite) any duplicate keys in self
+        in lists shared between self and src, the list in self gets emptied
+        before the items from src are added
+        place the new items at the specified base key
+        default is the root key
         '''
 
         if type(src) == dict: src = Conf(src)
 
-        if type(src) == Conf:
-            for key,value in src.items():
-                #truncate any existing lists to prevent old items surviving
-                self.setitem(key,value,truncate=True)
+        if type(src) != Conf:
+            raise Exception(f"unsupported object type {type(src)}")
 
-        else:
-            raise Exception(f"unsuported object type {type(src)}")
+        if base:
+            base_key,base_subkeys = self.get_key_and_subkeys(base)
+
+        for src_key,src_value in src.containers():
+            if base:
+                self_key = '/'.join((base_key,src_key))
+            else:
+                self_key = src_key
+
+            try:
+                self_value = self[self_key]
+            except:
+                self_value = None
+
+            if self_value == None:
+                if type(src_value) == list:
+                    #pad out to required new length
+                    self[self_key] = [None] * len(src_value)
+                elif type(src_value) == dict:
+                    self[self_key] = {}
+                else:
+                    raise Exception(f"unsupported container type {type(src_value)} at {src_key}")
+
+            elif type(src_value) == list:
+                #wipe any existing list values, pad out to required new length
+                self[self_key] = [None] * len(src_value)
+            elif type(src_value) == dict and type(self_value) != dict:
+                #only create empty dict if not already a dict
+                #therefore preserver any existing keys
+                self[self_key] = {}
+
+        for src_key,src_value in src.items():
+            if base:
+                self_key = '/'.join((base_key,src_key))
+            else:
+                self_key = src_key
+
+            self[self_key] = src_value
 
     def override(self,src):
         '''
-        add all items from another conf object
+        merge in all items from another Conf object or dict
         values of self take priority for any duplicate keys
         '''
 
@@ -265,6 +297,48 @@ class Conf:
 
         for subkeys,value in self.subkey_items(item):
             yield '/'.join(subkeys),value
+
+    def containers(self,item=None):
+        '''
+        generator function to crawl through all key:value pairs
+        returning only containers not leaves
+        return key as '/'.join(subkey_list)
+        rather than a list of subkeys
+        '''
+
+        for subkeys,value in self.subkey_containers(item):
+            yield '/'.join(subkeys),value
+
+    def subkey_containers(self,item=None):
+        '''
+        generator function to crawl through all key:value pairs
+        returning only containers not leaves
+        return key as a list of subkeys
+        rather than '/'.join(subkey_list)
+        '''
+
+        if item == None: item = self.d
+
+        if type(item) == dict:
+            for key in item:
+                if type(item[key]) not in (list,dict): continue
+
+                yield [key],item[key]
+
+                for subkey,value in self.subkey_containers(item[key]):
+                    yield [key]+subkey,value
+
+        elif type(item) == list:
+            for i in range(len(item)):
+                if type(item[i]) not in (list,dict): continue
+
+                yield [str(i)],item[i]
+
+                for subkey,value in self.subkey_containers(item[i]):
+                    yield [str(i)]+subkey,value
+
+        else:
+            raise Exception(f"cannot generate items from type {type(item)}")
 
     def subkey_items(self,item=None):
         '''
@@ -301,7 +375,8 @@ class Conf:
 
     def get_key_and_subkeys(self,key):
         '''
-        split key into subkeys or join subkeys into key
+        given either type of key
+        return the '/'.join and list forms of the key
         '''
 
         if type(key) == list:
@@ -393,13 +468,17 @@ class Conf:
 
     def __setitem__(self,key,value):
         'set item assuming lists should not be truncated'
-        self.setitem(key,value,truncate=False)
+        self.setitem(key,value)
 
     def setitem(self,key,value,truncate=False):
         '''
         set item by hierachical key
         creating any parent nodes required
         '''
+
+        if truncate == True:
+            print("truncate")
+            exit()
 
         key,subkeys = self.get_key_and_subkeys(key)
 
@@ -572,9 +651,11 @@ def process(pipeline,path,config=None):
 
         elif item_type == 'config':
             #add new config to the existing one, overriding any shared keys
+            #config.show("orig config")
             config.update(item[item_type])
-            config.includes(path)
             #config.show("loaded config")
+            config.includes_and_loads(path)
+            #config.show("actioned includes and loads")
 
         elif item_type == 'module':
             #process a nested pipeline without affecting the config of any
@@ -609,7 +690,7 @@ def setup_action(config,action,path):
 
     #merge config into action but action has priority
     action.override(config)
-    action.includes(path)
+    action.includes_and_loads(path)
 
     #try to ensure placeholder subtitution is not ambiguous
     #find_duplicates([action,input,output])
@@ -696,10 +777,10 @@ def generate_job_list(action,input,output):
     #expand in-job list patterns
     for job in job_list: generate_list2list(action,job)
 
-    print("after injob list")
-    for job in job_list:
-        print(list(job.keys()))
-        for key in job: job[key].show()
+    # print("after injob list")
+    # for job in job_list:
+    #     print(list(job.keys()))
+    #     for key in job: job[key].show()
 
     #expand between-job list patterns
     new_list = []
@@ -708,10 +789,10 @@ def generate_job_list(action,input,output):
 
     if len(job_list) == 0: return []
 
-    print("after between list")
-    for job in job_list:
-        print(list(job.keys()))
-        for key in job: job[key].show()
+    # print("after between list")
+    # for job in job_list:
+    #     print(list(job.keys()))
+    #     for key in job: job[key].show()
 
     #expanded input pattern globs
     new_list = []
@@ -720,11 +801,10 @@ def generate_job_list(action,input,output):
 
     if len(job_list) == 0: return []
 
-    print("after globs")
-    for job in job_list:
-        print(list(job.keys()))
-        for key in job: job[key].show()
-
+    # print("after globs")
+    # for job in job_list:
+    #     print(list(job.keys()))
+    #     for key in job: job[key].show()
 
     exit()
 
@@ -871,7 +951,7 @@ def expand_into_lists(item):
 
     key_dict = {}
     for subkeys,pattern in item.subkey_items():
-        print('/'.join(subkeys))
+        #print('/'.join(subkeys))
 
         if re.search(glob2list_regx,pattern):
             key = '/'.join(subkeys)
@@ -1020,7 +1100,7 @@ def generate_glob_jobs(action,job):
 
         #mismatching combo of input path variables therefore no job generated
         if conflict:
-            print('conflict')
+            #print('conflict')
             continue
 
         #all_injob and all_between now contain the final placeholder values

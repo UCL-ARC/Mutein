@@ -4,6 +4,8 @@
       stale_output_file:    "recycle"
       stale_output_dir:     "ignore"
       missing_parent_dir:   "create"
+      includes:
+        - "test_include.yml"
 
     working_dir:          "/lustre/scratch/scratch/{$USER}/549_mutein"
     test_dir:             "test"
