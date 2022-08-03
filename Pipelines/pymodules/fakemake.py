@@ -251,9 +251,6 @@ class Conf:
         print(json.dumps(self.d,sort_keys=False,indent=indent))
         print()
 
-    # def __contains__(self,key):
-    #     return key in self.keys()
-
     def keys(self,item=None):
         'generator function to crawl through all leaf keys'
 
@@ -270,7 +267,10 @@ class Conf:
             yield '/'.join(subkeys),value
 
     def subkey_items(self,item=None):
-        'generator function to crawl through all leaf key:value pairs'
+        '''
+        generator function to crawl through all leaf key:value pairs
+        return key as explicit list of subkeys
+        '''
 
         if item == None: item = self.d
 
@@ -299,40 +299,69 @@ class Conf:
 
         return self.getitem(key,delete=False)
 
+    def get_key_and_subkeys(self,key):
+        '''
+        split key into subkeys or join subkeys into key
+        '''
+
+        if type(key) == list:
+            for x in key: assert type(x) == str
+            subkeys = key
+            key = '/'.join(key)
+        elif type(key) == str:
+            subkeys = key.split('/')
+        else:
+            raise Exception(f'invalid key type {type(key)}')
+
+        assert len(subkeys) > 0, f"invalid empty key {key}"
+
+        return key,subkeys
+
     def getitem(self,key,delete=False):
         '''
         lookup an item by hierachical key
         key can be as 'subkey1/subkey2...'
-        or '{%subkey1/subkey2...}'
+        or ['subkey1','subkey2'...]
         for lists the "subkey" is the normal python index
+        or N for list length
+        or any single non digit for joined version of whole list
         for dicts the "subkey" is a normal key string
+        ??or '' for list of key strings
         error if key does not exist
         delete=True means delete instead of returning value
         '''
 
-        #convert a list of subkeys into a single string-type key
-        if type(key) == list: key = '/'.join(key)
-
-        #strip off any surrounding placeholder characters
-        if key.startswith('{'):
-            assert key.endswith('}'),f"malformed placeholder {key}"
-            assert key[1] == '%',f"malformed placeholder {key}"
-            key = key[2:-1]
-
-        subkeys = key.split('/')
-
-        assert len(subkeys) > 0, f"invalid empty key {key}"
+        key,subkeys = self.get_key_and_subkeys(key)
 
         item = self.d
-        leaf = False
+        final = False
         for i,sk in enumerate(subkeys):
-            if i == len(subkeys)-1: leaf = True
+            if i == len(subkeys)-1: final = True
 
             if type(item) == dict:
+                if sk == '':
+                    #special meaning: get list of keys
+                    assert not delete, "cannot delete keys using the empty key"
+                    if final:
+                        return list(item.keys())
+                    else:
+                        item = list(item.keys())
+                        continue
+
                 assert sk in item, f"key error for {sk} within {key}"
 
+                if not final:
+                    item = item[sk]
+                    continue
+
+                if delete:
+                    del item[sk]
+                    return None
+
+                return item[sk]
+
             elif type(item) == list:
-                if leaf and len(sk) == 1 and not sk.isdigit():
+                if final and len(sk) == 1 and not sk.isdigit():
                     #special subscript meaning
                     assert not delete,f'invalid use of special subscript {sk} at {key}'
                     return self.special_subscript(sk,item)
@@ -344,17 +373,17 @@ class Conf:
 
                 sk = int(sk)
 
+                if not final:
+                    item = item[sk]
+                    continue
+
+                if delete:
+                    del item[sk]
+                    return None
+
+                return item[sk]
             else:
                 raise Exception(f"unsupported data type in {key}")
-
-            if not leaf:
-                item = item[sk]
-
-        if delete:
-            del item[sk]
-            return None
-        else:
-            return item[sk]
 
     def special_subscript(self,sk,item):
         if sk == 'N':
@@ -372,27 +401,17 @@ class Conf:
         creating any parent nodes required
         '''
 
-        #convert a list of subkeys into a single string-type key
-        if type(key) == list: key = '/'.join(key)
-
-        #strip off any surrounding placeholder characters
-        if key.startswith('{'):
-            assert key.endswith('}'),f"malformed placeholder {key}"
-            assert key[1] == '%',f"malformed placeholder {key}"
-            key = key[2:-1]
-
-        subkeys = key.split('/')
-
-        assert len(subkeys) > 0, f"invalid empty key {key}"
+        key,subkeys = self.get_key_and_subkeys(key)
 
         item = self.d
-
         assign = False
         for i,sk in enumerate(subkeys):
             if i == len(subkeys) - 1: #leaf reached, time to assign the new value
                 assign = True
 
             if type(item) == dict:
+                assert sk != '', "cannot assign to dict key list"
+
                 if assign:
                     item[sk] = value
                     return
@@ -425,7 +444,7 @@ class Conf:
                 else:
                     #sequentially assigning all items in a list
                     #therefore drop any existing items
-                    assert sk >= 0,f"negative index {sk} for sequential update within {key}"
+                    assert sk >= 0, f"negative index {sk} for sequential update within {key}"
 
                     if assign:
                         #assign leaf node value within list
@@ -451,15 +470,6 @@ class Conf:
 
             else:
                 raise Exception(f"unsupported data type in {key}")
-
-    def sub_input_output(self,src):
-        '''
-        substitute only {=...} and {*...} placeholders
-        or throw exception
-        '''
-
-        self.sub_values(src,glob2job_regx)
-        self.sub_values(src,list2job_regx)
 
     def sub_vars2(self,src=None):
         '''
@@ -683,33 +693,25 @@ def generate_job_list(action,input,output):
     #which may have placeholders in need of expansion
     job_list = [{"input":input,"output":output}]
 
-    # print("before generate_list2list")
-    # for job in job_list:
-    #     job['input'].show('job input')
-    #     job['output'].show('job output')
-    # exit()
-
-    #expand list2list patterns
+    #expand in-job list patterns
     for job in job_list: generate_list2list(action,job)
 
-    # print("after generate_list2list")
-    # for job in job_list:
-    #     job['input'].show('job input')
-    #     job['output'].show('job output')
-    # exit()
+    print("after injob list")
+    for job in job_list:
+        print(list(job.keys()))
+        for key in job: job[key].show()
 
-    #expand lists2job patterns
+    #expand between-job list patterns
     new_list = []
-    for job in job_list: new_list += generate_list_jobs(action,job)
+    for job in job_list: new_list += generate_list2jobs(action,job)
     job_list = new_list
 
     if len(job_list) == 0: return []
 
-    # print("after generate_list_jobs")
-    # for job in job_list:
-    #     job['input'].show('job input')
-    #     job['output'].show('job output')
-    #     job['lists'].show('list variables')
+    print("after between list")
+    for job in job_list:
+        print(list(job.keys()))
+        for key in job: job[key].show()
 
     #expanded input pattern globs
     new_list = []
@@ -718,12 +720,11 @@ def generate_job_list(action,input,output):
 
     if len(job_list) == 0: return []
 
-    # print("after generate_glob_jobs")
-    # for job in job_list:
-    #     job['input'].show('job input')
-    #     job['output'].show('job output')
-    #     job['lists'].show('list variables')
-    #     job['globs'].show('glob variables')
+    print("after globs")
+    for job in job_list:
+        print(list(job.keys()))
+        for key in job: job[key].show()
+
 
     exit()
 
@@ -743,7 +744,7 @@ def expand_lists(action,item,key,value):
     #expand patterns into lists of patterns
     #filled out with the values from the list(s)
     #where multiple lists are present expand to all combinations of the lists
-    meta_list = [action[key] for key in ph_names]
+    meta_list = [ action[key] for key in ph_names ]
 
     new_list = []
 
@@ -765,7 +766,7 @@ def generate_list2list(action,job):
     if they contain {-name} type placeholder(s)
     '''
 
-    #identify all list2list type placeholders {-name} in input/output patterns
+    #identify all in-job type placeholders {-name} in input/output patterns
 
     for key,value in job["input"].items():
         expand_lists(action,job["input"],key,value)
@@ -773,8 +774,12 @@ def generate_list2list(action,job):
     for key,value in job["output"].items():
         expand_lists(action,job["output"],key,value)
 
-def generate_list_jobs(action,job):
-    'expand job list to one item per file pattern match combo'
+def generate_list2jobs(action,job):
+    '''
+    expand between-job list placeholders to one independent job
+    per placeholder value for single lists
+    or value combination where multiple placeholders are in the same pattern
+    '''
 
     #identify all listjob type placeholders {=name} in input/output patterns
     ph_names = {}
@@ -801,7 +806,7 @@ def generate_list_jobs(action,job):
     new_list = []
     meta_list = [action[key] for key in ph_names]
 
-    #product implements nested for loops over all the lists
+    #do nested for loops over all the lists
     for value_list in itertools.product(*meta_list):
         src = { name:value_list[i] for i,name in enumerate(ph_names.keys()) }
 
@@ -856,18 +861,31 @@ def build_glob_and_regx(pattern):
 
 def expand_into_lists(item):
     '''
-    expand into lists those keys which contain
-    {+name} type placeholders
-    return a dict with all the expanded keys in
+    find all keys which contain {+name} type placeholders
+    expand these into lists
+    unless they are already members of a list
+    return a dict with all the {+name} keys in
+    set to True if it was expanded
+    False otherwise
     '''
 
     key_dict = {}
-    for key,pattern in item.items():
+    for subkeys,pattern in item.subkey_items():
+        print('/'.join(subkeys))
+
         if re.search(glob2list_regx,pattern):
-            key_dict[key] = True
+            key = '/'.join(subkeys)
+
+            if len(subkeys) == 1 or type(item[subkeys[:-1]]) != list:
+                #expand into list
+                key_dict[key] = True
+            else:
+                #already a list, do not expand further
+                key_dict[key] = False
 
     for key in key_dict:
-        item[key] = [ item[key] ]
+        if key_dict[key] == True:
+            item[key] = [ item[key] ]
 
     return key_dict
 
@@ -902,16 +920,19 @@ def generate_glob_jobs(action,job):
     info_file: "samples/toad.txt" in the next job etc
     '''
 
+    # print("before expand into lists")
     # job["input"].show()
-    # exit()
+    # job["output"].show()
+    #exit()
 
     #expand into lists all input and output keys which contain injob list placeholders
     expanding_input_keys = expand_into_lists(job["input"])
     expanding_output_keys = expand_into_lists(job["output"])
 
+    # print("after expand into lists")
     # job["input"].show()
     # job["output"].show()
-    # exit()
+    #exit()
 
     #glob matches keyed by input pattern name
     glob_matches = {}
@@ -926,7 +947,7 @@ def generate_glob_jobs(action,job):
         # print(input_glob,input_regx)
         # show(names1)
         # show(names2)
-        # exit()
+        #exit()
 
         glob_matches[key] = []
         
@@ -952,10 +973,13 @@ def generate_glob_jobs(action,job):
         #no jobs are generated if any input pattern has zero matches
         if len(glob_matches[key]) == 0: return []
 
+        #sort into alphabetical order by path
+        glob_matches[key].sort(key=lambda item: item[1])
+
     # print("glob_matches")
     # for key in glob_matches:
     #     show(glob_matches[key])
-    # exit()
+    #exit()
 
     #find glob_matches where the placeholders
     #have matching values across all input patterns (including injob and between)
@@ -986,6 +1010,7 @@ def generate_glob_jobs(action,job):
 
             #find conflicts for any variables shared between paths
             if find_conflicts(all_injob,injob) or find_conflicts(all_between,between):
+                #print("conflict")
                 conflict = True
                 break
 
@@ -1034,26 +1059,50 @@ def generate_glob_jobs(action,job):
             appending = True
             new_job = new_job_dict[job_key]
             for exp_key in expanding_input_keys:
-                new_job['input'][exp_key].append(new_input[exp_key][0])
+                # print(exp_key)
+                # new_job['input'].show()
+                if type(new_job['input'][exp_key]) == list:
+                    # print(exp_key)
+                    new_job['input'][exp_key].append(new_input[exp_key][0])
+                else:
+                    parent_key = '/'.join(exp_key.split('/')[:-1])
+                    # print('>',parent_key,'<')
+                    new_job['input'][parent_key].append(new_input[exp_key])
+                # new_job['input'].show()
+
             for exp_key in expanding_output_keys:
-                new_job['output'][exp_key].append(new_output[exp_key][0])
+                # print(exp_key)
+                # new_job['output'].show()
+
+                if type(new_job['output'][exp_key]) == list:
+                    # print(exp_key)
+                    new_job['output'][exp_key].append(new_output[exp_key][0])
+                else:
+                    parent_key = '/'.join(exp_key.split('/')[:-1])
+                    # print('>',parent_key,'<')
+                    new_job['output'][parent_key].append(new_output[exp_key])
+                # new_job['output'].show()
+
             for exp_key in injob:
                 new_job['injob'][exp_key].append(injob[exp_key])
+
+            # exit()
 
         # new_job_dict[job_key]['input'].show()
         # new_job_dict[job_key]['output'].show()
         # new_job_dict[job_key]['injob'].show()
         # new_job_dict[job_key]['between'].show()
-        #exit()
+        # exit()
 
     #convert new_jobs into list
     job_list = [new_job_dict[k] for k in new_job_dict]
 
-    for x in job_list:
-        x['input'].show()
-        x['output'].show()
-        x['injob'].show()
-        x['between'].show()
+    # for x in job_list:
+    #     print('job')
+    #     x['input'].show()
+    #     x['output'].show()
+    #     x['injob'].show()
+    #     x['between'].show()
 
     return job_list
 

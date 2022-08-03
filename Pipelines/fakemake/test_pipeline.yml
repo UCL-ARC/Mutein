@@ -39,22 +39,65 @@
 
 #- module: "test_module/module.yml"
 
-- action:
-    name:     "test1"
-    exec:     "local"
-    input:
-      samp_file: "test/samples/{*sample_subset}/{*sample}.data"
-    output:
-      out_file:  "test/output/{*sample_subset}/{*sample}.step1"
-    shell: |
-      echo samp_file={%samp_file} out_file={%out_file}
-      
 # - action:
 #     name:     "test1"
 #     exec:     "local"
-#     conda:    "{%mut_prefix}main"
-#     list1:    "{>./test/load_test.txt[\tR0]}"
-#     includes: [ "action_list.yml" ]
+#     sample_subset:
+#       - "subset1"
+#       - "subset2"
+#       - "subset3"
+#       - "subset4"
+#       - "subset5"
+#     sample:
+#       - 1
+#       - 2
+#       - 3
+#       - 4
+#       - 5
+#       - 6
+#     input:
+#       samp_file: "test/samples/{-sample_subset}/{-sample}.data"
+#     output:
+#       out_file:  "test/output/{-sample_subset}/{-sample}.step1"
+#     shell: |
+#       echo samp_file={%samp_file} out_file={%out_file}
+#       echo sample_subset={-sample_subset} sample={-sample}
+#       echo all samples: {%sample[,]}
+#       echo all subsets: {%sample_subset[,]}
+
+# - action:
+#     name:     "test1"
+#     exec:     "local"
+#     input:
+#       samp_file: "test/samples/{*sample_subset}/{+sample}.data"
+#     output:
+#       out_file:  "test/output/{*sample_subset}/{+sample}.step1"
+#     shell: |
+#       echo samp_file={%samp_file} out_file={%out_file}
+      
+- action:
+    name:     "test1"
+    exec:     "local"
+    sample_subset:
+      - "subset1"
+      - "subset2"
+    treatment_class:
+      - "prenormify"
+      - "subexpansification"
+    input:
+      samp_file:  [ "{%test_dir}/samples/{*sample_subset}/{+sample}.data" ]
+      #treat_meta: "{%test_dir}/treatments/{=treatment_class}/{*treatment}"
+      #combo_file: "{%test_dir}/combos/{+sample}_{*treatment}"
+    output:
+      test_out: "{%test_dir}/output/{*sample_subset}/{+sample}.data"
+      #result: "{%test_dir}/output/{-sample_subset}/{=treatment_class}/{+sample}_{*treatment}.step1"
+    shell: |
+      echo samp_file={%samp_file} treat_meta={%treat_meta} > {%output}
+      echo {=sample_subset} {*sample} {=treatment_class} {*treatment} >> {%output}
+      
+# - action:
+#     name:     "conflict"
+#     exec:     "local"
 #     sample_subset:
 #       - "subset1"
 #       - "subset2"
@@ -69,7 +112,7 @@
 #     shell: |
 #       echo samp_file={%samp_file} treat_meta={%treat_meta} > {%output}
 #       echo {=sample_subset} {*sample} {=treatment_class} {*treatment} >> {%output}
-      
+
 # - action:
 #     name:     "step1"
 #     exec:     "local"
