@@ -24,7 +24,7 @@ list2list_regx  = r'\{-.+?\}'  #{-list} ==> become in-job list
 default_global_config =\
 {
     'fm':{
-        'prefix':'fm',                   #log file/job name  prefix: qsub doesn't like numerical names
+        'prefix':'fm-',                   #log file/job name  prefix: qsub doesn't like numerical names
         'log_dir':'fakemake_logs',       #name of subfolder for logging
         'remote_delay_secs':'10',        #wait this long after remote jobs incase of latency
         'stale_output_file':'ignore',    #ignore,delete,recycle (also applies to symlinks)
@@ -39,12 +39,14 @@ default_global_config =\
         'conda_setup':'',
     },
     'qsub':{
-        'time':'02:00:00',          #$ -l h_rt={args.time}
-        'mem':'4G',                 #$ -l mem={args.mem}
-        'tmpfs':'10G',              #$ -l tmpfs={args.tmpfs}
-        'pe':'smp',                 #$ -pe smp {threads}
-        'cores':'1',
-        'template':'default',       #default or path to your own
+        'template':'default',       #template job script: "default" or path to your own
+        'time':'02:00:00',          #$ -l h_rt={time}
+        'mem':'4G',                 #$ -l mem={mem}
+        'tmpfs':'10G',              #$ -l tmpfs={tmpfs}
+        'pe':'smp',                 #$ -pe {pe} {cores}
+        'cores':'1',                #$ -pe {pe} {cores}
+        'log_dir':'{%fm/log_dir}'   #log dir for qsub stdout and stderr files
+                                    #$ -o/e {log_dir}/{jobname}.$TASK_ID.out/err
     },
     'exec':'local',                  #default execution environment
 }
@@ -72,6 +74,13 @@ class Conf:
 
         else:
             raise Exception(f"unsupported source class {type(src)}")
+
+    def __contains__(self,key):
+        try:
+            self[key]
+            return True
+        except:
+            return False
 
     def stringify(self):
         #make sure any numerical types are converted to string
@@ -436,7 +445,7 @@ class Conf:
                 return item[sk]
 
             elif type(item) == list:
-                if final and len(sk) in (0,1) and not sk.isdigit():
+                if final and not is_valid_int(sk):
                     #special subscript meaning
                     assert not delete,f'invalid use of special subscript {sk} at {key}'
                     return self.special_subscript(sk,item)
@@ -463,6 +472,10 @@ class Conf:
     def special_subscript(self,sk,item):
         if sk == 'N':
             return str(len(item))
+        elif sk == '\\t':
+            return '\t'.join(item)
+        elif sk == '\\n':
+            return '\n'.join(item)
         else:
             return sk.join(item)
 
@@ -566,24 +579,36 @@ class Conf:
             if m == None: break #no more matches
 
             key = m.group(0)[2:-1]   #{+key}, {$key}, {%hierachical/key}, {%list/0}
-            value = value[:m.start(0)] + src[key] + value[m.end(0):]
+            sub = src[key]
+
+            if type(sub) != str:
+                raise Exception(f'key {key} resolves to a {type(sub)} not a string')
+
+            value = value[:m.start(0)] + sub + value[m.end(0):]
+
             changed = True
 
         return value,changed
 
-    def validate_subscript(self,subscript,list_length):
-        try:
-            i = int(subscript)
-        except:
-            return False
-
-        if i < -list_length or i >= list_length: return False
-
-        return True
-
     def make_log_dir(self):
         if not os.path.exists(self['fm/log_dir']):
             os.makedirs(self['fm/log_dir'])
+
+def is_valid_int(subscript):
+    try:
+        int(subscript)
+        return True
+    except:
+        return False
+
+def valid_subscript(subscript,list_var):
+    if not is_valid_int(subscript):
+        return False
+
+    if int(subscript) < -len(list_var) or int(subscript) >= len(list_var):
+        return False
+
+    return True
 
 def show(item,label=None,indent=2):
     if label: print(label)
@@ -591,7 +616,7 @@ def show(item,label=None,indent=2):
     print()
 
 def check_cwd(config):
-    if 'working_dir' in config.keys():
+    if 'working_dir' in config:
         if os.path.realpath(os.getcwd()) != config['working_dir']:
             print("warning: current path is not the expected working directory")
             print(f"expecting: {config['working_dir']}")
@@ -700,27 +725,6 @@ def split_action(action):
 
     return action,input,output,shell
 
-# def update_config(config,new_config):
-#     #check all keys and values are simple strings
-#     #check for forbidden keys
-#     for key,value in new_config.items():
-#         assert type(key) == str
-#         assert type(value) == str
-#         assert key not in nonconfig_keys
-
-#     #substitute any environment variables
-#     sub_environ(new_config)
-
-#     #substitute any fakemake variables
-#     sub_vars(new_config)
-
-#     #create log directory if not already present
-#     if 'log_dir' in new_config:
-#         if not os.path.exists(new_config['log_dir']):
-#             os.makedirs(new_config['log_dir'])
-
-#     config.update(new_config)
-
 def parse_yaml(fname):
     'parse yaml into list of items'
     with open(fname) as f:
@@ -745,9 +749,7 @@ def generate_job_list(action,input,output):
     for job in job_list: generate_list2list(action,job)
 
     # print("after injob list")
-    # for job in job_list:
-    #     print(list(job.keys()))
-    #     for key in job: job[key].show()
+    # for job in job_list: show_job(job)
 
     #expand between-job list patterns
     new_list = []
@@ -757,9 +759,7 @@ def generate_job_list(action,input,output):
     if len(job_list) == 0: return []
 
     # print("after between list")
-    # for job in job_list:
-    #     print(list(job.keys()))
-    #     for key in job: job[key].show()
+    # for job in job_list: show_job(job)
 
     #expanded input pattern globs
     new_list = []
@@ -768,12 +768,8 @@ def generate_job_list(action,input,output):
 
     if len(job_list) == 0: return []
 
-    print("after globs")
-    for job in job_list:
-        print(list(job.keys()))
-        for key in job: job[key].show()
-
-    exit()
+    # print("after globs")
+    # for job in job_list: show_job(job)
 
     return job_list
 
@@ -843,7 +839,7 @@ def generate_list2jobs(action,job):
 
     #nothing to expand if no list patterns present in input patterns
     if len(ph_names) == 0:
-        job["lists"] = Conf()
+        job["job_vars"] = Conf()
         return [ job ]
 
     #expand input and output patterns into complete paths
@@ -866,7 +862,7 @@ def generate_list2jobs(action,job):
 
         #add new matches to job
         new_lists = Conf(src)
-        new_list.append({"input":new_input,"output":new_output,"lists":new_lists})
+        new_list.append({"input":new_input,"output":new_output,"job_vars":new_lists})
 
     return new_list
 
@@ -968,8 +964,7 @@ def generate_glob_jobs(action,job):
     '''
 
     # print("before expand into lists")
-    # job["input"].show()
-    # job["output"].show()
+    # show_job(job)
     #exit()
 
     #expand into lists all input and output keys which contain injob list placeholders
@@ -977,8 +972,7 @@ def generate_glob_jobs(action,job):
     expanding_output_keys = expand_into_lists(job["output"])
 
     # print("after expand into lists")
-    # job["input"].show()
-    # job["output"].show()
+    # show_job(job)
     #exit()
 
     #glob matches keyed by input pattern name
@@ -1096,10 +1090,10 @@ def generate_glob_jobs(action,job):
             {
                 "input":new_input,
                 "output":new_output,
-                "lists":Conf(job["lists"]),
-                "between":Conf(all_between),
+                "job_vars":Conf(job["job_vars"]),
+                "glob_vars":Conf(all_between),
             }
-            new_job["injob"] = Conf({k:[v] for k,v in injob.items()})
+            new_job["glob_lists"] = Conf({k:[v] for k,v in injob.items()})
             new_job_dict[job_key] = new_job
 
         else:
@@ -1132,27 +1126,26 @@ def generate_glob_jobs(action,job):
                 # new_job['output'].show()
 
             for exp_key in injob:
-                new_job['injob'][exp_key].append(injob[exp_key])
+                new_job['glob_lists'][exp_key].append(injob[exp_key])
 
             # exit()
 
-        # new_job_dict[job_key]['input'].show()
-        # new_job_dict[job_key]['output'].show()
-        # new_job_dict[job_key]['injob'].show()
-        # new_job_dict[job_key]['between'].show()
+        # show_job(new_job_dict[job_key])
         # exit()
 
     #convert new_jobs into list
     job_list = [new_job_dict[k] for k in new_job_dict]
 
-    for x in job_list:
-        print('job')
-        x['input'].show()
-        x['output'].show()
-        x['injob'].show()
-        x['between'].show()
+    #for job in job_list: show_job(job)
 
     return job_list
+
+def show_job(job):
+    print('=====job=====')
+    for key in job:
+        print(key)
+        job[key].show()
+    print()
 
 def find_conflicts(all_vals,values):
     'return True upon first conflict found'
@@ -1195,7 +1188,8 @@ def check_output_mtimes(output):
     return oldest_mtime
 
 def generate_shell_commands(action,job_list,shell):
-    name = action['name']
+    #name = action['name']
+
     for job_numb,job in enumerate(job_list):
         #check all inputs present, return newest mtime
         newest_input = check_input_mtimes(job['input'])
@@ -1221,7 +1215,7 @@ def generate_shell_commands(action,job_list,shell):
         handle_stale_outputs(action,job['output'])
 
         #create any missing output *parent* directories
-        if action['missing_parent_dir'] == 'create':
+        if action['fm/missing_parent_dir'] == 'create':
             create_output_dirs(action,job['output'])
 
     #remove non-runable jobs
@@ -1234,13 +1228,15 @@ def generate_shell_commands(action,job_list,shell):
         config.update(job['input'])
         config.update(job['output'])
 
+        #config.show()
+
         #substitute remaining placeholders in shell command
         shell_final = Conf(shell)
         shell_final.sub_values(os.environ,environ_regx)
         shell_final.sub_values(config,scalar_regx)
-        shell_final.sub_values(config,list_regx)
-        shell_final.sub_values(job['lists'],list2job_regx)
-        shell_final.sub_values(job['globs'],glob2job_regx)
+        shell_final.sub_values(job['job_vars'],list2job_regx)
+        shell_final.sub_values(job['glob_vars'],glob2job_regx)
+        shell_final.sub_values(job['glob_lists'],glob2list_regx)
         shell_list.append(shell_final["shell"])
 
     return job_list,shell_list
@@ -1366,12 +1362,12 @@ def generate_full_command(config,shell):
 
     cmd_list = []
 
-    if 'bash_prefix' in config and config['bash_prefix'] != '':
-        cmd_list.append(config['bash_prefix'])
+    if 'fm/bash_prefix' in config and config['fm/bash_prefix'] != '':
+        cmd_list.append(config['fm/bash_prefix'])
 
     if 'conda' in config and config['conda'] != '':
-        if 'conda_setup_command' in config and config['conda_setup_command'] != '':
-            cmd_list.append(config['conda_setup_command'])
+        if 'fm/conda_setup_command' in config and config['fm/conda_setup_command'] != '':
+            cmd_list.append(config['fm/conda_setup_command'])
         cmd_list.append(f'conda activate {config["conda"]}')
 
     cmd_list.append(shell)
@@ -1382,17 +1378,17 @@ def generate_job_environment(config,job_numb,njobs):
     'copy local environment with a few adjustments'
 
     env = copy.deepcopy(os.environ)
-    env[ config['job_count'] ] = f'{njobs}'
-    env[ config['job_number'] ] = f'{job_numb+1}' # convert from 0 to 1 based to match SGE_TASK_ID
+    env[ config['fm/job_count'] ] = f'{njobs}'
+    env[ config['fm/job_number'] ] = f'{job_numb+1}' # convert from 0 to 1 based to match SGE_TASK_ID
 
     return env
 
 def write_jobfile(action,shell_list):
     'save action config and shell_list as json'
 
-    fnamebase = f'{action["log_prefix"]}{timestamp_now()}.{action["name"]}'
-    jobfile = os.path.join(action['log_dir'],fnamebase+'.jobs')
-    payload = {'action':action.to_dict(),'shell_list':shell_list}
+    fnamebase = f'{action["fm/prefix"]}{timestamp_now()}.{action["name"]}'
+    jobfile = os.path.join(action['fm/log_dir'],fnamebase+'.jobs')
+    payload = {'action':action.getdict(),'shell_list':shell_list}
 
     with open(jobfile,'w') as f:
         json.dump(payload,f,sort_keys=False,indent=2)
@@ -1402,9 +1398,9 @@ def write_jobfile(action,shell_list):
 
 def execute_command(config,job_numb,cmd,env):
     'execute command locally'
-    fname = f'{config["log_prefix"]}{timestamp_now()}.{config["name"]}'
-    foutname = os.path.join(config['log_dir'],fname+'.out')
-    ferrname = os.path.join(config['log_dir'],fname+'.err')
+    fname = f'{config["fm/prefix"]}{timestamp_now()}.{config["name"]}'
+    foutname = os.path.join(config['fm/log_dir'],fname+'.out')
+    ferrname = os.path.join(config['fm/log_dir'],fname+'.err')
     fout = open(foutname,'w')
     ferr = open(ferrname,'w')
 
@@ -1427,14 +1423,14 @@ def execute_command(config,job_numb,cmd,env):
 def write_qsub_file(action,qsub_script,jobname,njobs,jobfile):
     'fill out the qsub job script template and write to file ready to pass to qsub'
 
-    if action['qsub_template'] == 'default':
+    if action['qsub/template'] == 'default':
         f_in = open(os.path.join(os.path.dirname(__file__),"qsub_template.sh"))
     else:
-        f_in = open(action['qsub_template'])
+        f_in = open(action['qsub/template'])
 
     f_out = open(qsub_script,'w')
 
-    env = copy.deepcopy(action)
+    env = copy.deepcopy(action['qsub'])
     env["njobs"] = njobs
     env["jobname"] = jobname
     env["jobfile"] = jobfile
@@ -1454,8 +1450,8 @@ def submit_job_qsub(action,shell_list,job_list):
     #action['python_executable'] = sys.executable
     #action['python_path'] = sys.path
     jobname = write_jobfile(action,shell_list)
-    qsub_script = os.path.join(action['log_dir'],jobname+'.qsub')
-    jobfile = os.path.join(action['log_dir'],jobname+'.jobs')
+    qsub_script = os.path.join(action['fm/log_dir'],jobname+'.qsub')
+    jobfile = os.path.join(action['fm/log_dir'],jobname+'.jobs')
     njobs = len(shell_list)
 
     write_qsub_file(action,qsub_script,jobname,njobs,jobfile)
@@ -1464,8 +1460,8 @@ def submit_job_qsub(action,shell_list,job_list):
 
     env = copy.deepcopy(os.environ)
 
-    foutname = os.path.join(action['log_dir'],jobname+'.out')
-    ferrname = os.path.join(action['log_dir'],jobname+'.err')
+    foutname = os.path.join(action['fm/log_dir'],jobname+'.out')
+    ferrname = os.path.join(action['fm/log_dir'],jobname+'.err')
     fout = open(foutname,'w')
     ferr = open(ferrname,'w')
 
@@ -1481,14 +1477,14 @@ def submit_job_qsub(action,shell_list,job_list):
     ferr.close()
 
     #delay to allow for shared filesystem latency on status files
-    time.sleep(int(action['remote_delay_secs']))
+    time.sleep(int(action['fm/remote_delay_secs']))
 
     if failed: print(' failed')
     else:      print(' okay')
 
     #check each individual job's status file
     for job_numb,item in enumerate(shell_list):
-        status_file = f'{action["log_dir"]}/{jobname}.{job_numb+1}.status'
+        status_file = f'{action["fm/log_dir"]}/{jobname}.{job_numb+1}.status'
 
         job_failed = False
         if not os.path.exists(status_file):
@@ -1511,6 +1507,10 @@ def qsub_execute_job(jobfile):
     invoked automatically by fakemake using the --qsub option
     '''
     action,shell_list = read_jobfile(jobfile)
+
+    action = Conf(action)
+
+    #action.show()
 
     assert jobfile.endswith('.jobs')
 
@@ -1584,14 +1584,13 @@ def process_action(config,action,path):
     #return list of values, one per potential job
     job_list = generate_job_list(action,input,output)
 
-    exit()
     if len(job_list) == 0: return
 
     #determine if all inputs are present
     #and if outputs need to be regenerated
     job_list,shell_list = generate_shell_commands(action,job_list,shell)
 
-    for cmd in shell_list: show(cmd,"cmd")
+    #for cmd in shell_list: show(cmd,"cmd")
 
     print(f'{len(shell_list)} jobs generated')
 
