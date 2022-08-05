@@ -78,8 +78,8 @@
 #       echo samp_file={%samp_file} out_file={%out_file}
       
 - action:
-    name:     "test1"
-    exec:     "qsub"
+    name: "test1"
+    exec: "local"
     sample_subset:
       - "subset1"
       - "subset2"
@@ -94,8 +94,8 @@
       test_out: "{%test_dir}/output/{*sample_subset}/{+sample}.data"
       #result: "{%test_dir}/output/{-sample_subset}/{=treatment_class}/{+sample}_{*treatment}.step1"
     shell: |
-      echo samp_file={%samp_file/,} treat_meta={%treat_meta} {%test_out/0}
-      echo sample_subset={*sample_subset} sample={+sample/,} {=treatment_class} {*treatment} {%test_out/0}
+      echo samp_file={%samp_file/,} treat_meta={%treat_meta} > {%test_out/0}
+      echo sample_subset={*sample_subset} sample={+sample/,} {=treatment_class} {*treatment} >> {%test_out/0}
       echo {%sample_subset/,}
       
 # - action:
@@ -160,3 +160,14 @@
 #     shell: |
 #       file {%read1} {%read2} > {%info}
 #       echo {$USER} processed >> {%info}
+
+- prealloc:
+    name: "pretest"
+    exec: "qsub"
+    workers: "2"
+    qsub:
+      time:  "02:00:00"
+      mem:   "4G"
+      tmpfs: "10G"
+      pe:    "smp"
+      cores: "1"

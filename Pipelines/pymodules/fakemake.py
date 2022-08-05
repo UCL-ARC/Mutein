@@ -39,14 +39,15 @@ default_global_config =\
         'conda_setup':'',
     },
     'qsub':{
-        'template':'default',       #template job script: "default" or path to your own
-        'time':'02:00:00',          #$ -l h_rt={time}
-        'mem':'4G',                 #$ -l mem={mem}
-        'tmpfs':'10G',              #$ -l tmpfs={tmpfs}
-        'pe':'smp',                 #$ -pe {pe} {cores}
-        'cores':'1',                #$ -pe {pe} {cores}
-        'log_dir':'{%fm/log_dir}'   #log dir for qsub stdout and stderr files
-                                    #$ -o/e {log_dir}/{jobname}.$TASK_ID.out/err
+        'template':'default',        #template job script: "default" or path to your own
+        'worker_timeout_secs':'600', #how long to wait for a preallocated node to report as ready
+        'time':'02:00:00',           #$ -l h_rt={time}
+        'mem':'4G',                  #$ -l mem={mem}
+        'tmpfs':'10G',               #$ -l tmpfs={tmpfs}
+        'pe':'smp',                  #$ -pe {pe} {cores}
+        'cores':'1',                 #$ -pe {pe} {cores}
+        'log_dir':'{%fm/log_dir}'    #log dir for qsub stdout and stderr files
+                                     #$ -o/e {log_dir}/{jobname}.$TASK_ID.out/err
     },
     'exec':'local',                  #default execution environment
 }
@@ -622,6 +623,78 @@ def check_cwd(config):
             print(f"expecting: {config['working_dir']}")
             print(f"but found {os.path.realpath(os.getcwd())}")
 
+def preallocate(config,prealloc):
+    prealloc = Conf(prealloc)
+    prealloc.override(config)
+
+    if prealloc["exec"] == 'qsub':
+        preallocate_qsub(prealloc)
+    else:
+        raise Exception(f'preallocate exec method {prealloc["exec"]} unsupported')
+
+def preallocate_qsub(prealloc):
+    '''
+    submit worker node jobs to qsub and wait for them to report in as ready
+    fail after timeout period
+    '''
+
+    jobname = write_jobfile(prealloc,'prealloc')
+    qsub_script = os.path.join(prealloc['fm/log_dir'],jobname+'.qsub')
+    jobfile = os.path.join(prealloc['fm/log_dir'],jobname+'.jobs')
+    njobs = int(prealloc['workers'])
+
+    write_qsub_file(prealloc,qsub_script,jobname,njobs,jobfile)
+
+    cmd = f"qsub -sync n {qsub_script}"
+    env = copy.deepcopy(os.environ)
+
+    foutname = os.path.join(prealloc['fm/log_dir'],jobname+'.out')
+    ferrname = os.path.join(prealloc['fm/log_dir'],jobname+'.err')
+    fout = open(foutname,'w')
+    ferr = open(ferrname,'w')
+
+    failed = False
+    print(f'launching {njobs} qsub workers:',end='')
+    sys.stdout.flush()
+    try:
+        subprocess.run(cmd,env=env,shell=True,check=True,stdout=fout,stderr=ferr)
+    except subprocess.CalledProcessError:
+        failed = True
+
+    fout.close()
+    ferr.close()
+
+    if failed:
+        print(' failed')
+        return
+
+    print(' submitted')
+
+    start_time = time.time()
+    timed_out = False
+    while time.time() - start_time < float(prealloc["qsub/worker_timeout_secs"]):
+        time.sleep(1)
+        remaining = start_time + float(prealloc["qsub/worker_timeout_secs"]) - time.time()
+        if remaining <= 0:
+            timed_out = True
+            break
+        #poll for existence of a "started" touch file
+        missing = 0
+        for i in range(njobs):
+            fname = os.path.join(prealloc['fm/log_dir'],jobname+f'.{str(i+1)}.started')
+            if not os.path.exists(fname):
+                missing += 1
+
+        print(f"\rwaiting for {missing} workers to start, timeout in {remaining} seconds")
+
+        if missing == 0: break
+        
+    if timed_out:
+        print("\ntimed out")
+    else:
+        print("\nokay")
+
+
 def process(pipeline,path,config=None):
     #initially set config to default values if none provided
     if config == None:
@@ -648,6 +721,10 @@ def process(pipeline,path,config=None):
             #config.show("loaded config")
             config.includes_and_loads(path)
             #config.show("actioned includes and loads")
+
+        elif item_type == 'prealloc':
+            #preallocate one or more hpc worker jobs
+            preallocate(config,item[item_type])
 
         elif item_type == 'module':
             #process a nested pipeline without affecting the config of any
@@ -1447,8 +1524,6 @@ def submit_job_qsub(action,shell_list,job_list):
     issue the qsub command to spawn an array of jobs
     wait for completion before checking the status of each job
     '''
-    #action['python_executable'] = sys.executable
-    #action['python_path'] = sys.path
     jobname = write_jobfile(action,shell_list)
     qsub_script = os.path.join(action['fm/log_dir'],jobname+'.qsub')
     jobfile = os.path.join(action['fm/log_dir'],jobname+'.jobs')
@@ -1514,6 +1589,23 @@ def qsub_execute_job(jobfile):
 
     assert jobfile.endswith('.jobs')
 
+    if shell_list == 'prealloc':
+        spawn_worker(jobfile,action,shell_list)
+    else:
+        spawn_job(jobfile,action,shell_list)
+
+def spawn_worker(jobfile,action,shell_list):
+    'become worker node controller'
+
+    basename = f'{jobfile[:-5]}.{os.environ["SGE_TASK_ID"]}'
+    job_numb = int(os.environ["SGE_TASK_ID"]) - 1 #convert from 1 to 0 based
+
+    f = open(basename+'.started','w')
+    f.close()
+
+def spawn_job(jobfile,action,shell_list):
+    'spawn user job'
+
     status_file = f'{jobfile[:-5]}.{os.environ["SGE_TASK_ID"]}.status'
     job_numb = int(os.environ["SGE_TASK_ID"]) - 1 #convert from 1 to 0 based
     item = shell_list[job_numb]
@@ -1521,7 +1613,7 @@ def qsub_execute_job(jobfile):
     cmd = generate_full_command(action,item)
     env = generate_job_environment(action,job_numb,len(shell_list))
 
-    #created/truncate to record that the job is starting
+    #create/truncate to record that the job is starting
     f = open(status_file,'w')
     f.close()
 
