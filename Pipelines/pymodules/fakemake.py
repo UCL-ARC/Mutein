@@ -40,7 +40,7 @@ default_global_config =\
     },
     'qsub':{
         'template':'default',        #template job script: "default" or path to your own
-        'worker_timeout_secs':'600', #how long to wait for a preallocated node to report as ready
+        'worker_timeout_secs':'900', #how long to wait for a preallocated node to report as ready
         'time':'02:00:00',           #$ -l h_rt={time}
         'mem':'4G',                  #$ -l mem={mem}
         'tmpfs':'10G',               #$ -l tmpfs={tmpfs}
@@ -623,9 +623,9 @@ def check_cwd(config):
             print(f"expecting: {config['working_dir']}")
             print(f"but found {os.path.realpath(os.getcwd())}")
 
-def preallocate(config,prealloc):
+def preallocate(config,prealloc,path):
     prealloc = Conf(prealloc)
-    prealloc.override(config)
+    fill_out_all(config,prealloc,path)
 
     if prealloc["exec"] == 'qsub':
         preallocate_qsub(prealloc)
@@ -674,7 +674,7 @@ def preallocate_qsub(prealloc):
     timed_out = False
     while time.time() - start_time < float(prealloc["qsub/worker_timeout_secs"]):
         time.sleep(1)
-        remaining = start_time + float(prealloc["qsub/worker_timeout_secs"]) - time.time()
+        remaining = int(start_time + float(prealloc["qsub/worker_timeout_secs"]) - time.time())
         if remaining <= 0:
             timed_out = True
             break
@@ -685,7 +685,7 @@ def preallocate_qsub(prealloc):
             if not os.path.exists(fname):
                 missing += 1
 
-        print(f"\rwaiting for {missing} workers to start, timeout in {remaining} seconds")
+        print(f"\rwaiting for {missing} workers to start, timeout in {remaining} seconds   ",end='')
 
         if missing == 0: break
         
@@ -724,7 +724,7 @@ def process(pipeline,path,config=None):
 
         elif item_type == 'prealloc':
             #preallocate one or more hpc worker jobs
-            preallocate(config,item[item_type])
+            preallocate(config,item[item_type],path)
 
         elif item_type == 'module':
             #process a nested pipeline without affecting the config of any
@@ -753,25 +753,27 @@ def find_duplicates(conf_list):
             assert not key in all_keys, f"duplicate key {key}"
             all_keys.add(key)
 
+def fill_out_all(config,action,path):
+    'filling in missing placeholders etc'
+    action.override(config)
+    action.includes_and_loads(path)
+    action.sub_vars()
+    action.make_log_dir()
+
 def setup_action(config,action,path):
     #separate out and canonicalise input, output and shell
     action,input,output,shell = split_action(action)
 
     #merge config into action but action has priority
-    action.override(config)
-    action.includes_and_loads(path)
+    fill_out_all(config,action,path)
 
     #try to ensure placeholder subtitution is not ambiguous
     #find_duplicates([action,input,output])
 
     #substitute all placeholders except for shell
     #which likely contains input/output variables yet to be determined
-    action.sub_vars()
     input.sub_vars(src=action)
     output.sub_vars(src=action)
-
-    #create log dir if missing
-    action.make_log_dir()
 
     return action,input,output,shell
 
