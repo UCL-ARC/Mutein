@@ -93,6 +93,7 @@ def run_pipeline(args):
             fdf = FileDf.FileDf(file_back_bm)
             all_back_bm.append(fdf.openDataFrame())
         else:
+            print("No pdb file for",file_back_bm)
             exists_all_back = False
         
 
