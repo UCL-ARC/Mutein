@@ -6,7 +6,7 @@ This file sets up all the imports necessary at this level and any level below
 The python files in python directory are the code gatekeepers
 """
 
-dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-1]
+dirs = os.path.dirname(os.path.realpath(__file__)). split("/")[:-1]
 python_path = "/".join(dirs) + "/python"
 dirs = os.path.dirname(os.path.realpath(__file__)).split("/")[:-1]
 lib_path = "/".join(dirs) + "/libs"
