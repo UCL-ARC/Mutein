@@ -140,5 +140,3 @@ Pipelines/shared/data/outputs/pdbs/*
 Pipelines/shared/data/thruputs*
 Pipelines/shared/data/inputs/pdbs/*
 
-Pipelines/geneanalysis/ppl_notch_NOTCH1sym.sh
-Pipelines/geneanalysis/ppl_notch_NOTCH1_STITCH_sym.sh
