@@ -1,0 +1,132 @@
+"""
+-----------------------------
+RSA 17/03/22
+-----------------------------
+
+This aggregates the outputs from split positionscans into 1 file
+-----------------------------
+N.b this file may be run on the myriad clusters or on a local machine
+-----------------------------
+"""
+import os
+from os.path import exists
+import pandas as pd
+from shutil import copyfile
+import sys
+
+import _helper
+import Paths
+import Arguments
+import Config
+import Analysis
+import FileDf
+
+
+def run_pipeline(args):
+    print("### Foldx aggregate pos scan ###")
+    print(args)
+    ##############################################
+    argus = Arguments.Arguments(args)
+    install_dir = argus.arg("install_dir")    
+    data_dir = argus.arg("data_dir")
+    dataset = argus.arg("dataset","")
+    gene = argus.arg("gene","")
+    pdbcode = argus.arg("pdb", "").lower()
+
+    gene_path = Paths.Paths(
+        data_dir,
+        install_dir,
+        dataset=dataset,
+        gene=gene,
+        pdb=pdbcode,
+    )
+    pdb_list = []
+    if pdbcode != "":
+        pdb_list.append(pdbcode)
+    else:
+        pdbtasks = gene_path.gene_outputs + "pdb_tasklist.csv"
+        fio = FileDf.FileDf(pdbtasks)
+        df = fio.openDataFrame()
+
+        for t in range(len(df.index)):
+            pdbcode = df["pdb"][t].lower()
+            if pdbcode[0] != '#': #we can comment out failed pdbs
+                pdb_list.append(pdbcode)
+
+    for pdbcode in pdb_list:
+        pdb_path = Paths.Paths(
+            data_dir,
+            install_dir,
+            dataset=dataset,
+            gene=gene,
+            pdb=pdbcode,
+        )
+        # pdb_config = Config.Config(pdb_path.pdb_inputs + "/config.yml")
+        # argus.addConfig(pdb_config.params)
+
+        work_path = pdb_path.pdb_thruputs + "agg/"
+        argus.params["work_path"] = work_path
+        pdb_path.goto_job_dir(argus.arg("work_path"), args, argus.params, "_inputs05a")
+        ############################################
+        params_file = gene_path.inputs + "params_background.txt"
+        if exists(params_file):
+            fdfp = FileDf.FileDf(
+                params_file, sep=" ", cols=["pdb", "mut", "task"], header=False
+            )
+            pm_df = fdfp.openDataFrame()
+            all_df = []
+            all_exists = True
+            for i in range(len(pm_df.index)):
+                r = pm_df["task"][i]
+                rpdb = pm_df["pdb"][i]
+                if rpdb == pdbcode:
+                    # the file has already been turned into a dataframe called posscan_df.csv
+                    in_csv_i = work_path + str(r) + "_ddg_background.csv"
+                    if exists(in_csv_i):
+                        fdf = FileDf.FileDf(in_csv_i)
+                        all_df.append(fdf.openDataFrame())
+                    else:
+                        all_exists = False
+        else:
+            all_exists = False
+
+        if all_exists:
+            if len(all_df) > 0:
+                ddg_df = pd.concat(all_df, ignore_index=True)
+                df_file = pdb_path.pdb_outputs + "ddg_background.csv"
+                ddg_df.to_csv(df_file, index=False)
+
+                """
+                plot_file = (
+                    pdb_path.pdb_outputs
+                    + argus.arg("pdb")
+                    + "_"
+                    + str(argus.arg("repairs"))
+                    + "_background_plot.png"
+                )
+                plot_file_gene = (
+                    pdb_path.pdb_outputs
+                    + argus.arg("pdb")
+                    + "_"
+                    + str(argus.arg("repairs"))
+                    + "_background_plot_gene.png"
+                )
+
+                ana = Analysis.Analysis(ddg_df, argus.arg("pdb"))
+                ana.createDdgResidue(plot_file, "background")
+                ana.createDdgResidue(
+                    plot_file_gene, "background muts", dropnagene=True, xax="gene_no"
+                )
+                """
+        else:
+            print("!!! Agg: not all results are present !!!")
+
+    print("### COMPLETED FoldX aggregate job ###")
+    #print("MUTEIN SCRIPT ENDED")
+
+
+##########################################################################################
+if __name__ == "__main__":
+    import sys
+
+    globals()["run_pipeline"](sys.argv)

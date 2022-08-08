@@ -1,0 +1,25 @@
+---
+id: 'TASKS'
+qsub_id: 'untasks'
+pipe_dir: 'Pipelines/foldx/python/'
+script: 'ga__runner'
+time: '48:00:0'
+cores: "4"
+dependency: '-1'
+array: -1
+arrayfile: "unparams"
+inputs: "runs=f@repairs=x@missing=Y"
+active: 'Y'
+---
+id: 'VTASKS'
+qsub_id: 'unvtasks'
+pipe_dir: 'Pipelines/foldx/python/'
+script: 'ga__runner'
+time: '48:00:0'
+cores: "4"
+dependency: '-1'
+array: -1
+arrayfile: "vunparams"
+inputs: "runs=g@repairs=x@missing=Y"
+active: 'Y'
+---
