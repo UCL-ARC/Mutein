@@ -62,7 +62,7 @@ The snakemake version of the pipeline only currently covers setting up conda env
 ## Fakemake
 I will fully document it elsewhere, but in brief: fakemake uses a YAML config file format similar to Snakemake's except that no embedded python code is allowed, i.e. it is pure YAML. The file format is a YAML list at the top level, with each list item being a dictionary with a single key defining what type of item it is: "config" modifies the config, "action" defines a data processing step similar to a Snakemake rule. Fakemake reads the file one item at a time and processes things in the order encountered (ie no complex dependency graph working backwards from a desired target, hence the "fake" in fakemake). Therefore "config" items that modify the configuration affect everything after them in the file, and "actions" are processed immediately.
 
-Configuration is arbitrary nested dicts and lists (like JSON/YAML) with strings as the leaf nodes, and addressed using path-like keys eg you could have "datasets/keogh/number_of_samples". Where the container is a list you use the python style list offset as the key eg "datasets/keogh/samples/-1" to access the last item in a list called samples in a dict called keogh in a dict called datasets etc.
+Configuration is arbitrary nested dicts and lists (like JSON/YAML) with strings as the leaf nodes, and addressed using path-like keys eg you could have "datasets/keogh/number_of_samples". Where the container is a list you use the python style list integer offset as the key eg "datasets/keogh/samples/-1" to access the last item in a list called samples in a dict called keogh in a dict called datasets etc. Non integer keys to lists are used as separators to the str.join() function, except "N" which returns the list length. Where the container is a dict an empty string key will return the list of keys
 
 Actions can contain their own arbitrary config that only affects that action (not subsequent actions) and have three main special keys: input, output and shell, which are very similar to Snakemake: input contains lists of files that must all be present for the action to run and output contains the corresponding lists of output files that should be generated for the job to be considered to have succeeded.
 
@@ -71,7 +71,29 @@ Anywhere in the config/action you can use special placeholders similar to python
 Summary of fakemake placeholders:
 
 - {$ENVIRONMENT_VARIABLE} "run on {$HOSTNAME} as {$USER}"
-- {%FAKEMAKE_VARIABLE} eg "the sample name is {%sample}"
+- {%FAKEMAKE_VARIABLE}
+  - "the sample name is {%sample}"
+  - "the second sample name is {%sample_list/1}"
+  - "the second to last sample name is {%sample_list/-2}"
+  - "the comma separated sample list is {%sample_list/,}"
+  - "the space separated sample list is {%sample_list/ }"
+  - "the XML-like sample list is <{%sample_list/><}>"
+  - "the total number of samples is {%sample_list/N}"
+  - "the nested dictionary variable is {%main_dict/sub_dict/final_key}"
+  - "the subdictionary keys are {%main_dict/sub_dict/}"
+- {+INJOB_GLOB} a glob that generates a list of filepaths within a single job, only allowed in input/output/shell inside an action
+  - some_file_list: "data/{+sample}" in the action/input term to generate the list
+  - "some_command --input_list={+some_file_list/,}" to pass the comma separated list to an action/shell command
+  - "for x in {+some_file_list/ } ; do echo $x >> output_list ; done" to pass a space separated list to the shell
+- {*SEPARATE_JOBS_GLOB} a glob that generates one array job task per glob match, only allowed in input/output/shell inside an action
+  - some_file_name: "data/{*sample}" to glob the list in action/input
+  - shell: "some_command --input_file={%some_file_name} --sample={*sample}" to pass the filename and sample name to an action/shell command
+- {-INJOB_LIST} uses a predefined fakemake list that expands an action/input path pattern into a list within a single job
+  - some_file_list: "data/{-sample_list}" in the action/input term to generate the list of paths from an existing list variable called sample_list
+  - "some_command --input_list={-sample/,}" to pass the comma separated list to an action/shell command
+- {-SEPARATE_JOBS_LIST} uses a predefined fakemake list that expands an action/input path pattern into a separate job per list item
+  - some_file_list: "data/{=sample_list}" in the action/input term to generate the list of paths from an existing list variable called sample_list
+  - "some_command --input_file={%some_file_list}" to pass each filename to an action/shell command
 
 
 Folders forming the fakemake version of the pipeline:
