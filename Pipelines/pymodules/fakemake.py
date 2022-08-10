@@ -681,7 +681,7 @@ def preallocate_qsub(prealloc):
         #poll for existence of a "started" touch file
         missing = 0
         for i in range(njobs):
-            fname = os.path.join(prealloc['fm/log_dir'],jobname+f'.{str(i+1)}.started')
+            fname = os.path.join(prealloc['fm/log_dir'],jobname+f'.{str(i+1)}.running')
             if not os.path.exists(fname):
                 missing += 1
 
@@ -693,7 +693,6 @@ def preallocate_qsub(prealloc):
         print("\ntimed out")
     else:
         print("\nokay")
-
 
 def process(pipeline,path,config=None):
     #initially set config to default values if none provided
@@ -1521,6 +1520,59 @@ def write_qsub_file(action,qsub_script,jobname,njobs,jobfile):
     f_out.close()
     f_in.close()
 
+def submit_job_prealloc(action,shell_list,job_list):
+    '''
+    submit jobs to preallocated workers
+    wait for completion before checking the status of each job
+    '''
+
+    jobname = write_jobfile(action,shell_list)
+    njobs = len(shell_list)
+
+    #find the .running files of the worker array
+    fname_glob = f'*.{action["prealloc"]}.*.running'
+    running_glob = os.path.join(action['fm/log_dir'],fname_glob)
+    worker_list = [path for path in glob.iglob(running_glob)]
+    worker_list.sort(key=lambda x:int(x.split('.')[-2]))
+    worker_list = [ {"path":path} for x in worker_list ]
+
+    #for job_numb,item in enumerate(shell_list):
+
+
+    # env = copy.deepcopy(os.environ)
+
+    # failed = False
+    # print(f'executing qsub job array with {njobs} jobs:',end='')
+    # sys.stdout.flush()
+    # try:
+    #     subprocess.run(cmd,env=env,shell=True,check=True,stdout=fout,stderr=ferr)
+    # except subprocess.CalledProcessError:
+    #     failed = True
+
+    # #delay to allow for shared filesystem latency on status files
+    # time.sleep(int(action['fm/remote_delay_secs']))
+
+    # if failed: print(' failed')
+    # else:      print(' okay')
+
+    # #check each individual job's status file
+    # for job_numb,item in enumerate(shell_list):
+    #     status_file = f'{action["fm/log_dir"]}/{jobname}.{job_numb+1}.status'
+
+    #     job_failed = False
+    #     if not os.path.exists(status_file):
+    #         print(f"job {job_numb+1} probably failed to start")
+    #         job_failed = True
+    #     else:
+    #         with open(status_file) as f: status = f.read().strip()
+    #         print(f"job {job_numb+1} status: {status}")
+    #         if status != "okay": job_failed= True
+
+    #     if not job_failed: continue
+
+    #     #deal with output of failed job
+    #     handle_failed_outputs(action,job_list[job_numb]["output"])
+
 def submit_job_qsub(action,shell_list,job_list):
     '''
     issue the qsub command to spawn an array of jobs
@@ -1602,8 +1654,12 @@ def spawn_worker(jobfile,action,shell_list):
     basename = f'{jobfile[:-5]}.{os.environ["SGE_TASK_ID"]}'
     job_numb = int(os.environ["SGE_TASK_ID"]) - 1 #convert from 1 to 0 based
 
-    f = open(basename+'.started','w')
+    f = open(basename+'.running','w')
     f.close()
+
+    while True:
+        time.sleep(10)
+
 
 def spawn_job(jobfile,action,shell_list):
     'spawn user job'
@@ -1649,6 +1705,10 @@ def execute_jobs(action,shell_list,job_list):
     elif action['exec'] == 'qsub':
         #qsub execution using an array job
         submit_job_qsub(action,shell_list,job_list)
+
+    elif action['exec'] == 'prealloc':
+        #execution using preallocated workers
+        submit_job_prealloc(action,shell_list,job_list)
 
     else:
         raise Exception(f"unsupported execution method {action['exec']}")

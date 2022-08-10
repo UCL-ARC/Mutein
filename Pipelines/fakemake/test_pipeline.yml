@@ -1,45 +1,6 @@
 - config:
-    fm:
-      prefix:               "mut."
-      stale_output_file:    "recycle"
-      stale_output_dir:     "ignore"
-      missing_parent_dir:   "create"
-      includes:
-        - "test_include.yml"
-
-    working_dir:          "/lustre/scratch/scratch/{$USER}/549_mutein"
-    test_dir:             "test"
-    mut_prefix:           "{$MUT_PREFIX}"
-    user:                 "{%mut_prefix}{$USER}_{%test_dir}"
-    temp_job_dir:         "fakemake_jobs"
-    test_list_index1:     "{%test_list/-1}"
-    test_list_index2:     "{%test_list/0}"
-    test_list_length:     "{%test_list/N}"
-    test_list_join:       "{%test_list/\t}"
-    test_shell_var:       "${leave_alone}"
-    test_list:
-      - "{%fm/prefix}test_string"
-      - "{%test_list[0]}"
-      - "{>./test/load_test.txt[\tC1]}"
-
     includes:
-      - "test_include.yml"
-
-    load_test: "{>./test/load_test.txt[\tR1]}"
-
-- config:
-    new_list:
-      - 1
-      - 2
-      - 3
-    test_list:
-      - "one"
-      - "two"
-    includes:
-      - "test_include.yml"
-      - "test_include.yml"
-
-#- module: "test_module/module.yml"
+      - "base_config.yml"
 
 # - action:
 #     name:     "test1"
@@ -77,26 +38,26 @@
 #     shell: |
 #       echo samp_file={%samp_file} out_file={%out_file}
       
-- action:
-    name: "test1"
-    exec: "local"
-    sample_subset:
-      - "subset1"
-      - "subset2"
-    treatment_class:
-      - "prenormify"
-      - "subexpansification"
-    input:
-      samp_file:  [ "{%test_dir}/samples/{*sample_subset}/{+sample}.data" ]
-      treat_meta: "{%test_dir}/treatments/{=treatment_class}/{*treatment}"
-      combo_file: "{%test_dir}/combos/{+sample}_{*treatment}"
-    output:
-      test_out: "{%test_dir}/output/{*sample_subset}/{+sample}.data"
-      #result: "{%test_dir}/output/{-sample_subset}/{=treatment_class}/{+sample}_{*treatment}.step1"
-    shell: |
-      echo samp_file={%samp_file/,} treat_meta={%treat_meta} > {%test_out/0}
-      echo sample_subset={*sample_subset} sample={+sample/,} {=treatment_class} {*treatment} >> {%test_out/0}
-      echo {%sample_subset/,}
+# - action:
+#     name: "test1"
+#     exec: "local"
+#     sample_subset:
+#       - "subset1"
+#       - "subset2"
+#     treatment_class:
+#       - "prenormify"
+#       - "subexpansification"
+#     input:
+#       samp_file:  [ "{%test_dir}/samples/{*sample_subset}/{+sample}.data" ]
+#       treat_meta: "{%test_dir}/treatments/{=treatment_class}/{*treatment}"
+#       combo_file: "{%test_dir}/combos/{+sample}_{*treatment}"
+#     output:
+#       test_out: "{%test_dir}/output/{*sample_subset}/{+sample}.data"
+#       #result: "{%test_dir}/output/{-sample_subset}/{=treatment_class}/{+sample}_{*treatment}.step1"
+#     shell: |
+#       echo samp_file={%samp_file/,} treat_meta={%treat_meta} > {%test_out/0}
+#       echo sample_subset={*sample_subset} sample={+sample/,} {=treatment_class} {*treatment} >> {%test_out/0}
+#       echo {%sample_subset/,}
       
 # - action:
 #     name:     "conflict"
@@ -161,13 +122,30 @@
 #       file {%read1} {%read2} > {%info}
 #       echo {$USER} processed >> {%info}
 
-- prealloc:
-    name: "pretest"
-    exec: "qsub"
-    workers: "2"
+# - prealloc:
+#     name: "my_workers"
+#     exec: "qsub"
+#     workers: "2"
+#     qsub:
+#       time:  "02:00:00"
+#       mem:   "4G"
+#       tmpfs: "10G"
+#       pe:    "smp"
+#       cores: "1"
+
+- action:
+    name:     "test1"
+    exec:     "prealloc"
+    prealloc: "my_workers"
     qsub:
       time:  "02:00:00"
       mem:   "4G"
       tmpfs: "10G"
       pe:    "smp"
       cores: "1"
+    input:
+      samp_file: "test/samples/{*sample_subset}/{+sample}.data"
+    output:
+      out_file:  "test/output/{*sample_subset}/{+sample}.step1"
+    shell: |
+      echo samp_file={%samp_file/,} out_file={%out_file/,}
