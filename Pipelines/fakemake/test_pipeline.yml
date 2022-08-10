@@ -122,27 +122,9 @@
 #       file {%read1} {%read2} > {%info}
 #       echo {$USER} processed >> {%info}
 
-# - prealloc:
-#     name: "my_workers"
-#     exec: "qsub"
-#     workers: "2"
-#     qsub:
-#       time:  "02:00:00"
-#       mem:   "4G"
-#       tmpfs: "10G"
-#       pe:    "smp"
-#       cores: "1"
-
 - action:
     name:     "test1"
-    exec:     "prealloc"
-    prealloc: "my_workers"
-    qsub:
-      time:  "02:00:00"
-      mem:   "4G"
-      tmpfs: "10G"
-      pe:    "smp"
-      cores: "1"
+    exec:     "local"
     input:
       samp_file: "test/samples/{*sample_subset}/{+sample}.data"
     output:

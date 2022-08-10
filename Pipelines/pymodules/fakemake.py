@@ -40,7 +40,6 @@ default_global_config =\
     },
     'qsub':{
         'template':'default',        #template job script: "default" or path to your own
-        'worker_timeout_secs':'900', #how long to wait for a preallocated node to report as ready
         'time':'02:00:00',           #$ -l h_rt={time}
         'mem':'4G',                  #$ -l mem={mem}
         'tmpfs':'10G',               #$ -l tmpfs={tmpfs}
@@ -623,77 +622,6 @@ def check_cwd(config):
             print(f"expecting: {config['working_dir']}")
             print(f"but found {os.path.realpath(os.getcwd())}")
 
-def preallocate(config,prealloc,path):
-    prealloc = Conf(prealloc)
-    fill_out_all(config,prealloc,path)
-
-    if prealloc["exec"] == 'qsub':
-        preallocate_qsub(prealloc)
-    else:
-        raise Exception(f'preallocate exec method {prealloc["exec"]} unsupported')
-
-def preallocate_qsub(prealloc):
-    '''
-    submit worker node jobs to qsub and wait for them to report in as ready
-    fail after timeout period
-    '''
-
-    jobname = write_jobfile(prealloc,'prealloc')
-    qsub_script = os.path.join(prealloc['fm/log_dir'],jobname+'.qsub')
-    jobfile = os.path.join(prealloc['fm/log_dir'],jobname+'.jobs')
-    njobs = int(prealloc['workers'])
-
-    write_qsub_file(prealloc,qsub_script,jobname,njobs,jobfile)
-
-    cmd = f"qsub -sync n {qsub_script}"
-    env = copy.deepcopy(os.environ)
-
-    foutname = os.path.join(prealloc['fm/log_dir'],jobname+'.out')
-    ferrname = os.path.join(prealloc['fm/log_dir'],jobname+'.err')
-    fout = open(foutname,'w')
-    ferr = open(ferrname,'w')
-
-    failed = False
-    print(f'launching {njobs} qsub workers:',end='')
-    sys.stdout.flush()
-    try:
-        subprocess.run(cmd,env=env,shell=True,check=True,stdout=fout,stderr=ferr)
-    except subprocess.CalledProcessError:
-        failed = True
-
-    fout.close()
-    ferr.close()
-
-    if failed:
-        print(' failed')
-        return
-
-    print(' submitted')
-
-    start_time = time.time()
-    timed_out = False
-    while time.time() - start_time < float(prealloc["qsub/worker_timeout_secs"]):
-        time.sleep(1)
-        remaining = int(start_time + float(prealloc["qsub/worker_timeout_secs"]) - time.time())
-        if remaining <= 0:
-            timed_out = True
-            break
-        #poll for existence of a "started" touch file
-        missing = 0
-        for i in range(njobs):
-            fname = os.path.join(prealloc['fm/log_dir'],jobname+f'.{str(i+1)}.running')
-            if not os.path.exists(fname):
-                missing += 1
-
-        print(f"\rwaiting for {missing} workers to start, timeout in {remaining} seconds   ",end='')
-
-        if missing == 0: break
-        
-    if timed_out:
-        print("\ntimed out")
-    else:
-        print("\nokay")
-
 def process(pipeline,path,config=None):
     #initially set config to default values if none provided
     if config == None:
@@ -720,10 +648,6 @@ def process(pipeline,path,config=None):
             #config.show("loaded config")
             config.includes_and_loads(path)
             #config.show("actioned includes and loads")
-
-        elif item_type == 'prealloc':
-            #preallocate one or more hpc worker jobs
-            preallocate(config,item[item_type],path)
 
         elif item_type == 'module':
             #process a nested pipeline without affecting the config of any
@@ -1520,59 +1444,6 @@ def write_qsub_file(action,qsub_script,jobname,njobs,jobfile):
     f_out.close()
     f_in.close()
 
-def submit_job_prealloc(action,shell_list,job_list):
-    '''
-    submit jobs to preallocated workers
-    wait for completion before checking the status of each job
-    '''
-
-    jobname = write_jobfile(action,shell_list)
-    njobs = len(shell_list)
-
-    #find the .running files of the worker array
-    fname_glob = f'*.{action["prealloc"]}.*.running'
-    running_glob = os.path.join(action['fm/log_dir'],fname_glob)
-    worker_list = [path for path in glob.iglob(running_glob)]
-    worker_list.sort(key=lambda x:int(x.split('.')[-2]))
-    worker_list = [ {"path":path} for x in worker_list ]
-
-    #for job_numb,item in enumerate(shell_list):
-
-
-    # env = copy.deepcopy(os.environ)
-
-    # failed = False
-    # print(f'executing qsub job array with {njobs} jobs:',end='')
-    # sys.stdout.flush()
-    # try:
-    #     subprocess.run(cmd,env=env,shell=True,check=True,stdout=fout,stderr=ferr)
-    # except subprocess.CalledProcessError:
-    #     failed = True
-
-    # #delay to allow for shared filesystem latency on status files
-    # time.sleep(int(action['fm/remote_delay_secs']))
-
-    # if failed: print(' failed')
-    # else:      print(' okay')
-
-    # #check each individual job's status file
-    # for job_numb,item in enumerate(shell_list):
-    #     status_file = f'{action["fm/log_dir"]}/{jobname}.{job_numb+1}.status'
-
-    #     job_failed = False
-    #     if not os.path.exists(status_file):
-    #         print(f"job {job_numb+1} probably failed to start")
-    #         job_failed = True
-    #     else:
-    #         with open(status_file) as f: status = f.read().strip()
-    #         print(f"job {job_numb+1} status: {status}")
-    #         if status != "okay": job_failed= True
-
-    #     if not job_failed: continue
-
-    #     #deal with output of failed job
-    #     handle_failed_outputs(action,job_list[job_numb]["output"])
-
 def submit_job_qsub(action,shell_list,job_list):
     '''
     issue the qsub command to spawn an array of jobs
@@ -1643,10 +1514,7 @@ def qsub_execute_job(jobfile):
 
     assert jobfile.endswith('.jobs')
 
-    if shell_list == 'prealloc':
-        spawn_worker(jobfile,action,shell_list)
-    else:
-        spawn_job(jobfile,action,shell_list)
+    spawn_job(jobfile,action,shell_list)
 
 def spawn_worker(jobfile,action,shell_list):
     'become worker node controller'
@@ -1705,10 +1573,6 @@ def execute_jobs(action,shell_list,job_list):
     elif action['exec'] == 'qsub':
         #qsub execution using an array job
         submit_job_qsub(action,shell_list,job_list)
-
-    elif action['exec'] == 'prealloc':
-        #execution using preallocated workers
-        submit_job_prealloc(action,shell_list,job_list)
 
     else:
         raise Exception(f"unsupported execution method {action['exec']}")
