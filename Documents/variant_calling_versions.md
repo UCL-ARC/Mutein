@@ -90,9 +90,9 @@ Summary of fakemake placeholders:
   - shell: "some_command --input_file={%some_file_name} --sample={*sample}" to pass the filename and sample name to an action/shell command
 - {-INJOB_LIST} uses a predefined fakemake list that expands an action/input path pattern into a list within a single job
   - some_file_list: "data/{-sample_list}" in the action/input term to generate the list of paths from an existing list variable called sample_list
-  - "some_command --input_list={-sample/,}" to pass the comma separated list to an action/shell command
+  - "some_command --input_list={-some_file_list/,}" to pass the comma separated list to an action/shell command
 - {=SEPARATE_JOBS_LIST} uses a predefined fakemake list that expands an action/input path pattern into a separate job per list item
-  - some_file_name: "data/{=sample}" in the action/input term to generate the list of paths from an existing list variable called sample_list
+  - some_file_name: "data/{=sample}" in the action/input term to generate the list of paths from an existing list variable called sample
   - "some_command --input_file={%some_file_name} --sample_name={=sample}" to pass each filename to an action/shell command
 
 
