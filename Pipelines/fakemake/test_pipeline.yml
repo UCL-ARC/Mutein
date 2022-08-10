@@ -1,6 +1,4 @@
-- config:
-    includes:
-      - "base_config.yml"
+- include: "base_config.yml"
 
 # - action:
 #     name:     "test1"

@@ -12,6 +12,8 @@ import sys
 import random
 import itertools
 
+global_state = {}
+
 #regex patterns to match non nested {%placeholders} and {$environment variables}
 environ_regx  = r'\{\$.+?\}'   #{$name}
 scalar_regx   = r'\{%.+?\}'    #{%scalar} or {%list[]}
@@ -21,11 +23,13 @@ glob2both_regx  = r'\{[\+\*].+?\}' #{+/*glob} ==> either type of glob placeholde
 list2job_regx  = r'\{=.+?\}'   #{=list} ==> split into separate jobs
 list2list_regx  = r'\{-.+?\}'  #{-list} ==> become in-job list
 
+default_log_dir = 'fakemake_logs'
+
 default_global_config =\
 {
     'fm':{
-        'prefix':'fm-',                   #log file/job name  prefix: qsub doesn't like numerical names
-        'log_dir':'fakemake_logs',       #name of subfolder for logging
+        'prefix':'fm-',                  #log file/job name  prefix: qsub doesn't like numerical names
+        'log_dir':default_log_dir,       #name of subfolder for logging
         'remote_delay_secs':'10',        #wait this long after remote jobs incase of latency
         'stale_output_file':'ignore',    #ignore,delete,recycle (also applies to symlinks)
         'stale_output_dir':'ignore',     #ignore,delete,recycle
@@ -158,13 +162,8 @@ class Conf:
             else:
                 raise Exception(f'misformed load parameters in {filename} at {key}')
 
-        #full path to the included file
-        if fname.startswith('./'):
-            #wrt current working directory
-            full_path = fname
-        else:
-            #wrt main yaml file
-            full_path = os.path.join(parent_path,fname)
+        #get full path to the included file
+        full_path = make_fullpath(fname,parent_path)
 
         if not os.path.exists(full_path):
             raise Exception(f"missing file {full_path} at {key}")
@@ -195,20 +194,18 @@ class Conf:
         #where to put the loaded variables
         base_keys = subkeys[:-2]
 
-        #full path to the included file
-        if filename.startswith('./'):
-            #wrt current working directory
-            full_path = filename
-        else:
-            #wrt main yaml file
-            full_path = os.path.join(parent_path,filename)
-
         #delete the include item so it won't be actioned a second time
         self.delete(subkeys)
 
         #delete the includes list if now empty
         if len(self.getitem(subkeys[:-1])) == 0:
             self.delete(subkeys[:-1])
+
+        self.do_include_inner(filename,parent_path,base_keys)
+
+    def do_include_inner(self,filename,parent_path,base_keys):
+        #get full path to the included file
+        full_path = make_fullpath(filename,parent_path)
 
         #load the YAML
         with open(full_path) as f:
@@ -594,6 +591,18 @@ class Conf:
         if not os.path.exists(self['fm/log_dir']):
             os.makedirs(self['fm/log_dir'])
 
+def make_fullpath(filename,parent_path):
+    'return full path to the included file'
+
+    if filename.startswith('./'):
+        #wrt current working directory
+        full_path = filename
+    else:
+        #wrt parent_path (probably the main yaml file)
+        full_path = os.path.join(parent_path,filename)
+
+    return full_path
+
 def is_valid_int(subscript):
     try:
         int(subscript)
@@ -622,11 +631,108 @@ def check_cwd(config):
             print(f"expecting: {config['working_dir']}")
             print(f"but found {os.path.realpath(os.getcwd())}")
 
-def process(pipeline,path,config=None):
+def toplevel_include(config,src,path):
+    '''
+    include into toplevel of config from a single path string
+    or list of path strings
+    '''
+
+    if type(src) == str:
+        config.do_include_inner(src,path,base_keys=[])
+
+    elif type(src) == list:
+        for src_path in src:
+            assert type(src_path) == str, "invalid include list, list items must be strings"
+            config.do_include_inner(src_path,path,base_keys=[])
+
+    else:
+        raise Exception('invalid include item, must be string or list of strings')
+
+    config.update(item[item_type])
+    #config.show("loaded config")
+    config.includes_and_loads(path)
+    #config.show("actioned includes and loads")
+
+def is_active():
+    return global_state['is_active']
+
+def update_activity_state(action):
+    '''
+    return true if pipeline is actively making changes
+    or false if it's in dry-run mode or on an inactive action
+    such as before the the run-from action has been encountered
+    '''
+
+    #incase the config has changed since the last action
+    if 'fm/log_dir' in action: global_state['log_dir'] = action['fm/log_dir']
+
+    #dry-run mode disables all actions
+    if global_state['args'].dry_run == True:
+        global_state['is_active'] = False
+        return
+
+    #if run-only is active action must be in the approved list
+    if global_state['args'].run_only and not action['name'] in global_state['args'].run_only:
+        global_state['is_active'] = False
+        return
+
+    #see if we've reached the run-from rule
+    if global_state['args'].run_from and action['name'] == global_state['args'].run_from:
+        global_state['reached_run_from'] = True
+
+    #see if we've reached the run-until rule
+    if global_state['args'].run_until and action['name'] == global_state['args'].run_until:
+        global_state['reached_run_until'] = True
+
+    #see if we're within the run-from to run-until interval
+    if global_state['reached_run_from'] and not global_state['reached_run_until']:
+        global_state['is_active'] = True
+        return
+
+    global_state['is_active'] = False
+
+def init_global_state(args,config):
+    global global_state
+
+    #only set global state once
+    if global_state != {}: return
+
+    assert args != None
+
+    #store dry_run, run_only, run_from, run_until settings
+    global_state['args'] = args
+
+    #store changeable states
+    #run-from implies we start off not running any action yet
+    if args.run_from:
+        global_state['reached_run_from'] = False
+    else:
+        global_state['reached_run_from'] = True
+
+    #becomes true when we encounter the named run-until action, if any
+    global_state['reached_run_until'] = False
+
+    #used to generate the log file names
+    global_state['start_time'] = timestamp_now()
+
+    global_state['is_active'] = None
+    global_state['log_dir'] = config['fm/log_dir']
+
+    update_activity_state({'name':None})
+
+def process(pipeline,path,config=None,args=None):
+    '''
+    process a YAML pipeline from the file args.yaml
+    '''
+
     #initially set config to default values if none provided
     if config == None:
         #set conf to defaults
         config = Conf(src="defaults")
+
+    #on first call store args and init stateful variables that
+    #implement run-from and run-until options
+    init_global_state(args,config)
 
     counter = 0
 
@@ -649,6 +755,13 @@ def process(pipeline,path,config=None):
             config.includes_and_loads(path)
             #config.show("actioned includes and loads")
 
+        elif item_type == 'include':
+            #toplevel include load and insert the yaml items in place of the include item
+            new_pipeline,new_path = load_pipeline(item[item_type],path) #new_path ignored
+            counter -= 1
+            del pipeline[counter]
+            pipeline = pipeline[:counter] + new_pipeline + pipeline[counter:]
+
         elif item_type == 'module':
             #process a nested pipeline without affecting the config of any
             #following items
@@ -663,7 +776,7 @@ def load_pipeline(path,parent_file):
     'path is relative to the parent path'
 
     parent_path = os.path.dirname(parent_file)
-    full_path = os.path.join(parent_path,path)
+    full_path = make_fullpath(path,parent_path)
 
     assert full_path != parent_file
     return parse_yaml(full_path),full_path
@@ -753,7 +866,7 @@ def generate_job_list(action,input,output):
     # print("after injob list")
     # for job in job_list: show_job(job)
 
-    #expand between-job list patterns
+    #expand separate-jobs list patterns
     new_list = []
     for job in job_list: new_list += generate_list2jobs(action,job)
     job_list = new_list
@@ -763,7 +876,7 @@ def generate_job_list(action,input,output):
     # print("after between list")
     # for job in job_list: show_job(job)
 
-    #expanded input pattern globs
+    #expanded input pattern globs (both the injob and separate jobs kind)
     new_list = []
     for job in job_list: new_list += generate_glob_jobs(action,job)
     job_list = new_list
@@ -1276,7 +1389,11 @@ def recycle_item(config,path):
             raise Exception(f"File {new_name} already in recycle bin")
 
     #move to recycle bin
-    shutil.move(path,new_name)
+    move_item(path,new_name)
+
+def move_item(path,new_name):
+    if is_active():
+        shutil.move(path,new_name)
 
 def create_output_dirs(config,outputs):
     '''
@@ -1289,10 +1406,30 @@ def create_output_dirs(config,outputs):
         if os.path.exists(parent): continue
         os.makedirs(parent)
 
+
+def remove_item(path):
+    if is_active(): os.remove(path)
+
+def remove_tree(path):
+    if is_active(): shutil.rmtree(path)
+
+def message(item,end='\n'):
+    item = timestamp_now_nice() + ' ' + str(item)
+
+    if global_state['args'].quiet != True:
+        print(item,end=end)
+        sys.stdout.flush()
+
+    if global_state['args'].nologs != True:
+        path = os.path.join(global_state['log_dir'],global_state['start_time']+'.messages')
+        f = open(path,'a')
+        f.write(item+end)
+        f.close()
+
 def handle_stale_outputs(config,outputs):
     '''
-    the job is going to be rerun therefore any output already present
-    is treated as stale and recycled or deleted
+    the job is going to be rerun therefore any outputs already present
+    are treated as stale and recycled or deleted
     '''
 
     for item in outputs.keys():
@@ -1301,17 +1438,20 @@ def handle_stale_outputs(config,outputs):
 
         if os.path.islink(path) or os.path.isfile(path):
             if config['stale_output_file'] == 'delete':
-                os.remove(path)
+                message(f'deleting stale output file {path}')
+                remove_item(path)
             elif config['stale_output_file'] == 'recycle':
+                message(f'recycling stale output file {path}')
                 recycle_item(config,path)
             elif config['stale_output_file'] == 'ignore':
+                message(f'ignoring stale output file {path}')
                 continue
             else:
                 raise Exception(f'unknown option for stale_output_file: {config["stale_output_file"]}')
 
         elif os.path.isdir(path):
             if config['stale_output_dir'] == 'delete':
-                shutil.rmtree(path)
+                remove_tree(path)
             elif config['stale_output_dir'] == 'recycle':
                 recycle_item(config,path)
             elif config['stale_output_dir'] == 'ignore':
@@ -1334,7 +1474,7 @@ def handle_failed_outputs(config,outputs):
 
         if os.path.islink(path) or os.path.isfile(path):
             if config['failed_output_file'] == 'delete':
-                os.remove(path)
+                remove_item(path)
             elif config['failed_output_file'] == 'recycle':
                 recycle_item(config,path)
             elif config['failed_output_file'] == 'stale':
@@ -1346,7 +1486,7 @@ def handle_failed_outputs(config,outputs):
 
         elif os.path.isdir(path):
             if config['failed_output_dir'] == 'delete':
-                shutil.rmtree(path)
+                remove_tree(path)
             elif config['failed_output_dir'] == 'recycle':
                 recycle_item(config,path)
             elif config['failed_output_dir'] == 'stale':
@@ -1403,22 +1543,25 @@ def execute_command(config,job_numb,cmd,env):
     fname = f'{config["fm/prefix"]}{timestamp_now()}.{config["name"]}'
     foutname = os.path.join(config['fm/log_dir'],fname+'.out')
     ferrname = os.path.join(config['fm/log_dir'],fname+'.err')
-    fout = open(foutname,'w')
-    ferr = open(ferrname,'w')
+
+    if is_active():
+        fout = open(foutname,'w')
+        ferr = open(ferrname,'w')
 
     failed = False
-    print(f'executing job number {job_numb+1} locally:',end='')
-    sys.stdout.flush()
+    message(f'executing job number {job_numb+1} locally...')
     try:
-        subprocess.run(cmd,env=env,shell=True,check=True,stdout=fout,stderr=ferr)
+        if is_active():
+            subprocess.run(cmd,env=env,shell=True,check=True,stdout=fout,stderr=ferr)
     except subprocess.CalledProcessError:
         failed = True
 
-    fout.close()
-    ferr.close()
+    if is_active():
+        fout.close()
+        ferr.close()
 
-    if failed: print(' failed')
-    else:      print(' okay')
+    if failed: message('==>failed')
+    else:      message('==>okay')
 
     return failed
 
@@ -1516,19 +1659,6 @@ def qsub_execute_job(jobfile):
 
     spawn_job(jobfile,action,shell_list)
 
-def spawn_worker(jobfile,action,shell_list):
-    'become worker node controller'
-
-    basename = f'{jobfile[:-5]}.{os.environ["SGE_TASK_ID"]}'
-    job_numb = int(os.environ["SGE_TASK_ID"]) - 1 #convert from 1 to 0 based
-
-    f = open(basename+'.running','w')
-    f.close()
-
-    while True:
-        time.sleep(10)
-
-
 def spawn_job(jobfile,action,shell_list):
     'spawn user job'
 
@@ -1580,6 +1710,9 @@ def execute_jobs(action,shell_list,job_list):
 def timestamp_now():
     return datetime.datetime.fromtimestamp(time.time()).strftime("%Y%m%d.%H%M%S.%f")
 
+def timestamp_now_nice():
+    return datetime.datetime.fromtimestamp(time.time()).strftime("%Y-%m-%d %H:%M:%S")
+
 def read_jobfile(fname):
     'load the action config and shell_list from json'
 
@@ -1592,11 +1725,14 @@ def read_jobfile(fname):
     return payload['action'], payload['shell_list']
 
 def process_action(config,action,path):
+    #see if the rule name triggers a change
+    update_activity_state(action)
+
     #validate action and substitute placeholders
     action,input,output,shell = setup_action(config,action,path)
     #action.show("setup action")
 
-    print(f'\naction: {action["name"]}')
+    message(f'action: {action["name"]}')
 
     #fill in any globbing placeholders in inputs and outputs
     #return list of values, one per potential job
@@ -1610,7 +1746,7 @@ def process_action(config,action,path):
 
     #for cmd in shell_list: show(cmd,"cmd")
 
-    print(f'{len(shell_list)} jobs generated')
+    message(f'{len(shell_list)} jobs generated')
 
     if len(shell_list) == 0: return
 
