@@ -15,21 +15,21 @@ import itertools
 global_state = {}
 
 #regex patterns to match non nested {%placeholders} and {$environment variables}
-environ_regx  = r'\{\$.+?\}'   #{$name}
-scalar_regx   = r'\{%.+?\}'    #{%scalar} or {%list[]}
+environ_regx  = r'\{\$.+?\}'       #{$name}
+scalar_regx   = r'\{%.+?\}'        #{%scalar} or {%list[]}
 glob2job_regx  = r'\{\*.+?\}'      #{*glob} ==> split into separate jobs
 glob2list_regx  = r'\{\+.+?\}'     #{+glob} ==> become in-job list
 glob2both_regx  = r'\{[\+\*].+?\}' #{+/*glob} ==> either type of glob placeholder
-list2job_regx  = r'\{=.+?\}'   #{=list} ==> split into separate jobs
-list2list_regx  = r'\{-.+?\}'  #{-list} ==> become in-job list
+list2job_regx  = r'\{=.+?\}'       #{=list} ==> split into separate jobs
+list2list_regx  = r'\{-.+?\}'      #{-list} ==> become in-job list
 
-default_log_dir = 'fakemake_logs'
+warning_prefix = 'WARNING: '
 
 default_global_config =\
 {
     'fm':{
         'prefix':'fm-',                  #log file/job name  prefix: qsub doesn't like numerical names
-        'log_dir':default_log_dir,       #name of subfolder for logging
+        'log_dir':'fakemake_logs',       #name of subfolder for logging
         'remote_delay_secs':'10',        #wait this long after remote jobs incase of latency
         'stale_output_file':'ignore',    #ignore,delete,recycle (also applies to symlinks)
         'stale_output_dir':'ignore',     #ignore,delete,recycle
@@ -589,10 +589,19 @@ class Conf:
 
     def make_log_dir(self):
         if not os.path.exists(self['fm/log_dir']):
+            message(f'creating missing log_dir {self["fm/log_dir"]}')
+
+            #note: still creating missing log_dir in dryrun mode
+            #so we can record messages and create qsub scripts
+            #for inspection by the user
+            #therefore not using the makedirs wrapper function
             os.makedirs(self['fm/log_dir'])
 
+def makedirs(path):
+    if is_active(): os.makedirs(path)
+
 def make_fullpath(filename,parent_path):
-    'return full path to the included file'
+    'return full path to the include file path'
 
     if filename.startswith('./'):
         #wrt current working directory
@@ -720,57 +729,6 @@ def init_global_state(args,config):
 
     update_activity_state({'name':None})
 
-def process(pipeline,path,config=None,args=None):
-    '''
-    process a YAML pipeline from the file args.yaml
-    '''
-
-    #initially set config to default values if none provided
-    if config == None:
-        #set conf to defaults
-        config = Conf(src="defaults")
-
-    #on first call store args and init stateful variables that
-    #implement run-from and run-until options
-    init_global_state(args,config)
-
-    counter = 0
-
-    while counter < len(pipeline):
-        item = pipeline[counter]
-        counter += 1
-        assert type(item) == dict
-        assert len(item) == 1
-        item_type = list(item.keys())[0]
-
-        if item_type == 'action':
-            #show(item[item_type],item_type)
-            process_action(config,item[item_type],path)
-
-        elif item_type == 'config':
-            #add new config to the existing one, overriding any shared keys
-            #config.show("orig config")
-            config.update(item[item_type])
-            #config.show("loaded config")
-            config.includes_and_loads(path)
-            #config.show("actioned includes and loads")
-
-        elif item_type == 'include':
-            #toplevel include load and insert the yaml items in place of the include item
-            new_pipeline,new_path = load_pipeline(item[item_type],path) #new_path ignored
-            counter -= 1
-            del pipeline[counter]
-            pipeline = pipeline[:counter] + new_pipeline + pipeline[counter:]
-
-        elif item_type == 'module':
-            #process a nested pipeline without affecting the config of any
-            #following items
-            new_pipeline,new_path = load_pipeline(item[item_type],path)
-            sub_config = Conf(config)
-            process(new_pipeline,new_path,config=sub_config)
-
-        else:
-            raise Exception(f"unsupported item type {item_type}")
 
 def load_pipeline(path,parent_file):
     'path is relative to the parent path'
@@ -1272,38 +1230,46 @@ def find_conflicts(all_vals,values):
     return False #no conflicts found
 
 def check_input_mtimes(input):
+    'return newest mtime if all inputs present otherwise return None'
+
     #verify all input paths present
-    all_inputs_present = True
+    missing = False
     newest_mtime = 0
     for item,path in input.items():
-        if not os.path.exists(path) or is_stale(path):
-            all_inputs_present = False
+        if not os.path.exists(path):
+            message(f'missing input {path}')
+            missing = True
+            continue
+
+        if is_stale(path):
+            message(f'stale input {path}')
+            missing = True
             continue
 
         mtime = os.path.getmtime(path)
         if mtime > newest_mtime: newest_mtime = mtime
 
-    #return newest mtime if all inputs present otherwise None
-    if all_inputs_present == False: return None
+    if missing: return None
+
     return newest_mtime
 
 def check_output_mtimes(output):
-    all_outputs_present = True
-    oldest_mtime = time.time() + 31e6 #dummy time 1 year in the future
+    'return oldest mtime if all outputs present otherwise return None'
+
+    #dummy future time guaranteed not to be older than a real file
+    oldest_mtime = time.time() + 31e6 
+
     for item,path in output.items():
         if not os.path.exists(path):
-            all_outputs_present = False
-            continue
+            return None
 
         mtime = os.path.getmtime(path)
         if mtime < oldest_mtime: oldest_mtime = mtime
 
-    #return oldest mtime if all outputs present otherwise None
-    if all_outputs_present == False: return None
+    
     return oldest_mtime
 
 def generate_shell_commands(action,job_list,shell):
-    #name = action['name']
 
     for job_numb,job in enumerate(job_list):
         #check all inputs present, return newest mtime
@@ -1313,6 +1279,7 @@ def generate_shell_commands(action,job_list,shell):
         if newest_input == None:
             #flag job for removal from the list
             job_list[job_numb] = None
+            warning(f'one or more inputs missing or stale, job not runable')
             continue
 
         #all inputs present
@@ -1400,18 +1367,28 @@ def create_output_dirs(config,outputs):
     if the parent folder of any output is missing create it
     '''
 
+    prev_parent = None
+
     for item in outputs.keys():
         path = outputs[item]
         parent = os.path.dirname(path)
         if os.path.exists(parent): continue
-        os.makedirs(parent)
 
+        #avoid message spamming about missing directories in dry-run mode
+        if parent != prev_parent:
+            message(f'creating missing output directory {parent}')
+
+        makedirs(parent)
+        prev_parent = parent
 
 def remove_item(path):
     if is_active(): os.remove(path)
 
 def remove_tree(path):
     if is_active(): shutil.rmtree(path)
+
+def warning(item,end='\n'):
+    message(warning_prefix+item,end=end)
 
 def message(item,end='\n'):
     item = timestamp_now_nice() + ' ' + str(item)
@@ -1422,9 +1399,13 @@ def message(item,end='\n'):
 
     if global_state['args'].nologs != True:
         path = os.path.join(global_state['log_dir'],global_state['start_time']+'.messages')
-        f = open(path,'a')
-        f.write(item+end)
-        f.close()
+
+        try:
+            with open(path,'a') as f:
+                f.write(item+end)
+                f.close()
+        except:
+            print(timestamp_now_nice() + ' ' + warning_prefix+f'log file {path} not writeable')
 
 def handle_stale_outputs(config,outputs):
     '''
@@ -1437,27 +1418,27 @@ def handle_stale_outputs(config,outputs):
         if not os.path.exists(path): continue
 
         if os.path.islink(path) or os.path.isfile(path):
-            if config['stale_output_file'] == 'delete':
+            if config['fm/stale_output_file'] == 'delete':
                 message(f'deleting stale output file {path}')
                 remove_item(path)
-            elif config['stale_output_file'] == 'recycle':
+            elif config['fm/stale_output_file'] == 'recycle':
                 message(f'recycling stale output file {path}')
                 recycle_item(config,path)
-            elif config['stale_output_file'] == 'ignore':
+            elif config['fm/stale_output_file'] == 'ignore':
                 message(f'ignoring stale output file {path}')
                 continue
             else:
-                raise Exception(f'unknown option for stale_output_file: {config["stale_output_file"]}')
+                raise Exception(f'unknown option for stale_output_file: {config["fm/stale_output_file"]}')
 
         elif os.path.isdir(path):
-            if config['stale_output_dir'] == 'delete':
+            if config['fm/stale_output_dir'] == 'delete':
                 remove_tree(path)
-            elif config['stale_output_dir'] == 'recycle':
+            elif config['fm/stale_output_dir'] == 'recycle':
                 recycle_item(config,path)
-            elif config['stale_output_dir'] == 'ignore':
+            elif config['fm/stale_output_dir'] == 'ignore':
                 continue
             else:
-                raise Exception(f'unknown option for stale_output_dir: {config["stale_output_dir"]}')
+                raise Exception(f'unknown option for stale_output_dir: {config["fm/stale_output_dir"]}')
                 
         else:
             raise Exception(f'unsupported output type {path}')
@@ -1473,28 +1454,28 @@ def handle_failed_outputs(config,outputs):
         if not os.path.exists(path): continue
 
         if os.path.islink(path) or os.path.isfile(path):
-            if config['failed_output_file'] == 'delete':
+            if config['fm/failed_output_file'] == 'delete':
                 remove_item(path)
-            elif config['failed_output_file'] == 'recycle':
+            elif config['fm/failed_output_file'] == 'recycle':
                 recycle_item(config,path)
-            elif config['failed_output_file'] == 'stale':
+            elif config['fm/failed_output_file'] == 'stale':
                 make_stale(path)
-            elif config['failed_output_file'] == 'ignore':
+            elif config['fm/failed_output_file'] == 'ignore':
                 continue
             else:
-                raise Exception(f'unknown option for failed_output_file: {config["failed_output_file"]}')
+                raise Exception(f'unknown option for failed_output_file: {config["fm/failed_output_file"]}')
 
         elif os.path.isdir(path):
-            if config['failed_output_dir'] == 'delete':
+            if config['fm/failed_output_dir'] == 'delete':
                 remove_tree(path)
-            elif config['failed_output_dir'] == 'recycle':
+            elif config['fm/failed_output_dir'] == 'recycle':
                 recycle_item(config,path)
-            elif config['failed_output_dir'] == 'stale':
+            elif config['fm/failed_output_dir'] == 'stale':
                 make_stale(path)
-            elif config['failed_output_dir'] == 'ignore':
+            elif config['fm/failed_output_dir'] == 'ignore':
                 continue
             else:
-                raise Exception(f'unknown option for failed_output_dir: {config["failed_output_dir"]}')
+                raise Exception(f'unknown option for failed_output_dir: {config["fm/failed_output_dir"]}')
                 
         else:
             raise Exception(f'unsupported output type {path}')
@@ -1544,24 +1525,30 @@ def execute_command(config,job_numb,cmd,env):
     foutname = os.path.join(config['fm/log_dir'],fname+'.out')
     ferrname = os.path.join(config['fm/log_dir'],fname+'.err')
 
-    if is_active():
-        fout = open(foutname,'w')
-        ferr = open(ferrname,'w')
+    message(f'job {job_numb+1} executing locally...')
+
+    if cmd.endswith('\n'): message(f'{cmd}',end='')
+    else:                  message(f'{cmd}')
+
+    if not is_active():
+        #dry-run: signal job completed ok without running it
+        message(f'skipping execution')
+        return False
 
     failed = False
-    message(f'executing job number {job_numb+1} locally...')
+    fout = open(foutname,'w')
+    ferr = open(ferrname,'w')
+
     try:
-        if is_active():
-            subprocess.run(cmd,env=env,shell=True,check=True,stdout=fout,stderr=ferr)
+        subprocess.run(cmd,env=env,shell=True,check=True,stdout=fout,stderr=ferr)
     except subprocess.CalledProcessError:
         failed = True
 
-    if is_active():
-        fout.close()
-        ferr.close()
+    fout.close()
+    ferr.close()
 
-    if failed: message('==>failed')
-    else:      message('==>okay')
+    if failed: warning('command failed')
+    else:      message('command completed normally')
 
     return failed
 
@@ -1572,6 +1559,11 @@ def write_qsub_file(action,qsub_script,jobname,njobs,jobfile):
         f_in = open(os.path.join(os.path.dirname(__file__),"qsub_template.sh"))
     else:
         f_in = open(action['qsub/template'])
+
+    if is_active():
+        message(f'creating qsub jobscript {qsub_script}')
+    else:
+        message(f'creating qsub jobscript {qsub_script} (even in dry-run mode)')
 
     f_out = open(qsub_script,'w')
 
@@ -1592,6 +1584,7 @@ def submit_job_qsub(action,shell_list,job_list):
     issue the qsub command to spawn an array of jobs
     wait for completion before checking the status of each job
     '''
+
     jobname = write_jobfile(action,shell_list)
     qsub_script = os.path.join(action['fm/log_dir'],jobname+'.qsub')
     jobfile = os.path.join(action['fm/log_dir'],jobname+'.jobs')
@@ -1603,45 +1596,60 @@ def submit_job_qsub(action,shell_list,job_list):
 
     env = copy.deepcopy(os.environ)
 
-    foutname = os.path.join(action['fm/log_dir'],jobname+'.out')
-    ferrname = os.path.join(action['fm/log_dir'],jobname+'.err')
-    fout = open(foutname,'w')
-    ferr = open(ferrname,'w')
+    message(f'executing {cmd} with {njobs}...')
 
-    failed = False
-    print(f'executing qsub job array with {njobs} jobs:',end='')
-    sys.stdout.flush()
-    try:
-        subprocess.run(cmd,env=env,shell=True,check=True,stdout=fout,stderr=ferr)
-    except subprocess.CalledProcessError:
-        failed = True
+    something_failed = False
 
-    fout.close()
-    ferr.close()
+    if is_active():
+        foutname = os.path.join(action['fm/log_dir'],jobname+'.out')
+        ferrname = os.path.join(action['fm/log_dir'],jobname+'.err')
+        fout = open(foutname,'w')
+        ferr = open(ferrname,'w')
+        #sys.stdout.flush()
+
+        try:
+            subprocess.run(cmd,env=env,shell=True,check=True,stdout=fout,stderr=ferr)
+        except subprocess.CalledProcessError:
+            something_failed = True
+
+        fout.close()
+        ferr.close()
+
+        if something_failed: warning(f'qsub call failed')
+        else:                message(f'qsub call succeeded')
 
     #delay to allow for shared filesystem latency on status files
+    message(f'sleeping for {action["fm/remote_delay_secs"]} seconds to allow for filesystem latency...')
     time.sleep(int(action['fm/remote_delay_secs']))
 
-    if failed: print(' failed')
-    else:      print(' okay')
-
-    #check each individual job's status file
+    #check each individual job's status file and expected outputs
+    #some jobs may not have failed even if qsub returned an error code?
     for job_numb,item in enumerate(shell_list):
         status_file = f'{action["fm/log_dir"]}/{jobname}.{job_numb+1}.status'
 
-        job_failed = False
+        failed = False
         if not os.path.exists(status_file):
-            print(f"job {job_numb+1} probably failed to start")
-            job_failed = True
+            warning(f"job {job_numb+1} produced no status file {status_file} and probably failed to start")
+            failed = True
         else:
             with open(status_file) as f: status = f.read().strip()
-            print(f"job {job_numb+1} status: {status}")
-            if status != "okay": job_failed= True
 
-        if not job_failed: continue
+            if status == "okay":
+                message(f"job {job_numb+1} status: {status}")
+            else:
+                warning(f"job {job_numb+1} status: {status}")
+                failed = True
 
-        #deal with output of failed job
-        handle_failed_outputs(action,job_list[job_numb]["output"])
+        if failed == False:
+            #job has also failed if not all required outputs were created
+            failed = verify_expected_outputs(action,job_list[job_numb]["output"],job_list[job_numb]["input"])
+
+        if failed == True:
+            #deal with output of failed job
+            handle_failed_outputs(action,job_list[job_numb]["output"])
+            something_failed = True
+
+    return something_failed
 
 def qsub_execute_job(jobfile):
     '''
@@ -1690,22 +1698,74 @@ def spawn_job(jobfile,action,shell_list):
         f.close()
         sys.exit(0)
 
+def verify_expected_outputs(action,outputs,inputs):
+    '''
+    verify that all specified output files exist
+    and are newer than the job start time
+    if any are missing or stale flag job as failed
+
+    implies jobs must use touch to update any output file that does not need altering
+    or else exclude it from the list of required outputs
+    '''
+
+    #find newest input file
+    newest_mtime = check_input_mtimes(inputs)
+
+    #if any input(s) missing cannot verify that outputs are not stale
+    #implies jobs cannot delete their inputs
+    #ie this would need to be handled by a separate job
+    if newest_mtime == None:
+        warning('unable to verify all outputs are fresh due to missing input(s)')
+        return True
+
+    failed = False
+    for item in outputs.keys():
+        path = outputs[item]
+        if not os.path.exists(path):
+            warning(f'missing output {path}')
+            failed = True 
+        elif is_stale(path) or os.path.getmtime(path) < newest_mtime:
+            message(f'stale output {path}')
+            failed = True
+
+    if failed:
+        #job has failed
+        return True
+
+    #signal job seems to have completed okay
+    message('all outputs look good')
+    return False
+
 def execute_jobs(action,shell_list,job_list):
+    something_failed = False
+
     if action['exec'] == 'local':
         #local serial execution
         for job_numb,item in enumerate(shell_list):
             cmd = generate_full_command(action,item)
             env = generate_job_environment(action,job_numb,len(shell_list))
+
+            #reports only explicit job failure from exit code
             failed = execute_command(action,job_numb,cmd,env)
 
-            if failed: handle_failed_outputs(action,job_list[job_numb]["output"])
+            if failed == False:
+                #job has also failed if not all required outputs were created
+                failed = verify_expected_outputs(action,job_list[job_numb]["output"],job_list[job_numb]["input"])
+
+            if failed == True:
+                #carry out config controlled action on outputs of failed job
+                #ie delete, recycle, mark as stale or ignore
+                handle_failed_outputs(action,job_list[job_numb]["output"])
+                something_failed = True
 
     elif action['exec'] == 'qsub':
         #qsub execution using an array job
-        submit_job_qsub(action,shell_list,job_list)
+        something_failed = submit_job_qsub(action,shell_list,job_list)
 
     else:
         raise Exception(f"unsupported execution method {action['exec']}")
+
+    return something_failed
 
 def timestamp_now():
     return datetime.datetime.fromtimestamp(time.time()).strftime("%Y%m%d.%H%M%S.%f")
@@ -1754,4 +1814,64 @@ def process_action(config,action,path):
     check_cwd(action)
 
     #execute jobs locally or remotely from the jobfile
-    execute_jobs(action,shell_list,job_list)
+    if execute_jobs(action,shell_list,job_list):
+        warning(f'action {action["name"]} had failed job(s)')
+        #signal action failed
+        return True
+
+    #signal action completed ok
+    return False
+
+def process(pipeline,path,config=None,args=None):
+    '''
+    process a YAML pipeline from the file args.yaml
+    '''
+
+    #initially set config to default values if none provided
+    if config == None:
+        #set conf to defaults
+        config = Conf(src="defaults")
+
+    #on first call store args and init stateful variables that
+    #implement run-from and run-until options
+    init_global_state(args,config)
+
+    counter = 0
+
+    while counter < len(pipeline):
+        item = pipeline[counter]
+        counter += 1
+        assert type(item) == dict
+        assert len(item) == 1
+        item_type = list(item.keys())[0]
+
+        if item_type == 'action':
+            #show(item[item_type],item_type)
+            if process_action(config,item[item_type],path):
+                warning('aborting pipeline due to failed action')
+                return
+
+        elif item_type == 'config':
+            #add new config to the existing one, overriding any shared keys
+            #config.show("orig config")
+            config.update(item[item_type])
+            #config.show("loaded config")
+            config.includes_and_loads(path)
+            #config.show("actioned includes and loads")
+
+        elif item_type == 'include':
+            #toplevel include load and insert the yaml items in place of the include item
+            new_pipeline,new_path = load_pipeline(item[item_type],path) #new_path ignored
+            counter -= 1
+            del pipeline[counter]
+            pipeline = pipeline[:counter] + new_pipeline + pipeline[counter:]
+
+        elif item_type == 'module':
+            #process a nested pipeline without affecting the config of any
+            #following items
+            new_pipeline,new_path = load_pipeline(item[item_type],path)
+            sub_config = Conf(config)
+            process(new_pipeline,new_path,config=sub_config)
+
+        else:
+            raise Exception(f"unsupported item type {item_type}")
