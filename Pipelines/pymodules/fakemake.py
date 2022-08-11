@@ -663,27 +663,41 @@ def toplevel_include(config,src,path):
     #config.show("actioned includes and loads")
 
 def is_active():
-    return global_state['is_active']
+    '''
+    return True if activity_state() is "active"
+    return False if activity_state() is "dryrun" or "inactive"
+    '''
+
+    if activity_state() == 'active': return True
+    return False
+
+def activity_state():
+    '''
+    return the current activity state: active, dryrun or inactive
+    active = run everything as normal (action is active, dryrun is off)
+    dryrun = pretend to run (action is active, but dryrun is on)
+    inactive = run nothing (action is not active)
+    '''
+
+    if global_state['is_active'] == False:
+        #do not run the current action at all
+        return 'inactive'
+
+    if global_state['args'].dry_run == True:
+        #run the current action in dryrin mode only
+        return 'dryrun'
+
+    #run as normal
+    return 'active'
 
 def update_activity_state(action):
     '''
-    return true if pipeline is actively making changes
-    or false if it's in dry-run mode or on an inactive action
-    such as before the the run-from action has been encountered
+    update the global_state['is_active'] state based on the action name
+    this implements the run-only,run-from and run-until command line options
     '''
 
     #incase the config has changed since the last action
     if 'fm/log_dir' in action: global_state['log_dir'] = action['fm/log_dir']
-
-    #dry-run mode disables all actions
-    if global_state['args'].dry_run == True:
-        global_state['is_active'] = False
-        return
-
-    #if run-only is active action must be in the approved list
-    if global_state['args'].run_only and not action['name'] in global_state['args'].run_only:
-        global_state['is_active'] = False
-        return
 
     #see if we've reached the run-from rule
     if global_state['args'].run_from and action['name'] == global_state['args'].run_from:
@@ -693,12 +707,15 @@ def update_activity_state(action):
     if global_state['args'].run_until and action['name'] == global_state['args'].run_until:
         global_state['reached_run_until'] = True
 
-    #see if we're within the run-from to run-until interval
-    if global_state['reached_run_from'] and not global_state['reached_run_until']:
-        global_state['is_active'] = True
-        return
+    #if run-only is active then the action must be in the approved list
+    if global_state['args'].run_only and not action['name'] in global_state['args'].run_only:
+        global_state['is_active'] = False
 
-    global_state['is_active'] = False
+    #see if we're within the run-from to run-until interval
+    elif global_state['reached_run_from'] and not global_state['reached_run_until']:
+        global_state['is_active'] = True
+    else:
+        global_state['is_active'] = False
 
 def init_global_state(args,config):
     global global_state
@@ -1288,10 +1305,14 @@ def generate_shell_commands(action,job_list,shell):
         oldest_output = check_output_mtimes(job['output'])
 
         #all outputs present and newer than newest input: no need to run
+        #unless run: always is set for this action 
         if oldest_output != None and oldest_output > newest_input:
-            #flag job for removal from the list
-            job_list[job_numb] = None
-            continue
+            if 'run' in action and action['run'] == 'always':
+                message('"run always" option forcing outputs to be treated as stale')
+            else:
+                #flag job for removal from the list
+                job_list[job_numb] = None
+                continue
 
         #remove stale output files/symlinks/directories before action is run
         handle_stale_outputs(action,job['output'])
@@ -1343,7 +1364,7 @@ def make_stale(path):
 def recycle_item(config,path):
     'move the path into the recycle bin'
     
-    recycle_bin = config['recycle_bin']
+    recycle_bin = config['fm/recycle_bin']
 
     assert path != recycle_bin
 
@@ -1620,7 +1641,7 @@ def submit_job_qsub(action,shell_list,job_list):
 
     #delay to allow for shared filesystem latency on status files
     message(f'sleeping for {action["fm/remote_delay_secs"]} seconds to allow for filesystem latency...')
-    time.sleep(int(action['fm/remote_delay_secs']))
+    if activity_state() == 'active': time.sleep(int(action['fm/remote_delay_secs']))
 
     #check each individual job's status file and expected outputs
     #some jobs may not have failed even if qsub returned an error code?
@@ -1629,7 +1650,10 @@ def submit_job_qsub(action,shell_list,job_list):
 
         failed = False
         if not os.path.exists(status_file):
-            warning(f"job {job_numb+1} produced no status file {status_file} and probably failed to start")
+            if activity_state() == 'dryrun':
+                warning(f"job {job_numb+1} produced no status file {status_file} due to dryrun mode")
+            else:
+                warning(f"job {job_numb+1} produced no status file {status_file} and probably failed to start")
             failed = True
         else:
             with open(status_file) as f: status = f.read().strip()
@@ -1785,30 +1809,37 @@ def read_jobfile(fname):
     return payload['action'], payload['shell_list']
 
 def process_action(config,action,path):
-    #see if the rule name triggers a change
-    update_activity_state(action)
-
     #validate action and substitute placeholders
     action,input,output,shell = setup_action(config,action,path)
     #action.show("setup action")
 
-    message(f'action: {action["name"]}')
+    #see if the rule name triggers a change
+    update_activity_state(action)
 
-    #fill in any globbing placeholders in inputs and outputs
-    #return list of values, one per potential job
+    if activity_state() == 'inactive':
+        message(f'skipping action {action["name"]}')
+        return False
+
+    if 'run' in action and action['run'] == 'never':
+        message(f'skipping action {action["name"]}')
+        return False
+
+    if activity_state() == 'dryrun':
+        message(f'dry-running action {action["name"]}')
+    else:
+        message(f'running action: {action["name"]}')
+
+    #generate list of potential jobs by filling out glob and list placeholders
+    #this step does not pay any attention to file time stamps
     job_list = generate_job_list(action,input,output)
+    message(f'placeholder expansion found {len(job_list)} potential jobs')
+    if len(job_list) == 0: return False
 
-    if len(job_list) == 0: return
-
-    #determine if all inputs are present
-    #and if outputs need to be regenerated
+    #determine if all inputs are present and non-stale
+    #determine if any outputs need (re)generating
     job_list,shell_list = generate_shell_commands(action,job_list,shell)
-
-    #for cmd in shell_list: show(cmd,"cmd")
-
-    message(f'{len(shell_list)} jobs generated')
-
-    if len(shell_list) == 0: return
+    message(f'input/output file checking found {len(shell_list)} runable jobs')
+    if len(shell_list) == 0: return False
 
     #check current working directory agrees with configured value
     check_cwd(action)
@@ -1833,10 +1864,12 @@ def process(pipeline,path,config=None,args=None):
         config = Conf(src="defaults")
 
     #on first call store args and init stateful variables that
-    #implement run-from and run-until options
+    #implement run-only, run-from and run-until options
     init_global_state(args,config)
 
     counter = 0
+
+    message(f"starting pipeline {path}")
 
     while counter < len(pipeline):
         item = pipeline[counter]
@@ -1848,19 +1881,24 @@ def process(pipeline,path,config=None,args=None):
         if item_type == 'action':
             #show(item[item_type],item_type)
             if process_action(config,item[item_type],path):
-                warning('aborting pipeline due to failed action')
-                return
+                if activity_state() == 'dryrun':
+                    warning('action failed due to dryrun mode, continuing pipeline anyway')
+                else:
+                    warning('aborting pipeline due to failed action')
+                    return 2
 
         elif item_type == 'config':
             #add new config to the existing one, overriding any shared keys
             #config.show("orig config")
+            message(f'updating config')
             config.update(item[item_type])
             #config.show("loaded config")
             config.includes_and_loads(path)
             #config.show("actioned includes and loads")
 
         elif item_type == 'include':
-            #toplevel include load and insert the yaml items in place of the include item
+            #toplevel include: load and insert the yaml items in place of the include item
+            message(f'including {item[item_type]}')
             new_pipeline,new_path = load_pipeline(item[item_type],path) #new_path ignored
             counter -= 1
             del pipeline[counter]
@@ -1875,3 +1913,7 @@ def process(pipeline,path,config=None,args=None):
 
         else:
             raise Exception(f"unsupported item type {item_type}")
+
+    message(f"reached end of pipeline {path}")
+
+    return 0

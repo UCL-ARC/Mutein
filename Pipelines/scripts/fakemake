@@ -13,7 +13,7 @@ def run_main():
     if args.yaml != None:
         #process a fakemake file
         pipeline = fm.parse_yaml(args.yaml)
-        fm.process(pipeline,args.yaml,args=args)
+        exit(fm.process(pipeline,args.yaml,args=args))
 
     elif args.qsub != None:
         #carry out a job on a compute node spawned from qsub (gridengine)

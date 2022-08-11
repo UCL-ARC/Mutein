@@ -121,8 +121,9 @@
 #       echo {$USER} processed >> {%info}
 
 - action:
-    name:     "test1"
-    exec:     "local"
+    name:   "test1"
+    exec:   "qsub"
+    run:    "always"
     input:
       samp_file: "test/samples/{*sample_subset}/{+sample}.data"
     output:
