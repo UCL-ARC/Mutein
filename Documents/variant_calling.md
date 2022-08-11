@@ -18,11 +18,12 @@ We recommend installing [Miniconda](https://docs.conda.io/en/latest/miniconda.ht
     chmod u+x ./Miniconda3-latest-Linux-x86_64.sh
     ./Miniconda3-latest-Linux-x86_64.sh
 
-then log out and in again after which the conda command should be available.
+If asked, let it run `conda init`, as this will modify your `~/.bashrc` to put the conda commands in your path, amongst other things.
 
+Then log out and in again after which the conda command should be available.
 
 ### download or clone this repository
-While the repository is private (i.e. during its development stage) you can only access the code thorough an authorised github account. Once your account has been given access to the repository the simplest way to do a one-off download is to log into your github account, browse to the [Mutein repository](https://github.com/UCL/Mutein), click on the green Code button, then click Download zip. Then copy this zip file onto the HPC (if required).
+While the repository is private (i.e. during its development stage) you can only access the code through an authorised github account. Once your account has been given access to the repository the simplest way to do a one-off download is to log into your github account, browse to the [Mutein repository](https://github.com/UCL/Mutein), click on the green Code button, then click Download zip. Then copy this zip file onto the HPC (if required).
 
 If you will require frequent downloading of the latest version then you need to setup ssh access to github from the place you intend to execute the pipeline, explained [here](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account). Then you'll be able to access it direct from the command line as if it were a public repo, explained next.
 
