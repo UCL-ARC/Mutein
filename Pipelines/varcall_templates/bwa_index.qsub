@@ -1,0 +1,27 @@
+#!/bin/bash
+
+set -eu
+source ~/.mutein_settings
+export SGE_TASK_ID
+
+conda activate ${MUT_PREFIX}bwa
+
+#extract gzipped file
+gunzip ${reference}
+
+#recompress with bgzip
+bgzip ${reference/\.gz/}
+
+#run approx ??? hour
+samtools faidx ${reference}
+
+#run time approx 1 hour
+bwa index -a bwtsw ${reference}
+conda deactivate ${MUT_PREFIX}bwa
+
+conda activate ${MUT_PREFIX}gatk4
+
+rm -f ${reference}.dict
+gatk CreateSequenceDictionary -R ${reference}
+
+conda deactivate ${MUT_PREFIX}gatk4

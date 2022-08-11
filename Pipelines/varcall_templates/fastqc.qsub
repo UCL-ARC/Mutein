@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -eu
+source ~/.mutein_settings
+export SGE_TASK_ID
+conda activate ${MUT_PREFIX}trim-galore
+
+$(vc_extract_params accession)
+
+fastqc -t ${vc_cores} ${accession}/*.fastq.gz

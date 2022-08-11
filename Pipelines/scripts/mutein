@@ -1,0 +1,45 @@
+#!/usr/bin/env python3
+
+import argparse
+import random
+from pymutein import *
+
+#seed with system time
+random.seed()
+
+def main_func():
+    args = parse_args()
+
+    if args.subcommand == "check-cwd":    check_cwd(args)
+    if args.subcommand == "recycle":      recycle(args)
+    if args.subcommand == "set-password": set_password(args)
+    if args.subcommand == "encrypt-json": encrypt_json(args)
+
+
+def parse_args():
+    '''
+    parse arguments from command line
+    '''
+
+    parser = argparse.ArgumentParser(description='Wrapper function for top-level mutein functions')
+    subparsers = parser.add_subparsers(dest="subcommand")
+
+    #check_cwd
+    check_cwd = subparsers.add_parser('check-cwd', help='check the working directory is the expected data folder')
+
+    #recycle
+    recycle = subparsers.add_parser('recycle', help='move the file into a subfolder called recycle_bin')
+    recycle.add_argument('file',nargs='+',help="list of files to recycle, last one must be a list terminator END")
+
+    #get master password from user, store in environment variable
+    set_password = subparsers.add_parser('set-password', help='read in password from keyboard to environment variable')
+
+    #encrypt json to file
+    encrypt_json  = subparsers.add_parser('encrypt-json', help='encrypt json from keyboard, save to config/password_vault')
+
+    args = parser.parse_args()
+
+    return args
+
+if __name__ == "__main__":
+    globals()["main_func"]()

@@ -1,0 +1,26 @@
+#!/bin/bash -l
+
+set -euo pipefail
+
+# Due to use of exit and "set -eu" this script must be executed rather than sourced.
+
+# setup conda snakemake environment if not already available (also provides python3)
+if ! conda env list | grep -qe "${MUT_PREFIX}main" ; then
+    echo "Setting up the main conda environment..."
+    conda create -y -n ${MUT_PREFIX}main \
+        $(cat ${MUT_DIR}/Pipelines/conda_envs/channels) \
+        --file ${MUT_DIR}/Pipelines/conda_envs/main.env \
+    || { echo "Failed to setup snakemake conda environment!"; exit 2; }
+fi
+
+# activate snakemake conda environment, also provides python3
+echo "Activating the conda snakemake environment..."
+conda activate ${MUT_PREFIX}main \
+|| { echo "Failed to activate snakemake conda environment!"; exit 3; }
+
+# verify mutein is in the PATH and print warning if not in MUT_DATA directory
+mutein check-cwd \
+|| { echo "Failed to run mutein script!"; exit 4; }
+
+# set the master password used to decrypt specific passwords from encrypted file
+export MUT_PASSWORD=$(mutein set-password)

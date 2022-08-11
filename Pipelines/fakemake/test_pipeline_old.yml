@@ -1,0 +1,94 @@
+- config:
+    working_dir:          "/lustre/scratch/scratch/{$USER}/549_mutein"
+    log_prefix:           "mut."
+    test_dir:             "test"
+    mut_prefix:           "{$MUT_PREFIX}"
+    user:                 "{%mut_prefix}{$USER}_{%test_dir}"
+    temp_job_dir:         "fakemake_jobs"
+    stale_output_file:    "recycle"
+    stale_output_dir:     "ignore"
+    missing_parent_dir:   "create"
+    test_list_index1:     "{&test_list[-1]}"
+    test_list_index2:     "{&test_list[0]}"
+    test_list_length:     "{&test_list[N]}"
+    test_list_join:       "{&test_list[ ]}"
+    test_shell_var:       "${leave_alone}"
+    test_list:
+      - "{%log_prefix}test_string"
+      - "{&test_list[0]}"
+      - "third_item"
+
+- include: "test_include.yml"
+
+- module: "test_module/module.yml"
+
+- load_list:
+    name: "load_test"
+    file: "test/load_test.txt"
+    sep: "\t"
+    row: "1"
+
+- action:
+    name:     "test1"
+    exec:     "qsub"
+    conda:    "{%mut_prefix}main"
+    sample_subset:
+      - "subset1"
+      - "subset2"
+    treatment_class:
+      - "prenormify"
+      - "subexpansification"
+    input:
+      #meaningful comment
+      samp_file:  "{%test_dir}/samples/{=sample_subset}/{*sample}.data"
+      treat_meta: "{%test_dir}/treatments/{=treatment_class}/{*treatment}"
+      combo_file: "{%test_dir}/combos/{*sample}_{*treatment}"
+    output: "{%test_dir}/output/{=sample_subset}/{=treatment_class}/{*sample}_{*treatment}.step1"
+    shell: |
+      echo samp_file={%samp_file} treat_meta={%treat_meta} > {%output}
+      echo {=sample_subset} {*sample} {=treatment_class} {*treatment} >> {%output}
+      
+# - action:
+#     name:     "step1"
+#     exec:     "local"
+#     time:     "1:00:00"
+#     mem:      "2G"
+#     cores:    "1"
+#     conda:    "{%mut_prefix}main"
+#     data_dir: "{%test_dir}/input"
+#     input:    "{%data_dir}/{*sample}.input"
+#     output:   "{%test_dir}/output/{*sample}.step1"
+#     shell: |
+#       cat {%input} > {%output}
+#       echo file {%input} sample {*sample} >> {%output}
+#       echo processed by {%name} >> {%output}
+#       echo "{%input}" | grep -v -e '1\.input' #should cause task1 to fail
+      
+# - action:
+#     name: "step2"
+#     exec: "local"
+#     time:     "0:30:00"
+#     mem:      "2G"
+#     cores:    "2"
+#     conda: "{$MUT_PREFIX}main"
+#     input:
+#       step1: "{%test_dir}/output/{*sample}.step1"
+#     output:
+#       final: "{%test_dir}/output/{*sample}.step2"
+#     shell: |
+#       cat {%step1} > {%final}
+#       echo processed by {%name} >> {%final}
+#       echo "hello"
+
+# - action:
+#     name: step4
+#     conda: "{$MUT_PREFIX}main"
+#     input:
+#       read1: "datasets/{=dataset}/{=subset}/{=accession}/{=accession}_1.fastq.gz"
+#       read2: "datasets/{%dataset}/{%subset}/{%accession}/{%accession}_2.fastq.gz"
+#     output:
+#       info: "datasets/{%dataset}/{%subset}/{%accession}/{%accession}.info"
+#     exec: qsub
+#     shell: |
+#       file {%read1} {%read2} > {%info}
+#       echo {$USER} processed >> {%info}
