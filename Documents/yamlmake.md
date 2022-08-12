@@ -19,6 +19,8 @@ This markdown documents YAMLmake the new workflow tool developed during the Mute
 
 ## YAMLmake overview
 
+The following outline of YAMLmake assumes some knowledge of bash.
+
 YAMLmake runs a YAML pipeline file containing a list of *actions* from top to bottom executing each one in the order encountered, taking account of *includes* and *modules*. A configuration state is also maintained as a hierachical tree of nested lists, dictionaries and strings which is modified everytime a *config* item is encountered in the pipeline. For example:
 
 ```
@@ -61,7 +63,24 @@ Much like `include` a `module` pipeline item refers to another YAML file, which 
 
 ### action
 
-To operate on sets of multiple files the input and output items can contain named subitems, each of which can contain special placeholders which expand the filenames by globbing against the filesystem just before the action is run.
+The `input` and `output` keys of an action are special. In their simplest form they can contain a string specifying a single input and output file respectively, referred to simply as `{%input}` and `{%output}` in the shell command. However they can also be expanded into dictionaries containing any number of keys, each of which is then available within the shell command. For example:
+
+```
+- action:
+    name: "zip-test"
+    input:
+      first_input: "file1"
+      second_input: "file2"
+    output:
+      results: "all.zip"
+      aux_file: "stdout"
+    shell: |
+      zip {%results} {%first_input} {%second_input} > {%aux_file}
+```
+
+To operate on sets of multiple files the input and output items can also contain any combination of four special types placeholders which expand the filenames in various ways. These four placeholder types are of the form `{*placeholder}`, `{=placeholder}`, `{+placeholder}` and `{-placeholder}` which respectively operate to expand the input and output lists by globbing paths that spawn separate jobs (`{*...}`), using existing variable lists to spawn separate jobs (`{=...}`), globbing paths that create path lists within single jobs (`{+...}`) and using existing variable lists to create path lists within single jobs (`{-...}`). This will be explained in more detail below.
+
+#### Spawning separate jobs by matching filenames
 
 ```
   - action:
@@ -76,9 +95,9 @@ To operate on sets of multiple files the input and output items can contain name
         wget $(cat {%url}) -O {%fastq}
 ```
 
-#### Spawning separate jobs by matching filenames
+Here the `{*dataset}` placeholder in the *url* input key means "glob (i.e. search the filesystem for) this path using a * in place of `{*dataset}` and spawn a *separate job* for each path. The globbing is always done using the input key, since the output files do not exist before the action is run. Once the list of matching file paths has be created the value of the placeholder is extracted in a variable and substituted into all output path patterns to create the corresponding output paths for each input path.
 
-Here the `{*dataset}` placeholder in the *url* input key means "glob (i.e. search the filesystem for) this path using a * in place of `{*dataset}` and spawn a *separate job* for each path. The globbing is always done using the input key, since the output files do not exist before the action is run. Therefore if we start off with a set of subfolders under `metadata` named to match each of the datasets that require downloading the above action will run a separate shell command to download each url and save it in a matching folder under `data`. Any required output folders are automatically created if missing. The action will fail if the specified matching output files do not get created. Time stamps are used the check that the output files are newer than the input files.
+Therefore if we start off with a set of subfolders under `metadata` named to match each of the datasets that require downloading the above action will run a separate shell command to download each url and save it in a matching folder under `data`. Any required output folders are automatically created if missing. The action will fail if the specified matching output files do not get created. Time stamps are used to check that the output files are newer than the input files.
 
 Across the multiple jobs spawned by the action the value assigned to the `{*dataset}` placeholder is always the same across all keys within each job, therefore when each shell command runs it is guaranteed that the value will be the same across the `"metadata/{*dataset}/url.txt"` input file path, the `"data/{*dataset}/{*dataset}.fastq.gz"` output file path and the `{*dataset}` value itself.
 
@@ -136,9 +155,9 @@ The above spawns a separate job for each member of the `sample` list. If more th
 
 The above would generate 16 jobs in total from all combinations of samples and treatments.
 
-The variable names `sample` and `treatment` are therefore used twice in the above, once as the names of lists in the local config of the action, and again as list based job creation placeholders. To distinguish between these two the first character of the placeholder is `%` for normal variables, and `=` for list-to-separate-job placeholders. In the shell command it is therefore valid to refer to the original list as `{%sample}` and to the value assigned to the current job as `{=sample}`. The caveat here is that the `{%sample}` placeholder refers to a list of strings rather than a single string so YAMLmake will complain that it does not know how to render the list into a substitutable string form. How to do this is explained next.
+The variable names `sample` and `treatment` are therefore used twice in the above, once as the names of lists in the local config of the action, and again as job creation placeholders referring to the existing lists. To distinguish between these two the first character of the placeholder is `%` for normal variables, and `=` for list-to-separate-job placeholders. In the shell command it is therefore valid to refer to the original list as `{%sample}` and to the value assigned to the current job as `{=sample}`. The caveat here is that the `{%sample}` placeholder refers to a list of strings rather than a single string so YAMLmake will complain that it does not know how to render the list into a substitutable string form. How to do this is fully explained next, but in outline, you must either specify which list item you want, or provide a separator string to be used to join all the items together into a single string.
 
-There is also an alternative form of list expansion placeholder of the form `{-dataset}` which generates a list of items within a single job. This will be also explained later.
+As with the globbing placeholder there is also an alternative form of list expansion placeholder of the form `{-sample}` which generates a list of items within a single job instead of separate jobs. This will be also explained later.
 
 #### Accessing values stored in lists and dictionaries
 
@@ -169,6 +188,8 @@ The above is a key `prefix` within a dictionary `ym` within the top-level config
       treatments:
         - 1A
         - 1B
+        - 2
+        - 3 
       
 ```
 
@@ -177,17 +198,82 @@ Note: although numbers can be entered, everything is converted to a string when 
 Anywhere a string can be entered into the configuration file a variable placeholder can to inserted. Where the variable required is within a nest hierachy the full path to the variable must be used, using forward-slash separators. For example, to refer to the location of the newt samples you would use a place holder like:
 
 ```
-{%metadata/samples/newt/location}
+{%metadata/samples/newt/location} #give "rm 8"
 ```
 
-To refer to an item in a list use the 0-base integer location as the key following the list name. Negative indexes refer to items counting backwards from the end, as with Python lists:
+Note: you never have to put `config` or `action` as the first part of the key. To refer to an item in a list use the 0-base integer location as the key following the list name. Negative indexes refer to items counting backwards from the end, as with Python lists:
 
 ```
-{%metadata/treatments/0} # gives 1A
-{%metadata/treatments/1} # gives 1B
-{%metadata/treatments/-1} # gives 1B
-{%metadata/treatments/-2} # gives 1A
+{%metadata/treatments/0} # gives "1A"
+{%metadata/treatments/1} # gives "1B"
+{%metadata/treatments/-1} # gives "3"
+{%metadata/treatments/-2} # gives "2"
 ```
 
-The input and output sections of actions can also contain the four special types of placeholder which expand to generate either separate jobs or lists of items within a single job. The later therefore expand a single key into a list, which must be used within the shell command.
+To get a comma separated list of all the items use a comma as the key (any character(s) used as the index will generate a list of all item using that as the separator). The special index `N` yields the list's length. For dictionaries a special empty string key yields a list of all the keys, which can then be indexed like a normal list. So:
 
+```
+{%metadata/treatments/ }    # gives "1A 1B 2 3"
+{%metadata/treatments/,}    # gives "1A,1B,2,3"
+{%metadata/treatments/N}    # gives "4"
+{%metadata/treatments/}     # gives "1A1B23"
+<{%metadata/treatments/><}> # gives "<1A><1B><2><3>"
+{%metadata/samples//N}      # gives "3", the number of samples
+{%metadata/samples//0}      # gives "toad" 
+```
+
+The input and output sections of actions can also contain the four special types of placeholder which expand to generate either separate jobs or lists of items within a single job. The later therefore expand a single key into a list, which can be used within the shell command.
+
+#### Creating lists of file paths within single jobs by matching filenames
+Similarly to the `{*dataset}` style placeholder there is an alternative expanding globbing placeholder of the form `{+dataset}` which can be used in the input and output sections of an action. These also expand by matching filenames in the filesystem but generate lists of file paths within the same job instead of generating separate jobs for each path. Unlike the `{*dataset}` style placeholder this means that the files paths are in a list which must be dealt with in the shell command. For example:
+
+```
+  - action:
+      name: "download_datasets"
+      exec: "local"
+      input:
+        url: "metadata/{+dataset}/url.txt"
+      output:
+        fastq: "data/{+dataset}/{+dataset}.fastq.gz"
+      shell: |
+        echo Downloading dataset list: {+dataset/, }
+        echo Number of datasets: {+dataset/N}
+        my_download_script.py --url_list={%url/,} \
+                              --output_list={%fastq/,}
+```
+
+Assuming the metadata folder had subfolders called one, two and three which contained a file called url.txt this would generate the command:
+
+```
+    echo Downloading dataset list: one, two, three
+    echo Number of datasets: 3
+    my_download_script.py --url_list=metadata/one/url.txt,metadata/two/url.txt,metadata/three/url.txt \
+                          --output_list=data/one/one.fastq.gz,data/two/two.fastq.gz,data/three/three.fastq.gz
+```
+
+#### Creating lists of file paths within single jobs from existing lists
+The final special placeholder uses the form `{-sample}`, and generates lists of file paths within a single job. For example:
+
+```
+  - action:
+      name: "decompress samples"
+      exec: "local"
+      sample:
+        - frog
+        - toad
+        - newt
+        - caecilian
+      input:
+        gzip: "data/{-sample}/{-sample}.fastq.gz"
+      output:
+        fastq: "data/{-sample}/{-sample}.fastq"
+      shell: |
+        echo Decompressing data for samples: "{-sample/" "}"
+        for finput in {%gzip/ }
+        do
+            foutput=${finput/fastq/fastq.gz}
+            gunzip --stdout ${finput} > ${foutput}
+        done
+```
+
+Here I've used only the `gzip` list of input paths in the shell command, but the expected output files must still be specified to YAMLmake so it can check they were created.
