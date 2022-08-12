@@ -21,6 +21,7 @@ This markdown documents YAMLmake the new workflow tool developed during the Mute
 
 YAMLmake runs a YAML pipeline file containing a list of *actions* from top to bottom executing each one in the order encountered, taking account of *includes* and *modules*. A configuration state is also maintained as a hierachical tree of nested lists, dictionaries and strings which is modified everytime a *config* item is encountered in the pipeline. For example:
 
+```
   - include: "base_config.yml"
   - action:
       name: "download_reference"
@@ -29,11 +30,13 @@ YAMLmake runs a YAML pipeline file containing a list of *actions* from top to bo
       output: "reference/GRCh38.fasta.gz"
       shell: |
         wget $(cat {%input}) -O {%output}
+```
 
 Each action specifies one or more input and output files. If the output files are all present and more recent than any input file then the action is not executed. Likewise if any input file is missing the action will not run. The shell field of the action contains curly bracket placeholders where YAMLmake substitutes the input and output filenames before running the command either locally or through qsub. Provided the return code is zero and all the specified output files were created the action is considered to have succeeded. If the action is considered to have failed then any output files present will be removed, either by deletion or moving to a specified recycle bin folder. They can also be flagged as stale in-place by setting the mtime to a special value.
 
 To operate on sets of multiple files the input and output items can contain multiple named subitems, each of which can contain special placeholders which expand the filenames using predefined lists from the configuration object or by globbing against the filesystem just before the action is run.
 
+```
   - action:
       name: "download_datasets"
       exec: "local"
@@ -43,3 +46,4 @@ To operate on sets of multiple files the input and output items can contain mult
         md5: "data/{*dataset}/MD5.txt"
       shell: |
         wget $(cat {%url}) -O {*dataset}
+```
