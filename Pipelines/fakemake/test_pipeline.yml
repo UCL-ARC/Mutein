@@ -121,11 +121,13 @@
 #       echo {$USER} processed >> {%info}
 
 - action:
-    name:     "test1"
-    exec:     "local"
+    name:   "test1"
+    exec:   "qsub"
+    run:    "always"
     input:
       samp_file: "test/samples/{*sample_subset}/{+sample}.data"
     output:
       out_file:  "test/output/{*sample_subset}/{+sample}.step1"
     shell: |
       echo samp_file={%samp_file/,} out_file={%out_file/,}
+      for fname in {%out_file/ } ; do touch ${fname} ; done

@@ -13,7 +13,7 @@ def run_main():
     if args.yaml != None:
         #process a fakemake file
         pipeline = fm.parse_yaml(args.yaml)
-        fm.process(pipeline,args.yaml,args=args)
+        exit(fm.process(pipeline,args.yaml,args=args))
 
     elif args.qsub != None:
         #carry out a job on a compute node spawned from qsub (gridengine)
@@ -28,10 +28,9 @@ def parse_args():
     parser.add_argument('--run-only',action='extend',nargs="+",type=str,help="run only the named action(s)")
     parser.add_argument('--run-from',help="only start running at the named action")
     parser.add_argument('--run-until',help="stop running from before the named action")
-    parser.add_argument('--dry-run',action='store_true',help="do not run anything ,just report what would have been run")
+    parser.add_argument('--dry-run','--dryrun',action='store_true',help="do not run anything ,just report what would have been run")
     parser.add_argument('--quiet',action='store_true',help="do not print any status messages to screen")
     parser.add_argument('--nologs',action='store_true',help="do not save any status or error messages to the main log files")
-
 
     parser.add_argument('--qsub',help="used internally to execute a job using qsub")
     args = parser.parse_args()
