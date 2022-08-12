@@ -82,6 +82,8 @@ Here the `{*dataset}` placeholder in the *url* input key means "glob (i.e. searc
 
 Across the multiple jobs spawned by the action the value assigned to the `{*dataset}` placeholder is always the same across all keys within each job, therefore when each shell command runs it is guaranteed that the value will be the same across the `"metadata/{*dataset}/url.txt"` input file path, the `"data/{*dataset}/{*dataset}.fastq.gz"` output file path and the `{*dataset}` value itself.
 
+There is also an alternative form of globbing placeholder of the form `{+dataset}` which generates a list of items within a single job. This will be explained later.
+
 #### Spawning separate jobs from an existing list
 
 Lists of strings can be defined anywhere in the configuration. Additionally each action can define any temporary local configuration it needs - this does not persist after the action has ended. Therefore a short list of files can be hard coded into the action itself:
@@ -133,3 +135,59 @@ The above spawns a separate job for each member of the `sample` list. If more th
 ```
 
 The above would generate 16 jobs in total from all combinations of samples and treatments.
+
+The variable names `sample` and `treatment` are therefore used twice in the above, once as the names of lists in the local config of the action, and again as list based job creation placeholders. To distinguish between these two the first character of the placeholder is `%` for normal variables, and `=` for list-to-separate-job placeholders. In the shell command it is therefore valid to refer to the original list as `{%sample}` and to the value assigned to the current job as `{=sample}`. The caveat here is that the `{%sample}` placeholder refers to a list of strings rather than a single string so YAMLmake will complain that it does not know how to render the list into a substitutable string form. How to do this is explained next.
+
+There is also an alternative form of list expansion placeholder of the form `{-dataset}` which generates a list of items within a single job. This will be also explained later.
+
+#### Accessing values stored in lists and dictionaries
+
+YAMLmake configuration can be hierachically structured, meaning that lists (simple ordered sequences of item) and dictionaries (where items are stored under named keys) can be nested inside each other. An example is the internal YAMLmake configuration which is stored under the `ym` subkey of the global configuration. For example:
+
+```
+- config:
+    ym:
+      prefix: "my_project."
+```
+
+The above is a key `prefix` within a dictionary `ym` within the top-level configuration dictionary `config`. Youc an setup your own structured configuration if required, for example to add a new subtree of configuration use something like the following, which could be kept in a separate config file and linked to using an `include`:
+
+```
+- config:
+    metadata:
+      samples:
+        - toad:
+            n_samples: 10
+            location: "rm 7"
+        - frog:
+            n_samples: 12
+            location: "rm 9"
+            note: "moved from rm 8"
+        - newt:
+            n_samples: 5
+            location: "rm 8"
+      treatments:
+        - 1A
+        - 1B
+      
+```
+
+Note: although numbers can be entered, everything is converted to a string when loaded. You may want to put quotes around everything to prevent the precision of numerical values from being altered during the loading process.
+
+Anywhere a string can be entered into the configuration file a variable placeholder can to inserted. Where the variable required is within a nest hierachy the full path to the variable must be used, using forward-slash separators. For example, to refer to the location of the newt samples you would use a place holder like:
+
+```
+{%metadata/samples/newt/location}
+```
+
+To refer to an item in a list use the 0-base integer location as the key following the list name. Negative indexes refer to items counting backwards from the end, as with Python lists:
+
+```
+{%metadata/treatments/0} # gives 1A
+{%metadata/treatments/1} # gives 1B
+{%metadata/treatments/-1} # gives 1B
+{%metadata/treatments/-2} # gives 1A
+```
+
+The input and output sections of actions can also contain the four special types of placeholder which expand to generate either separate jobs or lists of items within a single job. The later therefore expand a single key into a list, which must be used within the shell command.
+
