@@ -1,8 +1,10 @@
 
 import sys
 import tkinter as tk
+from idlelib.tooltip import Hovertip
 from functools import partial
 import tabConfig as rs
+import ToolTip
 
 # TODO Need to use background threads
 # https://www.pythontutorial.net/tkinter/tkinter-thread/
@@ -11,6 +13,11 @@ import tabConfig as rs
 def getQstat():    
     shell = rs.getSshShell()    
     result = shell.run(["qstat"])
+    return result.output
+
+def getQuota():    
+    shell = rs.getSshShell()    
+    result = shell.run(["lquota"])
     return result.output
 
 def cancelQJobs(job_task_pattern):  
@@ -61,8 +68,6 @@ def cancelQJobs(job_task_pattern):
             results.append(str(error) + " : " + jobkill)
 
 
-        
-    
     return results
 
 def update_btn_text(txtBox):
@@ -70,34 +75,42 @@ def update_btn_text(txtBox):
     txtBox.delete(1.0,tk.END)
     txtBox.insert('end', res)
 
-
+def updateQ_btn_text(txtBox):
+    res = getQuota()
+    txtBox.delete(1.0,tk.END)
+    txtBox.insert('end', res)
 
 def run_clean(txtBox):
-        res = rs.RunClean()
-        txtBox.delete(1.0,tk.END)
-        txtBox.insert('end', res)
+    res = rs.RunClean()
+    txtBox.delete(1.0,tk.END)
+    txtBox.insert('end', res)
 
 def run_clean_all(txtBox):
-        res = rs.RunCleanAll()
-        txtBox.delete(1.0,tk.END)
-        txtBox.insert('end', res)
+    res = rs.RunCleanAll()
+    txtBox.delete(1.0,tk.END)
+    txtBox.insert('end', res)
 
 def run_view(txtBox,txtJob):
-        pattern = txtJob.get().strip()
-        res = rs.RunView(pattern)
-        txtBox.delete(1.0,tk.END)
-        txtBox.insert('end', res)
+    pattern = txtJob.get().strip()
+    res = rs.RunView(pattern)
+    txtBox.delete(1.0,tk.END)
+    txtBox.insert('end', res)
 
-def run_rerun(self):
-        res = rs.RunRerun()
-        self.txtBox.delete(1.0,tk.END)
-        self.txtBox.insert('end', "rerun")
+def run_rerun(txtBox):
+    res = rs.RunRerun()
+    txtBox.delete(1.0,tk.END)
+    txtBox.insert('end', res)
+
+def run_reruno(txtBox):
+    res = rs.RunRerunO()
+    txtBox.delete(1.0,tk.END)
+    txtBox.insert('end', res)
 
 def run_cancel(txtBox,txtCancel):
-        pattern = txtCancel.get().strip()
-        res = cancelQJobs(pattern)
-        txtBox.delete(1.0,tk.END)
-        txtBox.insert('end', res)
+    pattern = txtCancel.get().strip()
+    res = cancelQJobs(pattern)
+    txtBox.delete(1.0,tk.END)
+    txtBox.insert('end', res)
             
         
 class tabMain:
@@ -141,9 +154,11 @@ class tabMain:
         
 
         btnQ = tk.Button(rhs_up, text="Refresh QStat", command=partial(update_btn_text,self.txtBox),borderwidth=5, relief="groove",width=20,bg="lime")
+        btnQu = tk.Button(rhs_up, text="Refresh Quota", command=partial(updateQ_btn_text,self.txtBox),borderwidth=5, relief="groove",width=20,bg="lime")
         btnC = tk.Button(rhs_up, text="Clean", command=partial(run_clean,self.txtBox),borderwidth=5, relief="groove",width=20,bg="darkorange")
         btnCA = tk.Button(rhs_up, text="Delete all log files", command=partial(run_clean_all,self.txtBox),borderwidth=5, relief="groove",width=20,bg="tomato")
         btnE = tk.Button(rhs_up, text="Rerun Errors", command=partial(run_rerun,self.txtBox),borderwidth=5, relief="groove",width=20, bg="red")
+        btnEO = tk.Button(rhs_up, text="Rerun Orphans", command=partial(run_reruno,self.txtBox),borderwidth=5, relief="groove",width=20, bg="red")
         btnL = tk.Button(rhs_up, text="View Log", command=partial(run_view,self.txtBox,self.txtJob),borderwidth=5, relief="groove",width=20,bg="lime")
         btnX = tk.Button(rhs_up, text="Cancel Jobs", command=partial(run_cancel,self.txtBox,self.txtCancel),borderwidth=5, relief="groove",width=20,bg="tomato")
         lblA = tk.Label(rhs_up,text="Formats accepted as patterns for the job delete:",width=60,bg=clra)
@@ -152,11 +167,21 @@ class tabMain:
         lblD = tk.Label(rhs_up,text="From-to jobs = 12345-3456",width=60,bg=clra)
         lblE = tk.Label(rhs_up,text="From-to tasks = 12345.5-12345.9",width=60,bg=clra)
         lblF = tk.Label(rhs_up,text="!!! All !!! = *",width=60,bg="tomato")
+
+        ToolTip.ToolTip(btnQ, text='qstat')
+        ToolTip.ToolTip(btnC, text='Delete log files of completed tasks')
+        ToolTip.ToolTip(btnCA, text='Delete ALL(!) log files')
+        ToolTip.ToolTip(btnEO, text='Rerun jobs stalled for 10 hours or more')
+        ToolTip.ToolTip(btnE, text='Rerun jobs with errors')
+        ToolTip.ToolTip(btnL, text='View log files matching')
+        ToolTip.ToolTip(btnX, text='!! Cancel matching jobs')
         
         btnQ.grid(row=1,column=3, padx=2, pady=2)
+        btnQu.grid(row=1,column=4, padx=2, pady=2)
         btnC.grid(row=2,column=3, padx=2, pady=2)
         btnCA.grid(row=2,column=4, padx=2, pady=2)
         btnE.grid(row=3,column=3, padx=2, pady=2)
+        btnEO.grid(row=3,column=4, padx=2, pady=2)
         self.txtJob.grid(row=4,column=3, padx=2, pady=2)
         btnL.grid(row=4,column=4, padx=2, pady=2)
         self.txtCancel.grid(row=5,column=3, padx=2, pady=2)  
