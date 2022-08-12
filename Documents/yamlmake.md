@@ -34,16 +34,19 @@ YAMLmake runs a YAML pipeline file containing a list of *actions* from top to bo
 
 Each action specifies one or more input and output files. If the output files are all present and more recent than any input file then the action is not executed. Likewise if any input file is missing the action will not run. The shell field of the action contains curly bracket placeholders where YAMLmake substitutes the input and output filenames before running the command either locally or through qsub. Provided the return code is zero and all the specified output files were created the action is considered to have succeeded. If the action is considered to have failed then any output files present will be removed, either by deletion or moving to a specified recycle bin folder. They can also be flagged as stale in-place by setting the mtime to a special value.
 
-To operate on sets of multiple files the input and output items can contain multiple named subitems, each of which can contain special placeholders which expand the filenames using predefined lists from the configuration object or by globbing against the filesystem just before the action is run.
+To operate on sets of multiple files the input and output items can contain named subitems, each of which can contain special placeholders which expand the filenames by globbing against the filesystem just before the action is run.
 
 ```
   - action:
       name: "download_datasets"
       exec: "local"
       input:
-        url: "metadata/{*dataset}/dataset_url.txt"
+        url: "metadata/{*dataset}/url.txt"
       output:
-        md5: "data/{*dataset}/MD5.txt"
+        md5: "data/{*dataset}/{*dataset}.fastq.gz"
       shell: |
-        wget $(cat {%url}) -O {*dataset}
+        echo Downloading dataset {*dataset}
+        wget $(cat {%url}) -O data/{*dataset}/{*dataset}.fastq.gz
 ```
+
+Here the `{*dataset}` placeholder in the *url* input key means "glob this path using a * in place of `{*dataset}` and spawn a *separate job* for each path. The globbing is always done using the input key, since the output files do not exist before the action is run. Therefore if we start off with a set of subfolders under `metadata` named to match each of the required datasets the shell command will download the url contained in each and save it in a matching folder under `data`. Any required output folders are automatically created if missing. The action will fail if the specified matching output 
