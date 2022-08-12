@@ -1879,7 +1879,6 @@ def process(pipeline,path,config=None,args=None):
         item_type = list(item.keys())[0]
 
         if item_type == 'action':
-            #show(item[item_type],item_type)
             if process_action(config,item[item_type],path):
                 if activity_state() == 'dryrun':
                     warning('action failed due to dryrun mode, continuing pipeline anyway')
@@ -1889,12 +1888,9 @@ def process(pipeline,path,config=None,args=None):
 
         elif item_type == 'config':
             #add new config to the existing one, overriding any shared keys
-            #config.show("orig config")
             message(f'updating config')
             config.update(item[item_type])
-            #config.show("loaded config")
             config.includes_and_loads(path)
-            #config.show("actioned includes and loads")
 
         elif item_type == 'include':
             #toplevel include: load and insert the yaml items in place of the include item
