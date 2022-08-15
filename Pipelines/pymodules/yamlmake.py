@@ -14,9 +14,9 @@ import itertools
 
 default_global_config =\
 {
-    'fm':{
-        'prefix':'fm-',                  #log file/job name  prefix: qsub doesn't like numerical names
-        'log_dir':'fakemake_logs',       #name of subfolder for logging
+    'ym':{
+        'prefix':'ym-',                  #log file/job name  prefix: qsub doesn't like numerical names
+        'log_dir':'yamlmake_logs',       #name of subfolder for logging
         'remote_delay_secs':'10',        #wait this long after remote jobs incase of latency
         'stale_output_file':'ignore',    #ignore,delete,recycle (also applies to symlinks)
         'stale_output_dir':'ignore',     #ignore,delete,recycle
@@ -24,8 +24,8 @@ default_global_config =\
         'failed_output_dir':'stale',     #delete,recycle,stale,ignore    
         'missing_parent_dir':'create',   #ignore,create
         'recycle_bin':'recycle_bin',     #name of recycle bin folder
-        'job_count':'FM_NJOBS',          #env variable: how many jobs spawned by current action
-        'job_number':'FM_JOB_NUMBER',    #env variable: 1 based job numbering within the current action
+        'job_count':'YM_NJOBS',          #env variable: how many jobs spawned by current action
+        'job_number':'YM_JOB_NUMBER',    #env variable: 1 based job numbering within the current action
         'bash_setup':'source ~/.bashrc\nset -euo pipefail\nset +o history',
         'conda_setup':'',
     },
@@ -36,7 +36,7 @@ default_global_config =\
         'tmpfs':'10G',               #$ -l tmpfs={tmpfs}
         'pe':'smp',                  #$ -pe {pe} {cores}
         'cores':'1',                 #$ -pe {pe} {cores}
-        'log_dir':'{%fm/log_dir}'    #log dir for qsub stdout and stderr files
+        'log_dir':'{%ym/log_dir}'    #log dir for qsub stdout and stderr files
                                      #$ -o/e {log_dir}/{jobname}.$TASK_ID.out/err
     },
     'exec':'local',                  #default execution environment
@@ -589,14 +589,14 @@ class Conf:
         return value,changed
 
     def make_log_dir(self):
-        if not os.path.exists(self['fm/log_dir']):
-            message(f'creating missing log_dir {self["fm/log_dir"]}')
+        if not os.path.exists(self['ym/log_dir']):
+            message(f'creating missing log_dir {self["ym/log_dir"]}')
 
             #note: still creating missing log_dir in dryrun mode
             #so we can record messages and create qsub scripts
             #for inspection by the user
             #therefore not using the makedirs wrapper function
-            os.makedirs(self['fm/log_dir'])
+            os.makedirs(self['ym/log_dir'])
 
 def makedirs(path):
     if is_active(): os.makedirs(path)
@@ -698,7 +698,7 @@ def update_activity_state(action):
     '''
 
     #incase the config has changed since the last action
-    if 'fm/log_dir' in action: global_state['log_dir'] = action['fm/log_dir']
+    if 'ym/log_dir' in action: global_state['log_dir'] = action['ym/log_dir']
 
     #see if we've reached the run-from rule
     if global_state['args'].run_from and action['name'] == global_state['args'].run_from:
@@ -743,7 +743,7 @@ def init_global_state(args,config):
     global_state['start_time'] = timestamp_now()
 
     global_state['is_active'] = None
-    global_state['log_dir'] = config['fm/log_dir']
+    global_state['log_dir'] = config['ym/log_dir']
 
     update_activity_state({'name':None})
 
@@ -1319,7 +1319,7 @@ def generate_shell_commands(action,job_list,shell):
         handle_stale_outputs(action,job['output'])
 
         #create any missing output *parent* directories
-        if action['fm/missing_parent_dir'] == 'create':
+        if action['ym/missing_parent_dir'] == 'create':
             create_output_dirs(action,job['output'])
 
     #remove non-runable jobs
@@ -1365,7 +1365,7 @@ def make_stale(path):
 def recycle_item(config,path):
     'move the path into the recycle bin'
     
-    recycle_bin = config['fm/recycle_bin']
+    recycle_bin = config['ym/recycle_bin']
 
     assert path != recycle_bin
 
@@ -1440,27 +1440,27 @@ def handle_stale_outputs(config,outputs):
         if not os.path.exists(path): continue
 
         if os.path.islink(path) or os.path.isfile(path):
-            if config['fm/stale_output_file'] == 'delete':
+            if config['ym/stale_output_file'] == 'delete':
                 message(f'deleting stale output file {path}')
                 remove_item(path)
-            elif config['fm/stale_output_file'] == 'recycle':
+            elif config['ym/stale_output_file'] == 'recycle':
                 message(f'recycling stale output file {path}')
                 recycle_item(config,path)
-            elif config['fm/stale_output_file'] == 'ignore':
+            elif config['ym/stale_output_file'] == 'ignore':
                 message(f'ignoring stale output file {path}')
                 continue
             else:
-                raise Exception(f'unknown option for stale_output_file: {config["fm/stale_output_file"]}')
+                raise Exception(f'unknown option for stale_output_file: {config["ym/stale_output_file"]}')
 
         elif os.path.isdir(path):
-            if config['fm/stale_output_dir'] == 'delete':
+            if config['ym/stale_output_dir'] == 'delete':
                 remove_tree(path)
-            elif config['fm/stale_output_dir'] == 'recycle':
+            elif config['ym/stale_output_dir'] == 'recycle':
                 recycle_item(config,path)
-            elif config['fm/stale_output_dir'] == 'ignore':
+            elif config['ym/stale_output_dir'] == 'ignore':
                 continue
             else:
-                raise Exception(f'unknown option for stale_output_dir: {config["fm/stale_output_dir"]}')
+                raise Exception(f'unknown option for stale_output_dir: {config["ym/stale_output_dir"]}')
                 
         else:
             raise Exception(f'unsupported output type {path}')
@@ -1476,28 +1476,28 @@ def handle_failed_outputs(config,outputs):
         if not os.path.exists(path): continue
 
         if os.path.islink(path) or os.path.isfile(path):
-            if config['fm/failed_output_file'] == 'delete':
+            if config['ym/failed_output_file'] == 'delete':
                 remove_item(path)
-            elif config['fm/failed_output_file'] == 'recycle':
+            elif config['ym/failed_output_file'] == 'recycle':
                 recycle_item(config,path)
-            elif config['fm/failed_output_file'] == 'stale':
+            elif config['ym/failed_output_file'] == 'stale':
                 make_stale(path)
-            elif config['fm/failed_output_file'] == 'ignore':
+            elif config['ym/failed_output_file'] == 'ignore':
                 continue
             else:
-                raise Exception(f'unknown option for failed_output_file: {config["fm/failed_output_file"]}')
+                raise Exception(f'unknown option for failed_output_file: {config["ym/failed_output_file"]}')
 
         elif os.path.isdir(path):
-            if config['fm/failed_output_dir'] == 'delete':
+            if config['ym/failed_output_dir'] == 'delete':
                 remove_tree(path)
-            elif config['fm/failed_output_dir'] == 'recycle':
+            elif config['ym/failed_output_dir'] == 'recycle':
                 recycle_item(config,path)
-            elif config['fm/failed_output_dir'] == 'stale':
+            elif config['ym/failed_output_dir'] == 'stale':
                 make_stale(path)
-            elif config['fm/failed_output_dir'] == 'ignore':
+            elif config['ym/failed_output_dir'] == 'ignore':
                 continue
             else:
-                raise Exception(f'unknown option for failed_output_dir: {config["fm/failed_output_dir"]}')
+                raise Exception(f'unknown option for failed_output_dir: {config["ym/failed_output_dir"]}')
                 
         else:
             raise Exception(f'unsupported output type {path}')
@@ -1507,12 +1507,12 @@ def generate_full_command(config,shell):
 
     cmd_list = []
 
-    if 'fm/bash_prefix' in config and config['fm/bash_prefix'] != '':
-        cmd_list.append(config['fm/bash_prefix'])
+    if 'ym/bash_prefix' in config and config['ym/bash_prefix'] != '':
+        cmd_list.append(config['ym/bash_prefix'])
 
     if 'conda' in config and config['conda'] != '':
-        if 'fm/conda_setup_command' in config and config['fm/conda_setup_command'] != '':
-            cmd_list.append(config['fm/conda_setup_command'])
+        if 'ym/conda_setup_command' in config and config['ym/conda_setup_command'] != '':
+            cmd_list.append(config['ym/conda_setup_command'])
         cmd_list.append(f'conda activate {config["conda"]}')
 
     cmd_list.append(shell)
@@ -1523,16 +1523,16 @@ def generate_job_environment(config,job_numb,njobs):
     'copy local environment with a few adjustments'
 
     env = copy.deepcopy(os.environ)
-    env[ config['fm/job_count'] ] = f'{njobs}'
-    env[ config['fm/job_number'] ] = f'{job_numb+1}' # convert from 0 to 1 based to match SGE_TASK_ID
+    env[ config['ym/job_count'] ] = f'{njobs}'
+    env[ config['ym/job_number'] ] = f'{job_numb+1}' # convert from 0 to 1 based to match SGE_TASK_ID
 
     return env
 
 def write_jobfile(action,shell_list):
     'save action config and shell_list as json'
 
-    fnamebase = f'{action["fm/prefix"]}{timestamp_now()}.{action["name"]}'
-    jobfile = os.path.join(action['fm/log_dir'],fnamebase+'.jobs')
+    fnamebase = f'{action["ym/prefix"]}{timestamp_now()}.{action["name"]}'
+    jobfile = os.path.join(action['ym/log_dir'],fnamebase+'.jobs')
     payload = {'action':action.getdict(),'shell_list':shell_list}
 
     with open(jobfile,'w') as f:
@@ -1543,9 +1543,9 @@ def write_jobfile(action,shell_list):
 
 def execute_command(config,job_numb,cmd,env):
     'execute command locally'
-    fname = f'{config["fm/prefix"]}{timestamp_now()}.{config["name"]}'
-    foutname = os.path.join(config['fm/log_dir'],fname+'.out')
-    ferrname = os.path.join(config['fm/log_dir'],fname+'.err')
+    fname = f'{config["ym/prefix"]}{timestamp_now()}.{config["name"]}'
+    foutname = os.path.join(config['ym/log_dir'],fname+'.out')
+    ferrname = os.path.join(config['ym/log_dir'],fname+'.err')
 
     message(f'job {job_numb+1} executing locally...')
 
@@ -1594,7 +1594,7 @@ def write_qsub_file(action,qsub_script,jobname,njobs,jobfile):
     env["jobname"] = jobname
     env["jobfile"] = jobfile
     env["python"] = sys.executable
-    env["fakemake"] = sys.argv[0]
+    env["yamlmake"] = sys.argv[0]
 
     for line in f_in: f_out.write(line.format(**env))
 
@@ -1608,8 +1608,8 @@ def submit_job_qsub(action,shell_list,job_list):
     '''
 
     jobname = write_jobfile(action,shell_list)
-    qsub_script = os.path.join(action['fm/log_dir'],jobname+'.qsub')
-    jobfile = os.path.join(action['fm/log_dir'],jobname+'.jobs')
+    qsub_script = os.path.join(action['ym/log_dir'],jobname+'.qsub')
+    jobfile = os.path.join(action['ym/log_dir'],jobname+'.jobs')
     njobs = len(shell_list)
 
     write_qsub_file(action,qsub_script,jobname,njobs,jobfile)
@@ -1623,8 +1623,8 @@ def submit_job_qsub(action,shell_list,job_list):
     something_failed = False
 
     if is_active():
-        foutname = os.path.join(action['fm/log_dir'],jobname+'.out')
-        ferrname = os.path.join(action['fm/log_dir'],jobname+'.err')
+        foutname = os.path.join(action['ym/log_dir'],jobname+'.out')
+        ferrname = os.path.join(action['ym/log_dir'],jobname+'.err')
         fout = open(foutname,'w')
         ferr = open(ferrname,'w')
         #sys.stdout.flush()
@@ -1641,13 +1641,13 @@ def submit_job_qsub(action,shell_list,job_list):
         else:                message(f'qsub call succeeded')
 
     #delay to allow for shared filesystem latency on status files
-    message(f'sleeping for {action["fm/remote_delay_secs"]} seconds to allow for filesystem latency...')
-    if activity_state() == 'active': time.sleep(int(action['fm/remote_delay_secs']))
+    message(f'sleeping for {action["ym/remote_delay_secs"]} seconds to allow for filesystem latency...')
+    if activity_state() == 'active': time.sleep(int(action['ym/remote_delay_secs']))
 
     #check each individual job's status file and expected outputs
     #some jobs may not have failed even if qsub returned an error code?
     for job_numb,item in enumerate(shell_list):
-        status_file = f'{action["fm/log_dir"]}/{jobname}.{job_numb+1}.status'
+        status_file = f'{action["ym/log_dir"]}/{jobname}.{job_numb+1}.status'
 
         failed = False
         if not os.path.exists(status_file):
@@ -1680,7 +1680,7 @@ def qsub_execute_job(jobfile):
     '''
     runs on a compute node under grid engine control
     execute one job of a job array spawned by qsub
-    invoked automatically by fakemake using the --qsub option
+    invoked automatically by yamlmake using the --qsub option
     '''
     action,shell_list = read_jobfile(jobfile)
 
