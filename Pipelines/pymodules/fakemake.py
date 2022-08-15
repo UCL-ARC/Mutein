@@ -12,19 +12,6 @@ import sys
 import random
 import itertools
 
-global_state = {}
-
-#regex patterns to match non nested {%placeholders} and {$environment variables}
-environ_regx  = r'\{\$.+?\}'       #{$name}
-scalar_regx   = r'\{%.+?\}'        #{%scalar} or {%list[]}
-glob2job_regx  = r'\{\*.+?\}'      #{*glob} ==> split into separate jobs
-glob2list_regx  = r'\{\+.+?\}'     #{+glob} ==> become in-job list
-glob2both_regx  = r'\{[\+\*].+?\}' #{+/*glob} ==> either type of glob placeholder
-list2job_regx  = r'\{=.+?\}'       #{=list} ==> split into separate jobs
-list2list_regx  = r'\{-.+?\}'      #{-list} ==> become in-job list
-
-warning_prefix = 'WARNING: '
-
 default_global_config =\
 {
     'fm':{
@@ -54,6 +41,20 @@ default_global_config =\
     },
     'exec':'local',                  #default execution environment
 }
+
+global_state = {}
+
+#regex patterns to match non nested {%placeholders} and {$environment variables}
+environ_regx  = r'\{\$.+?\}'       #{$name}
+scalar_regx   = r'\{%.+?\}'        #{%scalar} or {%list[]}
+glob2job_regx  = r'\{\*.+?\}'      #{*glob} ==> split into separate jobs
+glob2list_regx  = r'\{\+.+?\}'     #{+glob} ==> become in-job list
+glob2both_regx  = r'\{[\+\*].+?\}' #{+/*glob} ==> either type of glob placeholder
+list2job_regx  = r'\{=.+?\}'       #{=list} ==> split into separate jobs
+list2list_regx  = r'\{-.+?\}'      #{-list} ==> become in-job list
+
+warning_prefix = 'WARNING: '
+
 
 class Conf:
     def __init__(self,src=None):

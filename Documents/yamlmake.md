@@ -1,17 +1,17 @@
 # YAMLmake Workflow Tool
 
-This markdown documents YAMLmake the new workflow tool developed during the Mutein project. This is similar to Snakemake in that a config file documents each possible action in the pipeline in terms of input and output files, the shell command(s) to be run and also allows local or HPC execution. However YAMLmake config files are written in pure YAML rather than a mixture of YAML and Snakemake exhanced Python. YAMLmake also does not create a dependency graph working backwards from a target, rather the actions are carried out sequentially in the order they appear in the file. This makes it much simpler to deal with lists of input files that are not known in advance, the action simply globs then before it runs. Whereas Snakemake requires the special checkpoint concept to handle this common situation. YAMLmake allows easy changing between local and qsub execution, whereas Snakemake requires a separate directive for each rule to make it run remotely, and these can break when a module is imported. YAMLmake tries to specify all input and output files using special placeholders which insert filenames from predefined lists or from filesystem globs executed just prior to running the action. It therefore does not need to use embedded Python functions to generate the file lists.
+This markdown documents YAMLmake, a new workflow tool developed during the Mutein project. This is similar to Snakemake in that a config file documents each step in the pipeline in terms of input and output files, the shell command(s) to be run and also allows local or HPC execution. However YAMLmake config files are written in pure YAML rather than a mixture of YAML and Snakemake exhanced Python. YAMLmake also does not create a dependency graph working backwards from a target output file, rather the actions are carried out sequentially in the order they appear in the file. This makes it much simpler to deal with lists of input files that are not known in advance, the action simply globs then before it runs, whereas Snakemake requires a special checkpoint concept to handle this common situation. YAMLmake allows easy changing between local and qsub execution, whereas Snakemake requires a separate directive for each rule to make it run remotely, and these can break when a module is imported. YAMLmake tries to specify all input and output files using special placeholders which insert filenames from predefined lists or from filesystem globs executed just prior to running the action. It therefore does not use embedded Python functions to generate the file lists.
 
 ## Key aims
 
 - Produce a basic workflow engine that is easy to learn and not off-putting to new data scientists learning Linux and HPC on the job as part of their broader research
-- No requirement to know any scripting language beyond what bash or scripts commands you would be running manually without a workflow engine
+- No requirement to know any scripting language beyond the bash or script commands you would be running manually without a workflow engine
 - Support reproducibility / portability through conda
 - Support local and HPC execution through GridEngine
 - Support array jobs on GridEngine
 - Easily rerun only the failed jobs from an array
 - Easily specify sets of input and output files for each action using placeholders rather than embedded Python functions
-- Flexible, hierachical, modular config files with comments to support well organised, maintainable pipelines
+- Flexible, modular config files with comments to support well organised, maintainable pipelines
 
 ## Possible future features
 
@@ -19,9 +19,9 @@ This markdown documents YAMLmake the new workflow tool developed during the Mute
 
 ## YAMLmake overview
 
-The following outline of YAMLmake assumes some knowledge of bash.
+The following outline of YAMLmake assumes some knowledge of bash to understand the details of the commands being run.
 
-YAMLmake runs a YAML pipeline file containing a list of *actions* from top to bottom executing each one in the order encountered, taking account of *includes* and *modules*. A configuration state is also maintained as a hierachical tree of nested lists, dictionaries and strings which is modified everytime a *config* item is encountered in the pipeline. For example:
+YAMLmake runs a YAML pipeline file containing a list of *actions* from top to bottom executing each one in the order encountered, taking account of *includes* and *modules*. Command line options allow jumping to run a specific action(s). A configuration state is also maintained as a hierachical tree of nested lists, dictionaries and strings which is modified everytime a *config* item is encountered in the pipeline. For example:
 
 ```
   - include: "base_config.yml"
@@ -34,7 +34,7 @@ YAMLmake runs a YAML pipeline file containing a list of *actions* from top to bo
         wget $(cat {%input}) -O {%output}
 ```
 
-Each action specifies one or more input and output files. If the output files are all present and more recent than any input file then the action is not executed. Likewise if any input file is missing the action will not run. The shell field of the action contains curly bracket placeholders where YAMLmake substitutes the input and output filenames before running the command either locally or through qsub. Provided the return code is zero and all the specified output files were created the action is considered to have succeeded. If the action is considered to have failed then any output files present will be removed, either by deletion or moving to a specified recycle bin folder. They can also be flagged as stale in-place by setting the mtime to a special value.
+Each action specifies one or more input and output files. If the output files are all present and more recent than any input file then the action is not executed. Likewise if any input file is missing the action will not run. The shell field of the action contains curly bracket placeholders where YAMLmake substitutes the input and output filenames before running the command either locally or through GridEngine. Provided the return code is zero and all the specified output files were created the action is considered to have succeeded. If the action is considered to have failed then any output files present will be removed, either by deletion or moving to a specified recycle bin folder. They can also be flagged as stale in-place by setting the mtime to a special value.
 
 ### include
 
@@ -42,7 +42,7 @@ The `include` item above causes the referred to file to be inserted into the pip
 
 ### config
 
-In the example above the file `base_config.yml` is included as the first item. This file would therefore likely contain the starting configuration options for the pipeline in the form of a `config` item, for example: 
+In the example above the file `base_config.yml` is included as the first item. This file would therefore contain the starting configuration options for the pipeline in the form of a `config` item, for example: 
 
 ```
 - config:
@@ -55,7 +55,7 @@ In the example above the file `base_config.yml` is included as the first item. T
     working_dir:          "/scratch/xyz1234/my_project"
 ```
 
-Here we see the special `ym` key underwhich is stored the internal config of YAMLmake. To change YAMLmake internal settings from their default values we must assign new values as shown above. Any values not explicitly set using a `config` pipeline item will remain at their default values. See the source code for a complete list of internal YAMLmake configuration keys.
+Here we see the special `ym` key under which is stored the internal config of YAMLmake. To change YAMLmake internal settings from their default values we must assign new values as shown above. Any values not explicitly set using a `config` pipeline item will remain at their default values. See the source code for a complete list of internal YAMLmake configuration keys.
 
 ### module
 
@@ -63,7 +63,9 @@ Much like `include` a `module` pipeline item refers to another YAML file, which 
 
 ### action
 
-The `input` and `output` keys of an action are special. In their simplest form they can contain a string specifying a single input and output file respectively, referred to simply as `{%input}` and `{%output}` in the shell command. However they can also be expanded into dictionaries containing any number of keys, each of which is then available within the shell command. For example:
+An `action` executes commands that process your data files. The required fields of an action are `name`, `input`, `output` and `shell`. The input field specifies a list of one or more files that must be present in order for the action to be runnable. The output field specifies a list of all the output file the action is guaranteed to create. If any have not been created by the time the action completes YAMLmake therefore assumes the action has failed and acts accordingly. The action will also not run if it looks like the output files have already been created and no input file has changed since then. The shell field contains the bash command that actually carries out the action using placeholders to insert the paths of the required input and output files.
+
+In their simplest form the input and output fields can contain a single string each specifying an input and output file path respectively, referred to by the placeholders `{%input}` and `{%output}` in the shell command. However input and/or output can also be an arbitrary hierachy of fields containing any number of named file paths. As a simple example, supposed there are two input files and two output files which all need unique variable names:
 
 ```
 - action:
@@ -78,9 +80,11 @@ The `input` and `output` keys of an action are special. In their simplest form t
       zip {%results} {%first_input} {%second_input} > {%aux_file}
 ```
 
-To operate on sets of multiple files the input and output items can also contain any combination of four special types placeholders which expand the filenames in various ways. These four placeholder types are of the form `{*placeholder}`, `{=placeholder}`, `{+placeholder}` and `{-placeholder}` which respectively operate to expand the input and output lists by globbing paths that spawn separate jobs (`{*...}`), using existing variable lists to spawn separate jobs (`{=...}`), globbing paths that create path lists within single jobs (`{+...}`) and using existing variable lists to create path lists within single jobs (`{-...}`). This will be explained in more detail below.
+Above we see that, although the file path field names are nested under the input and output fields, for naming purposes they are considered to be directly under the action name space, and we refer to them directly within the shell using `{%first_input}` etc and not `{%input/first_input}` (see below for how to access nested variables within the configuration hierachy). This special shortcut applies only to the input and output fields, and saves a lot of typing in the shell command, but also means we must avoid name collisions with other config variables.
 
-#### Spawning separate jobs by matching filenames
+To operate on sets of multiple files the input and output items can also contain any combination of four special types of placeholder which expand the file pahts in various ways. These four placeholder types are of the form `{*placeholder}`, `{=placeholder}`, `{+placeholder}` and `{-placeholder}` which respectively operate to expand the input and output lists by globbing paths that spawn separate jobs (`{*...}`), using existing variable lists to spawn separate jobs (`{=...}`), globbing paths that create path lists within single jobs (`{+...}`) and using existing variable lists to create path lists within single jobs (`{-...}`). This will be explained in more detail below.
+
+#### Spawning separate jobs for each matching filename
 
 ```
   - action:
@@ -95,15 +99,15 @@ To operate on sets of multiple files the input and output items can also contain
         wget $(cat {%url}) -O {%fastq}
 ```
 
-Here the `{*dataset}` placeholder in the *url* input key means "glob (i.e. search the filesystem for) this path using a * in place of `{*dataset}` and spawn a *separate job* for each path. The globbing is always done using the input key, since the output files do not exist before the action is run. Once the list of matching file paths has be created the value of the placeholder is extracted in a variable and substituted into all output path patterns to create the corresponding output paths for each input path.
+Here the `{*dataset}` placeholder in the *url* input field means "glob (i.e. search the filesystem for) this path using a * in place of `{*dataset}` and spawn a *separate job* for each path found". The globbing is always done using the input field(s), since the output files do not exist before the action is run. Once a list of matching file paths has be found the value of the `{*dataset}` placeholder is extracted and substituted into the output path patterns to create the corresponding output paths for each input path.
 
-Therefore if we start off with a set of subfolders under `metadata` named to match each of the datasets that require downloading the above action will run a separate shell command to download each url and save it in a matching folder under `data`. Any required output folders are automatically created if missing. The action will fail if the specified matching output files do not get created. Time stamps are used to check that the output files are newer than the input files.
+Therefore if we start off with a set of subfolders under `metadata` named to match each of the datasets which require downloading the above action will run a separate shell command to download each url and save it in a matching folder under `data`. Any required output folders are automatically created if missing. The action will fail if the specified matching output files do not get created. Time stamps are used to check that the output files are newer than the input files.
 
-Across the multiple jobs spawned by the action the value assigned to the `{*dataset}` placeholder is always the same across all keys within each job, therefore when each shell command runs it is guaranteed that the value will be the same across the `"metadata/{*dataset}/url.txt"` input file path, the `"data/{*dataset}/{*dataset}.fastq.gz"` output file path and the `{*dataset}` value itself.
+Across the multiple jobs spawned by the action the value assigned to the `{*dataset}` placeholder is always the same across all fields within each job, therefore when each shell command runs it is guaranteed that the value will be the same across the `"metadata/{*dataset}/url.txt"` input file path, the `"data/{*dataset}/{*dataset}.fastq.gz"` output file path and the `{*dataset}` value itself. If there had been multiple input file paths per job, all containing the same placeholder, then jobs would only be created where a match was found for all the input paths containing the same value of the placeholder. 
 
 There is also an alternative form of globbing placeholder of the form `{+dataset}` which generates a list of items within a single job. This will be explained later.
 
-#### Spawning separate jobs from an existing list
+#### Spawning separate jobs for each item of an existing list
 
 Lists of strings can be defined anywhere in the configuration. Additionally each action can define any temporary local configuration it needs - this does not persist after the action has ended. Therefore a short list of files can be hard coded into the action itself:
 
@@ -155,7 +159,7 @@ The above spawns a separate job for each member of the `sample` list. If more th
 
 The above would generate 16 jobs in total from all combinations of samples and treatments.
 
-The variable names `sample` and `treatment` are therefore used twice in the above, once as the names of lists in the local config of the action, and again as job creation placeholders referring to the existing lists. To distinguish between these two the first character of the placeholder is `%` for normal variables, and `=` for list-to-separate-job placeholders. In the shell command it is therefore valid to refer to the original list as `{%sample}` and to the value assigned to the current job as `{=sample}`. The caveat here is that the `{%sample}` placeholder refers to a list of strings rather than a single string so YAMLmake will complain that it does not know how to render the list into a substitutable string form. How to do this is fully explained next, but in outline, you must either specify which list item you want, or provide a separator string to be used to join all the items together into a single string.
+The variable names `sample` and `treatment` are therefore used twice in the above, once as the names of lists in the local config of the action, and again as job creation placeholders referring to those existing lists. To distinguish between these two the first character of the placeholder is `%` for normal configuration variables, and `=` for list-items-to-separate-jobs placeholders. In the shell command it is therefore valid to refer to the original list as `{%sample}` and to the value assigned to the current job as `{=sample}`. The caveat here is that the `{%sample}` placeholder always still refers to the whole list of strings rather than a single string so YAMLmake will complain that it does not know how to render the list into a substitutable string form. How to do this is fully explained next, but in outline, you must either specify which list item you want, or provide a separator string to be used to join all the items together into a single string.
 
 As with the globbing placeholder there is also an alternative form of list expansion placeholder of the form `{-sample}` which generates a list of items within a single job instead of separate jobs. This will be also explained later.
 
@@ -169,7 +173,7 @@ YAMLmake configuration can be hierachically structured, meaning that lists (simp
       prefix: "my_project."
 ```
 
-The above is a key `prefix` within a dictionary `ym` within the top-level configuration dictionary `config`. Youc an setup your own structured configuration if required, for example to add a new subtree of configuration use something like the following, which could be kept in a separate config file and linked to using an `include`:
+The above is a key `prefix` within a dictionary `ym` within the top-level configuration dictionary `config`. You can setup your own structured configuration if required, for example to add a new subtree of configuration use something like the following, which could be kept in a separate config file and linked to using an `include`:
 
 ```
 - config:
@@ -198,10 +202,12 @@ Note: although numbers can be entered, everything is converted to a string when 
 Anywhere a string can be entered into the configuration file a variable placeholder can to inserted. Where the variable required is within a nest hierachy the full path to the variable must be used, using forward-slash separators. For example, to refer to the location of the newt samples you would use a place holder like:
 
 ```
-{%metadata/samples/newt/location} #give "rm 8"
+{%metadata/samples/newt/location} #gives "rm 8"
 ```
 
-Note: you never have to put `config` or `action` as the first part of the key. To refer to an item in a list use the 0-base integer location as the key following the list name. Negative indexes refer to items counting backwards from the end, as with Python lists:
+Note: you never have to put an explicit `config` or `action` as the first part of the key, as this is assumed. Within a `config` pipeline item the root of the namespace is always implicitly "config/". Within each action the root of the namespace is also implicitly "config/". Any of the action's own local configuration gets added to the global configuration as soon as the action begins, overriding anything with the same key, therefore the namespace root is actual the result of the merger of "config" and "action" into a unified root.
+
+To refer to an item in a list use the 0-base integer location as the key following the list name. Negative indexes refer to items counting backwards from the end, as with Python lists:
 
 ```
 {%metadata/treatments/0} # gives "1A"
