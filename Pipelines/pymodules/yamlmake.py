@@ -54,7 +54,7 @@ list2job_regx  = r'\{=.+?\}'       #{=list} ==> split into separate jobs
 list2list_regx  = r'\{-.+?\}'      #{-list} ==> become in-job list
 
 warning_prefix = 'WARNING: '
-
+illegal_chrs = '\\\n\r\t\'" *?:;,/#%&{}<>+`|=$!@'
 
 class Conf:
     def __init__(self,src=None):
@@ -142,8 +142,16 @@ class Conf:
         row = None
         col = None
 
-        fname = filename        
+        fname = filename
+        #optional extra info can follow the filename in square brackets
+        #if not square brackets entire file is loaded including multiple lines
         if '[' in filename:
+            #filename[<options>]
+            #options are: <sep>R<numb> or <sep>C<numb>
+            #sep is the field separator
+            #R = extract a row
+            #C = extract a column
+            #numb = which row or column to extract
             assert filename[-1] == ']',f'misformed load parameters in {filename} at {key}'
             params = filename.split('[')[-1][:-1]
             fname = filename.split('[')[0]
@@ -698,7 +706,9 @@ def update_activity_state(action):
     '''
 
     #incase the config has changed since the last action
-    if 'ym/log_dir' in action: global_state['log_dir'] = action['ym/log_dir']
+    if 'ym/log_dir' in action:
+        global_state['log_dir'] = action['ym/log_dir']
+        global_state['prefix'] = action['ym/prefix']
 
     #see if we've reached the run-from rule
     if global_state['args'].run_from and action['name'] == global_state['args'].run_from:
@@ -744,6 +754,7 @@ def init_global_state(args,config):
 
     global_state['is_active'] = None
     global_state['log_dir'] = config['ym/log_dir']
+    global_state['prefix'] = config['ym/prefix']
 
     update_activity_state({'name':None})
 
@@ -772,7 +783,25 @@ def fill_out_all(config,action,path):
     action.sub_vars()
     action.make_log_dir()
 
+def validate_action(action):
+    'check for required fields'
+
+    assert 'name' in action, 'all actions must have a name field'
+    assert 'input' in action, 'all actions must have an input field'
+    assert 'output' in action, 'all actions must have an output field'
+    assert 'shell' in action, 'all actions must have a shell field'
+
+    #name is used to general file and job names
+    #therefore prevent any characters that cause problems for filenames
+    for ch in illegal_chrs:
+        assert not ch in action['name'], f'cannot use "{ch}" in action name, consider a description field for longer text'
+
+    assert action['name'][0] != '.', f'action name {action["name"]} cannot start with a dot'
+
 def setup_action(config,action,path):
+    #validate the action
+    validate_action(action)
+
     #separate out and canonicalise input, output and shell
     action,input,output,shell = split_action(action)
 
@@ -804,11 +833,13 @@ def split_action(action):
     del action['output']
     del action['shell']
 
-    #convert simple form input/output into dictionary form
-    if type(input) == str:  input = {'input':input}
-    if type(output) == str: output = {'output':output}
-    shell = { 'shell':shell }
+    #decided to remove this little convenience as it makes
+    #explaining input/output more complex
+    # #convert simple form input/output into dictionary form
+    # if type(input) == str:  input = {'input':input}
+    # if type(output) == str: output = {'output':output}
 
+    shell = { 'shell':shell }
     action = Conf(action)
     input = Conf(input)
     output = Conf(output)
@@ -1409,18 +1440,20 @@ def remove_item(path):
 def remove_tree(path):
     if is_active(): shutil.rmtree(path)
 
-def warning(item,end='\n'):
-    message(warning_prefix+item,end=end)
+def warning(item,end='\n',timestamp=True):
+    message(warning_prefix+item,end=end,timestamp=timestamp)
 
-def message(item,end='\n'):
-    item = timestamp_now_nice() + ' ' + str(item)
+def message(item,end='\n',timestamp=True):
+    if timestamp:
+        item = timestamp_now_nice() + ' ' + str(item)
 
     if global_state['args'].quiet != True:
         print(item,end=end)
         sys.stdout.flush()
 
     if global_state['args'].nologs != True:
-        path = os.path.join(global_state['log_dir'],global_state['start_time']+'.messages')
+        path = os.path.join(global_state['log_dir'],
+                            global_state['prefix']+global_state['start_time']+'.messages')
 
         try:
             with open(path,'a') as f:
@@ -1549,8 +1582,8 @@ def execute_command(config,job_numb,cmd,env):
 
     message(f'job {job_numb+1} executing locally...')
 
-    if cmd.endswith('\n'): message(f'{cmd}',end='')
-    else:                  message(f'{cmd}')
+    if cmd.endswith('\n'): message(f'{cmd}',end='',timestamp=False)
+    else:                  message(f'{cmd}',timestamp=False)
 
     if not is_active():
         #dry-run: signal job completed ok without running it

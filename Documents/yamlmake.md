@@ -28,17 +28,19 @@ YAMLmake runs a YAML pipeline file containing a list of *actions* from top to bo
   - action:
       name: "download_reference"
       exec: "local"
-      input: "metadata/GRCh38_reference_url.txt"
-      output: "reference/GRCh38.fasta.gz"
+      input:
+        url: "metadata/GRCh38_reference_url.txt"
+      output:
+        fastq: "reference/GRCh38.fasta.gz"
       shell: |
-        wget $(cat {%input}) -O {%output}
+        wget $(cat {%url}) -O {%fastq}
 ```
 
 Each action specifies one or more input and output files. If the output files are all present and more recent than any input file then the action is not executed. Likewise if any input file is missing the action will not run. The shell field of the action contains curly bracket placeholders where YAMLmake substitutes the input and output filenames before running the command either locally or through GridEngine. Provided the return code is zero and all the specified output files were created the action is considered to have succeeded. If the action is considered to have failed then any output files present will be removed, either by deletion or moving to a specified recycle bin folder. They can also be flagged as stale in-place by setting the mtime to a special value.
 
 ### include
 
-The `include` item above causes the referred to file to be inserted into the pipeline as if it had been copy-pasted in at the location of the include. The included file can contain any YAMLmake configuration, including further nested includes and modules.
+The `include` item above causes the referred to file to be inserted into the pipeline as if it had been copy-pasted in at the location of the include. The included file can contain any YAMLmake configuration, including further nested includes and modules. When a pipeline first starts running the configuration state is set to build-in default values for the internal YAMLmake config fields. These then get overridden by any `config` items encountered in the main pipeline file or any includes.
 
 ### config
 
@@ -63,9 +65,11 @@ Much like `include` a `module` pipeline item refers to another YAML file, which 
 
 ### action
 
-An `action` executes commands that process your data files. The required fields of an action are `name`, `input`, `output` and `shell`. The input field specifies a list of one or more files that must be present in order for the action to be runnable. The output field specifies a list of all the output file the action is guaranteed to create. If any have not been created by the time the action completes YAMLmake therefore assumes the action has failed and acts accordingly. The action will also not run if it looks like the output files have already been created and no input file has changed since then. The shell field contains the bash command that actually carries out the action using placeholders to insert the paths of the required input and output files.
+An `action` executes commands that process your data files. The required fields of an action are `name`, `input`, `output` and `shell`. The name field is required and must not contain any spaces or special characters as it forms the basis for various log filenames and GridEngine job names.
 
-In their simplest form the input and output fields can contain a single string each specifying an input and output file path respectively, referred to by the placeholders `{%input}` and `{%output}` in the shell command. However input and/or output can also be an arbitrary hierachy of fields containing any number of named file paths. As a simple example, supposed there are two input files and two output files which all need unique variable names:
+The input field specifies one or more files that must be present in order for the action to be runnable. The output field specifies all the output files the action is guaranteed to create. If any have not been created by the time the action completes YAMLmake therefore assumes the action has failed and acts accordingly. The action will also not run if it looks like the output files have already been created and no input file has changed since then. The shell field contains the bash command that actually carries out the action using placeholders to insert the paths of the required input and output files.
+
+The input and/or output fields can contain one or more simple named subfields, or be an arbitrary hierachy of fields containing lists and dictionaries with any number of named file paths. As a simple example, supposed there are two input files and two output files:
 
 ```
 - action:
@@ -77,10 +81,11 @@ In their simplest form the input and output fields can contain a single string e
       results: "all.zip"
       aux_file: "stdout"
     shell: |
+      echo Running {%name}
       zip {%results} {%first_input} {%second_input} > {%aux_file}
 ```
 
-Above we see that, although the file path field names are nested under the input and output fields, for naming purposes they are considered to be directly under the action name space, and we refer to them directly within the shell using `{%first_input}` etc and not `{%input/first_input}` (see below for how to access nested variables within the configuration hierachy). This special shortcut applies only to the input and output fields, and saves a lot of typing in the shell command, but also means we must avoid name collisions with other config variables.
+Above we see that, although the file path field names are nested under the input and output fields, for naming purposes they are considered to be directly under the action name space, and we refer to them directly within the shell using `{%first_input}` etc and not `{%input/first_input}` (see below for how to access nested variables within the configuration hierachy). Effectively the "input" and "output" field labels disappear from the name space and their subfields get promoted one level. This applies only to the input and output fields, and saves a lot of typing in the shell command, but also means we must avoid name collisions with other config variables due to this promotion.
 
 To operate on sets of multiple files the input and output items can also contain any combination of four special types of placeholder which expand the file pahts in various ways. These four placeholder types are of the form `{*placeholder}`, `{=placeholder}`, `{+placeholder}` and `{-placeholder}` which respectively operate to expand the input and output lists by globbing paths that spawn separate jobs (`{*...}`), using existing variable lists to spawn separate jobs (`{=...}`), globbing paths that create path lists within single jobs (`{+...}`) and using existing variable lists to create path lists within single jobs (`{-...}`). This will be explained in more detail below.
 
@@ -95,7 +100,8 @@ To operate on sets of multiple files the input and output items can also contain
       output:
         fastq: "data/{*dataset}/{*dataset}.fastq.gz"
       shell: |
-        echo Downloading dataset {*dataset}
+        echo Action {%name} using execution mode {%exec}
+        echo Downloading dataset {*dataset} from {%url} to {%fastq}
         wget $(cat {%url}) -O {%fastq}
 ```
 
@@ -109,11 +115,11 @@ There is also an alternative form of globbing placeholder of the form `{+dataset
 
 #### Spawning separate jobs for each item of an existing list
 
-Lists of strings can be defined anywhere in the configuration. Additionally each action can define any temporary local configuration it needs - this does not persist after the action has ended. Therefore a short list of files can be hard coded into the action itself:
+Lists of strings can be defined anywhere in the configuration. Additionally each action can define any temporary local configuration it needs - this does not persist after the action has ended. Therefore a short list of files can be hard coded into the action itself (although in practise it might be better kept in a separate configuration file that is included):
 
 ```
   - action:
-      name: "decompress samples"
+      name: "decompress_samples"
       exec: "local"
       sample:
         - frog
@@ -129,11 +135,11 @@ Lists of strings can be defined anywhere in the configuration. Additionally each
         gunzip --stdout {%gzip} > {%fastq}
 ```
 
-The above spawns a separate job for each member of the `sample` list. If more than one such placeholder is present in a path then all combinations of both lists are generated as separate jobs:
+The above spawns a separate job for each member of the `sample` list. If more than one such placeholder is present in a path then all combinations of both lists are used to generate separate jobs:
 
 ```
   - action:
-      name: "decompress samples"
+      name: "decompress_samples"
       exec: "local"
       sample:
         - frog
@@ -197,15 +203,15 @@ The above is a key `prefix` within a dictionary `ym` within the top-level config
       
 ```
 
-Note: although numbers can be entered, everything is converted to a string when loaded. You may want to put quotes around everything to prevent the precision of numerical values from being altered during the loading process.
+Note: although numbers can be entered, everything is converted to a string when loaded. You may want to put quotes around every string to prevent the precision of numerical values from being altered during the loading process, as otherwise the YAML parser will initially convert numerical values into a numerical type which will then be converted into a string using Python's `str` function.
 
-Anywhere a string can be entered into the configuration file a variable placeholder can to inserted. Where the variable required is within a nest hierachy the full path to the variable must be used, using forward-slash separators. For example, to refer to the location of the newt samples you would use a place holder like:
+Anywhere a string can be entered as a leaf value (ie not a dictionary key / field name) in the configuration file a variable placeholder can to inserted. Where the variable required is within a nested hierachy the full path to the variable must be used, using forward-slash separators. The value of the variable with then be inserted whenever the field value is about to be used by an action. For example, to refer to the location of the newt samples you would use a place holder like:
 
 ```
 {%metadata/samples/newt/location} #gives "rm 8"
 ```
 
-Note: you never have to put an explicit `config` or `action` as the first part of the key, as this is assumed. Within a `config` pipeline item the root of the namespace is always implicitly "config/". Within each action the root of the namespace is also implicitly "config/". Any of the action's own local configuration gets added to the global configuration as soon as the action begins, overriding anything with the same key, therefore the namespace root is actual the result of the merger of "config" and "action" into a unified root.
+Within a `config` pipeline item you are setting values in the global configuration namespace which persists across the pipeline steps, and placeholders referring to this begin with a % and are surrounded by curly brackets. Within an action item any variables you set there are local to that action. When the action is carried out by the pipeline the action's local config begins as a copy of the current global configuration, which then gets modified by adding the action's locally defined configuration, such that the local field values overwrite any existing values from global configuration. The input and output file paths do not yet exist when the action's local configuration is setup, so local variables cannot refer to the, but they become available in the action's shell command.
 
 To refer to an item in a list use the 0-base integer location as the key following the list name. Negative indexes refer to items counting backwards from the end, as with Python lists:
 
@@ -216,7 +222,7 @@ To refer to an item in a list use the 0-base integer location as the key followi
 {%metadata/treatments/-2} # gives "2"
 ```
 
-To get a comma separated list of all the items use a comma as the key (any character(s) used as the index will generate a list of all item using that as the separator). The special index `N` yields the list's length. For dictionaries a special empty string key yields a list of all the keys, which can then be indexed like a normal list. So:
+To get a comma separated list of all the items use a comma as the key (any non-numerical character(s) used as the index to a list will generate a list of all items using that as the separator). The special index `N` yields the list's length. For dictionaries a special empty string key yields a list of all the keys, which can then be indexed like a normal list. So:
 
 ```
 {%metadata/treatments/ }    # gives "1A 1B 2 3"
@@ -229,6 +235,26 @@ To get a comma separated list of all the items use a comma as the key (any chara
 ```
 
 The input and output sections of actions can also contain the four special types of placeholder which expand to generate either separate jobs or lists of items within a single job. The later therefore expand a single key into a list, which can be used within the shell command.
+
+To insert environment variables from the shell used to invoke YAMLmake another type of placeholder is available, `{$...}`, which can be used anywhere. Note this gives the environment variable not of the shell command embedded in an action but of the shell used to invoke YAMLmake to run the entire pipeline. To get the environment variable value of the command the action is running use the normal `${}` form of shell variable:
+
+```
+- action:
+    name: "shell-test"
+    yamlmake-env1: "User {$USER} invoked YAMLmake on host {$HOSTNAME}"
+    input:
+      message: "data/message.txt"
+    output:
+      result: "test/output.txt"
+    shell: |
+      echo YAMLmake invocation information: {%yamlmake-env1}
+      echo Shell placeholders also work in the shell section
+      echo YAMLmake was invoked from directory {$PWD}
+      cd data
+      echo But this action is now running in ${PWD}
+```
+
+Normal shell variables of the form `${USER}`, `${HOSTNAME}` etc are simply ignored by YAMLmake as passed through to the shell command, therefore they give you the value when the command was actually executed, whereas `{$USER}` gets substituted by YAMLmake before the action's shell command is run.
 
 #### Creating lists of file paths within single jobs by matching filenames
 Similarly to the `{*dataset}` style placeholder there is an alternative expanding globbing placeholder of the form `{+dataset}` which can be used in the input and output sections of an action. These also expand by matching filenames in the filesystem but generate lists of file paths within the same job instead of generating separate jobs for each path. Unlike the `{*dataset}` style placeholder this means that the files paths are in a list which must be dealt with in the shell command. For example:
@@ -283,3 +309,48 @@ The final special placeholder uses the form `{-sample}`, and generates lists of 
 ```
 
 Here I've used only the `gzip` list of input paths in the shell command, but the expected output files must still be specified to YAMLmake so it can check they were created.
+
+#### Running on GridEngine
+
+To run an action using GridEngine an action must have the `exec` field set to `qsub`. This will automatically spawn an array job with as many tasks as their are jobs generated by the input and output filepath expansion step (ie the `{*...}` globbing and `{=...}` list based job spawning placeholders).
+
+The built-in default YAMLmake config includes a set of subfields under a `qsub` field which define default resource requests for qsub jobs which can be overridden in the usual way, either by changing their values in the global configuration using `config` and/or by providing per-action value within each `action`. The qsub specific values are:
+
+```
+    qsub:
+        template: 'default'        #template job script: "default" or path to your own
+        log_dir:  '{%ym/log_dir}'  #log dir for qsub stdout and stderr files
+        time:     '02:00:00'       #$ -l h_rt={time}
+        mem:      '4G'             #$ -l mem={mem}
+        tmpfs:    '10G'            #$ -l tmpfs={tmpfs}
+        pe:       'smp'            #$ -pe {pe} {cores}
+        cores:    '1'              #$ -pe {pe} {cores}
+```
+
+As indicated in the comments above the values of time,mem,tmpfs,pe and cores are copied into the qsub job script, whereas the log_dir field can be used to set a different log directory from the global YAMLmake log directory if desired (the default, as can be seen, is to use the same). Finally, the template file used to generate the qsub job script can be overridden if you need to customise it for you local system. The default is called qsub_template.sh within Pipelines/pymodules.
+
+#### Local Execution
+
+The default execution mode is local execution, which simply runs one job at a time without anykind of parallelism on the machine used to invoke YAMLmake.
+
+#### Loading Simple Lists
+
+A special type of placeholder can be used to extract data from an external, non-YAML text file. For example to load a list of values from the first column of a csv file:
+
+```
+- config:
+    data_list: "{>data/my_data.csv[,C0]}"
+```
+
+Where `,C0` means to extract the 0th (0-based numbering) Column using `,` as the column separator. Use `R` to instead extract the specified row. Finally to just extract the entire file into a single variable omit the square brackets section altogether:
+
+```
+- config:
+    url: "{>metadata/toad/toad_url.txt}"
+```
+
+
+
+
+
+#### Embedded Includes
