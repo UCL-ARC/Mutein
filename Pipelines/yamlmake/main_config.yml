@@ -13,7 +13,7 @@
         job_count:          "YM_NJOBS"
         job_number:         "YM_JOB_NUMBER"
         bash_setup:         "source ~/.bashrc\nset -euo pipefail\nset +o history"
-        conda_setup:        ""
+        #conda_setup:        "source ~/mambaforge/etc/profile.d/conda.sh"
 
     qsub:
         template: "default"
@@ -28,5 +28,5 @@
     conf_dir:       "{$MUT_DIR}/Pipelines/yamlmake"
     conda_channels: "--override-channels -c defaults -c bioconda -c conda-forge"
 
-#reference defining where to download the reference genome from
+#reference genome URL and file paths
 - include: "reference_config.yml"

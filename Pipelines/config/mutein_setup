@@ -1,8 +1,23 @@
-#!/bin/bash -l
+## the following will not normally need to be edited by the user
 
-set -euo pipefail
+#add Mutein scripts to the path
+export PATH=${MUT_DIR}/Pipelines/scripts:${PATH}
 
-# Due to use of exit and "set -eu" this script must be executed rather than sourced.
+#add Mutein python modules to PYTHONPATH
+export PYTHONPATH=${MUT_DIR}/Pipelines/pymodules:${PYTHONPATH}
+
+#set the snakemake profile folder and path to snakefile and mutein config
+export SNAKEMAKE_PROFILE=${MUT_DIR}/Pipelines/config
+export SNAKEFILE=${MUT_DIR}/Pipelines/config/Snakefile
+export SNAKECONF=${MUT_DIR}/Pipelines/config/mutein.yaml
+
+#always pass the snakefile and configfile to snakemake
+alias snakemake="snakemake --snakefile ${SNAKEFILE} --configfile ${SNAKECONF}"
+
+#conda environment names prefix to reduce chances of namespace collisions
+export MUT_PREFIX=mutein_
+
+## ========== END OF CONFIG =======================
 
 # setup conda snakemake environment if not already available (also provides python3)
 if ! conda env list | grep -qe "${MUT_PREFIX}main" ; then
@@ -10,17 +25,14 @@ if ! conda env list | grep -qe "${MUT_PREFIX}main" ; then
     conda create -y -n ${MUT_PREFIX}main \
         $(cat ${MUT_DIR}/Pipelines/conda_envs/channels) \
         --file ${MUT_DIR}/Pipelines/conda_envs/main.env \
-    || { echo "Failed to setup snakemake conda environment!"; exit 2; }
+    || { echo "Failed to setup snakemake conda environment!"; return; }
 fi
 
 # activate snakemake conda environment, also provides python3
 echo "Activating the conda snakemake environment..."
 conda activate ${MUT_PREFIX}main \
-|| { echo "Failed to activate snakemake conda environment!"; exit 3; }
+|| { echo "Failed to activate snakemake conda environment!"; return; }
 
 # verify mutein is in the PATH and print warning if not in MUT_DATA directory
 mutein check-cwd \
-|| { echo "Failed to run mutein script!"; exit 4; }
-
-# set the master password used to decrypt specific passwords from encrypted file
-export MUT_PASSWORD=$(mutein set-password)
+|| { echo "Failed to run mutein script!"; return; }

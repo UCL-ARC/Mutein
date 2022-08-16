@@ -1,12 +1,15 @@
 #download the reference files into a temporary location
 - action:
     name: "download_reference"
+
     readme_url: "{%ref/base_url}/{%ref/readme}"
     md5_url:    "{%ref/base_url}/{%ref/md5}"
     fasta_url:  "{%ref/base_url}/{%ref/fasta}"
+
     input:
-      #changes to ref_config file trigger a rerun unless run: "never" is used
+      #changes to ref_config file trigger a rerun unless "action/run:never" is used
       ref_config: "{%conf_dir}/reference_config.yml"
+
     output:
       readme: "{%ref/tmp_dir}/{%ref/readme}"
       md5:    "{%ref/tmp_dir}/{%ref/md5}"
@@ -18,82 +21,109 @@
       wget -O - {%md5_url}    > {%md5}
       wget -O - {%fasta_url}  > {%fasta}
 
-## ===== below is the Snakemake config that I'm porting to YAMLmake =====
+#do the md5 check of the reference file
+- action:
+    name: "check_reference"
 
-# #require the reference fasta file, and its readme and md5 file
-# #md5 check the reference file
-# rule check_reference:
-#     input:
-#         md5all=os.path.join(config["ref"]["tmp"],config["ref"]["md5"]),
-#         readme=os.path.join(config["ref"]["tmp"],config["ref"]["readme"]),
-#         fasta=os.path.join(config["ref"]["tmp"],config["ref"]["fasta"])
-#     output:
-#         md5ref=os.path.join(config["ref"]["tmp"],"MD5.txt")
-#     shell:
-#         #extract and check just the relevant checksum
-#         "cat {input.md5all} | grep -e '{config[ref][fasta]}' > {output.md5ref} && "
-#         "cd {config[ref][tmp]} && "
-#         "md5sum --check MD5.txt"
+    input:
+      readme: "{%ref/tmp_dir}/{%ref/readme}"
+      md5:    "{%ref/tmp_dir}/{%ref/md5}"
+      fasta:  "{%ref/tmp_dir}/{%ref/fasta}"
 
-# #convert gzip into an indexed bgzip format
-# rule create_bgzip:
-#     input:
-#         gz_fasta=os.path.join(config["ref"]["tmp"],config["ref"]["fasta"]),
-#         md5ref=os.path.join(config["ref"]["tmp"],"MD5.txt") #require that MD5 was valid
-#     output:
-#         bgz_fasta,
-#         bgz_fasta+".gzi"
-#     conda:
-#         os.environ["MUT_PREFIX"]+"bwa"
-#     threads:
-#         1
-#     params:
-#         time="1:00:00", mem="6G", tmpfs="10G"
-#     shell:
-#         "gunzip --to-stdout {input.gz_fasta} | bgzip -i -I {bgz_fasta}.gzi > {bgz_fasta}"
+    output:
+      md5check: "{%ref/tmp_dir}/MD5.txt"
 
-# #create fasta file index with samtools
-# rule create_fai:
-#     input:
-#         bgz_fasta
-#     output:
-#         bgz_fasta+".fai"
-#     conda:
-#         os.environ["MUT_PREFIX"]+"bwa"
-#     threads:
-#         1
-#     params:
-#         time="1:00:00", mem="6G", tmpfs="10G",
-#     shell:
-#         "samtools faidx {bgz_fasta}"
+    #extract and check just the relevant checksum
+    shell: |
+        cat {%md5} | grep -e '{%ref/fasta}' > {%md5check} 
+        cd {%ref/tmp_dir} && md5sum --check MD5.txt
 
-# #create bwa index
-# rule create_bwtsw:
-#     input:
-#         bgz_fasta
-#     output:
-#         bwt_indexes
-#     conda:
-#         os.environ["MUT_PREFIX"]+"bwa"
-#     threads:
-#         1
-#     params:
-#         time="2:00:00", mem="6G", tmpfs="10G",
-#     shell:
-#         "bwa index -a bwtsw {bgz_fasta}"
+#convert gzip into an indexed bgzip format
+- action:
+    name:  "create_bgzip"
+    exec:  "qsub"
+    conda: "{$MUT_PREFIX}bwa"
+    qsub:
+        time:  "1:00:00"
+        mem:   "6G"
+        tmpfs: "10G"
+        cores: "1"
 
-# #create gatk index
-# rule create_gatk_dict:
-#     input:
-#         bgz_fasta
-#     output:
-#         bgz_fasta+'.dict'
-#     conda:
-#         os.environ["MUT_PREFIX"]+"gatk4"
-#     threads:
-#         1
-#     params:
-#         time="1:00:00", mem="6G", tmpfs="10G",
-#     shell:
-#         "mutein recycle {bgz_fasta}.dict END && "
-#         "gatk CreateSequenceDictionary -R {bgz_fasta} -O {bgz_fasta}.dict"
+    input:
+        orig_fasta: "{%ref/tmp_dir}/{%ref/fasta}" #gzip compressed fasta
+        md5check:   "{%ref/tmp_dir}/MD5.txt"      #require that MD5 was checked
+
+    output:
+        fasta_bgz: "{%ref/fasta_bgz}"     #bgzip compressed fasta
+        fasta_gzi: "{%ref/fasta_gzi}"
+
+    shell: |
+        gunzip --to-stdout {%orig_fasta} | bgzip -i -I {%fasta_gzi} > {%fasta_bgz}
+
+#create fasta file index with samtools
+- action:
+    name:  "create_fai"
+    exec:  "qsub"
+    conda: "{$MUT_PREFIX}bwa"
+    qsub:
+        time:  "1:00:00"
+        mem:   "6G"
+        tmpfs: "10G"
+        cores: "1"
+
+    input:
+        fasta_bgz: "{%ref/fasta_bgz}"
+
+    output:
+        fasta_fai: "{%ref/fasta_fai}"
+
+    shell: |
+        samtools faidx {%fasta_bgz}
+
+#create bwa index
+- action:
+    name: "create_bwtsw"
+    exec:  "qsub"
+    conda: "{$MUT_PREFIX}bwa"
+    qsub:
+        time:  "2:00:00"
+        mem:   "6G"
+        tmpfs: "10G"
+        cores: "1"
+
+    #file extensions of all the index files bwa will create
+    exts: [ "bwt","pac","ann","amb","sa" ]
+
+    input:
+        fasta_bgz: "{%ref/fasta_bgz}"
+
+    output:
+        bwt_indexes: "{%ref/fasta_bgz}.{-exts}"
+
+    shell: |
+        bwa index -a bwtsw {%fasta_bgz}
+
+#create gatk index
+- action:
+    name: "create_gatk_dict"
+    exec:  "local"
+    conda: "{$MUT_PREFIX}gatk4"
+    qsub:
+        time:  "1:00:00"
+        mem:   "6G"
+        tmpfs: "10G"
+        cores: "1"
+    ym:
+        #disabling strict mode to prevent a conda error:
+        #/lustre/home/ccaervi/mambaforge/envs/mutein_gatk4/etc/conda/activate.d/openjdk_activate.sh:
+        #line 1: JAVA_HOME: unbound variable
+        bash_setup: "source ~/.bashrc\nset +o history" #disabling strict mode
+
+    input:
+        fasta_bgz: "{%ref/fasta_bgz}"
+
+    output:
+        fasta_dict: "{%ref/fasta_dict}"
+
+    shell: |
+        gatk CreateSequenceDictionary -R {%fasta_bgz} -O {%fasta_dict}

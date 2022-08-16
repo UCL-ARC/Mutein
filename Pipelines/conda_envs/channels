@@ -1,0 +1,1 @@
+--override-channels -c defaults -c bioconda -c conda-forge

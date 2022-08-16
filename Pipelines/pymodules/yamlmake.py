@@ -852,7 +852,10 @@ def parse_yaml(fname):
     with open(fname) as f:
         result = yaml.safe_load(f)
 
-    assert type(result) == list
+    #allow empty files, such as when all items are commented out
+    if result == None: result = []
+
+    assert type(result) == list, f"YAML file {fname} does not contain a list of YAMLmake items"
     
     return result
 
@@ -1443,6 +1446,12 @@ def remove_tree(path):
 def warning(item,end='\n',timestamp=True):
     message(warning_prefix+item,end=end,timestamp=timestamp)
 
+def header(item,end='\n',timestamp=True):
+    line = '-'*(70-len(item))
+    item = f'{item}  {line}'
+    print()
+    message(item,end=end,timestamp=timestamp)
+
 def message(item,end='\n',timestamp=True):
     if timestamp:
         item = timestamp_now_nice() + ' ' + str(item)
@@ -1540,12 +1549,12 @@ def generate_full_command(config,shell):
 
     cmd_list = []
 
-    if 'ym/bash_prefix' in config and config['ym/bash_prefix'] != '':
-        cmd_list.append(config['ym/bash_prefix'])
+    if 'ym/bash_setup' in config and config['ym/bash_setup'] != '':
+        cmd_list.append(config['ym/bash_setup'])
 
     if 'conda' in config and config['conda'] != '':
-        if 'ym/conda_setup_command' in config and config['ym/conda_setup_command'] != '':
-            cmd_list.append(config['ym/conda_setup_command'])
+        if 'ym/conda_setup' in config and config['ym/conda_setup'] != '':
+            cmd_list.append(config['ym/conda_setup'])
         cmd_list.append(f'conda activate {config["conda"]}')
 
     cmd_list.append(shell)
@@ -1651,7 +1660,7 @@ def submit_job_qsub(action,shell_list,job_list):
 
     env = copy.deepcopy(os.environ)
 
-    message(f'executing {cmd} with {njobs}...')
+    message(f'executing {cmd} with {njobs} task(s)...')
 
     something_failed = False
 
@@ -1715,18 +1724,11 @@ def qsub_execute_job(jobfile):
     execute one job of a job array spawned by qsub
     invoked automatically by yamlmake using the --qsub option
     '''
-    action,shell_list = read_jobfile(jobfile)
 
+    action,shell_list = read_jobfile(jobfile)
     action = Conf(action)
 
-    #action.show()
-
     assert jobfile.endswith('.jobs')
-
-    spawn_job(jobfile,action,shell_list)
-
-def spawn_job(jobfile,action,shell_list):
-    'spawn user job'
 
     status_file = f'{jobfile[:-5]}.{os.environ["SGE_TASK_ID"]}.status'
     job_numb = int(os.environ["SGE_TASK_ID"]) - 1 #convert from 1 to 0 based
@@ -1851,28 +1853,28 @@ def process_action(config,action,path):
     update_activity_state(action)
 
     if activity_state() == 'inactive':
-        message(f'skipping action {action["name"]}')
+        header(f'[{action["name"]}] skipped: pipeline inactive')
         return False
 
     if 'run' in action and action['run'] == 'never':
-        message(f'skipping action {action["name"]}')
+        header(f'[{action["name"]}] skipped: never run is set')
         return False
 
     if activity_state() == 'dryrun':
-        message(f'dry-running action {action["name"]}')
+        header(f'[{action["name"]}] dry-running')
     else:
-        message(f'running action: {action["name"]}')
+        header(f'[{action["name"]}] running')
 
     #generate list of potential jobs by filling out glob and list placeholders
     #this step does not pay any attention to file time stamps
     job_list = generate_job_list(action,input,output)
-    message(f'placeholder expansion found {len(job_list)} potential jobs')
+    message(f'{len(job_list)} potential jobs from placeholder expansion')
     if len(job_list) == 0: return False
 
     #determine if all inputs are present and non-stale
     #determine if any outputs need (re)generating
     job_list,shell_list = generate_shell_commands(action,job_list,shell)
-    message(f'input/output file checking found {len(shell_list)} runnable jobs')
+    message(f'{len(shell_list)} runnable jobs from input/output file checking')
     if len(shell_list) == 0: return False
 
     #check current working directory agrees with configured value
