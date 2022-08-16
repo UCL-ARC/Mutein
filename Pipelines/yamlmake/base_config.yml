@@ -1,9 +1,0 @@
-- config:
-    ym:
-      prefix:               "mut."
-      stale_output_file:    "recycle"
-      stale_output_dir:     "ignore"
-      missing_parent_dir:   "create"
-
-    working_dir:    "/lustre/scratch/scratch/{$USER}/549_mutein"
-    conda_channels: "--override-channels -c defaults -c bioconda -c conda-forge"

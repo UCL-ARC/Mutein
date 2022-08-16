@@ -354,3 +354,37 @@ Where `,C0` means to extract the 0th (0-based numbering) Column using `,` as the
 
 
 #### Embedded Includes
+A special field called `includes` can be inserted anywhere into the configuration which must be a list of one or more filepaths, which are loaded into the configuration hierachy at the location of the includes field. Unlike a top level `- include` item, files loaded using the embedded includes feature should not contain any toplevel pipeline items (which are only valid at the highest level of the pipeline), rather they must contain the exact configuration that needs to be inserted. For example:
+
+```
+- config:
+    base_config:
+      some_variable: "my_config_value"
+      includes:
+        - "auxiliary_config.yml"
+```
+
+And auxiliary_config.yml could contain:
+
+```
+another_variable: "my_other_value"
+some_list:
+  - "item1"
+  - "item2"
+```
+
+Which would be give the same result as if the original config item has been:
+
+```
+- config:
+    base_config:
+      some_variable: "my_config_value"
+      another_variable: "my_other_value"
+      some_list:
+        - "item1"
+        - "item2"
+```
+
+
+#### Notes
+Includes are relative to the config files unless they start with a "./" in which case they are relative to the working directory? Special action field: `run:` can be "always", "never" or "conditional".

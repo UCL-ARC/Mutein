@@ -1,4 +1,5 @@
-- include: "base_config.yml"
+- include: "main_config.yml"
 
 - include: "setup_conda_envs.yml"
 
+- include: "reference.yml"

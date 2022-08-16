@@ -1,0 +1,32 @@
+#core YAMLmake config
+- config:
+    ym:
+        prefix:             "mut."
+        log_dir:            "yamlmake_logs"
+        remote_delay_secs:  "10"
+        stale_output_file:  "recycle"
+        stale_output_dir:   "ignore"
+        failed_output_file: "stale"
+        failed_output_dir:  "stale"
+        missing_parent_dir: "create"
+        recycle_bin:        "recycle_bin"
+        job_count:          "YM_NJOBS"
+        job_number:         "YM_JOB_NUMBER"
+        bash_setup:         "source ~/.bashrc\nset -euo pipefail\nset +o history"
+        conda_setup:        ""
+
+    qsub:
+        template: "default"
+        time:     "02:00:00"
+        mem:      "4G"
+        tmpfs:    "10G"
+        pe:       "smp"
+        cores:    "1"
+        log_dir:  "{%ym/log_dir}"
+
+    working_dir:    "/lustre/scratch/scratch/{$USER}/549_mutein"
+    conf_dir:       "{$MUT_DIR}/Pipelines/yamlmake"
+    conda_channels: "--override-channels -c defaults -c bioconda -c conda-forge"
+
+#reference defining where to download the reference genome from
+- include: "reference_config.yml"

@@ -1328,7 +1328,7 @@ def generate_shell_commands(action,job_list,shell):
         if newest_input == None:
             #flag job for removal from the list
             job_list[job_numb] = None
-            warning(f'one or more inputs missing or stale, job not runable')
+            warning(f'one or more inputs missing or stale, job not runnable')
             continue
 
         #all inputs present
@@ -1353,7 +1353,7 @@ def generate_shell_commands(action,job_list,shell):
         if action['ym/missing_parent_dir'] == 'create':
             create_output_dirs(action,job['output'])
 
-    #remove non-runable jobs
+    #remove non-runnable jobs
     job_list = [job for job in job_list if job is not None]
     shell_list = []
 
@@ -1872,7 +1872,7 @@ def process_action(config,action,path):
     #determine if all inputs are present and non-stale
     #determine if any outputs need (re)generating
     job_list,shell_list = generate_shell_commands(action,job_list,shell)
-    message(f'input/output file checking found {len(shell_list)} runable jobs')
+    message(f'input/output file checking found {len(shell_list)} runnable jobs')
     if len(shell_list) == 0: return False
 
     #check current working directory agrees with configured value
