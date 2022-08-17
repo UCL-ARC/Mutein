@@ -4,4 +4,4 @@
 
 - include: "reference.yml"
 
-- include: "download/keogh2018.yml"
+- module: "download/keogh2018.yml"

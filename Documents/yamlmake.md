@@ -105,7 +105,7 @@ To operate on sets of multiple files the input and output items can also contain
         wget $(cat {%url}) -O {%fastq}
 ```
 
-Here the `{*dataset}` placeholder in the *url* input field means "glob (i.e. search the filesystem for) this path using a * in place of `{*dataset}` and spawn a *separate job* for each path found". The globbing is always done using the input field(s), since the output files do not exist before the action is run. Once a list of matching file paths has be found the value of the `{*dataset}` placeholder is extracted and substituted into the output path patterns to create the corresponding output paths for each input path.
+Here the `{*dataset}` placeholder in the *url* input field means "glob (i.e. search the filesystem for) this path using a * in place of `{*dataset}` and spawn a *separate job* for each path found". These globbing placeholders only trigger a filesystem glob based on the input field(s), since the output files are assumed not to exist before the action is run. However, once a list of matching input file paths has be found the value(s) of the globbing placeholder(s) are extracted and substituted into any corresponding placeholders in the output path patterns to create the corresponding output paths for each input path.
 
 Therefore if we start off with a set of subfolders under `metadata` named to match each of the datasets which require downloading the above action will run a separate shell command to download each url and save it in a matching folder under `data`. Any required output folders are automatically created if missing. The action will fail if the specified matching output files do not get created. Time stamps are used to check that the output files are newer than the input files.
 
@@ -115,7 +115,7 @@ There is also an alternative form of globbing placeholder of the form `{+dataset
 
 #### Spawning separate jobs for each item of an existing list
 
-Lists of strings can be defined anywhere in the configuration. Additionally each action can define any temporary local configuration it needs - this does not persist after the action has ended. Therefore a short list of files can be hard coded into the action itself (although in practise it might be better kept in a separate configuration file that is included):
+The special `{=...}` placeholder expands to generate a separate job for each item in an existing config list, and can appear in the input and/or output fields of an action. Lists of strings can be defined anywhere in the configuration. Additionally each action can define any temporary local configuration it needs - this does not persist after the action has ended. Therefore a short list of files can be hard coded into the action itself (although in practise it might be better kept in a separate configuration file that is included):
 
 ```
   - action:
@@ -257,6 +257,7 @@ To insert environment variables from the shell used to invoke YAMLmake another t
 Normal shell variables of the form `${USER}`, `${HOSTNAME}` etc are simply ignored by YAMLmake as passed through to the shell command, therefore they give you the value when the command was actually executed, whereas `{$USER}` gets substituted by YAMLmake before the action's shell command is run.
 
 #### Creating lists of file paths within single jobs by matching filenames
+
 Similarly to the `{*dataset}` style placeholder there is an alternative expanding globbing placeholder of the form `{+dataset}` which can be used in the input and output sections of an action. These also expand by matching filenames in the filesystem but generate lists of file paths within the same job instead of generating separate jobs for each path. Unlike the `{*dataset}` style placeholder this means that the files paths are in a list which must be dealt with in the shell command. For example:
 
 ```
@@ -284,6 +285,7 @@ Assuming the metadata folder had subfolders called one, two and three which cont
 ```
 
 #### Creating lists of file paths within single jobs from existing lists
+
 The final special placeholder uses the form `{-sample}`, and generates lists of file paths within a single job. For example:
 
 ```
@@ -349,11 +351,8 @@ Where `,C0` means to extract the 0th (0-based numbering) Column using `,` as the
     url: "{>metadata/toad/toad_url.txt}"
 ```
 
-
-
-
-
 #### Embedded Includes
+
 A special field called `includes` can be inserted anywhere into the configuration which must be a list of one or more filepaths, which are loaded into the configuration hierachy at the location of the includes field. Unlike a top level `- include` item, files loaded using the embedded includes feature should not contain any toplevel pipeline items (which are only valid at the highest level of the pipeline), rather they must contain the exact configuration that needs to be inserted. For example:
 
 ```
@@ -385,6 +384,6 @@ Which would be give the same result as if the original config item has been:
         - "item2"
 ```
 
-
 #### Notes
-Includes are relative to the config files unless they start with a "./" in which case they are relative to the working directory? Special action field: `run:` can be "always", "never" or "conditional".
+
+Includes are relative to the config files unless they start with a "./" in which case they are relative to the working directory? Special top-level field: `run:` can be "always", "never" or "conditional". Special top-level field: `env:` will be included in the running job's bash environment variables, all values must be simple strings, no nested containers allowed here.

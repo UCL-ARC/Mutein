@@ -758,7 +758,6 @@ def init_global_state(args,config):
 
     update_activity_state({'name':None})
 
-
 def load_pipeline(path,parent_file):
     'path is relative to the parent path'
 
@@ -1393,12 +1392,16 @@ def make_stale(path):
     without deleting it (incase the contents need to be inspected first)
     '''
 
+    if not is_active(): return
+
     dt_old = datetime.datetime.fromisoformat('1980-01-01').timestamp()
     os.utime(path, (dt_old, dt_old))
 
 def recycle_item(config,path):
     'move the path into the recycle bin'
     
+    if not is_active(): return
+
     recycle_bin = config['ym/recycle_bin']
 
     assert path != recycle_bin
@@ -1496,10 +1499,13 @@ def handle_stale_outputs(config,outputs):
 
         elif os.path.isdir(path):
             if config['ym/stale_output_dir'] == 'delete':
+                message(f'deleting stale output directory {path}')
                 remove_tree(path)
             elif config['ym/stale_output_dir'] == 'recycle':
+                message(f'recycling stale output directory {path}')
                 recycle_item(config,path)
             elif config['ym/stale_output_dir'] == 'ignore':
+                message(f'ignoring stale output directory {path}')
                 continue
             else:
                 raise Exception(f'unknown option for stale_output_dir: {config["ym/stale_output_dir"]}')
@@ -1519,24 +1525,32 @@ def handle_failed_outputs(config,outputs):
 
         if os.path.islink(path) or os.path.isfile(path):
             if config['ym/failed_output_file'] == 'delete':
+                message(f'deleting failed output file {path}')
                 remove_item(path)
             elif config['ym/failed_output_file'] == 'recycle':
+                message(f'recycling failed output file {path}')
                 recycle_item(config,path)
             elif config['ym/failed_output_file'] == 'stale':
+                message(f'marking as stale failed output file {path}')
                 make_stale(path)
             elif config['ym/failed_output_file'] == 'ignore':
+                message(f'ignoring failed output file {path}')
                 continue
             else:
                 raise Exception(f'unknown option for failed_output_file: {config["ym/failed_output_file"]}')
 
         elif os.path.isdir(path):
             if config['ym/failed_output_dir'] == 'delete':
+                message(f'deleting failed output directory {path}')
                 remove_tree(path)
             elif config['ym/failed_output_dir'] == 'recycle':
+                message(f'recycling failed output directory {path}')
                 recycle_item(config,path)
             elif config['ym/failed_output_dir'] == 'stale':
+                message(f'marking as stale failed output directory {path}')
                 make_stale(path)
             elif config['ym/failed_output_dir'] == 'ignore':
+                message(f'ignoring failed output directory {path}')
                 continue
             else:
                 raise Exception(f'unknown option for failed_output_dir: {config["ym/failed_output_dir"]}')
@@ -1561,10 +1575,24 @@ def generate_full_command(config,shell):
 
     return '\n'.join(cmd_list)
 
+def add_env(config,env):
+    'add key:value pairs from config["env"] to env'
+
+    #no environment variables provided
+    if not 'env' in config: return
+
+    for key,value in config['env'].items():
+        assert type(value) == str, f'non-string value found in env field {key}, all env fields must be simple strings'
+        env[key] = value
+
 def generate_job_environment(config,job_numb,njobs):
     'copy local environment with a few adjustments'
 
     env = copy.deepcopy(os.environ)
+
+    #add in items from the special 'env' field if present
+    add_env(config,env)
+
     env[ config['ym/job_count'] ] = f'{njobs}'
     env[ config['ym/job_number'] ] = f'{job_numb+1}' # convert from 0 to 1 based to match SGE_TASK_ID
 
@@ -1930,7 +1958,7 @@ def process(pipeline,path,config=None,args=None):
 
         elif item_type == 'include':
             #toplevel include: load and insert the yaml items in place of the include item
-            message(f'including {item[item_type]}')
+            header(f'[{item[item_type]}] included')
             new_pipeline,new_path = load_pipeline(item[item_type],path) #new_path ignored
             counter -= 1
             del pipeline[counter]
@@ -1939,6 +1967,7 @@ def process(pipeline,path,config=None,args=None):
         elif item_type == 'module':
             #process a nested pipeline without affecting the config of any
             #following items
+            header(f'[{item[item_type]}] module')
             new_pipeline,new_path = load_pipeline(item[item_type],path)
             sub_config = Conf(config)
             process(new_pipeline,new_path,config=sub_config)
