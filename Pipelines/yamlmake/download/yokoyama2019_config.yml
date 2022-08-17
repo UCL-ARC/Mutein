@@ -1,0 +1,10 @@
+#this file as an input to an action in yokoyama2019.yml therefore edits can trigger a rerun
+- config:
+    dataset_id: "yokoyama2019"
+
+    subset_id:
+      - "EGAD00001004464"
+      - "EGAD00001004462"
+      - "EGAD00010001631"
+
+    credentials: "config/private_config1.json"

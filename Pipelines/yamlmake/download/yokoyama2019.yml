@@ -1,0 +1,75 @@
+#define dataset_id and subset_list
+- include: "yokoyama2019_config.yml"
+
+#download list of accession names
+- action:
+    name:  "download_accession_list"
+    exec:  "local"
+    conda: "{$MUT_PREFIX}pyega3"
+
+    input:
+        yokoyama_config: "{%conf_dir}/download/yokoyama2019_config.yml"
+
+    output:
+        stdout:    "datasets/{%dataset_id}/{=subset_id}/stdout"
+        stderr:    "datasets/{%dataset_id}/{=subset_id}/stderr"
+        file_list: "datasets/{%dataset_id}/{=subset_id}/file_list"
+        md5_list:  "datasets/{%dataset_id}/{=subset_id}/md5_list"
+
+    #get list of EGAF accessions and MD5s using pyega3
+    shell: |
+        pyega3 -cf {%credentials} files {=subset_id}    > {%stdout} 2> {%stderr}
+        cat {%stderr} | grep EGAF | awk '{print $4}'    > {%file_list}
+        cat {%stderr} | grep EGAF | awk '{print $4,$7}' > {%md5_list}
+
+# - action:
+#     name: "create_subset_folders"
+#     exec: "local"
+
+#     input:
+#         yokoyama_config: "{%conf_dir}/download/yokoyama2019_config.yml"
+
+#     output:
+#         touch: "datasets/{%dataset_id}/{=subset_id}/created_folders.touch"
+
+#     shell: |
+#         touch {%touch}
+
+# - action:
+#     name: "download_accessions"
+#     exec:  "local"
+#     conda: "{$MUT_PREFIX}pyega3"
+
+#     input:
+#         #spawn one job per subset x accession
+#         accession_dir: "datasets/{%dataset_id}/{=subset_id}/{*accession}.d"
+
+#     output:
+#         read1: "datasets/{%dataset_id}/{=subset_id}/{*accession}.d/{*accession}_1.fastq.gz"
+#         read2: "datasets/{%dataset_id}/{=subset_id}/{*accession}.d/{*accession}_2.fastq.gz"
+
+#     shell: |
+#         cd {%accession_dir}
+#         enaDataGet -f fastq {*accession}
+
+# the below is being ported to yamlmake from raw script 
+
+# conda activate ${MUT_PREFIX}pyega3
+
+# EGAD00001004464
+# EGAD00001004462
+# EGAD00010001631
+
+# mkdir -p "${DATA_DIR}"
+# cd "${DATA_DIR}"
+
+# for x in $(cat "${ACC_FILE}")
+# do
+#     mkdir -p ${x} && cd ${x}
+#     pyega3 -ms 100000000000 fetch ${x}
+#     cd ..
+# done \
+# > download-${TIMESTAMP}.stdout \
+# 2> download-${TIMESTAMP}.stderr
+
+

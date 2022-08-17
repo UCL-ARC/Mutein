@@ -1,5 +1,5 @@
 #define dataset_id and subset_list
-- include: "keogh_config.yml"
+- include: "keogh2018_config.yml"
 
 #download list of accession names
 - action:
@@ -8,7 +8,7 @@
     conda: "{$MUT_PREFIX}enabrowsertools"
 
     input:
-        keogh_config: "{%conf_dir}/download/keogh_config.yml"
+        keogh_config: "{%conf_dir}/download/keogh2018_config.yml"
 
     output:
         accession_file: "datasets/{%dataset_id}/{=subset_id}/accession_list"

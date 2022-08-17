@@ -5,3 +5,5 @@
 - include: "reference.yml"
 
 - module: "download/keogh2018.yml"
+
+- module: "download/yokoyama2019.yml"

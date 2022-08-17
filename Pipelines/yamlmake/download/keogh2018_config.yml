@@ -5,5 +5,3 @@
     #currently only one data subset within keogh2018
     subset_id:
       - "SRP159015"
-
-    acc_prefix: "SRR"
