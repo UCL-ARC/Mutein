@@ -1,0 +1,54 @@
+# This file is intended to be sourced, not executed, so that you keep the env vars
+
+#add Mutein scripts to the path
+export PATH=${MUT_DIR}/Pipelines/scripts:${PATH}
+
+#add Mutein python modules to PYTHONPATH
+export PYTHONPATH=${MUT_DIR}/Pipelines/varcall_modules:${PYTHONPATH}
+export PYTHONPATH=${MUT_DIR}/Pipelines/pymodules:${PYTHONPATH}
+
+#set the snakemake profile folder and path to snakefile and mutein config
+export SNAKEMAKE_PROFILE=${MUT_DIR}/Pipelines/config
+export SNAKEFILE=${MUT_DIR}/Pipelines/config/Snakefile
+export SNAKECONF=${MUT_DIR}/Pipelines/config/mutein.yaml
+
+#always pass the snakefile and configfile to snakemake
+alias snakemake="snakemake --snakefile ${SNAKEFILE} --configfile ${SNAKECONF}"
+
+#conda environment names prefix to reduce chances of namespace collisions
+export MUT_PREFIX=mutein_
+
+## ========== END OF CONFIG =======================
+
+setup_conda_env()
+{
+    # setup conda snakemake environment if not already available (also provides python3)
+    if ! conda env list | grep -qe "${MUT_PREFIX}main" ; then
+        echo -n "Creating the ${MUT_PREFIX}main conda environment... "
+        conda create -y -n ${MUT_PREFIX}main \
+            $(cat ${MUT_DIR}/Pipelines/conda_envs/channels) \
+            --file ${MUT_DIR}/Pipelines/conda_envs/main.env \
+        || { echo "FAILED with error $?"; return 1; }
+        echo OK
+    else
+        echo "Conda environment ${MUT_PREFIX}main already exists"
+    fi
+
+    # activate snakemake conda environment, also provides python3
+    echo -n "Activating the ${MUT_PREFIX}main conda environment... "
+    conda activate "${MUT_PREFIX}main" \
+    || { echo "FAILED with error $?"; return 1; }
+    echo OK
+
+    echo -n "Running the mutein script... "
+    # verify mutein is in the PATH and print warning if not in MUT_DATA directory
+    mutein check-cwd \
+    || { echo "FAILED with error $?"; return 1; }
+    echo OK
+
+    # Disable password setting as this feature doesn't work as expected
+    # export MUT_PASSWORD=$(mutein set-password)
+}
+
+# run as a function so that we can stop on errors without exiting the current shell
+setup_conda_env
