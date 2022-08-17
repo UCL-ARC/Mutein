@@ -12,6 +12,36 @@ import sys
 import random
 import itertools
 
+default_global_config =\
+{
+    'ym':{
+        'prefix':'ym-',                  #log file/job name  prefix: qsub doesn't like numerical names
+        'log_dir':'yamlmake_logs',       #name of subfolder for logging
+        'remote_delay_secs':'10',        #wait this long after remote jobs incase of latency
+        'stale_output_file':'ignore',    #ignore,delete,recycle (also applies to symlinks)
+        'stale_output_dir':'ignore',     #ignore,delete,recycle
+        'failed_output_file':'stale',    #delete,recycle,stale,ignore (also applies to symlinks)
+        'failed_output_dir':'stale',     #delete,recycle,stale,ignore    
+        'missing_parent_dir':'create',   #ignore,create
+        'recycle_bin':'recycle_bin',     #name of recycle bin folder
+        'job_count':'YM_NJOBS',          #env variable: how many jobs spawned by current action
+        'job_number':'YM_JOB_NUMBER',    #env variable: 1 based job numbering within the current action
+        'bash_setup':'source ~/.bashrc\nset -euo pipefail\nset +o history',
+        'conda_setup':'',
+    },
+    'qsub':{
+        'template':'default',        #template job script: "default" or path to your own
+        'time':'02:00:00',           #$ -l h_rt={time}
+        'mem':'4G',                  #$ -l mem={mem}
+        'tmpfs':'10G',               #$ -l tmpfs={tmpfs}
+        'pe':'smp',                  #$ -pe {pe} {cores}
+        'cores':'1',                 #$ -pe {pe} {cores}
+        'log_dir':'{%ym/log_dir}'    #log dir for qsub stdout and stderr files
+                                     #$ -o/e {log_dir}/{jobname}.$TASK_ID.out/err
+    },
+    'exec':'local',                  #default execution environment
+}
+
 global_state = {}
 
 #regex patterns to match non nested {%placeholders} and {$environment variables}
@@ -24,36 +54,7 @@ list2job_regx  = r'\{=.+?\}'       #{=list} ==> split into separate jobs
 list2list_regx  = r'\{-.+?\}'      #{-list} ==> become in-job list
 
 warning_prefix = 'WARNING: '
-
-default_global_config =\
-{
-    'fm':{
-        'prefix':'fm-',                  #log file/job name  prefix: qsub doesn't like numerical names
-        'log_dir':'fakemake_logs',       #name of subfolder for logging
-        'remote_delay_secs':'10',        #wait this long after remote jobs incase of latency
-        'stale_output_file':'ignore',    #ignore,delete,recycle (also applies to symlinks)
-        'stale_output_dir':'ignore',     #ignore,delete,recycle
-        'failed_output_file':'stale',    #delete,recycle,stale,ignore (also applies to symlinks)
-        'failed_output_dir':'stale',     #delete,recycle,stale,ignore    
-        'missing_parent_dir':'create',   #ignore,create
-        'recycle_bin':'recycle_bin',     #name of recycle bin folder
-        'job_count':'FM_NJOBS',          #env variable: how many jobs spawned by current action
-        'job_number':'FM_JOB_NUMBER',    #env variable: 1 based job numbering within the current action
-        'bash_setup':'source ~/.bashrc\nset -euo pipefail\nset +o history',
-        'conda_setup':'',
-    },
-    'qsub':{
-        'template':'default',        #template job script: "default" or path to your own
-        'time':'02:00:00',           #$ -l h_rt={time}
-        'mem':'4G',                  #$ -l mem={mem}
-        'tmpfs':'10G',               #$ -l tmpfs={tmpfs}
-        'pe':'smp',                  #$ -pe {pe} {cores}
-        'cores':'1',                 #$ -pe {pe} {cores}
-        'log_dir':'{%fm/log_dir}'    #log dir for qsub stdout and stderr files
-                                     #$ -o/e {log_dir}/{jobname}.$TASK_ID.out/err
-    },
-    'exec':'local',                  #default execution environment
-}
+illegal_chrs = '\\\n\r\t\'" *?:;,/#%&{}<>+`|=$!@'
 
 class Conf:
     def __init__(self,src=None):
@@ -141,8 +142,16 @@ class Conf:
         row = None
         col = None
 
-        fname = filename        
+        fname = filename
+        #optional extra info can follow the filename in square brackets
+        #if not square brackets entire file is loaded including multiple lines
         if '[' in filename:
+            #filename[<options>]
+            #options are: <sep>R<numb> or <sep>C<numb>
+            #sep is the field separator
+            #R = extract a row
+            #C = extract a column
+            #numb = which row or column to extract
             assert filename[-1] == ']',f'misformed load parameters in {filename} at {key}'
             params = filename.split('[')[-1][:-1]
             fname = filename.split('[')[0]
@@ -588,14 +597,14 @@ class Conf:
         return value,changed
 
     def make_log_dir(self):
-        if not os.path.exists(self['fm/log_dir']):
-            message(f'creating missing log_dir {self["fm/log_dir"]}')
+        if not os.path.exists(self['ym/log_dir']):
+            message(f'creating missing log_dir {self["ym/log_dir"]}')
 
             #note: still creating missing log_dir in dryrun mode
             #so we can record messages and create qsub scripts
             #for inspection by the user
             #therefore not using the makedirs wrapper function
-            os.makedirs(self['fm/log_dir'])
+            os.makedirs(self['ym/log_dir'])
 
 def makedirs(path):
     if is_active(): os.makedirs(path)
@@ -697,7 +706,9 @@ def update_activity_state(action):
     '''
 
     #incase the config has changed since the last action
-    if 'fm/log_dir' in action: global_state['log_dir'] = action['fm/log_dir']
+    if 'ym/log_dir' in action:
+        global_state['log_dir'] = action['ym/log_dir']
+        global_state['prefix'] = action['ym/prefix']
 
     #see if we've reached the run-from rule
     if global_state['args'].run_from and action['name'] == global_state['args'].run_from:
@@ -742,7 +753,8 @@ def init_global_state(args,config):
     global_state['start_time'] = timestamp_now()
 
     global_state['is_active'] = None
-    global_state['log_dir'] = config['fm/log_dir']
+    global_state['log_dir'] = config['ym/log_dir']
+    global_state['prefix'] = config['ym/prefix']
 
     update_activity_state({'name':None})
 
@@ -771,7 +783,25 @@ def fill_out_all(config,action,path):
     action.sub_vars()
     action.make_log_dir()
 
+def validate_action(action):
+    'check for required fields'
+
+    assert 'name' in action, 'all actions must have a name field'
+    assert 'input' in action, 'all actions must have an input field'
+    assert 'output' in action, 'all actions must have an output field'
+    assert 'shell' in action, 'all actions must have a shell field'
+
+    #name is used to general file and job names
+    #therefore prevent any characters that cause problems for filenames
+    for ch in illegal_chrs:
+        assert not ch in action['name'], f'cannot use "{ch}" in action name, consider a description field for longer text'
+
+    assert action['name'][0] != '.', f'action name {action["name"]} cannot start with a dot'
+
 def setup_action(config,action,path):
+    #validate the action
+    validate_action(action)
+
     #separate out and canonicalise input, output and shell
     action,input,output,shell = split_action(action)
 
@@ -803,11 +833,13 @@ def split_action(action):
     del action['output']
     del action['shell']
 
-    #convert simple form input/output into dictionary form
-    if type(input) == str:  input = {'input':input}
-    if type(output) == str: output = {'output':output}
-    shell = { 'shell':shell }
+    #decided to remove this little convenience as it makes
+    #explaining input/output more complex
+    # #convert simple form input/output into dictionary form
+    # if type(input) == str:  input = {'input':input}
+    # if type(output) == str: output = {'output':output}
 
+    shell = { 'shell':shell }
     action = Conf(action)
     input = Conf(input)
     output = Conf(output)
@@ -820,7 +852,10 @@ def parse_yaml(fname):
     with open(fname) as f:
         result = yaml.safe_load(f)
 
-    assert type(result) == list
+    #allow empty files, such as when all items are commented out
+    if result == None: result = []
+
+    assert type(result) == list, f"YAML file {fname} does not contain a list of YAMLmake items"
     
     return result
 
@@ -1296,7 +1331,7 @@ def generate_shell_commands(action,job_list,shell):
         if newest_input == None:
             #flag job for removal from the list
             job_list[job_numb] = None
-            warning(f'one or more inputs missing or stale, job not runable')
+            warning(f'one or more inputs missing or stale, job not runnable')
             continue
 
         #all inputs present
@@ -1318,10 +1353,10 @@ def generate_shell_commands(action,job_list,shell):
         handle_stale_outputs(action,job['output'])
 
         #create any missing output *parent* directories
-        if action['fm/missing_parent_dir'] == 'create':
+        if action['ym/missing_parent_dir'] == 'create':
             create_output_dirs(action,job['output'])
 
-    #remove non-runable jobs
+    #remove non-runnable jobs
     job_list = [job for job in job_list if job is not None]
     shell_list = []
 
@@ -1364,7 +1399,7 @@ def make_stale(path):
 def recycle_item(config,path):
     'move the path into the recycle bin'
     
-    recycle_bin = config['fm/recycle_bin']
+    recycle_bin = config['ym/recycle_bin']
 
     assert path != recycle_bin
 
@@ -1408,18 +1443,26 @@ def remove_item(path):
 def remove_tree(path):
     if is_active(): shutil.rmtree(path)
 
-def warning(item,end='\n'):
-    message(warning_prefix+item,end=end)
+def warning(item,end='\n',timestamp=True):
+    message(warning_prefix+item,end=end,timestamp=timestamp)
 
-def message(item,end='\n'):
-    item = timestamp_now_nice() + ' ' + str(item)
+def header(item,end='\n',timestamp=True):
+    line = '-'*(70-len(item))
+    item = f'{item}  {line}'
+    print()
+    message(item,end=end,timestamp=timestamp)
+
+def message(item,end='\n',timestamp=True):
+    if timestamp:
+        item = timestamp_now_nice() + ' ' + str(item)
 
     if global_state['args'].quiet != True:
         print(item,end=end)
         sys.stdout.flush()
 
     if global_state['args'].nologs != True:
-        path = os.path.join(global_state['log_dir'],global_state['start_time']+'.messages')
+        path = os.path.join(global_state['log_dir'],
+                            global_state['prefix']+global_state['start_time']+'.messages')
 
         try:
             with open(path,'a') as f:
@@ -1439,27 +1482,27 @@ def handle_stale_outputs(config,outputs):
         if not os.path.exists(path): continue
 
         if os.path.islink(path) or os.path.isfile(path):
-            if config['fm/stale_output_file'] == 'delete':
+            if config['ym/stale_output_file'] == 'delete':
                 message(f'deleting stale output file {path}')
                 remove_item(path)
-            elif config['fm/stale_output_file'] == 'recycle':
+            elif config['ym/stale_output_file'] == 'recycle':
                 message(f'recycling stale output file {path}')
                 recycle_item(config,path)
-            elif config['fm/stale_output_file'] == 'ignore':
+            elif config['ym/stale_output_file'] == 'ignore':
                 message(f'ignoring stale output file {path}')
                 continue
             else:
-                raise Exception(f'unknown option for stale_output_file: {config["fm/stale_output_file"]}')
+                raise Exception(f'unknown option for stale_output_file: {config["ym/stale_output_file"]}')
 
         elif os.path.isdir(path):
-            if config['fm/stale_output_dir'] == 'delete':
+            if config['ym/stale_output_dir'] == 'delete':
                 remove_tree(path)
-            elif config['fm/stale_output_dir'] == 'recycle':
+            elif config['ym/stale_output_dir'] == 'recycle':
                 recycle_item(config,path)
-            elif config['fm/stale_output_dir'] == 'ignore':
+            elif config['ym/stale_output_dir'] == 'ignore':
                 continue
             else:
-                raise Exception(f'unknown option for stale_output_dir: {config["fm/stale_output_dir"]}')
+                raise Exception(f'unknown option for stale_output_dir: {config["ym/stale_output_dir"]}')
                 
         else:
             raise Exception(f'unsupported output type {path}')
@@ -1475,28 +1518,28 @@ def handle_failed_outputs(config,outputs):
         if not os.path.exists(path): continue
 
         if os.path.islink(path) or os.path.isfile(path):
-            if config['fm/failed_output_file'] == 'delete':
+            if config['ym/failed_output_file'] == 'delete':
                 remove_item(path)
-            elif config['fm/failed_output_file'] == 'recycle':
+            elif config['ym/failed_output_file'] == 'recycle':
                 recycle_item(config,path)
-            elif config['fm/failed_output_file'] == 'stale':
+            elif config['ym/failed_output_file'] == 'stale':
                 make_stale(path)
-            elif config['fm/failed_output_file'] == 'ignore':
+            elif config['ym/failed_output_file'] == 'ignore':
                 continue
             else:
-                raise Exception(f'unknown option for failed_output_file: {config["fm/failed_output_file"]}')
+                raise Exception(f'unknown option for failed_output_file: {config["ym/failed_output_file"]}')
 
         elif os.path.isdir(path):
-            if config['fm/failed_output_dir'] == 'delete':
+            if config['ym/failed_output_dir'] == 'delete':
                 remove_tree(path)
-            elif config['fm/failed_output_dir'] == 'recycle':
+            elif config['ym/failed_output_dir'] == 'recycle':
                 recycle_item(config,path)
-            elif config['fm/failed_output_dir'] == 'stale':
+            elif config['ym/failed_output_dir'] == 'stale':
                 make_stale(path)
-            elif config['fm/failed_output_dir'] == 'ignore':
+            elif config['ym/failed_output_dir'] == 'ignore':
                 continue
             else:
-                raise Exception(f'unknown option for failed_output_dir: {config["fm/failed_output_dir"]}')
+                raise Exception(f'unknown option for failed_output_dir: {config["ym/failed_output_dir"]}')
                 
         else:
             raise Exception(f'unsupported output type {path}')
@@ -1506,12 +1549,12 @@ def generate_full_command(config,shell):
 
     cmd_list = []
 
-    if 'fm/bash_prefix' in config and config['fm/bash_prefix'] != '':
-        cmd_list.append(config['fm/bash_prefix'])
+    if 'ym/bash_setup' in config and config['ym/bash_setup'] != '':
+        cmd_list.append(config['ym/bash_setup'])
 
     if 'conda' in config and config['conda'] != '':
-        if 'fm/conda_setup_command' in config and config['fm/conda_setup_command'] != '':
-            cmd_list.append(config['fm/conda_setup_command'])
+        if 'ym/conda_setup' in config and config['ym/conda_setup'] != '':
+            cmd_list.append(config['ym/conda_setup'])
         cmd_list.append(f'conda activate {config["conda"]}')
 
     cmd_list.append(shell)
@@ -1522,16 +1565,16 @@ def generate_job_environment(config,job_numb,njobs):
     'copy local environment with a few adjustments'
 
     env = copy.deepcopy(os.environ)
-    env[ config['fm/job_count'] ] = f'{njobs}'
-    env[ config['fm/job_number'] ] = f'{job_numb+1}' # convert from 0 to 1 based to match SGE_TASK_ID
+    env[ config['ym/job_count'] ] = f'{njobs}'
+    env[ config['ym/job_number'] ] = f'{job_numb+1}' # convert from 0 to 1 based to match SGE_TASK_ID
 
     return env
 
 def write_jobfile(action,shell_list):
     'save action config and shell_list as json'
 
-    fnamebase = f'{action["fm/prefix"]}{timestamp_now()}.{action["name"]}'
-    jobfile = os.path.join(action['fm/log_dir'],fnamebase+'.jobs')
+    fnamebase = f'{action["ym/prefix"]}{timestamp_now()}.{action["name"]}'
+    jobfile = os.path.join(action['ym/log_dir'],fnamebase+'.jobs')
     payload = {'action':action.getdict(),'shell_list':shell_list}
 
     with open(jobfile,'w') as f:
@@ -1542,14 +1585,14 @@ def write_jobfile(action,shell_list):
 
 def execute_command(config,job_numb,cmd,env):
     'execute command locally'
-    fname = f'{config["fm/prefix"]}{timestamp_now()}.{config["name"]}'
-    foutname = os.path.join(config['fm/log_dir'],fname+'.out')
-    ferrname = os.path.join(config['fm/log_dir'],fname+'.err')
+    fname = f'{config["ym/prefix"]}{timestamp_now()}.{config["name"]}'
+    foutname = os.path.join(config['ym/log_dir'],fname+'.out')
+    ferrname = os.path.join(config['ym/log_dir'],fname+'.err')
 
     message(f'job {job_numb+1} executing locally...')
 
-    if cmd.endswith('\n'): message(f'{cmd}',end='')
-    else:                  message(f'{cmd}')
+    if cmd.endswith('\n'): message(f'{cmd}',end='',timestamp=False)
+    else:                  message(f'{cmd}',timestamp=False)
 
     if not is_active():
         #dry-run: signal job completed ok without running it
@@ -1593,7 +1636,7 @@ def write_qsub_file(action,qsub_script,jobname,njobs,jobfile):
     env["jobname"] = jobname
     env["jobfile"] = jobfile
     env["python"] = sys.executable
-    env["fakemake"] = sys.argv[0]
+    env["yamlmake"] = sys.argv[0]
 
     for line in f_in: f_out.write(line.format(**env))
 
@@ -1607,8 +1650,8 @@ def submit_job_qsub(action,shell_list,job_list):
     '''
 
     jobname = write_jobfile(action,shell_list)
-    qsub_script = os.path.join(action['fm/log_dir'],jobname+'.qsub')
-    jobfile = os.path.join(action['fm/log_dir'],jobname+'.jobs')
+    qsub_script = os.path.join(action['ym/log_dir'],jobname+'.qsub')
+    jobfile = os.path.join(action['ym/log_dir'],jobname+'.jobs')
     njobs = len(shell_list)
 
     write_qsub_file(action,qsub_script,jobname,njobs,jobfile)
@@ -1617,13 +1660,13 @@ def submit_job_qsub(action,shell_list,job_list):
 
     env = copy.deepcopy(os.environ)
 
-    message(f'executing {cmd} with {njobs}...')
+    message(f'executing {cmd} with {njobs} task(s)...')
 
     something_failed = False
 
     if is_active():
-        foutname = os.path.join(action['fm/log_dir'],jobname+'.out')
-        ferrname = os.path.join(action['fm/log_dir'],jobname+'.err')
+        foutname = os.path.join(action['ym/log_dir'],jobname+'.out')
+        ferrname = os.path.join(action['ym/log_dir'],jobname+'.err')
         fout = open(foutname,'w')
         ferr = open(ferrname,'w')
         #sys.stdout.flush()
@@ -1640,13 +1683,13 @@ def submit_job_qsub(action,shell_list,job_list):
         else:                message(f'qsub call succeeded')
 
     #delay to allow for shared filesystem latency on status files
-    message(f'sleeping for {action["fm/remote_delay_secs"]} seconds to allow for filesystem latency...')
-    if activity_state() == 'active': time.sleep(int(action['fm/remote_delay_secs']))
+    message(f'sleeping for {action["ym/remote_delay_secs"]} seconds to allow for filesystem latency...')
+    if activity_state() == 'active': time.sleep(int(action['ym/remote_delay_secs']))
 
     #check each individual job's status file and expected outputs
     #some jobs may not have failed even if qsub returned an error code?
     for job_numb,item in enumerate(shell_list):
-        status_file = f'{action["fm/log_dir"]}/{jobname}.{job_numb+1}.status'
+        status_file = f'{action["ym/log_dir"]}/{jobname}.{job_numb+1}.status'
 
         failed = False
         if not os.path.exists(status_file):
@@ -1679,20 +1722,13 @@ def qsub_execute_job(jobfile):
     '''
     runs on a compute node under grid engine control
     execute one job of a job array spawned by qsub
-    invoked automatically by fakemake using the --qsub option
+    invoked automatically by yamlmake using the --qsub option
     '''
-    action,shell_list = read_jobfile(jobfile)
 
+    action,shell_list = read_jobfile(jobfile)
     action = Conf(action)
 
-    #action.show()
-
     assert jobfile.endswith('.jobs')
-
-    spawn_job(jobfile,action,shell_list)
-
-def spawn_job(jobfile,action,shell_list):
-    'spawn user job'
 
     status_file = f'{jobfile[:-5]}.{os.environ["SGE_TASK_ID"]}.status'
     job_numb = int(os.environ["SGE_TASK_ID"]) - 1 #convert from 1 to 0 based
@@ -1817,28 +1853,28 @@ def process_action(config,action,path):
     update_activity_state(action)
 
     if activity_state() == 'inactive':
-        message(f'skipping action {action["name"]}')
+        header(f'[{action["name"]}] skipped: pipeline inactive')
         return False
 
     if 'run' in action and action['run'] == 'never':
-        message(f'skipping action {action["name"]}')
+        header(f'[{action["name"]}] skipped: never run is set')
         return False
 
     if activity_state() == 'dryrun':
-        message(f'dry-running action {action["name"]}')
+        header(f'[{action["name"]}] dry-running')
     else:
-        message(f'running action: {action["name"]}')
+        header(f'[{action["name"]}] running')
 
     #generate list of potential jobs by filling out glob and list placeholders
     #this step does not pay any attention to file time stamps
     job_list = generate_job_list(action,input,output)
-    message(f'placeholder expansion found {len(job_list)} potential jobs')
+    message(f'{len(job_list)} potential jobs from placeholder expansion')
     if len(job_list) == 0: return False
 
     #determine if all inputs are present and non-stale
     #determine if any outputs need (re)generating
     job_list,shell_list = generate_shell_commands(action,job_list,shell)
-    message(f'input/output file checking found {len(shell_list)} runable jobs')
+    message(f'{len(shell_list)} runnable jobs from input/output file checking')
     if len(shell_list) == 0: return False
 
     #check current working directory agrees with configured value

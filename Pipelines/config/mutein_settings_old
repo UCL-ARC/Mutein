@@ -1,0 +1,23 @@
+## the user should copy this script into a subfolder of their
+## main data folder called config and then source it to
+## set up their working environment:
+##
+##   source ./config/mutein_settings
+##
+## conda must already be installed manually
+## this script will set up the mutein_main conda environment
+## if not already created, and will *keep it active* after it exits
+## so the user can start using mutein
+
+## ============ ONLY EDIT THIS SECTION ============
+
+#set this to the location you put the Mutein repository folder
+export MUT_DIR=~/repos/Mutein
+
+#set this to the location of your Mutein data folder
+export MUT_DATA=~/549_mutein
+
+## ================================================
+
+source "${MUT_DIR}"/Pipelines/config/mutein_setup
+

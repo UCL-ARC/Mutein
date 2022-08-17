@@ -9,31 +9,7 @@ export MUT_DATA=~/549_mutein
 
 ## ================================================
 
-## the following will not normally need to be edited by the user
+## Everything else will not normally need to be edited
+## by the user so is sourced from a file in the repo
 
-#add Mutein scripts to the path
-export PATH=${MUT_DIR}/Pipelines/scripts:${PATH}
-
-#add Mutein python modules to PYTHONPATH
-export PYTHONPATH=${MUT_DIR}/Pipelines/varcall_modules:${PYTHONPATH}
-export PYTHONPATH=${MUT_DIR}/Pipelines/pymodules:${PYTHONPATH}
-
-#set the snakemake profile folder and path to snakefile and mutein config
-export SNAKEMAKE_PROFILE=${MUT_DIR}/Pipelines/config
-export SNAKEFILE=${MUT_DIR}/Pipelines/config/Snakefile
-export SNAKECONF=${MUT_DIR}/Pipelines/config/mutein.yaml
-
-#always pass the snakefile and configfile to snakemake
-alias snakemake="snakemake --snakefile ${SNAKEFILE} --configfile ${SNAKECONF}"
-
-#conda environment names prefix to reduce chances of namespace collisions
-export MUT_PREFIX=mutein_
-
-## ========== END OF CONFIG =======================
-
-# execute setup script, do not source it
-"$MUT_DIR"/Pipelines/config/mutein_setup
-rc=$?
-if [ $rc -ne 0 ]; then
-    echo "Setup script failed with error $rc"
-fi
+source "$MUT_DIR"/Pipelines/config/mutein_fixed_settings

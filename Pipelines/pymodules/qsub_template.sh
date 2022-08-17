@@ -9,4 +9,4 @@
 #$ -l mem={mem}
 #$ -l tmpfs={tmpfs}
 #$ -pe {pe} {cores}
-{python} {fakemake} --qsub {jobfile}
+{python} {yamlmake} --qsub {jobfile}
