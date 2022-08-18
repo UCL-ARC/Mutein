@@ -1,8 +1,29 @@
 - config:
-    fm:
-      prefix:               "mut."
-      stale_output_file:    "recycle"
-      stale_output_dir:     "ignore"
-      missing_parent_dir:   "create"
+    ym:
+        prefix:             'ym-'           #log file/job name  prefix: qsub doesn't like numerical names
+        remote_delay_secs:  '10'            #wait this long after remote jobs incase of latency
+        stale_output_file:  'ignore'        #ignore,delete,recycle (also applies to symlinks)
+        stale_output_dir:   'ignore'        #ignore,delete,recycle
+        failed_output_file: 'stale'         #delete,recycle,stale,ignore (also applies to symlinks)
+        failed_output_dir:  'stale'         #delete,recycle,stale,ignore    
+        missing_parent_dir: 'create'        #ignore,create
+        recycle_bin:        'recycle_bin'   #name of recycle bin folder
+        job_count:          'YM_NJOBS'      #env variable: how many jobs spawned by current action
+        job_number:         'YM_JOB_NUMBER' #env variable: 1 based job numbering within the current action
+        conda_setup:        ''              #run just before trying to activate the conda env the command requested
+        conda_prefix:       ''              #a prefix to apply to the name of every conda environment
 
-    working_dir:          "/lustre/scratch/scratch/{$USER}/549_mutein"
+        # #run before every shell action
+        # bash_setup: |
+        #   source ~/.bashrc
+        #   set -euo pipefail
+        #   set +o history 
+    qsub:
+        template:           'default'       #template job script: "default" or path to your own
+        time:               '02:00:00'      #$ -l h_rt={time}
+        mem:                '4G'            #$ -l mem={mem}
+        tmpfs:              '10G'           #$ -l tmpfs={tmpfs}
+        pe:                 'smp'           #$ -pe {pe} {cores}
+        cores:              '1'             #$ -pe {pe} {cores}
+
+    working_dir:          "/lustre/scratch/scratch/{$USER}/testing/549_mutein"

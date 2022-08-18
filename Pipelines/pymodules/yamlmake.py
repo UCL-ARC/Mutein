@@ -12,36 +12,36 @@ import sys
 import random
 import itertools
 
-default_global_config =\
-{
-    'ym':{
-        'prefix':'ym-',                  #log file/job name  prefix: qsub doesn't like numerical names
-        #'log_dir':'yamlmake_logs',       #name of subfolder for logging is now a command line only option
-        'remote_delay_secs':'10',        #wait this long after remote jobs incase of latency
-        'stale_output_file':'ignore',    #ignore,delete,recycle (also applies to symlinks)
-        'stale_output_dir':'ignore',     #ignore,delete,recycle
-        'failed_output_file':'stale',    #delete,recycle,stale,ignore (also applies to symlinks)
-        'failed_output_dir':'stale',     #delete,recycle,stale,ignore    
-        'missing_parent_dir':'create',   #ignore,create
-        'recycle_bin':'recycle_bin',     #name of recycle bin folder
-        'job_count':'YM_NJOBS',          #env variable: how many jobs spawned by current action
-        'job_number':'YM_JOB_NUMBER',    #env variable: 1 based job numbering within the current action
-        'bash_setup':'source ~/.bashrc\nset -euo pipefail\nset +o history', #run before every shell action
-        'conda_setup':'',                #run just before trying to activate the conda env the command requested
-        'conda_prefix':'',               #a prefix to apply to the name of every conda environment
-    },
-    'qsub':{
-        'template':'default',        #template job script: "default" or path to your own
-        'time':'02:00:00',           #$ -l h_rt={time}
-        'mem':'4G',                  #$ -l mem={mem}
-        'tmpfs':'10G',               #$ -l tmpfs={tmpfs}
-        'pe':'smp',                  #$ -pe {pe} {cores}
-        'cores':'1',                 #$ -pe {pe} {cores}
-        #'log_dir':'{%ym/log_dir}'    #log dir for qsub stdout and stderr files no longer changable
-                                     #$ -o/e {log_dir}/{jobname}.$TASK_ID.out/err
-    },
-    'exec':'local',                  #default execution environment
-}
+default_config_str =\
+'''
+    ym:
+        prefix:             'ym-'           #log file/job name  prefix: qsub doesn't like numerical names
+        remote_delay_secs:  '10'            #wait this long after remote jobs incase of latency
+        stale_output_file:  'ignore'        #ignore,delete,recycle (also applies to symlinks)
+        stale_output_dir:   'ignore'        #ignore,delete,recycle
+        failed_output_file: 'stale'         #delete,recycle,stale,ignore (also applies to symlinks)
+        failed_output_dir:  'stale'         #delete,recycle,stale,ignore    
+        missing_parent_dir: 'create'        #ignore,create
+        recycle_bin:        'recycle_bin'   #name of recycle bin folder
+        job_count:          'YM_NJOBS'      #env variable: how many jobs spawned by current action
+        job_number:         'YM_JOB_NUMBER' #env variable: 1 based job numbering within the current action
+        conda_setup:        ''              #run just before trying to activate the conda env the command requested
+        conda_prefix:       ''              #a prefix to apply to the name of every conda environment
+        #run before every shell action
+        bash_setup: |
+          source ~/.bashrc
+          set -euo pipefail
+          set +o history 
+    qsub:
+        template:           'default'       #template job script: "default" or path to your own
+        time:               '02:00:00'      #$ -l h_rt={time}
+        mem:                '4G'            #$ -l mem={mem}
+        tmpfs:              '10G'           #$ -l tmpfs={tmpfs}
+        pe:                 'smp'           #$ -pe {pe} {cores}
+        cores:              '1'             #$ -pe {pe} {cores}
+'''
+
+default_global_config = yaml.safe_load(default_config_str)
 
 #global meta configuration
 meta = {}
@@ -548,6 +548,23 @@ class Conf:
             else:
                 raise Exception(f"unsupported data type in {key}")
 
+    def no_placeholders(self):
+        'verify no placeholders remain'
+
+        reg_list = [
+            environ_regx,
+            scalar_regx,
+            glob2job_regx,
+            glob2list_regx,
+            list2job_regx,
+            list2list_regx,
+        ]
+
+        for key,value in self.items():
+            for regx in reg_list:
+                if re.search(regx,value):
+                    raise Exception(f'unmatched placeholder {value} found in {key}')
+
     def sub_vars(self,src=None):
         '''
         substitute all {$...} and {%...} placeholders
@@ -718,7 +735,8 @@ def update_activity_state(action):
     '''
 
     #incase the config has changed since the last action
-    meta['prefix'] = action['ym/prefix']
+    if 'ym/prefix' in action:
+        meta['prefix'] = action['ym/prefix']
 
     #see if we've reached the run-from rule
     if meta['args'].run_from and action['name'] == meta['args'].run_from:
@@ -778,6 +796,7 @@ def init_meta(args,config):
         os.makedirs(meta['log_dir'])
         message(f"created missing log_dir {meta['log_dir']}")
 
+    #update with a fake action name that will not match any rule
     update_activity_state({'name':None})
 
 def load_pipeline(path,parent_file):
@@ -1092,33 +1111,14 @@ def make_alt_key(all_between):
 
     return job_key
 
-def generate_glob_jobs(action,job):
-    '''
-    glob filenames to match the two glob type placeholders
-    {+name} are globs that generate in-job lists, eg:
-    info_file: "samples/{+name}.txt"
-    becomes a list within a job like
-    info_file:
-      - "samples/frog.txt"
-      - "samples/toad.txt" etc
-    {*name} are globs that generate separate jobs ("varies between jobs"), eg:
-    info_file: "samples/{*name}.txt"
-    becomes separate jobs where:
-    info_file: "samples/frog.txt"
-    and then
-    info_file: "samples/toad.txt" in the next job etc
-    '''
+def generate_glob_matches(job_input):
+    #signal that no input patterns were specified
+    if job_input.is_empty(): return "no-input"
 
-    #expand into lists all input and output keys which contain injob list placeholders
-    #ready to receive the expanded items later
-    expanding_input_keys = expand_into_lists(job["input"])
-    expanding_output_keys = expand_into_lists(job["output"])
-
-    #glob matches keyed by input pattern name
     glob_matches = {}
 
     #glob each input field file pattern separately
-    for key,pattern in job["input"].items():
+    for key,pattern in job_input.items():
         #convert the pattern-with-placeholders into a glob and regex string
         #names1 contains all the injob glob keys {+name}
         #names2 contains all the between job glob keys {*name}
@@ -1149,17 +1149,66 @@ def generate_glob_jobs(action,job):
         #this includes input patterns without placeholders where the
         #hardcoded path/file is missing
         if len(glob_matches[key]) == 0:
-            message(f'no match for input {key}: {pattern}, action not runnable')
-            return []
+            message(f'no match for input {key}: {pattern}')
+            return "no-match"
 
         #sort into alphabetical order by path
         glob_matches[key].sort(key=lambda item: item[1])
+
+    return glob_matches
+
+def generate_glob_jobs(action,job):
+    '''
+    glob filenames to match the two glob type placeholders
+    {+name} are globs that generate in-job lists, eg:
+    info_file: "samples/{+name}.txt"
+    becomes a list within a job like
+    info_file:
+      - "samples/frog.txt"
+      - "samples/toad.txt" etc
+    {*name} are globs that generate separate jobs ("varies between jobs"), eg:
+    info_file: "samples/{*name}.txt"
+    becomes separate jobs where:
+    info_file: "samples/frog.txt"
+    and then
+    info_file: "samples/toad.txt" in the next job etc
+    '''
+
+    #expand into lists all input and output keys which contain injob list placeholders
+    #ready to receive the expanded items later
+    expanding_input_keys = expand_into_lists(job["input"])
+    expanding_output_keys = expand_into_lists(job["output"])
+
+    #find glob matches keyed by input pattern name
+    #returns "no-match" if no matches found to at least one input pattern
+    #return "empty" if no inputs patterns specified
+    glob_matches = generate_glob_matches(job["input"])
+
+    #no jobs generated from this input pattern
+    if glob_matches == "no-match": return []
+
+    if glob_matches == "no-input":
+        #no glob expansion to perform, return job as is with empty glob variable dicts
+        new_job = \
+        {
+            "input":Conf(job['input']),
+            "output":Conf(job['output']),
+            "job_vars":Conf(job['job_vars']),
+            "glob_vars":Conf(),
+            "glob_lists":Conf(),
+        }
+        new_job['input'].no_placeholders()
+        new_job['output'].no_placeholders()
+        return [new_job]
 
     #find glob_matches where the placeholders
     #have matching values across all input patterns (including injob and between)
     #reject all others
     new_job_dict = {}
     meta_list = [ glob_matches[key] for key in glob_matches ]
+
+    print(glob_matches)
+    print(meta_list)
 
     #do nested for loops over all the lists in meta_list
     #to generate all-vs-all combinations
@@ -1168,6 +1217,8 @@ def generate_glob_jobs(action,job):
         all_injob = {}  #accumulate all injob variables across all input patterns
         all_between = {}#accumulate all between job variables across all input patterns
         new_input = Conf(job["input"])
+
+        print(value_list)
 
         conflict = False
         for key,path,injob,between in value_list:
@@ -1197,6 +1248,7 @@ def generate_glob_jobs(action,job):
         #make alternative job key based on "between"
         job_key = make_alt_key(all_between)
         appending = False
+
         if not job_key in new_job_dict:
             #create new job upon first encounter with this particular combo of "between" values
             new_job = \
@@ -1259,7 +1311,7 @@ def check_input_mtimes(input):
     '''
 
     #no inputs to check
-    if input.is_empty() == 0: return "empty"
+    if input.is_empty(): return "empty"
 
     #verify all input paths present
     missing = False
@@ -1293,7 +1345,7 @@ def check_output_mtimes(output):
     return "empty" if job does not specify any outputs
     '''
 
-    if output.is_empty() == 0: return "empty"
+    if output.is_empty(): return "empty"
 
     oldest_mtime = None
     missing = False
@@ -1631,7 +1683,7 @@ def execute_command(config,job_numb,cmd,env):
 
     if not is_active():
         #dry-run: signal job completed ok without running it
-        message(f'skipping execution')
+        message(f'pipeline inactive, skipping actual command execution')
         return False
 
     failed = False
@@ -1844,7 +1896,7 @@ def verify_expected_outputs(action,outputs,inputs):
 def execute_jobs(action,shell_list,job_list):
     something_failed = False
 
-    if action['exec'] == 'local':
+    if not 'exec' in action or action['exec'] == 'local':
         #local serial execution
         for job_numb,item in enumerate(shell_list):
             cmd = generate_full_command(action,item)
@@ -1914,13 +1966,13 @@ def process_action(config,action,path):
     #this step does not pay any attention to file time stamps
     #but will reject anything with missing input file(s) already
     job_list = generate_job_list(action,input,output)
-    message(f'{len(job_list)} potential jobs from placeholder expansion')
+    message(f'{len(job_list)} potential job(s) after placeholder expansion')
     if len(job_list) == 0: return False
 
     #determine if all inputs are present and non-stale
     #determine if any outputs need (re)generating
     job_list,shell_list = generate_shell_commands(action,job_list,shell)
-    message(f'{len(shell_list)} runnable jobs from input/output file checking')
+    message(f'{len(shell_list)} runnable job(s) after input/output file checking')
     if len(shell_list) == 0: return False
 
     #check current working directory agrees with configured value
