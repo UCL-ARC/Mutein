@@ -2,7 +2,7 @@
     ym:
         prefix:             'ym-'           #log file/job name  prefix: qsub doesn't like numerical names
         remote_delay_secs:  '10'            #wait this long after remote jobs incase of latency
-        stale_output_file:  'ignore'        #ignore,delete,recycle (also applies to symlinks)
+        stale_output_file:  'delete'        #ignore,delete,recycle (also applies to symlinks)
         stale_output_dir:   'ignore'        #ignore,delete,recycle
         failed_output_file: 'stale'         #delete,recycle,stale,ignore (also applies to symlinks)
         failed_output_dir:  'stale'         #delete,recycle,stale,ignore    

@@ -1207,9 +1207,6 @@ def generate_glob_jobs(action,job):
     new_job_dict = {}
     meta_list = [ glob_matches[key] for key in glob_matches ]
 
-    print(glob_matches)
-    print(meta_list)
-
     #do nested for loops over all the lists in meta_list
     #to generate all-vs-all combinations
     for value_list in itertools.product(*meta_list):
@@ -1217,8 +1214,6 @@ def generate_glob_jobs(action,job):
         all_injob = {}  #accumulate all injob variables across all input patterns
         all_between = {}#accumulate all between job variables across all input patterns
         new_input = Conf(job["input"])
-
-        print(value_list)
 
         conflict = False
         for key,path,injob,between in value_list:
@@ -1378,34 +1373,54 @@ def generate_shell_commands(action,job_list,shell):
         #returns newest mtime, "missing" or "empty"
         newest_input = check_input_mtimes(job['input'])
 
-        #one or more inputs missing, job not runnable
-        if newest_input == "missing":
-            #flag job for removal from the list
-            job_list[job_numb] = None
-            warning(f'one or more inputs missing or stale, job not runnable')
-            continue
-
-        #all inputs present or no inputs were listed
-        #check if any outputs missing, marked as stale
-        #or older than newest input
         #returns oldest mtime, "missing" or "empty"
         oldest_output = check_output_mtimes(job['output'])
 
-        #no outputs specified and run:never already prevented reaching this point
-        #in the code therefore run the job
-        if oldest_output == "empty":
-            warning('running due to no outputs being specified')
+        run = False
 
-        #all outputs present and newer than newest input: no need to run
-        #unless run:always is set for this action 
-        elif oldest_output != "missing" and oldest_output > newest_input:
-            if 'run' in action and action['run'] == 'always':
-                warning('"run:always" option forcing outputs to be treated as stale')
+        #one or more inputs missing, job not runnable
+        if newest_input == "missing":
+            #flag job for removal from the list
+            message(f'one or more inputs missing or stale, job not runnable')
+            run = False
+
+        #one or more outputs missing, job needs to run
+        elif oldest_output == "missing":
+            run = True
+
+        elif 'run' in action and action['run'] == 'always':
+            warning('"run:always" forcing job to run')
+            run = True
+
+        #no way to check output mtimes wrt input
+        elif newest_input == "empty":
+            if oldest_output == "empty":
+                message('running due to no inputs or outputs being specified, use run:"never" to prevent')
+                run = True
+
+            #all outputs present, assume they are good
             else:
-                #job is not going to run as all outputs look good already
-                #flag job for removal from the list
-                job_list[job_numb] = None
-                continue
+                run = False
+
+        else: #newest_input has an mtime
+            #no outputs specified and run:never already prevented reaching this point
+            #in the code therefore run the job
+            if oldest_output == "empty":
+                message('running due to no outputs being specified, use run:"never" to prevent')
+                run = True
+
+            else: #oldest_output has an mtime
+                if oldest_output <= newest_input:
+                    #outputs not older than inputs
+                    run = True
+                else:
+                    #all outputs look newer than inputs
+                    run = False
+
+        if run == False:
+            #flag as defunct and move onto next potential job in the list
+            job_list[job_numb] = None
+            continue
 
         #job is going to run
 
@@ -1490,6 +1505,7 @@ def create_output_dirs(config,outputs):
     for item in outputs.keys():
         path = outputs[item]
         parent = os.path.dirname(path)
+        if parent == '': continue #current working directory
         if os.path.exists(parent): continue
 
         #avoid message spamming about missing directories in dry-run mode
@@ -1876,7 +1892,7 @@ def verify_expected_outputs(action,outputs,inputs):
             warning(f'stale output {path}')
             failed = True
         elif newest_mtime == 'empty' and i == 0:
-            warning(f'cannot verify output freshness of {path} due to no inputs being specified')
+            message(f'cannot verify output freshness of {path} due to no inputs being specified')
         elif newest_mtime == 'missing' and i == 0:
             warning(f'cannot verify output freshness of {path} due to missing input(s)')
         elif os.path.getmtime(path) < newest_mtime:

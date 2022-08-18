@@ -1,6 +1,48 @@
 - include: "base_config.yml"
 
 - action:
-    name:   "test1"
+    name: "test1"
+    output:
+      test1: "test1.out"
     shell: |
-      echo Hello World!
+      echo Hello World! > {%test1}
+
+- action:
+    name: "test2"
+    output:
+      test1: "test1.out"
+    shell: |
+      echo Hello World! > {%test1}
+
+- action:
+    name: "test3"
+    input:
+      ifile: "test_data/{*folder}/{*subfolder}/{+file}"
+    output:
+      ofile: "summary/{*folder}_{*subfolder}.txt"
+    shell: |
+      echo folder {*folder} subfolder {*subfolder} > {%ofile}
+      echo contains {+file/N} files: >> {%ofile}
+      echo called: >> {%ofile}
+      for x in {+file/ }
+      do
+        echo "  ${x}" >> {%ofile}
+      done
+
+- action:
+    name: "test4"
+    file_list:
+      - file1
+      - file2
+      - file3
+      - file4
+      - file5
+      - file6
+   
+    input:
+      ifile: "test_data/{*folder}/{*subfolder}/{=file_list}"
+    output:
+      ofile: "summary/{*folder}/{*subfolder}/{=file_list}"
+    shell: |
+      echo {*folder} {*subfolder} {=file_list} > {%ofile}
+
