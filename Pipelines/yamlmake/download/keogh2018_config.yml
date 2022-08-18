@@ -1,7 +1,0 @@
-#this file as an input to an action in keogh2018.yml therefore edits can trigger a rerun
-- config:
-    dataset_id: "keogh2018"
-
-    #currently only one data subset within keogh2018
-    subset_id:
-      - "SRP159015"

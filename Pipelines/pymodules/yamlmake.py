@@ -16,7 +16,7 @@ default_global_config =\
 {
     'ym':{
         'prefix':'ym-',                  #log file/job name  prefix: qsub doesn't like numerical names
-        'log_dir':'yamlmake_logs',       #name of subfolder for logging
+        #'log_dir':'yamlmake_logs',       #name of subfolder for logging is now a command line only option
         'remote_delay_secs':'10',        #wait this long after remote jobs incase of latency
         'stale_output_file':'ignore',    #ignore,delete,recycle (also applies to symlinks)
         'stale_output_dir':'ignore',     #ignore,delete,recycle
@@ -26,8 +26,9 @@ default_global_config =\
         'recycle_bin':'recycle_bin',     #name of recycle bin folder
         'job_count':'YM_NJOBS',          #env variable: how many jobs spawned by current action
         'job_number':'YM_JOB_NUMBER',    #env variable: 1 based job numbering within the current action
-        'bash_setup':'source ~/.bashrc\nset -euo pipefail\nset +o history',
-        'conda_setup':'',
+        'bash_setup':'source ~/.bashrc\nset -euo pipefail\nset +o history', #run before every shell action
+        'conda_setup':'',                #run just before trying to activate the conda env the command requested
+        'conda_prefix':'',               #a prefix to apply to the name of every conda environment
     },
     'qsub':{
         'template':'default',        #template job script: "default" or path to your own
@@ -36,13 +37,14 @@ default_global_config =\
         'tmpfs':'10G',               #$ -l tmpfs={tmpfs}
         'pe':'smp',                  #$ -pe {pe} {cores}
         'cores':'1',                 #$ -pe {pe} {cores}
-        'log_dir':'{%ym/log_dir}'    #log dir for qsub stdout and stderr files
+        #'log_dir':'{%ym/log_dir}'    #log dir for qsub stdout and stderr files no longer changable
                                      #$ -o/e {log_dir}/{jobname}.$TASK_ID.out/err
     },
     'exec':'local',                  #default execution environment
 }
 
-global_state = {}
+#global meta configuration
+meta = {}
 
 #regex patterns to match non nested {%placeholders} and {$environment variables}
 environ_regx  = r'\{\$.+?\}'       #{$name}
@@ -55,6 +57,8 @@ list2list_regx  = r'\{-.+?\}'      #{-list} ==> become in-job list
 
 warning_prefix = 'WARNING: '
 illegal_chrs = '\\\n\r\t\'" *?:;,/#%&{}<>+`|=$!@'
+
+default_log_dir = 'yamlmake_logs'
 
 class Conf:
     def __init__(self,src=None):
@@ -79,6 +83,12 @@ class Conf:
 
         else:
             raise Exception(f"unsupported source class {type(src)}")
+
+    def is_empty(self):
+        'return True if contains no keys'
+
+        if self.d == {}: return True
+        return False
 
     def __contains__(self,key):
         try:
@@ -596,15 +606,17 @@ class Conf:
 
         return value,changed
 
-    def make_log_dir(self):
-        if not os.path.exists(self['ym/log_dir']):
-            message(f'creating missing log_dir {self["ym/log_dir"]}')
+    # log_dir now either default or set on command line
+    # otherwise cannot be changed
+    # def make_log_dir(self):
+    #     if not os.path.exists(self['ym/log_dir']):
+    #         message(f'creating missing log_dir {self["ym/log_dir"]}')
 
-            #note: still creating missing log_dir in dryrun mode
-            #so we can record messages and create qsub scripts
-            #for inspection by the user
-            #therefore not using the makedirs wrapper function
-            os.makedirs(self['ym/log_dir'])
+    #         #note: still creating missing log_dir in dryrun mode
+    #         #so we can record messages and create qsub scripts
+    #         #for inspection by the user
+    #         #therefore not using the makedirs wrapper function
+    #         os.makedirs(self['ym/log_dir'])
 
 def makedirs(path):
     if is_active(): os.makedirs(path)
@@ -649,27 +661,27 @@ def check_cwd(config):
             print(f"expecting: {config['working_dir']}")
             print(f"but found {os.path.realpath(os.getcwd())}")
 
-def toplevel_include(config,src,path):
-    '''
-    include into toplevel of config from a single path string
-    or list of path strings
-    '''
+# def toplevel_include(config,src,path):
+#     '''
+#     include into toplevel of config from a single path string
+#     or list of path strings
+#     '''
 
-    if type(src) == str:
-        config.do_include_inner(src,path,base_keys=[])
+#     if type(src) == str:
+#         config.do_include_inner(src,path,base_keys=[])
 
-    elif type(src) == list:
-        for src_path in src:
-            assert type(src_path) == str, "invalid include list, list items must be strings"
-            config.do_include_inner(src_path,path,base_keys=[])
+#     elif type(src) == list:
+#         for src_path in src:
+#             assert type(src_path) == str, "invalid include list, list items must be strings"
+#             config.do_include_inner(src_path,path,base_keys=[])
 
-    else:
-        raise Exception('invalid include item, must be string or list of strings')
+#     else:
+#         raise Exception('invalid include item, must be string or list of strings')
 
-    config.update(item[item_type])
-    #config.show("loaded config")
-    config.includes_and_loads(path)
-    #config.show("actioned includes and loads")
+#     config.update(item[item_type])
+#     #config.show("loaded config")
+#     config.includes_and_loads(path)
+#     #config.show("actioned includes and loads")
 
 def is_active():
     '''
@@ -688,11 +700,11 @@ def activity_state():
     inactive = run nothing (action is not active)
     '''
 
-    if global_state['is_active'] == False:
+    if meta['is_active'] == False:
         #do not run the current action at all
         return 'inactive'
 
-    if global_state['args'].dry_run == True:
+    if meta['args'].dry_run == True:
         #run the current action in dryrin mode only
         return 'dryrun'
 
@@ -701,60 +713,70 @@ def activity_state():
 
 def update_activity_state(action):
     '''
-    update the global_state['is_active'] state based on the action name
+    update the meta['is_active'] state based on the action name
     this implements the run-only,run-from and run-until command line options
     '''
 
     #incase the config has changed since the last action
-    if 'ym/log_dir' in action:
-        global_state['log_dir'] = action['ym/log_dir']
-        global_state['prefix'] = action['ym/prefix']
+    meta['prefix'] = action['ym/prefix']
 
     #see if we've reached the run-from rule
-    if global_state['args'].run_from and action['name'] == global_state['args'].run_from:
-        global_state['reached_run_from'] = True
+    if meta['args'].run_from and action['name'] == meta['args'].run_from:
+        meta['reached_run_from'] = True
 
     #see if we've reached the run-until rule
-    if global_state['args'].run_until and action['name'] == global_state['args'].run_until:
-        global_state['reached_run_until'] = True
+    if meta['args'].run_until and action['name'] == meta['args'].run_until:
+        meta['reached_run_until'] = True
 
     #if run-only is active then the action must be in the approved list
-    if global_state['args'].run_only and not action['name'] in global_state['args'].run_only:
-        global_state['is_active'] = False
+    if meta['args'].run_only and not action['name'] in meta['args'].run_only:
+        meta['is_active'] = False
 
     #see if we're within the run-from to run-until interval
-    elif global_state['reached_run_from'] and not global_state['reached_run_until']:
-        global_state['is_active'] = True
+    elif meta['reached_run_from'] and not meta['reached_run_until']:
+        meta['is_active'] = True
     else:
-        global_state['is_active'] = False
+        meta['is_active'] = False
 
-def init_global_state(args,config):
-    global global_state
+def init_meta(args,config):
+    global meta
 
     #only set global state once
-    if global_state != {}: return
+    if meta != {}: return
 
     assert args != None
 
     #store dry_run, run_only, run_from, run_until settings
-    global_state['args'] = args
+    meta['args'] = args
 
     #store changeable states
     #run-from implies we start off not running any action yet
     if args.run_from:
-        global_state['reached_run_from'] = False
+        meta['reached_run_from'] = False
     else:
-        global_state['reached_run_from'] = True
+        meta['reached_run_from'] = True
 
     #becomes true when we encounter the named run-until action, if any
-    global_state['reached_run_until'] = False
+    meta['reached_run_until'] = False
 
     #used to generate the log file names
-    global_state['start_time'] = timestamp_now()
+    meta['start_time'] = timestamp_now()
 
-    global_state['is_active'] = None
-    global_state['log_dir'] = config['ym/log_dir']
-    global_state['prefix'] = config['ym/prefix']
+    meta['is_active'] = None
+    meta['prefix'] = config['ym/prefix']
+
+    if args.log_dir != None:
+        meta['log_dir'] = args.log_dir
+    else:
+        meta['log_dir'] = default_log_dir
+
+    #note: still creating missing log_dir in dryrun mode
+    #so we can record messages and create qsub scripts
+    #for inspection by the user
+    #therefore not using the makedirs wrapper function
+    if not os.path.exists(meta['log_dir']):
+        os.makedirs(meta['log_dir'])
+        message(f"created missing log_dir {meta['log_dir']}")
 
     update_activity_state({'name':None})
 
@@ -776,19 +798,29 @@ def find_duplicates(conf_list):
             all_keys.add(key)
 
 def fill_out_all(config,action,path):
-    'filling in missing placeholders etc'
+    '''
+    merge action with global config
+    do any includes and loads
+    filling in missing placeholders
+    create log folder if missing
+    '''
+
     action.override(config)
     action.includes_and_loads(path)
     action.sub_vars()
-    action.make_log_dir()
+    #action.make_log_dir()
 
 def validate_action(action):
     'check for required fields'
 
     assert 'name' in action, 'all actions must have a name field'
-    assert 'input' in action, 'all actions must have an input field'
-    assert 'output' in action, 'all actions must have an output field'
     assert 'shell' in action, 'all actions must have a shell field'
+
+    #assert 'output' in action, 'all actions must have an output field'
+    #assert 'input' in action, 'all actions must have an input field'
+    
+    if not 'input' in action: action['input'] = {}   #allow empty input field
+    if not 'output' in action: action['output'] = {} #allow empty output field
 
     #name is used to general file and job names
     #therefore prevent any characters that cause problems for filenames
@@ -872,9 +904,6 @@ def generate_job_list(action,input,output):
     #expand in-job list patterns
     for job in job_list: generate_list2list(action,job)
 
-    # print("after injob list")
-    # for job in job_list: show_job(job)
-
     #expand separate-jobs list patterns
     new_list = []
     for job in job_list: new_list += generate_list2jobs(action,job)
@@ -882,18 +911,12 @@ def generate_job_list(action,input,output):
 
     if len(job_list) == 0: return []
 
-    # print("after between list")
-    # for job in job_list: show_job(job)
-
     #expanded input pattern globs (both the injob and separate jobs kind)
     new_list = []
     for job in job_list: new_list += generate_glob_jobs(action,job)
     job_list = new_list
 
     if len(job_list) == 0: return []
-
-    # print("after globs")
-    # for job in job_list: show_job(job)
 
     return job_list
 
@@ -943,7 +966,7 @@ def generate_list2list(action,job):
 
 def generate_list2jobs(action,job):
     '''
-    expand between-job list placeholders to one independent job
+    expand job spawning list placeholders to one independent job
     per placeholder value for single lists
     or value combination where multiple placeholders are in the same pattern
     '''
@@ -1029,17 +1052,15 @@ def build_glob_and_regx(pattern):
 def expand_into_lists(item):
     '''
     find all keys which contain {+name} type placeholders
-    expand these into lists
-    unless they are already members of a list
+    expand these into lists unless they are already members of a list
     return a dict with all the {+name} keys in
     set to True if it was expanded
     False otherwise
     '''
 
+    #find what needs expanding
     key_dict = {}
     for subkeys,pattern in item.subkey_items():
-        #print('/'.join(subkeys))
-
         if re.search(glob2list_regx,pattern):
             key = '/'.join(subkeys)
 
@@ -1050,6 +1071,7 @@ def expand_into_lists(item):
                 #already a list, do not expand further
                 key_dict[key] = False
 
+    #perform the expansion
     for key in key_dict:
         if key_dict[key] == True:
             item[key] = [ item[key] ]
@@ -1072,7 +1094,7 @@ def make_alt_key(all_between):
 
 def generate_glob_jobs(action,job):
     '''
-    glob filename to match the two glob type placeholders
+    glob filenames to match the two glob type placeholders
     {+name} are globs that generate in-job lists, eg:
     info_file: "samples/{+name}.txt"
     becomes a list within a job like
@@ -1087,32 +1109,20 @@ def generate_glob_jobs(action,job):
     info_file: "samples/toad.txt" in the next job etc
     '''
 
-    # print("before expand into lists")
-    # show_job(job)
-    #exit()
-
     #expand into lists all input and output keys which contain injob list placeholders
+    #ready to receive the expanded items later
     expanding_input_keys = expand_into_lists(job["input"])
     expanding_output_keys = expand_into_lists(job["output"])
-
-    # print("after expand into lists")
-    # show_job(job)
-    #exit()
 
     #glob matches keyed by input pattern name
     glob_matches = {}
 
-    #glob each input file pattern separately
+    #glob each input field file pattern separately
     for key,pattern in job["input"].items():
         #convert the pattern-with-placeholders into a glob and regex string
         #names1 contains all the injob glob keys {+name}
         #names2 contains all the between job glob keys {*name}
         input_glob,input_regx,names1,names2 = build_glob_and_regx(pattern)
-
-        # print(input_glob,input_regx)
-        # show(names1)
-        # show(names2)
-        #exit()
 
         glob_matches[key] = []
         
@@ -1136,15 +1146,14 @@ def generate_glob_jobs(action,job):
             glob_matches[key].append([key,path,injob,between])
         
         #no jobs are generated if any input pattern has zero matches
-        if len(glob_matches[key]) == 0: return []
+        #this includes input patterns without placeholders where the
+        #hardcoded path/file is missing
+        if len(glob_matches[key]) == 0:
+            message(f'no match for input {key}: {pattern}, action not runnable')
+            return []
 
         #sort into alphabetical order by path
         glob_matches[key].sort(key=lambda item: item[1])
-
-    # print("glob_matches")
-    # for key in glob_matches:
-    #     show(glob_matches[key])
-    #exit()
 
     #find glob_matches where the placeholders
     #have matching values across all input patterns (including injob and between)
@@ -1152,31 +1161,19 @@ def generate_glob_jobs(action,job):
     new_job_dict = {}
     meta_list = [ glob_matches[key] for key in glob_matches ]
 
-    # show(meta_list)
-    # exit()
-
     #do nested for loops over all the lists in meta_list
     #to generate all-vs-all combinations
     for value_list in itertools.product(*meta_list):
         #build the potential new jobs
         all_injob = {}  #accumulate all injob variables across all input patterns
         all_between = {}#accumulate all between job variables across all input patterns
-        #inputs = {}
         new_input = Conf(job["input"])
 
         conflict = False
         for key,path,injob,between in value_list:
-            # print(key)
-            # print(path)
-            # print("injob")
-            # show(injob)
-            # print("between")
-            # show(between)
-            # print()
 
             #find conflicts for any variables shared between paths
             if find_conflicts(all_injob,injob) or find_conflicts(all_between,between):
-                #print("conflict")
                 conflict = True
                 break
 
@@ -1186,18 +1183,10 @@ def generate_glob_jobs(action,job):
 
         #mismatching combo of input path variables therefore no job generated
         if conflict:
-            #print('conflict')
             continue
 
         #all_injob and all_between now contain the final placeholder values
         #with conflicts removed
-
-        # print(job_key)
-        # exit()
-
-        #input placeholders are already filled out by the glob
-        ##new_input = Conf()
-        ##new_input.update(inputs)
 
         #fill in placeholders in output patterns here
         new_output = Conf(job['output'])
@@ -1225,42 +1214,24 @@ def generate_glob_jobs(action,job):
             appending = True
             new_job = new_job_dict[job_key]
             for exp_key in expanding_input_keys:
-                # print(exp_key)
-                # new_job['input'].show()
                 if type(new_job['input'][exp_key]) == list:
-                    # print(exp_key)
                     new_job['input'][exp_key].append(new_input[exp_key][0])
                 else:
                     parent_key = '/'.join(exp_key.split('/')[:-1])
-                    # print('>',parent_key,'<')
                     new_job['input'][parent_key].append(new_input[exp_key])
-                # new_job['input'].show()
 
             for exp_key in expanding_output_keys:
-                # print(exp_key)
-                # new_job['output'].show()
-
                 if type(new_job['output'][exp_key]) == list:
-                    # print(exp_key)
                     new_job['output'][exp_key].append(new_output[exp_key][0])
                 else:
                     parent_key = '/'.join(exp_key.split('/')[:-1])
-                    # print('>',parent_key,'<')
                     new_job['output'][parent_key].append(new_output[exp_key])
-                # new_job['output'].show()
 
             for exp_key in injob:
                 new_job['glob_lists'][exp_key].append(injob[exp_key])
 
-            # exit()
-
-        # show_job(new_job_dict[job_key])
-        # exit()
-
     #convert new_jobs into list
     job_list = [new_job_dict[k] for k in new_job_dict]
-
-    #for job in job_list: show_job(job)
 
     return job_list
 
@@ -1281,13 +1252,22 @@ def find_conflicts(all_vals,values):
     return False #no conflicts found
 
 def check_input_mtimes(input):
-    'return newest mtime if all inputs present otherwise return None'
+    '''
+    return newest mtime if all inputs present
+    otherwise return "missing" if any missing
+    or "empty" if there are no inputs listed
+    '''
+
+    #no inputs to check
+    if input.is_empty() == 0: return "empty"
 
     #verify all input paths present
     missing = False
-    newest_mtime = 0
+    newest_mtime = None
+
     for item,path in input.items():
         if not os.path.exists(path):
+            #should get filtered out by generate_glob_jobs already
             message(f'missing input {path}')
             missing = True
             continue
@@ -1298,55 +1278,84 @@ def check_input_mtimes(input):
             continue
 
         mtime = os.path.getmtime(path)
-        if mtime > newest_mtime: newest_mtime = mtime
+        if newest_mtime == None or mtime > newest_mtime:
+            newest_mtime = mtime
 
-    if missing: return None
+    if missing: return "missing"
 
+    assert newest_mtime != None, 'invalid newest_mtime!'
     return newest_mtime
 
 def check_output_mtimes(output):
-    'return oldest mtime if all outputs present otherwise return None'
+    '''
+    return oldest mtime if all outputs present
+    return "missing" if any missing or stale
+    return "empty" if job does not specify any outputs
+    '''
 
-    #dummy future time guaranteed not to be older than a real file
-    oldest_mtime = time.time() + 31e6 
+    if output.is_empty() == 0: return "empty"
+
+    oldest_mtime = None
+    missing = False
 
     for item,path in output.items():
         if not os.path.exists(path):
-            return None
+            message(f'missing output {path}')
+            missing = True
+            continue
+
+        if is_stale(path):
+            message(f'stale output {path}')
+            missing = True
+            continue
 
         mtime = os.path.getmtime(path)
-        if mtime < oldest_mtime: oldest_mtime = mtime
 
-    
+        if oldest_mtime == None or mtime < oldest_mtime:
+            oldest_mtime = mtime
+
+    if missing: return "missing"
+
+    assert oldest_mtime != None, 'invalid oldest_mtime!'
     return oldest_mtime
 
 def generate_shell_commands(action,job_list,shell):
 
     for job_numb,job in enumerate(job_list):
-        #check all inputs present, return newest mtime
+        #check all inputs
+        #returns newest mtime, "missing" or "empty"
         newest_input = check_input_mtimes(job['input'])
 
         #one or more inputs missing, job not runnable
-        if newest_input == None:
+        if newest_input == "missing":
             #flag job for removal from the list
             job_list[job_numb] = None
             warning(f'one or more inputs missing or stale, job not runnable')
             continue
 
-        #all inputs present
-        #check if any outputs missing, older than newest input
-        #more marked as stale
+        #all inputs present or no inputs were listed
+        #check if any outputs missing, marked as stale
+        #or older than newest input
+        #returns oldest mtime, "missing" or "empty"
         oldest_output = check_output_mtimes(job['output'])
 
+        #no outputs specified and run:never already prevented reaching this point
+        #in the code therefore run the job
+        if oldest_output == "empty":
+            warning('running due to no outputs being specified')
+
         #all outputs present and newer than newest input: no need to run
-        #unless run: always is set for this action 
-        if oldest_output != None and oldest_output > newest_input:
+        #unless run:always is set for this action 
+        elif oldest_output != "missing" and oldest_output > newest_input:
             if 'run' in action and action['run'] == 'always':
-                message('"run always" option forcing outputs to be treated as stale')
+                warning('"run:always" option forcing outputs to be treated as stale')
             else:
+                #job is not going to run as all outputs look good already
                 #flag job for removal from the list
                 job_list[job_numb] = None
                 continue
+
+        #job is going to run
 
         #remove stale output files/symlinks/directories before action is run
         handle_stale_outputs(action,job['output'])
@@ -1364,8 +1373,6 @@ def generate_shell_commands(action,job_list,shell):
         config = Conf(action)
         config.update(job['input'])
         config.update(job['output'])
-
-        #config.show()
 
         #substitute remaining placeholders in shell command
         shell_final = Conf(shell)
@@ -1459,13 +1466,13 @@ def message(item,end='\n',timestamp=True):
     if timestamp:
         item = timestamp_now_nice() + ' ' + str(item)
 
-    if global_state['args'].quiet != True:
+    if meta['args'].quiet != True:
         print(item,end=end)
         sys.stdout.flush()
 
-    if global_state['args'].nologs != True:
-        path = os.path.join(global_state['log_dir'],
-                            global_state['prefix']+global_state['start_time']+'.messages')
+    if meta['args'].no_logs != True:
+        path = os.path.join(meta['log_dir'],
+                            meta['prefix']+meta['start_time']+'.messages')
 
         try:
             with open(path,'a') as f:
@@ -1569,7 +1576,7 @@ def generate_full_command(config,shell):
     if 'conda' in config and config['conda'] != '':
         if 'ym/conda_setup' in config and config['ym/conda_setup'] != '':
             cmd_list.append(config['ym/conda_setup'])
-        cmd_list.append(f'conda activate {config["conda"]}')
+        cmd_list.append(f'conda activate {config["ym/conda_prefix"]}{config["conda"]}')
 
     cmd_list.append(shell)
 
@@ -1602,7 +1609,7 @@ def write_jobfile(action,shell_list):
     'save action config and shell_list as json'
 
     fnamebase = f'{action["ym/prefix"]}{timestamp_now()}.{action["name"]}'
-    jobfile = os.path.join(action['ym/log_dir'],fnamebase+'.jobs')
+    jobfile = os.path.join(meta['log_dir'],fnamebase+'.jobs')
     payload = {'action':action.getdict(),'shell_list':shell_list}
 
     with open(jobfile,'w') as f:
@@ -1614,8 +1621,8 @@ def write_jobfile(action,shell_list):
 def execute_command(config,job_numb,cmd,env):
     'execute command locally'
     fname = f'{config["ym/prefix"]}{timestamp_now()}.{config["name"]}'
-    foutname = os.path.join(config['ym/log_dir'],fname+'.out')
-    ferrname = os.path.join(config['ym/log_dir'],fname+'.err')
+    foutname = os.path.join(meta['log_dir'],fname+'.out')
+    ferrname = os.path.join(meta['log_dir'],fname+'.err')
 
     message(f'job {job_numb+1} executing locally...')
 
@@ -1665,6 +1672,7 @@ def write_qsub_file(action,qsub_script,jobname,njobs,jobfile):
     env["jobfile"] = jobfile
     env["python"] = sys.executable
     env["yamlmake"] = sys.argv[0]
+    env["log_dir"] = meta["log_dir"]
 
     for line in f_in: f_out.write(line.format(**env))
 
@@ -1678,8 +1686,8 @@ def submit_job_qsub(action,shell_list,job_list):
     '''
 
     jobname = write_jobfile(action,shell_list)
-    qsub_script = os.path.join(action['ym/log_dir'],jobname+'.qsub')
-    jobfile = os.path.join(action['ym/log_dir'],jobname+'.jobs')
+    qsub_script = os.path.join(meta['log_dir'],jobname+'.qsub')
+    jobfile = os.path.join(meta['log_dir'],jobname+'.jobs')
     njobs = len(shell_list)
 
     write_qsub_file(action,qsub_script,jobname,njobs,jobfile)
@@ -1693,8 +1701,8 @@ def submit_job_qsub(action,shell_list,job_list):
     something_failed = False
 
     if is_active():
-        foutname = os.path.join(action['ym/log_dir'],jobname+'.out')
-        ferrname = os.path.join(action['ym/log_dir'],jobname+'.err')
+        foutname = os.path.join(meta['log_dir'],jobname+'.out')
+        ferrname = os.path.join(meta['log_dir'],jobname+'.err')
         fout = open(foutname,'w')
         ferr = open(ferrname,'w')
         #sys.stdout.flush()
@@ -1717,7 +1725,7 @@ def submit_job_qsub(action,shell_list,job_list):
     #check each individual job's status file and expected outputs
     #some jobs may not have failed even if qsub returned an error code?
     for job_numb,item in enumerate(shell_list):
-        status_file = f'{action["ym/log_dir"]}/{jobname}.{job_numb+1}.status'
+        status_file = f'{meta["log_dir"]}/{jobname}.{job_numb+1}.status'
 
         failed = False
         if not os.path.exists(status_file):
@@ -1790,29 +1798,36 @@ def verify_expected_outputs(action,outputs,inputs):
     '''
     verify that all specified output files exist
     and are newer than the job start time
-    if any are missing or stale flag job as failed
+    if any are missing or stale flag job has failed
 
     implies jobs must use touch to update any output file that does not need altering
     or else exclude it from the list of required outputs
+
+    return True to indicate failure
     '''
 
+    if outputs.is_empty():
+        message('no outputs specified')
+        return False
+
     #find newest input file
+    #return newest_mtime, "empty" or "missing"
     newest_mtime = check_input_mtimes(inputs)
 
-    #if any input(s) missing cannot verify that outputs are not stale
-    #implies jobs cannot delete their inputs
-    #ie this would need to be handled by a separate job
-    if newest_mtime == None:
-        warning('unable to verify all outputs are fresh due to missing input(s)')
-        return True
-
     failed = False
-    for item in outputs.keys():
+    for i,item in enumerate(outputs.keys()):
         path = outputs[item]
         if not os.path.exists(path):
             warning(f'missing output {path}')
             failed = True 
-        elif is_stale(path) or os.path.getmtime(path) < newest_mtime:
+        elif is_stale(path):
+            warning(f'stale output {path}')
+            failed = True
+        elif newest_mtime == 'empty' and i == 0:
+            warning(f'cannot verify output freshness of {path} due to no inputs being specified')
+        elif newest_mtime == 'missing' and i == 0:
+            warning(f'cannot verify output freshness of {path} due to missing input(s)')
+        elif os.path.getmtime(path) < newest_mtime:
             message(f'stale output {path}')
             failed = True
 
@@ -1821,7 +1836,9 @@ def verify_expected_outputs(action,outputs,inputs):
         return True
 
     #signal job seems to have completed okay
-    message('all outputs look good')
+    if newest_mtime not in ('empty','missing'):
+        message('all outputs seem fresh')
+
     return False
 
 def execute_jobs(action,shell_list,job_list):
@@ -1837,7 +1854,7 @@ def execute_jobs(action,shell_list,job_list):
             failed = execute_command(action,job_numb,cmd,env)
 
             if failed == False:
-                #job has also failed if not all required outputs were created
+                #job has also failed if not all required outputs were created/updated
                 failed = verify_expected_outputs(action,job_list[job_numb]["output"],job_list[job_numb]["input"])
 
             if failed == True:
@@ -1895,6 +1912,7 @@ def process_action(config,action,path):
 
     #generate list of potential jobs by filling out glob and list placeholders
     #this step does not pay any attention to file time stamps
+    #but will reject anything with missing input file(s) already
     job_list = generate_job_list(action,input,output)
     message(f'{len(job_list)} potential jobs from placeholder expansion')
     if len(job_list) == 0: return False
@@ -1919,7 +1937,7 @@ def process_action(config,action,path):
 
 def process(pipeline,path,config=None,args=None):
     '''
-    process a YAML pipeline from the file args.yaml
+    process the YAML pipeline that was already loaded from path
     '''
 
     #initially set config to default values if none provided
@@ -1929,7 +1947,7 @@ def process(pipeline,path,config=None,args=None):
 
     #on first call store args and init stateful variables that
     #implement run-only, run-from and run-until options
-    init_global_state(args,config)
+    init_meta(args,config)
 
     counter = 0
 

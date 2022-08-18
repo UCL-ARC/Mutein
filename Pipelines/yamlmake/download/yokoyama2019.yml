@@ -1,11 +1,19 @@
 #define dataset_id and subset_list
-- include: "yokoyama2019_config.yml"
+- config:
+    dataset_id: "yokoyama2019"
+
+    subset_id:
+      - "EGAD00001004464"
+      - "EGAD00001004462"
+      - "EGAD00010001631"
+
+    credentials: "config/private_config1.json"
 
 #download list of accession names
 - action:
     name:  "download_accession_list"
     exec:  "local"
-    conda: "{$MUT_PREFIX}pyega3"
+    conda: "pyega3"
 
     input:
         yokoyama_config: "{%conf_dir}/download/yokoyama2019_config.yml"
@@ -22,23 +30,27 @@
         cat {%stderr} | grep EGAF | awk '{print $4}'    > {%file_list}
         cat {%stderr} | grep EGAF | awk '{print $4,$7}' > {%md5_list}
 
-# - action:
-#     name: "create_subset_folders"
-#     exec: "local"
+- action:
+    name: "create_subset_folders"
+    exec: "local"
 
-#     input:
-#         yokoyama_config: "{%conf_dir}/download/yokoyama2019_config.yml"
+    input:
+        accession_list: "datasets/{%dataset_id}/{=subset_id}/file_list"
 
-#     output:
-#         touch: "datasets/{%dataset_id}/{=subset_id}/created_folders.touch"
+    output:
+        touch: "datasets/{%dataset_id}/{=subset_id}/created_folders.touch"
 
-#     shell: |
-#         touch {%touch}
+    shell: |
+        for acc in $(cat {%accession_list})
+        do
+            mkdir -p datasets/{%dataset_id}/{=subset_id}/${acc}.d
+        done
+        touch {%touch}
 
 # - action:
 #     name: "download_accessions"
 #     exec:  "local"
-#     conda: "{$MUT_PREFIX}pyega3"
+#     conda: "pyega3"
 
 #     input:
 #         #spawn one job per subset x accession

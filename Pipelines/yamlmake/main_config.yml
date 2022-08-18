@@ -2,7 +2,6 @@
 - config:
     ym:
         prefix:             "mut."
-        log_dir:            "yamlmake_logs"
         remote_delay_secs:  "10"
         stale_output_file:  "recycle"
         stale_output_dir:   "ignore"
@@ -14,6 +13,7 @@
         job_number:         "YM_JOB_NUMBER"
         bash_setup:         "source ~/.bashrc\nset -euo pipefail\nset +o history"
         #conda_setup:        "source ~/mambaforge/etc/profile.d/conda.sh"
+        conda_prefix:       "{$MUT_PREFIX}"
 
     qsub:
         template: "default"

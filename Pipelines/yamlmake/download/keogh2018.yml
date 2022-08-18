@@ -1,17 +1,22 @@
 #define dataset_id and subset_list
-- include: "keogh2018_config.yml"
+- config:
+    dataset_id: "keogh2018"
+
+    #currently only one data subset within keogh2018
+    subset_id:
+      - "SRP159015"
 
 #download list of accession names
 - action:
     name:  "download_accession_list"
     exec:  "local"
-    conda: "{$MUT_PREFIX}enabrowsertools"
+    conda: "enabrowsertools"
 
     input:
         keogh_config: "{%conf_dir}/download/keogh2018_config.yml"
 
     output:
-        accession_file: "datasets/{%dataset_id}/{=subset_id}/accession_list"
+        accession_file: "datasets/{%dataset_id}/{=subset_id}/.meta/accession_list"
 
     #grab list of sra run accessions from NCBI (US site)
     shell: |
@@ -28,30 +33,30 @@
 
     input:
         #spawn one job per subset_id, currently there's only one
-        accession_list: "datasets/{%dataset_id}/{=subset_id}/accession_list"
+        accession_list: "datasets/{%dataset_id}/{=subset_id}/.meta/accession_list"
 
     output:
-        touch: "datasets/{%dataset_id}/{=subset_id}/created_folders.touch"
+        touch: "datasets/{%dataset_id}/{=subset_id}/.meta/created_folders.touch"
 
     shell: |
         for acc in $(cat {%accession_list})
         do
-            mkdir -p datasets/{%dataset_id}/{=subset_id}/${acc}.d
+            mkdir -p datasets/{%dataset_id}/{=subset_id}/${acc}
         done
         touch {%touch}
 
 - action:
     name: "download_accessions"
     exec:  "local"
-    conda: "{$MUT_PREFIX}enabrowsertools"
+    conda: "enabrowsertools"
 
     input:
         #spawn one job per subset x accession
-        accession_dir: "datasets/{%dataset_id}/{=subset_id}/{*accession}.d"
+        accession_dir: "datasets/{%dataset_id}/{=subset_id}/{*accession}"
 
     output:
-        read1: "datasets/{%dataset_id}/{=subset_id}/{*accession}.d/{*accession}_1.fastq.gz"
-        read2: "datasets/{%dataset_id}/{=subset_id}/{*accession}.d/{*accession}_2.fastq.gz"
+        read1: "datasets/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_1.fastq.gz"
+        read2: "datasets/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_2.fastq.gz"
 
     shell: |
         cd {%accession_dir}

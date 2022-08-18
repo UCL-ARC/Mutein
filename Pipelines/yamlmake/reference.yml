@@ -42,7 +42,7 @@
 - action:
     name:  "create_bgzip"
     exec:  "qsub"
-    conda: "{$MUT_PREFIX}bwa"
+    conda: "bwa"
     qsub:
         time:  "1:00:00"
         mem:   "6G"
@@ -64,7 +64,7 @@
 - action:
     name:  "create_fai"
     exec:  "qsub"
-    conda: "{$MUT_PREFIX}bwa"
+    conda: "bwa"
     qsub:
         time:  "1:00:00"
         mem:   "6G"
@@ -84,7 +84,7 @@
 - action:
     name: "create_bwtsw"
     exec:  "qsub"
-    conda: "{$MUT_PREFIX}bwa"
+    conda: "bwa"
     qsub:
         time:  "2:00:00"
         mem:   "6G"
@@ -107,7 +107,7 @@
 - action:
     name: "create_gatk_dict"
     exec:  "qsub"
-    conda: "{$MUT_PREFIX}gatk4"
+    conda: "gatk4"
     qsub:
         time:  "1:00:00"
         mem:   "6G"

@@ -9,7 +9,7 @@
         touch: "config/conda_envs/{*env_name}.touch"
     shell: |
         conda create -y \
-                     -n {$MUT_PREFIX}{*env_name} \
+                     -n {%ym/conda_prefix}{*env_name} \
                      {%conda_channels} \
                      --file {%env_file} 
         touch {%touch}
