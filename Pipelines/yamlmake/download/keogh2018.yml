@@ -12,8 +12,7 @@
     exec:  "local"
     conda: "enabrowsertools"
 
-    input:
-        keogh_config: "{%conf_dir}/download/keogh2018_config.yml"
+    #no input files
 
     output:
         accession_file: "datasets/{%dataset_id}/{=subset_id}/.meta/accession_list"
@@ -36,7 +35,7 @@
         accession_list: "datasets/{%dataset_id}/{=subset_id}/.meta/accession_list"
 
     output:
-        touch: "datasets/{%dataset_id}/{=subset_id}/.meta/created_folders.touch"
+        touch: "datasets/{%dataset_id}/{=subset_id}/.meta/create_accession_folders.touch"
 
     shell: |
         for acc in $(cat {%accession_list})
@@ -57,6 +56,7 @@
     output:
         read1: "datasets/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_1.fastq.gz"
         read2: "datasets/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_2.fastq.gz"
+        #most also have {*accession}.fastq.gz as well
 
     shell: |
         cd {%accession_dir}

@@ -1527,7 +1527,7 @@ def warning(item,end='\n',timestamp=True):
 def header(item,end='\n',timestamp=True):
     line = '-'*(70-len(item))
     item = f'{item}  {line}'
-    print()
+    if meta['args'].quiet != True: print() #make a blank line
     message(item,end=end,timestamp=timestamp)
 
 def message(item,end='\n',timestamp=True):
@@ -1568,7 +1568,9 @@ def handle_stale_outputs(config,outputs):
                 recycle_item(config,path)
             elif config['ym/stale_output_file'] == 'ignore':
                 message(f'ignoring stale output file {path}')
-                continue
+            elif config['ym/stale_output_file'] == 'stale':
+                message(f'explicitly marking as stale output file {path}')
+                make_stale(path)
             else:
                 raise Exception(f'unknown option for stale_output_file: {config["ym/stale_output_file"]}')
 
@@ -1581,7 +1583,9 @@ def handle_stale_outputs(config,outputs):
                 recycle_item(config,path)
             elif config['ym/stale_output_dir'] == 'ignore':
                 message(f'ignoring stale output directory {path}')
-                continue
+            elif config['ym/stale_output_dir'] == 'stale':
+                message(f'explicitly marking as stale output dir {path}')
+                make_stale(path)
             else:
                 raise Exception(f'unknown option for stale_output_dir: {config["ym/stale_output_dir"]}')
                 
@@ -1610,7 +1614,6 @@ def handle_failed_outputs(config,outputs):
                 make_stale(path)
             elif config['ym/failed_output_file'] == 'ignore':
                 message(f'ignoring failed output file {path}')
-                continue
             else:
                 raise Exception(f'unknown option for failed_output_file: {config["ym/failed_output_file"]}')
 
@@ -1626,12 +1629,21 @@ def handle_failed_outputs(config,outputs):
                 make_stale(path)
             elif config['ym/failed_output_dir'] == 'ignore':
                 message(f'ignoring failed output directory {path}')
-                continue
             else:
                 raise Exception(f'unknown option for failed_output_dir: {config["ym/failed_output_dir"]}')
                 
         else:
             raise Exception(f'unsupported output type {path}')
+
+def rmnl(item):
+    '''
+    remove one trailing newline if present
+    because it will be added back when they get joined
+    '''
+
+    assert type(item) == str
+    if item.endswith('\n'): return item[:-1]
+    return item
 
 def generate_full_command(config,shell):
     'generate the bash commands to run before the job commands'
@@ -1639,14 +1651,14 @@ def generate_full_command(config,shell):
     cmd_list = []
 
     if 'ym/bash_setup' in config and config['ym/bash_setup'] != '':
-        cmd_list.append(config['ym/bash_setup'])
+        cmd_list.append(rmnl(config['ym/bash_setup']))
 
     if 'conda' in config and config['conda'] != '':
         if 'ym/conda_setup' in config and config['ym/conda_setup'] != '':
-            cmd_list.append(config['ym/conda_setup'])
-        cmd_list.append(f'conda activate {config["ym/conda_prefix"]}{config["conda"]}')
+            cmd_list.append(rmnl(config['ym/conda_setup']))
+        cmd_list.append(rmnl(f'conda activate {config["ym/conda_prefix"]}{config["conda"]}'))
 
-    cmd_list.append(shell)
+    cmd_list.append(rmnl(shell))
 
     return '\n'.join(cmd_list)
 
@@ -1883,18 +1895,27 @@ def verify_expected_outputs(action,outputs,inputs):
     newest_mtime = check_input_mtimes(inputs)
 
     failed = False
-    for i,item in enumerate(outputs.keys()):
+    show = True
+    for item in outputs.keys():
         path = outputs[item]
         if not os.path.exists(path):
             warning(f'missing output {path}')
             failed = True 
+
         elif is_stale(path):
             warning(f'stale output {path}')
             failed = True
-        elif newest_mtime == 'empty' and i == 0:
-            message(f'cannot verify output freshness of {path} due to no inputs being specified')
-        elif newest_mtime == 'missing' and i == 0:
-            warning(f'cannot verify output freshness of {path} due to missing input(s)')
+
+        elif newest_mtime == 'empty':
+            if show:
+                message(f'cannot verify output freshness of {path} due to no inputs being specified')
+                show = False
+
+        elif newest_mtime == 'missing':
+            if show:
+                warning(f'cannot verify output freshness of {path} due to missing input(s)')
+                show = False
+                
         elif os.path.getmtime(path) < newest_mtime:
             message(f'stale output {path}')
             failed = True

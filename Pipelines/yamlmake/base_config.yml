@@ -3,8 +3,8 @@
     ym:
         prefix:             "mut."
         remote_delay_secs:  "10"
-        stale_output_file:  "recycle"
-        stale_output_dir:   "ignore"
+        stale_output_file:  "stale"
+        stale_output_dir:   "stale"
         failed_output_file: "stale"
         failed_output_dir:  "stale"
         missing_parent_dir: "create"
@@ -22,7 +22,6 @@
         tmpfs:    "10G"
         pe:       "smp"
         cores:    "1"
-        log_dir:  "{%ym/log_dir}"
 
     working_dir:    "/lustre/scratch/scratch/{$USER}/549_mutein"
     conf_dir:       "{$MUT_DIR}/Pipelines/yamlmake"

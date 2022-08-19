@@ -15,18 +15,18 @@
     exec:  "local"
     conda: "pyega3"
 
-    input:
-        yokoyama_config: "{%conf_dir}/download/yokoyama2019_config.yml"
+    #no input
 
     output:
-        stdout:    "datasets/{%dataset_id}/{=subset_id}/stdout"
-        stderr:    "datasets/{%dataset_id}/{=subset_id}/stderr"
-        file_list: "datasets/{%dataset_id}/{=subset_id}/file_list"
-        md5_list:  "datasets/{%dataset_id}/{=subset_id}/md5_list"
+        stdout:    "datasets/{%dataset_id}/{=subset_id}/.meta/pyega3.stdout"
+        stderr:    "datasets/{%dataset_id}/{=subset_id}/.meta/pyega3.stderr"
+        file_list: "datasets/{%dataset_id}/{=subset_id}/.meta/file_list"
+        md5_list:  "datasets/{%dataset_id}/{=subset_id}/.meta/md5_list"
 
     #get list of EGAF accessions and MD5s using pyega3
     shell: |
         pyega3 -cf {%credentials} files {=subset_id}    > {%stdout} 2> {%stderr}
+        rm -f pyega3_output.log
         cat {%stderr} | grep EGAF | awk '{print $4}'    > {%file_list}
         cat {%stderr} | grep EGAF | awk '{print $4,$7}' > {%md5_list}
 
@@ -35,15 +35,15 @@
     exec: "local"
 
     input:
-        accession_list: "datasets/{%dataset_id}/{=subset_id}/file_list"
+        accession_list: "datasets/{%dataset_id}/{=subset_id}/.meta/file_list"
 
     output:
-        touch: "datasets/{%dataset_id}/{=subset_id}/created_folders.touch"
+        touch: "datasets/{%dataset_id}/{=subset_id}/.meta/create_subset_folders.touch"
 
     shell: |
         for acc in $(cat {%accession_list})
         do
-            mkdir -p datasets/{%dataset_id}/{=subset_id}/${acc}.d
+            mkdir -p datasets/{%dataset_id}/{=subset_id}/${acc}
         done
         touch {%touch}
 
