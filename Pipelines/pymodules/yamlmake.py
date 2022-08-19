@@ -899,6 +899,15 @@ def split_action(action):
 
 def parse_yaml(fname):
     'parse yaml into list of items'
+
+    #make sure all shell: fields are literal block scalars
+    with open(fname) as f:
+        for line in f:
+            line = line.strip()
+            if not line.startswith("shell:"): continue
+            if not line == "shell: |":
+                raise Exception('all shell fields must use the literal block scalar style "shell: |" to preserve newlines')
+
     with open(fname) as f:
         result = yaml.safe_load(f)
 
@@ -1410,11 +1419,17 @@ def generate_shell_commands(action,job_list,shell):
                 run = True
 
             else: #oldest_output has an mtime
-                if oldest_output <= newest_input:
-                    #outputs not older than inputs
+                if oldest_output < newest_input:
+                    #outputs older than inputs
                     run = True
                 else:
-                    #all outputs look newer than inputs
+                    #all outputs look equal or newer than inputs
+                    #we allow equal to count as newer
+                    #so that a symlink to a file is not stale with respect to
+                    #the target file so we can make a symlink to a file
+                    #and not have it always look stale
+                    #because the default "getmtime" of a symlink
+                    #is that of the target not the actual symlink
                     run = False
 
         if run == False:
@@ -1915,7 +1930,7 @@ def verify_expected_outputs(action,outputs,inputs):
             if show:
                 warning(f'cannot verify output freshness of {path} due to missing input(s)')
                 show = False
-                
+
         elif os.path.getmtime(path) < newest_mtime:
             message(f'stale output {path}')
             failed = True

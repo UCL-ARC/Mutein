@@ -10,6 +10,9 @@
     credentials: "config/private_config1.json"
 
 #download list of accession names
+#not actually required since only the "subset_id" is needed to get all files
+#but can be used to verify what's been downloaded
+#md5_list will contain <EGAFnumber> <md5> <filename>
 - action:
     name:  "download_accession_list"
     exec:  "local"
@@ -28,60 +31,62 @@
         pyega3 -cf {%credentials} files {=subset_id}    > {%stdout} 2> {%stderr}
         rm -f pyega3_output.log
         cat {%stderr} | grep EGAF | awk '{print $4}'    > {%file_list}
-        cat {%stderr} | grep EGAF | awk '{print $4,$7}' > {%md5_list}
+        cat {%stderr} | grep EGAF | awk '{print $4,$7,$8}' > {%md5_list}
 
+#one download command per subset rather than accession
 - action:
-    name: "create_subset_folders"
-    exec: "local"
+    name:  "download_accessions"
+    exec:  "local"
+    conda: "pyega3"
 
-    input:
-        accession_list: "datasets/{%dataset_id}/{=subset_id}/.meta/file_list"
+    #ensure files downloaded as single chunks
+    #workaround for buggy download system
+    pyega3_options: "-ms 100000000000" 
+
+    #no input
 
     output:
-        touch: "datasets/{%dataset_id}/{=subset_id}/.meta/create_subset_folders.touch"
+        touch: "datasets/{%dataset_id}/{=subset_id}/.meta/{%name}.touch"
 
+    #get list of EGAF accessions and MD5s using pyega3
     shell: |
-        for acc in $(cat {%accession_list})
-        do
-            mkdir -p datasets/{%dataset_id}/{=subset_id}/${acc}
-        done
+        cd datasets/{%dataset_id}/{=subset_id}
+        pyega3 {%pyega3_options} fetch {=subset_id}
+        cd -
         touch {%touch}
 
+#explicitly test md5 of all downloaded files
+- action:
+    name: "verify_downloads"
+    exec: "qsub"
+
+    input:
+        accession_dir: "datasets/{%dataset_id}/{=subset_id}/{*accession}"
+        md5_list: "datasets/{%dataset_id}/{=subset_id}/.meta/md5_list"
+
+    output:
+        touch: "datasets/{%dataset_id}/{=subset_id}/{*accession}/.meta/{%name}.touch"
+
+    shell: |
+        filename=$(cat {%md5_list} | grep -w '^{*accession}' | awk '{print $3}')
+        expected=$(cat {%md5_list} | grep -w '^{*accession}' | awk '{print $2}')
+        observed=$(cat {%accession_dir}/${filename} | md5sum | awk '{print $1}')
+        [[ "${expected}" == "${observed}" ]] && touch {%touch}
+
+#not needed provided download command will create the accession folders
 # - action:
-#     name: "download_accessions"
-#     exec:  "local"
-#     conda: "pyega3"
+#     name: "create_subset_folders"
+#     exec: "local"
 
 #     input:
-#         #spawn one job per subset x accession
-#         accession_dir: "datasets/{%dataset_id}/{=subset_id}/{*accession}.d"
+#         accession_list: "datasets/{%dataset_id}/{=subset_id}/.meta/file_list"
 
 #     output:
-#         read1: "datasets/{%dataset_id}/{=subset_id}/{*accession}.d/{*accession}_1.fastq.gz"
-#         read2: "datasets/{%dataset_id}/{=subset_id}/{*accession}.d/{*accession}_2.fastq.gz"
+#         touch: "datasets/{%dataset_id}/{=subset_id}/.meta/create_subset_folders.touch"
 
 #     shell: |
-#         cd {%accession_dir}
-#         enaDataGet -f fastq {*accession}
-
-# the below is being ported to yamlmake from raw script 
-
-# conda activate ${MUT_PREFIX}pyega3
-
-# EGAD00001004464
-# EGAD00001004462
-# EGAD00010001631
-
-# mkdir -p "${DATA_DIR}"
-# cd "${DATA_DIR}"
-
-# for x in $(cat "${ACC_FILE}")
-# do
-#     mkdir -p ${x} && cd ${x}
-#     pyega3 -ms 100000000000 fetch ${x}
-#     cd ..
-# done \
-# > download-${TIMESTAMP}.stdout \
-# 2> download-${TIMESTAMP}.stderr
-
-
+#         for acc in $(cat {%accession_list})
+#         do
+#             mkdir -p datasets/{%dataset_id}/{=subset_id}/${acc}
+#         done
+#         touch {%touch}

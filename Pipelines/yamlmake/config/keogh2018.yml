@@ -1,0 +1,7 @@
+#define dataset_id and subset_list
+- config:
+    dataset_id: "keogh2018"
+
+    #currently only one data subset within keogh2018
+    subset_id:
+      - "SRP159015"

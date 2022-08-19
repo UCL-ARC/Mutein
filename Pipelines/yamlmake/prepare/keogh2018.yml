@@ -1,0 +1,34 @@
+#define dataset_id and subset_list
+- include: "../config/keogh2018.yml"
+
+#create a new directory hierachy to contain the processed versions of the data
+#with symlinks to the originals
+- action:
+    name: "create_processed_directories"
+    exec: "local"
+
+    input:
+        original: "datasets/{%dataset_id}/{*subset_id}/{*accession}/{*basename}.fastq.gz"
+
+    output:
+        symlink: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*basename}.fastq.gz"
+
+    shell: |
+       cd processed/{%dataset_id}/{*subset_id}/{*accession}
+       ln -s ../../../../{%original}
+
+# #generate QC stats for the "raw" reads
+# - action:
+#     name: "fastqc"
+#     exec: "local"
+
+#     qsub:
+#       time:  "1:00:0"
+#       mem:   "1G"
+#       tmpfs: "15G"
+#       cores: "4"
+
+#     input:
+#       fastq: "processed/{%dataset_id}/{*subset_id}/{*accession}/*.fastq.gz"
+#     output:
+#     shell:
