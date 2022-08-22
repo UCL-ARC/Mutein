@@ -1,0 +1,32 @@
+#define dataset_id and subset_list
+- include: "../config/keogh2018.yml"
+
+- action:
+    name:  "bwa_mem"
+    exec:  "qsub"
+    conda: "bwa"
+
+    qsub: 
+      time:  "4:00:0"
+      mem:   "2G"
+      tmpfs: "8G"
+      cores: "2"
+
+    input:
+        read1: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_1.fastq.gz"
+        read2: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_2.fastq.gz"
+
+    output:
+        bam:   "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_aln_sort.bam"
+
+    #map with bwa mem, add readgroup tag to say "these are all from the same sample"
+    #sort mapped read by mapping position, output to bam file
+    shell: |
+      SAMTOOLS_TMP=${TMPDIR}/${USER}-${RANDOM}${RANDOM}
+      mkdir -p ${SAMTOOLS_TMP}
+      bwa mem -t {%qsub/cores} {%ref/fasta_bgz} {%read1} {%read2} \
+      | samtools addreplacerg \
+      -r 'ID:{%dataset_id}_{*subset_id}_{*accession}' \
+      -r 'SM:{%dataset_id}_{*subset_id}_{*accession}' - \
+      | samtools sort -T ${SAMTOOLS_TMP} -O bam -m 2G - \
+      > {%bam}

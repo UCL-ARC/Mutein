@@ -1,0 +1,71 @@
+#define dataset_id and subset_list
+- include: "../config/keogh2018.yml"
+
+# #https://gatk.broadinstitute.org/hc/en-us/articles/360037225632-HaplotypeCaller
+# #use -L to specify target regions, eg for exome/bait capture
+# #https://gatk.broadinstitute.org/hc/en-us/articles/360035531852-Intervals-and-interval-lists
+# - action:
+#     name:  "haplotype_caller"
+#     exec:  "qsub"
+#     conda: "gatk4"
+
+#     qsub:
+#       time:  "3:00:00"
+#       mem:   "9G"
+#       tmpfs: "1G"
+#       cores: "4"
+
+#     input:
+#       bam: "datasets/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_aln_sort.bam"
+
+#     output:
+#       vcf: "datasets/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_haplo.vcf"
+
+#     shell: |
+#         gatk --java-options \"-Xmx8g\" HaplotypeCaller \
+#           --native-pair-hmm-threads {%qsub/cores} -L {%intervals} -ip 10 \
+#           -R {%ref/fasta_bgz} -I {%bam} -O {%vcf} -ERC GVCF
+
+# - action:
+#     # https://gatk.broadinstitute.org/hc/en-us/articles/360035889971
+#     name:  "genomics_db_import"
+#     exec:  "qsub"
+#     conda: "gatk4"
+
+#     qsub:
+#       time:  "3:00:00"
+#       mem:   "9G"
+#       tmpfs: "1G"
+#       cores: "4"
+
+#       shell: |
+#         GDB=datasets/${DATASET}/${SUBSET}/gatk_db
+#         FINALVCF=datasets/${DATASET}/${SUBSET}/${DATASET}_${SUBSET}.vcf
+
+#         SGE_TASK_ID=$((SGE_TASK_ID+1))
+#         REF=reference/${MUT_REFERENCE}
+#         BAM=datasets/${DATASET}/${SUBSET}/${ACCESSION}/${ACCESSION}_aln_sort.bam
+#         VCF=datasets/${DATASET}/${SUBSET}/${ACCESSION}/${ACCESSION}_haplo.vcf
+#         INT=datasets/${DATASET}/${SUBSET}/intervals.list
+
+#         rm -rf ${GDB}
+#         gatk GenomicsDBImport \
+#           -V ${VCF} \
+#           --genomicsdb-workspace-path ${GDB} \
+#           -L datasets/${DATASET}/${SUBSET}/intervals.list \
+#           -ip 10
+
+
+# - action:
+#     name:  "genotype_gvcfs"
+#     exec:  "qsub"
+#     conda: "gatk4"
+
+#     qsub:
+#       time:  "3:00:00"
+#       mem:   "9G"
+#       tmpfs: "1G"
+#       cores: "4"
+
+#     shell: |
+#         gatk GenotypeGVCFs -R ${REF} -V gendb://${GDB} -O ${FINALVCF}
