@@ -17,7 +17,44 @@
        cd processed/{%dataset_id}/{*subset_id}/{*accession}
        ln -s ../../../../{%original}
 
-# #generate QC stats for the "raw" reads
+# #move existing fastqc and bwa results out of datasets folder and into processed folder
+# #this is a one-off to change the directory structure of the project and should not need 
+# #to be rerun
+# - action:
+#     name: "move_existing_results"
+#     exec: "local"
+
+#     input:
+#       izip:   "datasets/{%dataset_id}/{*subset_id}/{*accession}/{*file}_fastqc.zip"
+#       ihtml:  "datasets/{%dataset_id}/{*subset_id}/{*accession}/{*file}_fastqc.html"
+#       ibam:   "datasets/{%dataset_id}/{*subset_id}/{*accession}/{*file}_aln_sort.bam"
+
+#     output:
+#       ozip:   "processed/{%dataset_id}/{*subset_id}/{*accession}/{*file}_fastqc.zip"
+#       ohtml:  "processed/{%dataset_id}/{*subset_id}/{*accession}/{*file}_fastqc.html"
+#       obam:   "processed/{%dataset_id}/{*subset_id}/{*accession}/{*file}_aln_sort.bam"
+
+#     #this will generate a warning that the inputs are missing after job completes
+#     shell: |
+#         mv {%izip}  {%ozip}
+#         mv {%ihtml} {%ohtml}
+#         mv {%ibam}  {%obam}
+
+# #reset the mtime of the datasets raw data folders to prevent "download_accessions" rerunning
+# #mtimes were changed by running "move_existing_results"
+# - action:
+#     name: "reset_mtimes"
+#     exec: "local"
+
+#     input:
+#       folder:   "datasets/{%dataset_id}/{*subset_id}/{*accession}"
+
+#     #no output
+
+#     shell: |
+#         touch -t 202208171200 {%folder}
+
+# #update timestamp on existing fastqc results to avoid having to rerun
 # - action:
 #     name: "fastqc"
 #     exec: "local"
@@ -29,6 +66,31 @@
 #       cores: "4"
 
 #     input:
-#       fastq: "processed/{%dataset_id}/{*subset_id}/{*accession}/*.fastq.gz"
-#     output:
-#     shell:
+#       zip:  "processed/{%dataset_id}/{*subset_id}/{*accession}/{*file}_fastqc.zip"
+#       html: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*file}_fastqc.html"
+
+#     shell: |
+#       touch -t 202208181200 {%zip}
+#       touch -t 202208181200 {%html}
+
+#generate QC stats for the "raw" reads
+- action:
+    name: "fastqc"
+    exec: "qsub"
+    conda: "trim-galore"
+
+    qsub:
+      time:  "1:00:0"
+      mem:   "1G"
+      tmpfs: "15G"
+      cores: "4"
+
+    input:
+      fastq: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*file}.fastq.gz"
+
+    output:
+      zip:  "processed/{%dataset_id}/{*subset_id}/{*accession}/{*file}_fastqc.zip"
+      html: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*file}_fastqc.html"
+
+    shell: |
+        fastqc -t {%qsub/cores} {%fastq}

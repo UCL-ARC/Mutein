@@ -1927,11 +1927,14 @@ def verify_expected_outputs(action,outputs,inputs):
                 show = False
 
         elif newest_mtime == 'missing':
+            #this will happen if the job deletes or moves any of its inputs
             if show:
                 warning(f'cannot verify output freshness of {path} due to missing input(s)')
                 show = False
 
         elif os.path.getmtime(path) < newest_mtime:
+            #expected output file exists but appears stale
+            #ie we assume it was not updated by the command
             message(f'stale output {path}')
             failed = True
 
