@@ -87,7 +87,9 @@ The input and/or output fields can contain one or more simple named subfields, o
 
 Above we see that, although the file path field names are nested under the input and output fields, for naming purposes they are considered to be directly under the action name space, and we refer to them directly within the shell using `{%first_input}` etc and not `{%input/first_input}` (see below for how to access nested variables within the configuration hierachy). Effectively the "input" and "output" field labels disappear from the name space and their subfields get promoted one level. This applies only to the input and output fields, and saves a lot of typing in the shell command, but also means we must avoid name collisions with other config variables due to this promotion.
 
-To operate on sets of multiple files the input and output items can also contain any combination of four special types of placeholder which expand the file pahts in various ways. These four placeholder types are of the form `{*placeholder}`, `{=placeholder}`, `{+placeholder}` and `{-placeholder}` which respectively operate to expand the input and output lists by globbing paths that spawn separate jobs (`{*...}`), using existing variable lists to spawn separate jobs (`{=...}`), globbing paths that create path lists within single jobs (`{+...}`) and using existing variable lists to create path lists within single jobs (`{-...}`). This will be explained in more detail below.
+To operate on sets of multiple files the input and output items can also contain any combination of four special types of placeholder which expand the file paths in various ways. These four placeholder types are of the form `{*placeholder}`, `{=placeholder}`, `{+placeholder}` and `{-placeholder}` which respectively operate to expand the input and output lists by: globbing paths that spawn separate jobs (`{*...}`), using existing variable lists to spawn separate jobs (`{=...}`), globbing paths that create path lists within single jobs (`{+...}`) and using existing variable lists to create path lists within single jobs (`{-...}`). This will be explained in more detail below.
+
+Once all placeholders in the input and output fields have been processed they become available within the shell command. Note that the shell field must always be of YAML's literal block scalar type (ie `shell: |` as shown) to ensure that commands written on separate lines are not merged together into a single line. To continue a single shell command over multiple lines use the back slash character at the end of each continuing line as you would in a normal shell script file.
 
 #### Spawning separate jobs for each matching filename
 
@@ -269,7 +271,7 @@ Similarly to the `{*dataset}` style placeholder there is an alternative expandin
       output:
         fastq: "data/{+dataset}/{+dataset}.fastq.gz"
       shell: |
-        echo Downloading dataset list: {+dataset/, }
+        echo Downloading dataset list: {+dataset/,}
         echo Number of datasets: {+dataset/N}
         my_download_script.py --url_list={%url/,} \
                               --output_list={%fastq/,}
@@ -302,7 +304,7 @@ The final special placeholder uses the form `{-sample}`, and generates lists of 
       output:
         fastq: "data/{-sample}/{-sample}.fastq"
       shell: |
-        echo Decompressing data for samples: "{-sample/" "}"
+        echo Decompressing data for samples: "{-sample/ }"
         for finput in {%gzip/ }
         do
             foutput=${finput/fastq/fastq.gz}
