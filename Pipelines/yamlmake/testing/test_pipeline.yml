@@ -1,133 +1,48 @@
 - include: "base_config.yml"
 
-# - action:
-#     name:     "test1"
-#     exec:     "local"
-#     sample_subset:
-#       - "subset1"
-#       - "subset2"
-#       - "subset3"
-#       - "subset4"
-#       - "subset5"
-#     sample:
-#       - 1
-#       - 2
-#       - 3
-#       - 4
-#       - 5
-#       - 6
-#     input:
-#       samp_file: "test/samples/{-sample_subset}/{-sample}.data"
-#     output:
-#       out_file:  "test/output/{-sample_subset}/{-sample}.step1"
-#     shell: |
-#       echo samp_file={%samp_file} out_file={%out_file}
-#       echo sample_subset={-sample_subset} sample={-sample}
-#       echo all samples: {%sample[,]}
-#       echo all subsets: {%sample_subset[,]}
-
-# - action:
-#     name:     "test1"
-#     exec:     "local"
-#     input:
-#       samp_file: "test/samples/{*sample_subset}/{+sample}.data"
-#     output:
-#       out_file:  "test/output/{*sample_subset}/{+sample}.step1"
-#     shell: |
-#       echo samp_file={%samp_file} out_file={%out_file}
-      
-# - action:
-#     name: "test1"
-#     exec: "local"
-#     sample_subset:
-#       - "subset1"
-#       - "subset2"
-#     treatment_class:
-#       - "prenormify"
-#       - "subexpansification"
-#     input:
-#       samp_file:  [ "{%test_dir}/samples/{*sample_subset}/{+sample}.data" ]
-#       treat_meta: "{%test_dir}/treatments/{=treatment_class}/{*treatment}"
-#       combo_file: "{%test_dir}/combos/{+sample}_{*treatment}"
-#     output:
-#       test_out: "{%test_dir}/output/{*sample_subset}/{+sample}.data"
-#       #result: "{%test_dir}/output/{-sample_subset}/{=treatment_class}/{+sample}_{*treatment}.step1"
-#     shell: |
-#       echo samp_file={%samp_file/,} treat_meta={%treat_meta} > {%test_out/0}
-#       echo sample_subset={*sample_subset} sample={+sample/,} {=treatment_class} {*treatment} >> {%test_out/0}
-#       echo {%sample_subset/,}
-      
-# - action:
-#     name:     "conflict"
-#     exec:     "local"
-#     sample_subset:
-#       - "subset1"
-#       - "subset2"
-#     treatment_class:
-#       - "prenormify"
-#       - "subexpansification"
-#     input:
-#       samp_file:  "{%test_dir}/samples/{-sample_subset}/{+sample}.data"
-#       treat_meta: "{%test_dir}/treatments/{=treatment_class}/{*treatment}"
-#       combo_file: "{%test_dir}/combos/{+sample}_{*treatment}"
-#     output: "{%test_dir}/output/{-sample_subset}/{=treatment_class}/{+sample}_{*treatment}.step1"
-#     shell: |
-#       echo samp_file={%samp_file} treat_meta={%treat_meta} > {%output}
-#       echo {=sample_subset} {*sample} {=treatment_class} {*treatment} >> {%output}
-
-# - action:
-#     name:     "step1"
-#     exec:     "local"
-#     time:     "1:00:00"
-#     mem:      "2G"
-#     cores:    "1"
-#     conda:    "{%mut_prefix}main"
-#     data_dir: "{%test_dir}/input"
-#     input:    "{%data_dir}/{*sample}.input"
-#     output:   "{%test_dir}/output/{*sample}.step1"
-#     shell: |
-#       cat {%input} > {%output}
-#       echo file {%input} sample {*sample} >> {%output}
-#       echo processed by {%name} >> {%output}
-#       echo "{%input}" | grep -v -e '1\.input' #should cause task1 to fail
-      
-# - action:
-#     name: "step2"
-#     exec: "local"
-#     time:     "0:30:00"
-#     mem:      "2G"
-#     cores:    "2"
-#     conda: "{$MUT_PREFIX}main"
-#     input:
-#       step1: "{%test_dir}/output/{*sample}.step1"
-#     output:
-#       final: "{%test_dir}/output/{*sample}.step2"
-#     shell: |
-#       cat {%step1} > {%final}
-#       echo processed by {%name} >> {%final}
-#       echo "hello"
-
-# - action:
-#     name: step4
-#     conda: "{$MUT_PREFIX}main"
-#     input:
-#       read1: "datasets/{=dataset}/{=subset}/{=accession}/{=accession}_1.fastq.gz"
-#       read2: "datasets/{%dataset}/{%subset}/{%accession}/{%accession}_2.fastq.gz"
-#     output:
-#       info: "datasets/{%dataset}/{%subset}/{%accession}/{%accession}.info"
-#     exec: qsub
-#     shell: |
-#       file {%read1} {%read2} > {%info}
-#       echo {$USER} processed >> {%info}
+- action:
+    name: "test1"
+    output:
+      test1: "test1.out"
+    shell: |
+      echo Hello World! > {%test1}
 
 - action:
-    name:   "test1"
-    exec:   "qsub"
-    run:    "always"
-    input:
-      samp_file: "test/samples/{*sample_subset}/{+sample}.data"
+    name: "test2"
     output:
-      out_file:  "test/output/{*sample_subset}/{+sample}.step1"
+      test1: "test1.out"
     shell: |
-      echo samp_file={%samp_file/,} out_file={%out_file/,}
-      for fname in {%out_file/ } ; do touch ${fname} ; done
+      echo Hello World! > {%test1}
+
+- action:
+    name: "test3"
+    input:
+      ifile: "test_data/{*folder}/{*subfolder}/{+file}"
+    output:
+      ofile: "summary/{*folder}_{*subfolder}.txt"
+    shell: |
+      echo folder {*folder} subfolder {*subfolder} > {%ofile}
+      echo contains {+file/N} files: >> {%ofile}
+      echo called: >> {%ofile}
+      for x in {+file/ }
+      do
+        echo "  ${x}" >> {%ofile}
+      done
+
+- action:
+    name: "test4"
+    file_list:
+      - file1
+      - file2
+      - file3
+      - file4
+      - file5
+      - file6
+   
+    input:
+      ifile: "test_data/{*folder}/{*subfolder}/{=file_list}"
+    output:
+      ofile: "summary/{*folder}/{*subfolder}/{=file_list}"
+    shell: |
+      echo {*folder} {*subfolder} {=file_list} > {%ofile}
+

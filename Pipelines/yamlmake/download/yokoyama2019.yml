@@ -1,0 +1,92 @@
+#define dataset_id and subset_list
+- config:
+    dataset_id: "yokoyama2019"
+
+    subset_id:
+      - "EGAD00001004464"
+      - "EGAD00001004462"
+      - "EGAD00010001631"
+
+    credentials: "config/private_config1.json"
+
+#download list of accession names
+#not actually required since only the "subset_id" is needed to get all files
+#but can be used to verify what's been downloaded
+#md5_list will contain <EGAFnumber> <md5> <filename>
+- action:
+    name:  "download_accession_list"
+    exec:  "local"
+    conda: "pyega3"
+
+    #no input
+
+    output:
+        stdout:    "datasets/{%dataset_id}/{=subset_id}/.meta/pyega3.stdout"
+        stderr:    "datasets/{%dataset_id}/{=subset_id}/.meta/pyega3.stderr"
+        file_list: "datasets/{%dataset_id}/{=subset_id}/.meta/file_list"
+        md5_list:  "datasets/{%dataset_id}/{=subset_id}/.meta/md5_list"
+
+    #get list of EGAF accessions and MD5s using pyega3
+    shell: |
+        pyega3 -cf {%credentials} files {=subset_id}    > {%stdout} 2> {%stderr}
+        rm -f pyega3_output.log
+        cat {%stderr} | grep EGAF | awk '{print $4}'    > {%file_list}
+        cat {%stderr} | grep EGAF | awk '{print $4,$7,$8}' > {%md5_list}
+
+#one download command per subset rather than accession
+- action:
+    name:  "download_accessions"
+    exec:  "local"
+    conda: "pyega3"
+
+    #ensure files downloaded as single chunks
+    #workaround for buggy download system
+    pyega3_options: "-ms 100000000000" 
+
+    #no input
+
+    output:
+        touch: "datasets/{%dataset_id}/{=subset_id}/.meta/{%name}.touch"
+
+    #get list of EGAF accessions and MD5s using pyega3
+    shell: |
+        cd datasets/{%dataset_id}/{=subset_id}
+        pyega3 {%pyega3_options} fetch {=subset_id}
+        cd -
+        touch {%touch}
+
+#explicitly test md5 of all downloaded files
+- action:
+    name: "verify_downloads"
+    exec: "qsub"
+
+    input:
+        accession_dir: "datasets/{%dataset_id}/{=subset_id}/{*accession}"
+        md5_list: "datasets/{%dataset_id}/{=subset_id}/.meta/md5_list"
+
+    output:
+        touch: "datasets/{%dataset_id}/{=subset_id}/{*accession}/.meta/{%name}.touch"
+
+    shell: |
+        filename=$(cat {%md5_list} | grep -w '^{*accession}' | awk '{print $3}')
+        expected=$(cat {%md5_list} | grep -w '^{*accession}' | awk '{print $2}')
+        observed=$(cat {%accession_dir}/${filename} | md5sum | awk '{print $1}')
+        [[ "${expected}" == "${observed}" ]] && touch {%touch}
+
+#not needed provided download command will create the accession folders
+# - action:
+#     name: "create_subset_folders"
+#     exec: "local"
+
+#     input:
+#         accession_list: "datasets/{%dataset_id}/{=subset_id}/.meta/file_list"
+
+#     output:
+#         touch: "datasets/{%dataset_id}/{=subset_id}/.meta/create_subset_folders.touch"
+
+#     shell: |
+#         for acc in $(cat {%accession_list})
+#         do
+#             mkdir -p datasets/{%dataset_id}/{=subset_id}/${acc}
+#         done
+#         touch {%touch}

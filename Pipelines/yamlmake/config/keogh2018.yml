@@ -1,0 +1,10 @@
+#define dataset_id and subset_list
+- config:
+    dataset_id: "keogh2018"
+
+    #genomic positions covered by the capture baits
+    intervals: "datasets/keogh2018/.meta/intervals.list"
+
+    #currently only one data subset within keogh2018
+    subset_id:
+      - "SRP159015"

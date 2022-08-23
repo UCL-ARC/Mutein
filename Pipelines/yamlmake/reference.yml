@@ -42,7 +42,7 @@
 - action:
     name:  "create_bgzip"
     exec:  "qsub"
-    conda: "{$MUT_PREFIX}bwa"
+    conda: "bwa"
     qsub:
         time:  "1:00:00"
         mem:   "6G"
@@ -64,7 +64,7 @@
 - action:
     name:  "create_fai"
     exec:  "qsub"
-    conda: "{$MUT_PREFIX}bwa"
+    conda: "bwa"
     qsub:
         time:  "1:00:00"
         mem:   "6G"
@@ -84,7 +84,7 @@
 - action:
     name: "create_bwtsw"
     exec:  "qsub"
-    conda: "{$MUT_PREFIX}bwa"
+    conda: "bwa"
     qsub:
         time:  "2:00:00"
         mem:   "6G"
@@ -106,18 +106,19 @@
 #create gatk index
 - action:
     name: "create_gatk_dict"
-    exec:  "local"
-    conda: "{$MUT_PREFIX}gatk4"
+    exec:  "qsub"
+    conda: "gatk4"
     qsub:
         time:  "1:00:00"
         mem:   "6G"
         tmpfs: "10G"
         cores: "1"
-    ym:
-        #disabling strict mode to prevent a conda error:
-        #/lustre/home/ccaervi/mambaforge/envs/mutein_gatk4/etc/conda/activate.d/openjdk_activate.sh:
-        #line 1: JAVA_HOME: unbound variable
-        bash_setup: "source ~/.bashrc\nset +o history" #disabling strict mode
+
+    env:
+        #provide dummy values to prevent bash strict mode causing unbound variable errors in
+        #~/mambaforge/envs/mutein_gatk4/etc/conda/activate.d/openjdk_activate.sh
+        JAVA_HOME: "-"
+        JAVA_LD_LIBRARY_PATH: "-"
 
     input:
         fasta_bgz: "{%ref/fasta_bgz}"

@@ -87,7 +87,9 @@ The input and/or output fields can contain one or more simple named subfields, o
 
 Above we see that, although the file path field names are nested under the input and output fields, for naming purposes they are considered to be directly under the action name space, and we refer to them directly within the shell using `{%first_input}` etc and not `{%input/first_input}` (see below for how to access nested variables within the configuration hierachy). Effectively the "input" and "output" field labels disappear from the name space and their subfields get promoted one level. This applies only to the input and output fields, and saves a lot of typing in the shell command, but also means we must avoid name collisions with other config variables due to this promotion.
 
-To operate on sets of multiple files the input and output items can also contain any combination of four special types of placeholder which expand the file pahts in various ways. These four placeholder types are of the form `{*placeholder}`, `{=placeholder}`, `{+placeholder}` and `{-placeholder}` which respectively operate to expand the input and output lists by globbing paths that spawn separate jobs (`{*...}`), using existing variable lists to spawn separate jobs (`{=...}`), globbing paths that create path lists within single jobs (`{+...}`) and using existing variable lists to create path lists within single jobs (`{-...}`). This will be explained in more detail below.
+To operate on sets of multiple files the input and output items can also contain any combination of four special types of placeholder which expand the file paths in various ways. These four placeholder types are of the form `{*placeholder}`, `{=placeholder}`, `{+placeholder}` and `{-placeholder}` which respectively operate to: spawn separate jobs by globbing file system paths (`{*...}`), spawn separate jobs using existing variable lists (`{=...}`), expand single input/output fields into lists by globbing file system paths (`{+...}`) and expand single input/output fields into lists using existing list variables (`{-...}`). This will be explained in more detail below.
+
+Once all placeholders in the input and output fields have been processed and expanded into lists and/or multiple jobs they become available within the shell command to fill out its own placeholders. Note that the shell field must always be of YAML's literal block scalar type (ie `shell: |` as shown) to ensure that commands written on separate lines are not merged together into a single line. To continue a single shell command over multiple lines use the back slash character at the end of each continuing line as you would in a normal shell script file.
 
 #### Spawning separate jobs for each matching filename
 
@@ -105,7 +107,7 @@ To operate on sets of multiple files the input and output items can also contain
         wget $(cat {%url}) -O {%fastq}
 ```
 
-Here the `{*dataset}` placeholder in the *url* input field means "glob (i.e. search the filesystem for) this path using a * in place of `{*dataset}` and spawn a *separate job* for each path found". The globbing is always done using the input field(s), since the output files do not exist before the action is run. Once a list of matching file paths has be found the value of the `{*dataset}` placeholder is extracted and substituted into the output path patterns to create the corresponding output paths for each input path.
+Here the `{*dataset}` placeholder in the *url* input field means "glob (i.e. search the filesystem for) this path using a * in place of `{*dataset}` and spawn a *separate job* for each path found". These globbing placeholders only trigger a filesystem glob based on the input field(s), since the output files are assumed not to exist before the action is run. However, once a list of matching input file paths has be found the value(s) of the globbing placeholder(s) are extracted and substituted into any corresponding placeholders in the output path patterns to create the corresponding output paths for each input path.
 
 Therefore if we start off with a set of subfolders under `metadata` named to match each of the datasets which require downloading the above action will run a separate shell command to download each url and save it in a matching folder under `data`. Any required output folders are automatically created if missing. The action will fail if the specified matching output files do not get created. Time stamps are used to check that the output files are newer than the input files.
 
@@ -115,7 +117,7 @@ There is also an alternative form of globbing placeholder of the form `{+dataset
 
 #### Spawning separate jobs for each item of an existing list
 
-Lists of strings can be defined anywhere in the configuration. Additionally each action can define any temporary local configuration it needs - this does not persist after the action has ended. Therefore a short list of files can be hard coded into the action itself (although in practise it might be better kept in a separate configuration file that is included):
+The special `{=...}` placeholder expands to generate a separate job for each item in an existing config list, and can appear in the input and/or output fields of an action. Lists of strings can be defined anywhere in the configuration. Additionally each action can define any temporary local configuration it needs - this does not persist after the action has ended. Therefore a short list of files can be hard coded into the action itself (although in practise it might be better kept in a separate configuration file that is included):
 
 ```
   - action:
@@ -257,6 +259,7 @@ To insert environment variables from the shell used to invoke YAMLmake another t
 Normal shell variables of the form `${USER}`, `${HOSTNAME}` etc are simply ignored by YAMLmake as passed through to the shell command, therefore they give you the value when the command was actually executed, whereas `{$USER}` gets substituted by YAMLmake before the action's shell command is run.
 
 #### Creating lists of file paths within single jobs by matching filenames
+
 Similarly to the `{*dataset}` style placeholder there is an alternative expanding globbing placeholder of the form `{+dataset}` which can be used in the input and output sections of an action. These also expand by matching filenames in the filesystem but generate lists of file paths within the same job instead of generating separate jobs for each path. Unlike the `{*dataset}` style placeholder this means that the files paths are in a list which must be dealt with in the shell command. For example:
 
 ```
@@ -268,7 +271,7 @@ Similarly to the `{*dataset}` style placeholder there is an alternative expandin
       output:
         fastq: "data/{+dataset}/{+dataset}.fastq.gz"
       shell: |
-        echo Downloading dataset list: {+dataset/, }
+        echo Downloading dataset list: {+dataset/,}
         echo Number of datasets: {+dataset/N}
         my_download_script.py --url_list={%url/,} \
                               --output_list={%fastq/,}
@@ -284,6 +287,7 @@ Assuming the metadata folder had subfolders called one, two and three which cont
 ```
 
 #### Creating lists of file paths within single jobs from existing lists
+
 The final special placeholder uses the form `{-sample}`, and generates lists of file paths within a single job. For example:
 
 ```
@@ -300,7 +304,7 @@ The final special placeholder uses the form `{-sample}`, and generates lists of 
       output:
         fastq: "data/{-sample}/{-sample}.fastq"
       shell: |
-        echo Decompressing data for samples: "{-sample/" "}"
+        echo Decompressing data for samples: "{-sample/ }"
         for finput in {%gzip/ }
         do
             foutput=${finput/fastq/fastq.gz}
@@ -349,11 +353,8 @@ Where `,C0` means to extract the 0th (0-based numbering) Column using `,` as the
     url: "{>metadata/toad/toad_url.txt}"
 ```
 
-
-
-
-
 #### Embedded Includes
+
 A special field called `includes` can be inserted anywhere into the configuration which must be a list of one or more filepaths, which are loaded into the configuration hierachy at the location of the includes field. Unlike a top level `- include` item, files loaded using the embedded includes feature should not contain any toplevel pipeline items (which are only valid at the highest level of the pipeline), rather they must contain the exact configuration that needs to be inserted. For example:
 
 ```
@@ -385,6 +386,6 @@ Which would be give the same result as if the original config item has been:
         - "item2"
 ```
 
-
 #### Notes
-Includes are relative to the config files unless they start with a "./" in which case they are relative to the working directory? Special action field: `run:` can be "always", "never" or "conditional".
+
+Includes are relative to the config files unless they start with a "./" in which case they are relative to the working directory? Special top-level field: `run:` can be "always", "never" or "conditional". Special top-level field: `env:` will be included in the running job's bash environment variables, all values must be simple strings, no nested containers allowed here.

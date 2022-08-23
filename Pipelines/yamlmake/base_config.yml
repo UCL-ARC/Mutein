@@ -2,10 +2,9 @@
 - config:
     ym:
         prefix:             "mut."
-        log_dir:            "yamlmake_logs"
         remote_delay_secs:  "10"
-        stale_output_file:  "recycle"
-        stale_output_dir:   "ignore"
+        stale_output_file:  "stale"
+        stale_output_dir:   "stale"
         failed_output_file: "stale"
         failed_output_dir:  "stale"
         missing_parent_dir: "create"
@@ -14,6 +13,7 @@
         job_number:         "YM_JOB_NUMBER"
         bash_setup:         "source ~/.bashrc\nset -euo pipefail\nset +o history"
         #conda_setup:        "source ~/mambaforge/etc/profile.d/conda.sh"
+        conda_prefix:       "{$MUT_PREFIX}"
 
     qsub:
         template: "default"
@@ -22,7 +22,12 @@
         tmpfs:    "10G"
         pe:       "smp"
         cores:    "1"
-        log_dir:  "{%ym/log_dir}"
+
+    env:
+        #provide dummy values to prevent bash strict mode causing unbound variable errors in
+        #~/mambaforge/envs/mutein_gatk4/etc/conda/activate.d/openjdk_activate.sh
+        JAVA_HOME: "-"
+        JAVA_LD_LIBRARY_PATH: "-"
 
     working_dir:    "/lustre/scratch/scratch/{$USER}/549_mutein"
     conf_dir:       "{$MUT_DIR}/Pipelines/yamlmake"
