@@ -5,11 +5,12 @@
     name:  "bwa_mem"
     exec:  "qsub"
     conda: "bwa"
+    run:   "always"
 
     qsub: 
-      time:  "4:00:0"
-      mem:   "2G"
-      tmpfs: "8G"
+      time:  "24:00:00" #run time seems to depend on network traffic
+      mem:   "10G"
+      tmpfs: "20G"
       cores: "2"
 
     input:

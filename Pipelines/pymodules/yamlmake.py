@@ -1395,6 +1395,7 @@ def generate_shell_commands(action,job_list,shell):
 
         #one or more outputs missing, job needs to run
         elif oldest_output == "missing":
+            message(f'one or more outputs missing or stale, job needs to run')
             run = True
 
         elif 'run' in action and action['run'] == 'always':
@@ -1409,6 +1410,7 @@ def generate_shell_commands(action,job_list,shell):
 
             #all outputs present, assume they are good
             else:
+                message("no inputs specified, assuming existing outputs are good")
                 run = False
 
         else: #newest_input has an mtime
@@ -1421,6 +1423,7 @@ def generate_shell_commands(action,job_list,shell):
             else: #oldest_output has an mtime
                 if oldest_output < newest_input:
                     #outputs older than inputs
+                    message('outputs older than inputs, running')
                     run = True
                 else:
                     #all outputs look equal or newer than inputs
@@ -1430,6 +1433,7 @@ def generate_shell_commands(action,job_list,shell):
                     #and not have it always look stale
                     #because the default "getmtime" of a symlink
                     #is that of the target not the actual symlink
+                    message('outputs not older than inputs, assuming good')
                     run = False
 
         if run == False:
