@@ -1138,7 +1138,16 @@ def generate_glob_matches(job_input):
         #find paths using iglob, match to placeholders using regex
         for path in glob.iglob(input_glob):
             m = re.fullmatch(input_regx,path)
-            assert m is not None,"regex cannot extract placeholders from the globbed path!"
+            
+            if m == None:
+                #regex cannot extract placeholders
+                #usually indicates two *'s in the glob matches different strings
+                #where as in the regex those two are required to be the same
+                #eg {*accession}/{*accession}
+                # ==> glob is */*
+                # ==> one path generated is A123/A123.txt
+                # which doesn't match the regex as "A123" != "A123.txt"
+                continue
 
             #split the re matches into the two types of placeholder
             injob = {}
