@@ -42,7 +42,7 @@ This should make your remote folders appear under local folders called myriad_ho
 
 If you'll be developing the git repo as well, I have found that having the repo checkout onto myriad itself and editing remotely in this way works pretty well, unless you are trying to work on a train going through a tunnel, in which case a locally checked out copy of the repo would obviously be preferable.
 
-## Tesing and Running Jobs on Myriad
+## Testing and Running Jobs on Myriad
 
 Mutein uses GridEngine to submit jobs to run on Myriad. If you are testing new code that needs to run jobs on myriad it can be very slow to test and debug if you need to wait for 10-15 minutes each time a job is submitted before being able to see if any errors were produced. For this reason, for very small operations such as creating symlinks, conda environment set up or for long running file downloads it is generally acceptable to run things directly on the login node (although you should always use `top -u <your_myriad_username>` to check how much RAM you are using. But certainly for anything requiring non-trivial RAM or compute resources you must use a compute node. Therefore rather than wait each time for a job submitted using qsub to start it is best to allocate yourself an interactive qlogin session as soon as you log into myriad, and have this running inside a "screen" session, such that if you are logged out unexpectedly for any reason you can reconnect and the qlogin session will still be running. The following shows a simple example of how to do this:
 
@@ -69,6 +69,8 @@ If there are no sessions already create a new one using:
 ```
   screen -S qlogin
 ```
+
+(In general, if you need to check whether you are inside a screen session or not (there is not visual indication) you can usually use the key combination CTRL-a CTRL-1, which will display a message at the bottom left if you are in screen, or cause the digit 1 to be entered if not. If you are using MobaXterm this may not work, but CTRL-a CTRL-2 should work instead).
 
 Once inside the screen session, you can request a new qlogin session (note: if reconnecting to an existing screen session you may already be in a qlogin session that you previously created as soon as the screen session reconnects). To do this use the following, but customise the resource request to suit your intended work load:
 
@@ -100,6 +102,12 @@ An annoyance of running inside screen is that, on my terminal at least, the mous
 ## Rapid Testing using qlogin
 
 If running yamlmake tasks from within the qlogin session if you use the "local" execution mode it will run tasks one at a time immediately on the compute node your qlogin session is running on, without having to wait for them to be schedules by GridEngine (because your qlogin session has already be allocated the resources you asked for in the qlogin command). However any qsub resource request embedded in the yamlmake configuration for the action(s) you are running will be ignored using "local" execution, therefore it is up to you to check that the action(s) have enough resources within your existing qlogin session if you run things locally in this way. It makes sense to test new code using a quick qlogin local execution and then switch the action over the qsub execution mode to access the full resources it needs for a production run. Note that all you need to do is change the execution mode from local to qsub and rerun it from your qlogin session: qsub requests can be submitted from qlogin sessions, you should not need to submit them from a myriad login node.
+
+## Monitoring your Disk Usage on Myriad
+
+It's important to stay aware of how much disk space you are using on Myriad. Currently a quota system enforces a limit of 150G in your home folder and, by default, a 1T limit in scratch. It is possible to apply for an increase in your scratch quota as explained (here)[https://www.rc.ucl.ac.uk/docs/Clusters/Myriad/#quotas]. Use the `lquota` command to see how much you are currently using. If you hit your quota limit new writes of data to disk will fail, even for small files such as scripts etc. To see how much raw disk space is free on the underlying filesystem you can use `df -h /scratch`.
+
+When a job is running on a compute node, or you are in a qlogin session you are requested to write temporary files into the folder defined by the environment variable $TMPDIR rather than to /tmp itself. This is so that the GridEngine system can automatically delete all your temporary files when your job/session is finished, and also allows GridEngine to ensure that there is enough space in $TMPDIR to satisfy any tmpfs resource request you made when you submitted your job/session request. $TMPDIR will automatically get set to a unique folder name per job so that jobs that happen to run at the same time on the same node will not interfere with each other's temporary files.
 
 # Pipeline Overview
 

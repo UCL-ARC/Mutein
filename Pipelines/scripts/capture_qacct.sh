@@ -9,9 +9,7 @@
 
 JOB_NAME=$1
 
-source ~/.mutein_settings
-
 qacct -j "${JOB_NAME}" \
 | grep -e failed -e exit_status -e maxvmem -e ru_wallclock -e owner -e taskid -e jobnumber -e jobname\
 | paste - - - - - - - - \
-> sge_logs/${JOB_NAME}.qacct
+> yamlmake_logs/${JOB_NAME}.qacct
