@@ -133,4 +133,4 @@
         ind:   "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_all_sort.bam.bai"
 
     shell: |
-        samtools index --threads $(({%qsub/cores}-1)) {%all}
+        samtools index -@ $(({%qsub/cores}-1)) {%all}

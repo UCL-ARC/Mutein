@@ -7,8 +7,9 @@
 #https://gatk.broadinstitute.org/hc/en-us/articles/360035531852-Intervals-and-interval-lists
 - action:
     name:  "haplotype_caller"
-    exec:  "local"
+    exec:  "qsub"
     conda: "gatk4"
+    run:   "always"
 
     qsub:
         time:  "3:00:00"
@@ -32,48 +33,48 @@
           -I {%bam} \
           -O {%vcf} -ERC GVCF
 
-# https://gatk.broadinstitute.org/hc/en-us/articles/360035889971
-- action:
-    name:  "genomics_db_import"
-    exec:  "local"
-    conda: "gatk4"
+# # https://gatk.broadinstitute.org/hc/en-us/articles/360035889971
+# - action:
+#     name:  "genomics_db_import"
+#     exec:  "qsub"
+#     conda: "gatk4"
 
-    qsub:
-        time:  "3:00:00"
-        mem:   "9G"
-        tmpfs: "1G"
-        cores: "4"
+#     qsub:
+#         time:  "3:00:00"
+#         mem:   "9G"
+#         tmpfs: "1G"
+#         cores: "4"
 
-    input:
-        vcf: "processed/{%dataset_id}/{*subset_id}/{+accession}/{+accession}_haplo.vcf"
+#     input:
+#         vcf: "processed/{%dataset_id}/{*subset_id}/{+accession}/{+accession}_haplo.vcf"
 
-    output:
-       gdb:  "processed/{%dataset_id}/{*subset_id}/.meta/gatk_db"
+#     output:
+#        gdb:  "processed/{%dataset_id}/{*subset_id}/.meta/gatk_db"
 
-    shell: |
-        rm -rf {%gdb}
-        gatk GenomicsDBImport \
-          -V {%vcf/ -V } \
-          --genomicsdb-workspace-path {%gdb} \
-          -L {%intervals} \
-          -ip 10
+#     shell: |
+#         rm -rf {%gdb}
+#         gatk GenomicsDBImport \
+#           -V {%vcf/ -V } \
+#           --genomicsdb-workspace-path {%gdb} \
+#           -L {%intervals} \
+#           -ip 10
 
-- action:
-    name:  "genotype_gvcfs"
-    exec:  "qsub"
-    conda: "gatk4"
+# - action:
+#     name:  "genotype_gvcfs"
+#     exec:  "qsub"
+#     conda: "gatk4"
 
-    qsub:
-        time:  "3:00:00"
-        mem:   "9G"
-        tmpfs: "1G"
-        cores: "4"
+#     qsub:
+#         time:  "3:00:00"
+#         mem:   "9G"
+#         tmpfs: "1G"
+#         cores: "4"
 
-    input:
-        gdb:  "processed/{%dataset_id}/{*subset_id}/.meta/gatk_db"
+#     input:
+#         gdb:  "processed/{%dataset_id}/{*subset_id}/.meta/gatk_db"
 
-    output:
-        ovcf: "processed/{%dataset_id}/{*subset_id}/{%dataset_id}_{*subset_id}.vcf"
+#     output:
+#         ovcf: "processed/{%dataset_id}/{*subset_id}/{%dataset_id}_{*subset_id}.vcf"
 
-    shell: |
-        gatk GenotypeGVCFs -R {%ref/fasta_bgz} -V gendb://{%gdb} -O {%ovcf}
+#     shell: |
+#         gatk GenotypeGVCFs -R {%ref/fasta_bgz} -V gendb://{%gdb} -O {%ovcf}
