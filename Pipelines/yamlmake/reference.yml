@@ -6,9 +6,7 @@
     md5_url:    "{%ref/base_url}/{%ref/md5}"
     fasta_url:  "{%ref/base_url}/{%ref/fasta}"
 
-    input:
-      #changes to ref_config file trigger a rerun unless "action/run:never" is used
-      ref_config: "{%conf_dir}/reference_config.yml"
+    #no input
 
     output:
       readme: "{%ref/tmp_dir}/{%ref/readme}"
@@ -113,12 +111,6 @@
         mem:   "6G"
         tmpfs: "10G"
         cores: "1"
-
-    env:
-        #provide dummy values to prevent bash strict mode causing unbound variable errors in
-        #~/mambaforge/envs/mutein_gatk4/etc/conda/activate.d/openjdk_activate.sh
-        JAVA_HOME: "-"
-        JAVA_LD_LIBRARY_PATH: "-"
 
     input:
         fasta_bgz: "{%ref/fasta_bgz}"

@@ -8,3 +8,5 @@
     #currently only one data subset within keogh2018
     subset_id:
       - "SRP159015"
+    
+    #note only SRR7762515 seems to lack unpaired reads

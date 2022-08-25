@@ -1,57 +1,62 @@
 #define dataset_id and subset_list
 - include: "../config/keogh2018.yml"
 
+#initial per sample variant calling
 #https://gatk.broadinstitute.org/hc/en-us/articles/360037225632-HaplotypeCaller
 #use -L to specify target regions, eg for exome/bait capture
 #https://gatk.broadinstitute.org/hc/en-us/articles/360035531852-Intervals-and-interval-lists
 - action:
     name:  "haplotype_caller"
-    exec:  "qsub"
+    exec:  "local"
     conda: "gatk4"
 
     qsub:
-      time:  "3:00:00"
-      mem:   "9G"
-      tmpfs: "1G"
-      cores: "4"
+        time:  "3:00:00"
+        mem:   "9G"
+        tmpfs: "1G"
+        cores: "4"
 
     input:
-      bam: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_aln_sort.bam"
+        int: "{%intervals}"
+        bam: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_all_sort.bam"
 
     output:
-      vcf: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_haplo.vcf"
+        vcf: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_haplo.vcf"
 
     #not sure if \"-Xmx8g\" or "-Xmx8g" will work
     shell: |
-        gatk --java-options \"-Xmx8g\" HaplotypeCaller \
-          --native-pair-hmm-threads {%qsub/cores} -L {%intervals} -ip 10 \
-          -R {%ref/fasta_bgz} -I {%bam} -O {%vcf} -ERC GVCF
+        gatk --java-options "-Xmx8g" HaplotypeCaller \
+          --native-pair-hmm-threads {%qsub/cores} \
+          -L {%int} -ip 10 \
+          -R {%ref/fasta_bgz} \
+          -I {%bam} \
+          -O {%vcf} -ERC GVCF
 
+# https://gatk.broadinstitute.org/hc/en-us/articles/360035889971
 - action:
-    # https://gatk.broadinstitute.org/hc/en-us/articles/360035889971
     name:  "genomics_db_import"
     exec:  "local"
     conda: "gatk4"
 
     qsub:
-      time:  "3:00:00"
-      mem:   "9G"
-      tmpfs: "1G"
-      cores: "4"
+        time:  "3:00:00"
+        mem:   "9G"
+        tmpfs: "1G"
+        cores: "4"
 
     input:
-      vcf: "processed/{%dataset_id}/{*subset_id}/{+accession}/{+accession}_haplo.vcf"
+        vcf: "processed/{%dataset_id}/{*subset_id}/{+accession}/{+accession}_haplo.vcf"
 
     output:
-      gdb:  "processed/{%dataset_id}/{*subset_id}/.meta/gatk_db"
+       gdb:  "processed/{%dataset_id}/{*subset_id}/.meta/gatk_db"
 
     shell: |
-      rm -rf {%gdb}
-      gatk GenomicsDBImport \
-        -V {%vcf/ -V } \
-        --genomicsdb-workspace-path {%gdb} \
-        -L {%intervals} \
-        -ip 10
+        rm -rf {%gdb}
+        gatk GenomicsDBImport \
+          -V {%vcf/ -V } \
+          --genomicsdb-workspace-path {%gdb} \
+          -L {%intervals} \
+          -ip 10
 
 - action:
     name:  "genotype_gvcfs"
@@ -59,16 +64,16 @@
     conda: "gatk4"
 
     qsub:
-      time:  "3:00:00"
-      mem:   "9G"
-      tmpfs: "1G"
-      cores: "4"
+        time:  "3:00:00"
+        mem:   "9G"
+        tmpfs: "1G"
+        cores: "4"
 
     input:
-      gdb:  "processed/{%dataset_id}/{*subset_id}/.meta/gatk_db"
+        gdb:  "processed/{%dataset_id}/{*subset_id}/.meta/gatk_db"
 
     output:
-      ovcf: "processed/{%dataset_id}/{*subset_id}/{%dataset_id}_{*subset_id}.vcf"
+        ovcf: "processed/{%dataset_id}/{*subset_id}/{%dataset_id}_{*subset_id}.vcf"
 
     shell: |
         gatk GenotypeGVCFs -R {%ref/fasta_bgz} -V gendb://{%gdb} -O {%ovcf}
