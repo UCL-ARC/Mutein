@@ -1555,15 +1555,22 @@ def warning(item,end='\n',timestamp=True):
 def header(item,end='\n',timestamp=True):
     line = '-'*(70-len(item))
     item = f'{item}  {line}'
-    if meta['args'].quiet != True: print() #make a blank line
+    blank()
     message(item,end=end,timestamp=timestamp)
+    flush()
+
+def flush():
+    message('',end='',timestamp=False)
+
+def blank():
+    message('',end='\n',timestamp=False)
 
 def message(item,end='\n',timestamp=True):
     if timestamp:
         item = timestamp_now_nice() + ' ' + str(item)
 
     if meta['args'].quiet != True:
-        print(item,end=end)
+        display_message(item+end)
         sys.stdout.flush()
 
     if meta['args'].no_logs != True:
@@ -1576,6 +1583,28 @@ def message(item,end='\n',timestamp=True):
                 f.close()
         except:
             print(timestamp_now_nice() + ' ' + warning_prefix+f'log file {path} not writeable')
+
+def display_message(item):
+    if not 'prev_message' in meta:
+        meta['prev_message'] = None
+        meta['prev_count'] = 0
+
+    if item == meta['prev_message']:
+        meta['prev_count'] += 1
+        return
+
+    if meta['prev_message'] != None:
+        if meta['prev_count'] > 1:
+            if meta['prev_message'].endswith('\n'):
+                meta['prev_message'] = meta['prev_message'][:-1]
+                meta['prev_message'] += f' [ x{meta["prev_count"]} ]\n'
+            else:
+                meta['prev_message'] += f' [ x{meta["prev_count"]} ]'
+
+        print(meta['prev_message'],end='')
+
+    meta['prev_message'] = item
+    meta['prev_count'] = 1
 
 def handle_stale_outputs(config,outputs):
     '''
@@ -1742,6 +1771,8 @@ def execute_command(config,job_numb,cmd,env):
         message(f'pipeline inactive, skipping actual command execution')
         return False
 
+    flush()
+
     failed = False
     fout = open(foutname,'w')
     ferr = open(ferrname,'w')
@@ -1757,6 +1788,7 @@ def execute_command(config,job_numb,cmd,env):
     if failed: warning('command failed')
     else:      message('command completed normally')
 
+    flush()
     return failed
 
 def write_qsub_file(action,qsub_script,jobname,njobs,jobfile):
@@ -1814,6 +1846,7 @@ def submit_job_qsub(action,shell_list,job_list):
         fout = open(foutname,'w')
         ferr = open(ferrname,'w')
         #sys.stdout.flush()
+        flush()
 
         try:
             subprocess.run(cmd,env=env,shell=True,check=True,stdout=fout,stderr=ferr)
@@ -1828,6 +1861,7 @@ def submit_job_qsub(action,shell_list,job_list):
 
     #delay to allow for shared filesystem latency on status files
     message(f'sleeping for {action["ym/remote_delay_secs"]} seconds to allow for filesystem latency...')
+    flush()
     if activity_state() == 'active': time.sleep(int(action['ym/remote_delay_secs']))
 
     #check each individual job's status file and expected outputs
@@ -1860,6 +1894,7 @@ def submit_job_qsub(action,shell_list,job_list):
             handle_failed_outputs(action,job_list[job_numb]["output"])
             something_failed = True
 
+    flush()
     return something_failed
 
 def qsub_execute_job(jobfile):
@@ -2114,5 +2149,6 @@ def process(pipeline,path,config=None,args=None):
             raise Exception(f"unsupported item type {item_type}")
 
     message(f"reached end of pipeline {path}")
+    flush()
 
     return 0

@@ -9,7 +9,6 @@
     name:  "haplotype_caller"
     exec:  "qsub"
     conda: "gatk4"
-    run:   "always"
 
     qsub:
         time:  "3:00:00"
