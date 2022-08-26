@@ -1,0 +1,22 @@
+- action:
+    name: "jeremy"
+    output:
+      blah_out: "good.txt"
+    shell: |
+      ls -la > good.txt
+- action:
+    name: "jeremy2"
+    input:
+      foobar: "good.txt"
+    output:
+      blah_out: "bad.txt"
+    shell: |
+      false > bad.txt
+- action:
+    name: "try to use incomplete/erroneous file"
+    input:
+      foobar: "bad.txt"
+    output:
+      blah_out: "verybad.txt"
+    shell: |
+      true > verybad.txt
