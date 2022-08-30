@@ -22,3 +22,9 @@
       fasta_gzi:  "{%ref/fasta_bgz}.gzi"
       fasta_fai:  "{%ref/fasta_bgz}.fai"
       fasta_dict: "{%ref/base_dir}/{%ref/base_name}.dict"
+
+      #ensembl annotation
+      annot_url:  "http://ftp.ensembl.org/pub/release-107/gff3/homo_sapiens"
+      annot_gff3: "Homo_sapiens.GRCh38.107.gff3.gz"
+      annot_chk:  "CHECKSUMS"
+      annot_dir:  "annotation/ensembl_107"

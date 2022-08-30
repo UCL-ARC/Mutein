@@ -120,3 +120,42 @@
 
     shell: |
         gatk CreateSequenceDictionary -R {%fasta_bgz} -O {%fasta_dict}
+
+#download the GFF3 annotation file
+- action:
+    name: "download_annotation"
+
+    gff3_url: "{%ref/annot_url}/{%ref/annot_gff3}"
+    chk_url:  "{%ref/annot_url}/{%ref/annot_chk}"
+
+    #no input
+
+    output:
+      gff3: "{%ref/annot_dir}/{%ref/annot_gff3}"
+      chk:  "{%ref/annot_dir}/{%ref/annot_chk}"
+
+    shell: |
+      wget -O - {%gff3_url} > {%gff3}
+      wget -O - {%chk_url}  > {%chk}
+
+#verify the GFF3 annotation file
+- action:
+    name: "verify_annotation"
+
+    input:
+        gff3: "{%ref/annot_dir}/{%ref/annot_gff3}"
+        chk:  "{%ref/annot_dir}/{%ref/annot_chk}"
+
+    output:
+        touch: "{%ref/annot_dir}/{%name}.touch"
+
+    shell: |
+        expected=$(cat {%chk} | grep '{%ref/annot_gff3}' | awk '{print $1,$2}')
+        observed=$(sum {%gff3})
+
+        if [[ ! "${observed}" == "${expected}" ]] ; then
+            echo "Got checksum ${observed} but expected ${expected}"
+            exit 1
+        fi
+
+        touch {%touch}
