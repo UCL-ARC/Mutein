@@ -1,0 +1,34 @@
+#create symlinks for the expected trimmed files
+#to handle datasets where the "raw" reads we got are al ready trimmed
+#to prevent double trimming
+
+#handles the case of no unpaired reads but requires paired reads
+- action:
+    name:  "fake_trim"
+    exec:  "local"
+
+    qsub: 
+        time:  "4:00:00"
+        mem:   "1G"
+        tmpfs: "1G"
+        cores: "1"
+
+    input:
+        #requires paired reads
+        iread1: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_1.fastq.gz"
+        iread2: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_2.fastq.gz"
+
+    output:
+        oread1: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_trim_1.fastq.gz"
+        oread2: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_trim_2.fastq.gz"
+
+    shell: |
+        #optional unpaired raw / trimmed file paths
+        ireadu="processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}.fastq.gz"
+        oreadu="processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_trim.fastq.gz"
+
+        ln -sr "{%iread1}" "{%oread1}"
+        ln -sr "{%iread2}" "{%oread2}"
+        if [[ -f "${ireadu}" ]] ; then
+            ln -sr "${ireadu}" "${oreadu}"
+        fi

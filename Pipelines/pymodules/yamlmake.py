@@ -2075,8 +2075,11 @@ def process_action(config,action,path):
     #determine if all inputs are present and non-stale
     #determine if any outputs need (re)generating
     job_list,shell_list = generate_shell_commands(action,job_list,shell)
-    message(f'{len(shell_list)} runnable job(s) after input/output file checking')
-    if len(shell_list) == 0: return False
+    if len(shell_list) == 0:
+        message('no runnable job(s) after input/output file checking')
+        return False
+
+    message(f'==> {len(shell_list)} runnable job(s) <==')
 
     #check current working directory agrees with configured value
     check_cwd(action)

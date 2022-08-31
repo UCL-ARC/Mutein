@@ -4,11 +4,9 @@
 - include: "setup_conda_envs.yml"
 - include: "reference.yml"
 
-## note: I'm commenting out these modules only for convenience
-## they are still part of the pipeline, just not wanting to run them right now
-# - module: "download/keogh2018.yml"
+- module: "download/keogh2018.yml"
 - module: "prepare/keogh2018.yml"
-# - module: "mapping/keogh2018.yml"
-# - module: "germline/keogh2018.yml"
+- module: "mapping/keogh2018.yml"
+#- module: "germline/keogh2018.yml"
 
 # - module: "download/yokoyama2019.yml"
