@@ -67,6 +67,7 @@
 
 #merge single and paired read alignments into single bam
 #note this action misses samples lacking single reads, but next action handles that
+# -c -p options should be making sure IDs in common between input files are not modified
 - action:
     name:  "samtools_merge"
     exec:  "qsub"
@@ -107,6 +108,7 @@
         all:   "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_all_sort.bam"
 
     #make sure symlink is never created if single file somehow does exist
+    #only create symlink if the paired bam is the only bam
     shell: |
         paired="{%pair}"
 
@@ -114,3 +116,32 @@
             cd "processed/{%dataset_id}/{*subset_id}/{*accession}"
             ln -s "{*accession}_pair_sort.bam" "{*accession}_all_sort.bam"
         fi
+
+#to save disk space truncate the pre-merger bam files
+#retaining only the _all_sort.bam file
+#make sure to only run where _sing and _pair exist
+#therefore _all is not a symlink to _pair
+#touch all to keep it as new as the now truncated inputs
+- action:
+    name:  "truncate_premerged_bams"
+    exec:  "local"
+
+    input:
+        sing:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_sing_sort.bam"
+        pair:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_pair_sort.bam"
+        all:   "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_all_sort.bam"
+
+    output:
+        touch: "processed/{%dataset_id}/{=subset_id}/{*accession}/{%name}.touch"
+
+    shell: |
+        #truncate paired and single bams
+        echo -n > "{%pair}"
+        echo -n > "{%sing}"
+
+        #touch all to keep it newer than pair and sing
+        touch {%all}
+
+        #ensure touch file (the "output") is newer than all (an input)
+        sleep 1
+        touch {%touch}

@@ -1,3 +1,5 @@
+
+
 #following duplicate marking change sort order from read name to mapping position
 - action:
     name:  "sort_by_position"

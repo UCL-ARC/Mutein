@@ -73,7 +73,7 @@
         gdb:  "processed/{%dataset_id}/{*subset_id}/.meta/gatk_db"
 
     output:
-        ovcf: "processed/{%dataset_id}/{*subset_id}/{%dataset_id}_{*subset_id}.vcf"
+        ovcf: "processed/{%dataset_id}/{*subset_id}/.meta/{%dataset_id}_{*subset_id}.vcf"
 
     shell: |
         gatk GenotypeGVCFs -R {%ref/fasta_bgz} -V gendb://{%gdb} -O {%ovcf}
