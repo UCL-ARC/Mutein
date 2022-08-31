@@ -1,0 +1,46 @@
+#following duplicate marking change sort order from read name to mapping position
+- action:
+    name:  "sort_by_position"
+    exec:  "qsub"
+    conda: "bwa"
+
+    qsub: 
+        time:  "24:00:00" #run time seems to depend on network traffic
+        mem:   "10G"
+        tmpfs: "20G"
+        cores: "2"
+
+    input:
+        ibam:  "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_all_sort.bam"
+
+    output:
+        obam:  "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_posn_sort.bam"
+
+    #sort mapped reads by mapping position, output to bam file
+    shell: |
+        SAMTOOLS_TMP=${TMPDIR}/${USER}-${RANDOM}${RANDOM}
+        mkdir -p ${SAMTOOLS_TMP}
+
+        samtools view -h {%ibam} \
+        | samtools sort -T ${SAMTOOLS_TMP} -O bam -m 2G - \
+        > {%obam}
+
+#index the sorted bam
+- action:
+    name:  "samtools_index"
+    exec:  "qsub"
+    conda: "bwa"
+
+    qsub:
+        time:  "24:00:00" #run time seems to depend on network traffic
+        mem:   "6G"
+        cores: "3"
+
+    input:
+        all:   "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_all_sort.bam"
+
+    output:
+        ind:   "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_all_sort.bam.bai"
+
+    shell: |
+        samtools index -@ $(({%qsub/cores}-1)) {%all}

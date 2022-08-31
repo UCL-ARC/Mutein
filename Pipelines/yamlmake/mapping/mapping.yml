@@ -1,4 +1,6 @@
-#map paired reads to reference with bwa, add ID tag, sort, output to bam
+#map paired reads to reference with bwa, add ID tag
+#sort by read name ready for duplicate marking
+#output to bam
 - action:
     name:  "bwa_mem_pair"
     exec:  "qsub"
@@ -27,10 +29,11 @@
         | samtools addreplacerg \
           -r 'ID:{%dataset_id}_{*subset_id}_{*accession}' \
           -r 'SM:{%dataset_id}_{*subset_id}_{*accession}' - \
-        | samtools sort -T ${SAMTOOLS_TMP} -O bam -m 2G - \
+        | samtools sort -n -T ${SAMTOOLS_TMP} -O bam -m 2G - \
         > {%bam}
 
-#map single reads to reference with bwa, add ID tag, sort, output to bam
+#map single reads to reference with bwa, add ID tag
+#sort by read name ready for duplicate marking, output to bam
 #note not all samples have a single reads fastq.gz
 - action:
     name:  "bwa_mem_sing"
@@ -59,7 +62,7 @@
         | samtools addreplacerg \
           -r 'ID:{%dataset_id}_{*subset_id}_{*accession}' \
           -r 'SM:{%dataset_id}_{*subset_id}_{*accession}' - \
-        | samtools sort -T ${SAMTOOLS_TMP} -O bam -m 2G - \
+        | samtools sort -n -T ${SAMTOOLS_TMP} -O bam -m 2G - \
         > {%bam}
 
 #merge single and paired read alignments into single bam
@@ -82,7 +85,7 @@
         all:   "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_all_sort.bam"
 
     shell: |
-        samtools merge -c -p --threads $(({%qsub/cores}-1)) -o - {%sing} {%pair} > {%all}
+        samtools merge -n -c -p --threads $(({%qsub/cores}-1)) -o - {%sing} {%pair} > {%all}
 
 #handle samples where there is no single read file
 #therefore previous action did not run and all_sort is still missing
@@ -111,23 +114,3 @@
             cd "processed/{%dataset_id}/{*subset_id}/{*accession}"
             ln -s "{*accession}_pair_sort.bam" "{*accession}_all_sort.bam"
         fi
-
-#index the merged bam
-- action:
-    name:  "samtools_index"
-    exec:  "qsub"
-    conda: "bwa"
-
-    qsub:
-        time:  "24:00:00" #run time seems to depend on network traffic
-        mem:   "6G"
-        cores: "3"
-
-    input:
-        all:   "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_all_sort.bam"
-
-    output:
-        ind:   "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_all_sort.bam.bai"
-
-    shell: |
-        samtools index -@ $(({%qsub/cores}-1)) {%all}
