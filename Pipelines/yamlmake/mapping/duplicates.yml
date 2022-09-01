@@ -1,4 +1,33 @@
+#mark duplicates on the query (ie read name) sorted reads
+- action:
+    name:  "mark_duplicates"
+    exec:  "qsub"
+    conda: "gatk4"
+    #run:   "always"
 
+    qsub: 
+        time:  "24:00:00" #run time seems to depend on network traffic
+        mem:   "10G"
+        tmpfs: "20G"
+        cores: "2"
+
+    input:
+        ibam:    "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_all_sort.bam"
+
+    output:
+        obam:    "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_dedup.bam"
+        metrics: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_duplicate_metrics"
+
+    shell: |
+        MY_GATK_TMP=${TMPDIR}/${USER}-${RANDOM}${RANDOM}
+        mkdir -p ${MY_GATK_TMP}
+        gatk --java-options "-Xmx8g" MarkDuplicates \
+            --TMP_DIR ${MY_GATK_TMP} \
+            --READ_NAME_REGEX {%read_name_regex} \
+            --ASSUME_SORT_ORDER queryname \
+            -I {%ibam} \
+            -O {%obam} \
+            -M {%metrics}
 
 #following duplicate marking change sort order from read name to mapping position
 - action:

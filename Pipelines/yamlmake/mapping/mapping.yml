@@ -127,6 +127,7 @@
     exec:  "local"
 
     input:
+        #this combo of globs seems to make this action very slow in the placeholder stage =(
         sing:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_sing_sort.bam"
         pair:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_pair_sort.bam"
         all:   "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_all_sort.bam"

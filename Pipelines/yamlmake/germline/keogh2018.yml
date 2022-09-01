@@ -23,7 +23,6 @@
     output:
         vcf: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_haplo.vcf"
 
-    #not sure if \"-Xmx8g\" or "-Xmx8g" will work
     shell: |
         gatk --java-options "-Xmx8g" HaplotypeCaller \
           --native-pair-hmm-threads {%qsub/cores} \
