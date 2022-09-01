@@ -167,19 +167,74 @@
 
     vcf_url: "{%ref/dbsnp_url}/{%ref/dbsnp_vcf}"
     chk_url: "{%ref/dbsnp_url}/{%ref/dbsnp_md5}"
-    tbi_url: "{%ref/dbsnp_url}/{%ref/dbsnp_tbi}"
-    tb5_url: "{%ref/dbsnp_url}/{%ref/dbsnp_tb5}"
 
     #no input
 
     output:
         vcf: "{%ref/dbsnp_dir}/{%ref/dbsnp_vcf}"
         chk: "{%ref/dbsnp_dir}/{%ref/dbsnp_md5}"
-        tbi: "{%ref/dbsnp_dir}/{%ref/dbsnp_tbi}"
-        tb5: "{%ref/dbsnp_dir}/{%ref/dbsnp_tb5}"
 
     shell: |
         wget -O - {%vcf_url} > {%vcf}
         wget -O - {%chk_url} > {%chk}
-        wget -O - {%tbi_url} > {%tbi}
-        wget -O - {%tb5_url} > {%tb5}
+
+#check dbsnp md5s
+- action:
+    name: "check_dbsnp"
+
+    input:
+        vcf: "{%ref/dbsnp_dir}/{%ref/dbsnp_vcf}"
+        chk: "{%ref/dbsnp_dir}/{%ref/dbsnp_md5}"
+
+    output:
+        touch: "{%ref/dbsnp_dir}/{%name}.touch"
+
+    #check both md5
+    shell: |
+        cd {%ref/dbsnp_dir}
+        md5sum --check {%ref/dbsnp_md5}
+        cd -
+        touch {%touch}
+
+#download assembly report to enable conversion from dbsnp to ucsc naming
+- action:
+    name: "download_assembly_report"
+
+    report_url: "{%ref/assembly_report_url}/{%ref/assembly_report_file}"
+
+    output:
+        report: "{%ref/dbsnp_dir}/{%ref/assembly_report_file}"
+
+    shell: |
+        wget -O - {%report_url} > {%report}
+
+#generate ncbi to ucsc name mapping file
+- action:
+    name: "generate_name_mapping"
+
+    input:
+        report: "{%ref/dbsnp_dir}/{%ref/assembly_report_file}"
+
+    output:
+        mapping: "{%ref/dbsnp_dir}/{%ref/assembly_name_mapping}"
+
+    shell: |
+        cat {%report} | grep -v '^#' | cut -f7,10 | grep -v 'na' > {%mapping}
+
+#change the chromosomes names in the dbsnp vcf to match the reference
+- action:
+    name:  "rename_vcf_chromosomes"
+    conda: "bcftools"
+
+    input:
+        dbsnp:   "{%ref/dbsnp_dir}/{%ref/dbsnp_vcf}"
+        mapping: "{%ref/dbsnp_dir}/{%ref/assembly_name_mapping}"
+
+    output:
+        renamed: "{%ref/dbsnp_dir}/{%ref/renamed_vcf}"
+
+    shell: |
+        bcftools annotate \
+            --rename-chrs {%mapping} \
+            {%dbsnp} \
+            -Oz -o {%renamed} 
