@@ -3,7 +3,6 @@
     name:  "mark_duplicates"
     exec:  "qsub"
     conda: "gatk4"
-    #run:   "always"
 
     qsub: 
         time:  "24:00:00" #run time seems to depend on network traffic
@@ -30,8 +29,9 @@
             -M {%metrics}
 
 #following duplicate marking change sort order from read name to mapping position
+#then index the new bam
 - action:
-    name:  "sort_by_position"
+    name:  "sort_by_posn_then_index"
     exec:  "qsub"
     conda: "bwa"
 
@@ -39,39 +39,23 @@
         time:  "24:00:00" #run time seems to depend on network traffic
         mem:   "10G"
         tmpfs: "20G"
-        cores: "2"
+        cores: "3"
 
     input:
-        ibam:  "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_all_sort.bam"
+        ibam:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_dedup.bam"
 
     output:
-        obam:  "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_posn_sort.bam"
+        obam:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_posn_sort.bam"
+        indx:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_posn_sort.bam.bai"
 
     #sort mapped reads by mapping position, output to bam file
     shell: |
         SAMTOOLS_TMP=${TMPDIR}/${USER}-${RANDOM}${RANDOM}
         mkdir -p ${SAMTOOLS_TMP}
+        EXTRA_THREADS=$(({%qsub/cores}-1))
 
         samtools view -h {%ibam} \
-        | samtools sort -T ${SAMTOOLS_TMP} -O bam -m 2G - \
+        | samtools sort -@ ${EXTRA_THREADS} -T ${SAMTOOLS_TMP} -O bam -m 2G - \
         > {%obam}
 
-#index the sorted bam
-- action:
-    name:  "samtools_index"
-    exec:  "qsub"
-    conda: "bwa"
-
-    qsub:
-        time:  "24:00:00" #run time seems to depend on network traffic
-        mem:   "6G"
-        cores: "3"
-
-    input:
-        all:   "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_all_sort.bam"
-
-    output:
-        ind:   "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_all_sort.bam.bai"
-
-    shell: |
-        samtools index -@ $(({%qsub/cores}-1)) {%all}
+        samtools index -@ ${EXTRA_THREADS} {%obam}

@@ -1,0 +1,24 @@
+
+
+#https://gatk.broadinstitute.org/hc/en-us/articles/360035890531-Base-Quality-Score-Recalibration-BQSR-
+#https://hpc.nih.gov/training/gatk_tutorial/bqsr.html
+#
+# - action:
+#     name: "base_recalibrator"
+#     shell: |
+#         gatk --java-options "-Xmx4G"
+#           BaseRecalibrator \
+#           -I NA12892_markdup.bam \
+#           -R /fdb/igenomes/Homo_sapiens/UCSC/hg38/Sequence/WholeGenomeFasta/genome.fa \
+#           -O NA12892_markdup_bqsr.report \
+#           --known-sites /fdb/GATK_resource_bundle/hg38/dbsnp_146.hg38.vcf.gz
+
+# - action:
+#     name: "apply_bqsr"
+#     shell: |
+#         gatk --java-options "-Djava.io.tmpdir=/lscratch/$SLURM_JOBID -Xms2G -Xmx2G -XX:ParallelGCThreads=2"
+#         ApplyBQSR \
+#           -I NA12878_markdup.bam \
+#           -R /fdb/igenomes/Homo_sapiens/UCSC/hg38/Sequence/WholeGenomeFasta/genome.fa \
+#           --bqsr-recal-file NA12878_markdup_bqsr.report \
+#           -O NA12878_markdup_bqsr.bam

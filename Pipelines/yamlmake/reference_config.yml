@@ -28,3 +28,10 @@
       annot_gff3: "Homo_sapiens.GRCh38.107.gff3.gz"
       annot_chk:  "CHECKSUMS"
       annot_dir:  "annotation/ensembl_107"
+
+      dbsnp_url:  "https://ftp.ncbi.nih.gov/snp/latest_release/VCF"
+      dbsnp_vcf:  "GCF_000001405.39.gz"
+      dbsnp_md5:  "GCF_000001405.39.gz.md5"
+      dbsnp_tbi:  "GCF_000001405.39.gz.tbi"
+      dbsnp_tb5:  "GCF_000001405.39.gz.tbi.md5"
+      dbsnp_dir:  "dbsnp/build_155"

@@ -131,12 +131,12 @@
     #no input
 
     output:
-      gff3: "{%ref/annot_dir}/{%ref/annot_gff3}"
-      chk:  "{%ref/annot_dir}/{%ref/annot_chk}"
+        gff3: "{%ref/annot_dir}/{%ref/annot_gff3}"
+        chk:  "{%ref/annot_dir}/{%ref/annot_chk}"
 
     shell: |
-      wget -O - {%gff3_url} > {%gff3}
-      wget -O - {%chk_url}  > {%chk}
+        wget -O - {%gff3_url} > {%gff3}
+        wget -O - {%chk_url}  > {%chk}
 
 #verify the GFF3 annotation file
 - action:
@@ -159,3 +159,27 @@
         fi
 
         touch {%touch}
+
+#download dbsnp vcf for use with base quality score recalibration
+- action:
+    name: "download_dbsnp"
+    exec: "local"
+
+    vcf_url: "{%ref/dbsnp_url}/{%ref/dbsnp_vcf}"
+    chk_url: "{%ref/dbsnp_url}/{%ref/dbsnp_md5}"
+    tbi_url: "{%ref/dbsnp_url}/{%ref/dbsnp_tbi}"
+    tb5_url: "{%ref/dbsnp_url}/{%ref/dbsnp_tb5}"
+
+    #no input
+
+    output:
+        vcf: "{%ref/dbsnp_dir}/{%ref/dbsnp_vcf}"
+        chk: "{%ref/dbsnp_dir}/{%ref/dbsnp_md5}"
+        tbi: "{%ref/dbsnp_dir}/{%ref/dbsnp_tbi}"
+        tb5: "{%ref/dbsnp_dir}/{%ref/dbsnp_tb5}"
+
+    shell: |
+        wget -O - {%vcf_url} > {%vcf}
+        wget -O - {%chk_url} > {%chk}
+        wget -O - {%tbi_url} > {%tbi}
+        wget -O - {%tb5_url} > {%tb5}
