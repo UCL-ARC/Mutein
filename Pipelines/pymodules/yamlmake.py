@@ -60,6 +60,19 @@ illegal_chrs = '\\\n\r\t\'" *?:;,/#%&{}<>+`|=$!@'
 
 default_log_dir = 'yamlmake_logs'
 
+col=\
+{
+    'none':'\033[0m',
+    'black':'\033[1;30m',
+    'red':'\033[1;31m',
+    'green':'\033[1;32m',
+    'yellow':'\033[1;33m',
+    'blue':'\033[1;34m',
+    'purple':'\033[1;35m',
+    'cyan':'\033[1;36m',
+    'white':'\033[1;37m',
+}
+
 class Conf:
     def __init__(self,src=None):
         self.d = None
@@ -1550,13 +1563,13 @@ def remove_tree(path):
     if is_active(): shutil.rmtree(path)
 
 def warning(item,end='\n',timestamp=True):
-    message(warning_prefix+item,end=end,timestamp=timestamp)
+    message(col["yellow"]+warning_prefix+item+col["none"],end=end,timestamp=timestamp)
 
 def header(item,end='\n',timestamp=True):
     line = '-'*(70-len(item))
     item = f'{item}  {line}'
     blank()
-    message(item,end=end,timestamp=timestamp)
+    message(col["green"]+item+col["none"],end=end,timestamp=timestamp)
     flush()
 
 def flush():
@@ -1763,8 +1776,9 @@ def execute_command(config,job_numb,cmd,env):
 
     message(f'job {job_numb+1} executing locally...')
 
-    if cmd.endswith('\n'): message(f'{cmd}',end='',timestamp=False)
-    else:                  message(f'{cmd}',timestamp=False)
+    if cmd.endswith('\n'): end = ''
+    else:                  end = '\n'
+    message(f'{col["cyan"]}{cmd}{col["none"]}',end=end,timestamp=False)
 
     if not is_active():
         #dry-run: signal job completed ok without running it
@@ -2079,7 +2093,7 @@ def process_action(config,action,path):
         message('no runnable job(s) after input/output file checking')
         return False
 
-    message(f'==> {len(shell_list)} runnable job(s) <==')
+    message(f'==> {col["cyan"]}{len(shell_list)} runnable job(s){col["none"]} <==')
 
     #check current working directory agrees with configured value
     check_cwd(action)
@@ -2109,7 +2123,7 @@ def process(pipeline,path,config=None,args=None):
 
     counter = 0
 
-    message(f"starting pipeline {path}")
+    header(f"starting pipeline [{path}]")
 
     while counter < len(pipeline):
         item = pipeline[counter]

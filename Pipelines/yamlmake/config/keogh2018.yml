@@ -16,3 +16,6 @@
     #https://gatk.broadinstitute.org/hc/en-us/articles/360037052812-MarkDuplicates-Picard-#--READ_NAME_REGEX
     #see action yamlmake/mapping/duplicates.yml:mark_duplicates
     read_name_regex: "null"
+
+    #text for the PL: tag of bam files
+    platform: "ILLUMINA"

@@ -231,10 +231,25 @@
         mapping: "{%ref/dbsnp_dir}/{%ref/assembly_name_mapping}"
 
     output:
-        renamed: "{%ref/dbsnp_dir}/{%ref/renamed_vcf}"
+        final: "{%ref/dbsnp_dir}/{%ref/final_vcf}"
 
     shell: |
         bcftools annotate \
             --rename-chrs {%mapping} \
             {%dbsnp} \
-            -Oz -o {%renamed} 
+            -Oz -o {%final}
+
+#tabix index the fixed vcf
+- action:
+    name:  "index_vcf"
+    conda: "bwa"
+
+    input:
+        final: "{%ref/dbsnp_dir}/{%ref/final_vcf}"
+
+    output:
+        index: "{%ref/dbsnp_dir}/{%ref/final_vcf}.tbi"
+
+    shell: |
+        tabix -p vcf {%final}
+
