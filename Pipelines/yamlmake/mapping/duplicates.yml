@@ -5,7 +5,7 @@
     conda: "gatk4"
 
     qsub: 
-        time:  "24:00:00" #run time seems to depend on network traffic
+        time:  "24:00:00"
         mem:   "10G"
         tmpfs: "20G"
         cores: "2"
@@ -30,13 +30,20 @@
 
 #following duplicate marking change sort order from read name to mapping position
 #then index the new bam
+# note: for keogh the @RG PL:ILLUMINA tags were inserted at this point using
+# | samtools addreplacerg -u -w \
+#   -r 'ID:{%dataset_id}_{=subset_id}_{*accession}' \
+#   -r 'SM:{%dataset_id}_{=subset_id}_{*accession}' \
+#   -r 'PL:{%platform}' \
+#   - \
+#but the production pipeline inserts these tags in mapping/mapping.yml:samtools_merge
 - action:
     name:  "sort_by_posn_then_index"
     exec:  "qsub"
     conda: "bwa"
 
     qsub: 
-        time:  "24:00:00" #run time seems to depend on network traffic
+        time:  "24:00:00"
         mem:   "10G"
         tmpfs: "20G"
         cores: "3"
@@ -54,7 +61,7 @@
         mkdir -p ${SAMTOOLS_TMP}
         EXTRA_THREADS=$(({%qsub/cores}-1))
 
-        samtools view -h {%ibam} \
+        samtools view -uh {%ibam} \
         | samtools sort -@ ${EXTRA_THREADS} -T ${SAMTOOLS_TMP} -O bam -m 2G - \
         > {%obam}
 

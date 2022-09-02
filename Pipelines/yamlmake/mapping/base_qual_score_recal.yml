@@ -3,7 +3,7 @@
 
 - action:
     name:  "base_recalibrator"
-    exec:  "local"
+    exec:  "qsub"
     conda: "gatk4"
 
     qsub: 
