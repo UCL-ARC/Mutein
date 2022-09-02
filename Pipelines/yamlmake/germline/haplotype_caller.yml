@@ -1,0 +1,75 @@
+#initial per sample variant calling
+#https://gatk.broadinstitute.org/hc/en-us/articles/360037225632-HaplotypeCaller
+#use -L to specify target regions, eg for exome/bait capture
+#https://gatk.broadinstitute.org/hc/en-us/articles/360035531852-Intervals-and-interval-lists
+- action:
+    name:  "haplotype_caller"
+    exec:  "qsub"
+    conda: "gatk4"
+
+    qsub:
+        time:  "3:00:00"
+        mem:   "9G"
+        tmpfs: "1G"
+        cores: "4"
+
+    input:
+        int:  "{%intervals}"
+        ibam: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_bqsr.bam"
+
+    output:
+        vcf:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_germ.vcf.gz"
+
+    shell: |
+        gatk --java-options "-Xmx8g" HaplotypeCaller \
+          --native-pair-hmm-threads {%qsub/cores} \
+          -L {%int} -ip 10 \
+          -R {%ref/fasta_bgz} \
+          -I {%ibam} \
+          -O {%vcf} -ERC GVCF
+
+# https://gatk.broadinstitute.org/hc/en-us/articles/360035889971
+- action:
+    name:  "genomics_db_import"
+    exec:  "local"
+    conda: "gatk4"
+
+    qsub:
+        time:  "3:00:00"
+        mem:   "9G"
+        tmpfs: "1G"
+        cores: "2"
+
+    input:
+        vcf: "processed/{%dataset_id}/{=subset_id}/{+accession}/{+accession}_germ.vcf.gz"
+
+    output:
+       gdb:  "processed/{%dataset_id}/{=subset_id}/.meta/gatk_db"
+
+    shell: |
+        rm -rf {%gdb}
+        gatk GenomicsDBImport \
+          -V {%vcf/ -V } \
+          --genomicsdb-workspace-path {%gdb} \
+          -L {%intervals} \
+          -ip 10
+
+- action:
+    name:  "genotype_gvcfs"
+    exec:  "local"
+    conda: "gatk4"
+
+    qsub:
+        time:  "3:00:00"
+        mem:   "9G"
+        tmpfs: "1G"
+        cores: "2"
+
+    input:
+        gdb:  "processed/{%dataset_id}/{=subset_id}/.meta/gatk_db"
+
+    output:
+        ovcf: "processed/{%dataset_id}/{=subset_id}/.meta/{%dataset_id}_{=subset_id}.vcf"
+
+    shell: |
+        gatk GenotypeGVCFs -R {%ref/fasta_bgz} -V gendb://{%gdb} -O {%ovcf}
