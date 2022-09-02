@@ -89,73 +89,15 @@
           - \
         > {%all}
 
-# #handle samples where there are no single read bam files
-# - action:
-#     name:  "fake_merge"
-#     exec:  "qsub"
-#     conda: "bwa"
-
-#     qsub: 
-#         time:  "24:00:00"
-#         mem:   "6G"
-#         cores: "4"
-
-#     input:
-#         pair:  "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_pair_sort.bam"
-
-#     output:
-#         all:   "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_all_sort.bam"
-
-#     shell: |
-#         samtools view -uh -@ $(({%qsub/cores}-1)) {%pair}
-#         | samtools addreplacerg -w \
-#           -r 'ID:{%dataset_id}_{*subset_id}_{*accession}' \
-#           -r 'SM:{%dataset_id}_{*subset_id}_{*accession}' \
-#           -r 'PL:{%platform}' \
-#           - \
-#         > {%all}
-
-# #handle samples where there is no single read file
-# #therefore previous action did not run and all_sort is still missing
-# #fix by symlinking to the paired read bam from the merged filename
-# - action:
-#     name:  "fake_merge"
-#     exec:  "local"
-#     conda: "bwa"
-
-#     qsub: 
-#         time:  "24:00:00" #run time seems to depend on network traffic
-#         mem:   "6G"
-#         cores: "4"
-
-#     input:
-#         pair:  "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_pair_sort.bam"
-
-#     output:
-#         all:   "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_all_sort.bam"
-
-#     #make sure symlink is never created if single file somehow does exist
-#     #only create symlink if the paired bam is the only bam
-#     shell: |
-#         paired="{%pair}"
-
-#         if [[ ! -f "${paired/_pair_/_sing_}" ]] ; then
-#             cd "processed/{%dataset_id}/{*subset_id}/{*accession}"
-#             ln -s "{*accession}_pair_sort.bam" "{*accession}_all_sort.bam"
-#         fi
-
 #to save disk space truncate the pre-merger bam files
 #retaining only the _all_sort.bam file
-#make sure to only run where _sing and _pair exist
-#therefore _all is not a symlink to _pair
 #touch all to keep it as new as the now truncated inputs
 - action:
     name:  "truncate_premerged_bams"
     exec:  "local"
+    conda: "main"
 
     input:
-        #this combo of globs seems to make this action very slow in the placeholder stage =(
-        sing:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_sing_sort.bam"
         pair:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_pair_sort.bam"
         all:   "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_all_sort.bam"
 
@@ -163,13 +105,12 @@
         touch: "processed/{%dataset_id}/{=subset_id}/{*accession}/{%name}.touch"
 
     shell: |
-        #truncate paired and single bams
-        echo -n > "{%pair}"
-        echo -n > "{%sing}"
+        #truncate paired bam
+        mutein truncate "{%pair}"
 
-        #touch all to keep it newer than pair and sing
-        touch {%all}
+        #truncate single bam if present
+        sing="processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_sing_sort.bam"
+        mutein truncate -n "${sing}"
 
-        #ensure touch file (the "output") is newer than all (an input)
-        sleep 1
+        #signal truncation was carried out
         touch {%touch}
