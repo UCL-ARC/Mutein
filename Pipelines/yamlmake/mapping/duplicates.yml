@@ -1,0 +1,68 @@
+#mark duplicates on the query (ie read name) sorted reads
+- action:
+    name:  "mark_duplicates"
+    exec:  "qsub"
+    conda: "gatk4"
+
+    qsub: 
+        time:  "24:00:00"
+        mem:   "10G"
+        tmpfs: "20G"
+        cores: "2"
+
+    input:
+        ibam:    "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_all_sort.bam"
+
+    output:
+        obam:    "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_dedup.bam"
+        metrics: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_duplicate_metrics"
+
+    shell: |
+        MY_GATK_TMP=${TMPDIR}/${USER}-${RANDOM}${RANDOM}
+        mkdir -p ${MY_GATK_TMP}
+        gatk --java-options "-Xmx8g" MarkDuplicates \
+            --TMP_DIR ${MY_GATK_TMP} \
+            --READ_NAME_REGEX {%read_name_regex} \
+            --ASSUME_SORT_ORDER queryname \
+            -I {%ibam} \
+            -O {%obam} \
+            -M {%metrics}
+
+#following duplicate marking change sort order from read name to mapping position
+#then index the new bam
+# note: for keogh the @RG PL:ILLUMINA tags were inserted at this point using
+# | samtools addreplacerg -u -w \
+#   -r 'ID:{%dataset_id}_{=subset_id}_{*accession}' \
+#   -r 'SM:{%dataset_id}_{=subset_id}_{*accession}' \
+#   -r 'PL:{%platform}' \
+#   - \
+#but the production pipeline inserts these tags in mapping/mapping.yml:samtools_merge
+- action:
+    name:  "sort_by_posn_then_index"
+    exec:  "qsub"
+    conda: "bwa"
+
+    qsub: 
+        time:  "24:00:00"
+        mem:   "10G"
+        tmpfs: "20G"
+        cores: "3"
+
+    input:
+        ibam:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_dedup.bam"
+
+    output:
+        obam:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_posn_sort.bam"
+        indx:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_posn_sort.bam.bai"
+
+    #sort mapped reads by mapping position, output to bam file
+    shell: |
+        SAMTOOLS_TMP=${TMPDIR}/${USER}-${RANDOM}${RANDOM}
+        mkdir -p ${SAMTOOLS_TMP}
+        EXTRA_THREADS=$(({%qsub/cores}-1))
+
+        samtools view -uh {%ibam} \
+        | samtools sort -@ ${EXTRA_THREADS} -T ${SAMTOOLS_TMP} -O bam -m 2G - \
+        > {%obam}
+
+        samtools index -@ ${EXTRA_THREADS} {%obam}

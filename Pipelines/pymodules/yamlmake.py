@@ -60,6 +60,19 @@ illegal_chrs = '\\\n\r\t\'" *?:;,/#%&{}<>+`|=$!@'
 
 default_log_dir = 'yamlmake_logs'
 
+col=\
+{
+    'none':'\033[0m',
+    'black':'\033[1;30m',
+    'red':'\033[1;31m',
+    'green':'\033[1;32m',
+    'yellow':'\033[1;33m',
+    'blue':'\033[1;34m',
+    'purple':'\033[1;35m',
+    'cyan':'\033[1;36m',
+    'white':'\033[1;37m',
+}
+
 class Conf:
     def __init__(self,src=None):
         self.d = None
@@ -1138,7 +1151,16 @@ def generate_glob_matches(job_input):
         #find paths using iglob, match to placeholders using regex
         for path in glob.iglob(input_glob):
             m = re.fullmatch(input_regx,path)
-            assert m is not None,"regex cannot extract placeholders from the globbed path!"
+            
+            if m == None:
+                #regex cannot extract placeholders
+                #usually indicates two *'s in the glob matches different strings
+                #where as in the regex those two are required to be the same
+                #eg {*accession}/{*accession}
+                # ==> glob is */*
+                # ==> one path generated is A123/A123.txt
+                # which doesn't match the regex as "A123" != "A123.txt"
+                continue
 
             #split the re matches into the two types of placeholder
             injob = {}
@@ -1541,20 +1563,27 @@ def remove_tree(path):
     if is_active(): shutil.rmtree(path)
 
 def warning(item,end='\n',timestamp=True):
-    message(warning_prefix+item,end=end,timestamp=timestamp)
+    message(col["yellow"]+warning_prefix+item+col["none"],end=end,timestamp=timestamp)
 
 def header(item,end='\n',timestamp=True):
     line = '-'*(70-len(item))
     item = f'{item}  {line}'
-    if meta['args'].quiet != True: print() #make a blank line
-    message(item,end=end,timestamp=timestamp)
+    blank()
+    message(col["green"]+item+col["none"],end=end,timestamp=timestamp)
+    flush()
+
+def flush():
+    message('',end='',timestamp=False)
+
+def blank():
+    message('',end='\n',timestamp=False)
 
 def message(item,end='\n',timestamp=True):
     if timestamp:
         item = timestamp_now_nice() + ' ' + str(item)
 
     if meta['args'].quiet != True:
-        print(item,end=end)
+        display_message(item+end)
         sys.stdout.flush()
 
     if meta['args'].no_logs != True:
@@ -1567,6 +1596,28 @@ def message(item,end='\n',timestamp=True):
                 f.close()
         except:
             print(timestamp_now_nice() + ' ' + warning_prefix+f'log file {path} not writeable')
+
+def display_message(item):
+    if not 'prev_message' in meta:
+        meta['prev_message'] = None
+        meta['prev_count'] = 0
+
+    if item == meta['prev_message']:
+        meta['prev_count'] += 1
+        return
+
+    if meta['prev_message'] != None:
+        if meta['prev_count'] > 1:
+            if meta['prev_message'].endswith('\n'):
+                meta['prev_message'] = meta['prev_message'][:-1]
+                meta['prev_message'] += f' [ x{meta["prev_count"]} ]\n'
+            else:
+                meta['prev_message'] += f' [ x{meta["prev_count"]} ]'
+
+        print(meta['prev_message'],end='')
+
+    meta['prev_message'] = item
+    meta['prev_count'] = 1
 
 def handle_stale_outputs(config,outputs):
     '''
@@ -1725,13 +1776,16 @@ def execute_command(config,job_numb,cmd,env):
 
     message(f'job {job_numb+1} executing locally...')
 
-    if cmd.endswith('\n'): message(f'{cmd}',end='',timestamp=False)
-    else:                  message(f'{cmd}',timestamp=False)
+    if cmd.endswith('\n'): end = ''
+    else:                  end = '\n'
+    message(f'{col["cyan"]}{cmd}{col["none"]}',end=end,timestamp=False)
 
     if not is_active():
         #dry-run: signal job completed ok without running it
         message(f'pipeline inactive, skipping actual command execution')
         return False
+
+    flush()
 
     failed = False
     fout = open(foutname,'w')
@@ -1748,6 +1802,7 @@ def execute_command(config,job_numb,cmd,env):
     if failed: warning('command failed')
     else:      message('command completed normally')
 
+    flush()
     return failed
 
 def write_qsub_file(action,qsub_script,jobname,njobs,jobfile):
@@ -1805,6 +1860,7 @@ def submit_job_qsub(action,shell_list,job_list):
         fout = open(foutname,'w')
         ferr = open(ferrname,'w')
         #sys.stdout.flush()
+        flush()
 
         try:
             subprocess.run(cmd,env=env,shell=True,check=True,stdout=fout,stderr=ferr)
@@ -1819,6 +1875,7 @@ def submit_job_qsub(action,shell_list,job_list):
 
     #delay to allow for shared filesystem latency on status files
     message(f'sleeping for {action["ym/remote_delay_secs"]} seconds to allow for filesystem latency...')
+    flush()
     if activity_state() == 'active': time.sleep(int(action['ym/remote_delay_secs']))
 
     #check each individual job's status file and expected outputs
@@ -1851,6 +1908,7 @@ def submit_job_qsub(action,shell_list,job_list):
             handle_failed_outputs(action,job_list[job_numb]["output"])
             something_failed = True
 
+    flush()
     return something_failed
 
 def qsub_execute_job(jobfile):
@@ -2031,8 +2089,11 @@ def process_action(config,action,path):
     #determine if all inputs are present and non-stale
     #determine if any outputs need (re)generating
     job_list,shell_list = generate_shell_commands(action,job_list,shell)
-    message(f'{len(shell_list)} runnable job(s) after input/output file checking')
-    if len(shell_list) == 0: return False
+    if len(shell_list) == 0:
+        message('no runnable job(s) after input/output file checking')
+        return False
+
+    message(f'==> {col["cyan"]}{len(shell_list)} runnable job(s){col["none"]} <==')
 
     #check current working directory agrees with configured value
     check_cwd(action)
@@ -2062,7 +2123,7 @@ def process(pipeline,path,config=None,args=None):
 
     counter = 0
 
-    message(f"starting pipeline {path}")
+    header(f"starting pipeline [{path}]")
 
     while counter < len(pipeline):
         item = pipeline[counter]
@@ -2105,5 +2166,6 @@ def process(pipeline,path,config=None,args=None):
             raise Exception(f"unsupported item type {item_type}")
 
     message(f"reached end of pipeline {path}")
+    flush()
 
     return 0

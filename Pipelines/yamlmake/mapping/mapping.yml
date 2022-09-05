@@ -1,0 +1,116 @@
+#map paired reads to reference with bwa
+#sort by read name ready for duplicate marking
+#output to bam
+- action:
+    name:  "bwa_mem_pair"
+    exec:  "qsub"
+    conda: "bwa"
+
+    qsub: 
+        time:  "24:00:00"
+        mem:   "10G"
+        tmpfs: "20G"
+        cores: "2"
+
+    input:
+        read1: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_trim_1.fastq.gz"
+        read2: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_trim_2.fastq.gz"
+
+    output:
+        bam:   "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_pair_sort.bam"
+
+    shell: |
+        SAMTOOLS_TMP=${TMPDIR}/${USER}-${RANDOM}${RANDOM}
+        mkdir -p ${SAMTOOLS_TMP}
+
+        bwa mem -t {%qsub/cores} {%ref/fasta_bgz} {%read1} {%read2} \
+        | samtools sort -n -T ${SAMTOOLS_TMP} -O bam -m 2G - \
+        > {%bam}
+
+#map single reads to reference with bwa
+#sort by read name ready for duplicate marking, output to bam
+#note not all samples have a single reads fastq.gz
+- action:
+    name:  "bwa_mem_sing"
+    exec:  "qsub"
+    conda: "bwa"
+
+    qsub: 
+        time:  "24:00:00"
+        mem:   "10G"
+        tmpfs: "20G"
+        cores: "2"
+
+    input:
+        read: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_trim.fastq.gz"
+
+    output:
+        bam:  "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_sing_sort.bam"
+
+    shell: |
+        SAMTOOLS_TMP=${TMPDIR}/${USER}-${RANDOM}${RANDOM}
+        mkdir -p ${SAMTOOLS_TMP}
+
+        bwa mem -t {%qsub/cores} {%ref/fasta_bgz} {%read} \
+        | samtools sort -n -T ${SAMTOOLS_TMP} -O bam -m 2G - \
+        > {%bam}
+
+#merge single and paired read alignments into single bam
+#if no single read bam do a redundant "merge" of the paired file alone
+# -c -p options should be making sure IDs in common between input files are not modified
+# add readgroup tag to say "these are all from the same sample", include platform info
+- action:
+    name:  "samtools_merge"
+    exec:  "qsub"
+    conda: "bwa"
+
+    qsub: 
+        time:  "24:00:00"
+        mem:   "6G"
+        cores: "4"
+
+    input:
+        pair:  "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_pair_sort.bam"
+
+    output:
+        all:   "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_all_sort.bam"
+
+    shell: |
+        sing="processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_sing_sort.bam"
+        if [[ ! -f "${sing}" ]] ; then
+            sing=""
+        fi
+
+        samtools merge -u -n -c -p --threads $(({%qsub/cores}-1)) -o - ${sing} {%pair}
+        | samtools addreplacerg -w \
+          -r 'ID:{%dataset_id}_{*subset_id}_{*accession}' \
+          -r 'SM:{%dataset_id}_{*subset_id}_{*accession}' \
+          -r 'PL:{%platform}' \
+          - \
+        > {%all}
+
+#to save disk space truncate the pre-merger bam files
+#retaining only the _all_sort.bam file
+#touch all to keep it as new as the now truncated inputs
+- action:
+    name:  "truncate_premerged_bams"
+    exec:  "local"
+    conda: "main"
+
+    input:
+        pair:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_pair_sort.bam"
+        all:   "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_all_sort.bam"
+
+    output:
+        touch: "processed/{%dataset_id}/{=subset_id}/{*accession}/{%name}.touch"
+
+    shell: |
+        #truncate paired bam
+        mutein truncate "{%pair}"
+
+        #truncate single bam if present
+        sing="processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_sing_sort.bam"
+        mutein truncate -n "${sing}"
+
+        #signal truncation was carried out
+        touch {%touch}

@@ -31,7 +31,4 @@
 
     working_dir:    "/lustre/scratch/scratch/{$USER}/549_mutein"
     conf_dir:       "{$MUT_DIR}/Pipelines/yamlmake"
-    conda_channels: "--override-channels -c defaults -c bioconda -c conda-forge"
-
-#reference genome URL and file paths
-- include: "reference_config.yml"
+    conda_channels: "--override-channels -c conda-forge -c defaults -c bioconda"

@@ -8,3 +8,14 @@
     #currently only one data subset within keogh2018
     subset_id:
       - "SRP159015"
+
+    #note SRR7762515 seems to lack unpaired reads
+
+    #keogh has lost its original read names therefore cannot find optical duplicates
+    #because tile,x,y info is not in read names
+    #https://gatk.broadinstitute.org/hc/en-us/articles/360037052812-MarkDuplicates-Picard-#--READ_NAME_REGEX
+    #see action yamlmake/mapping/duplicates.yml:mark_duplicates
+    read_name_regex: "null"
+
+    #text for the PL: tag of bam files
+    platform: "ILLUMINA"

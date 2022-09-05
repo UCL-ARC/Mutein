@@ -6,10 +6,11 @@
       tmp_dir:  "references/GRCh38_noalt_withdecoys/tmp"
 
       #download URL and file list
-      base_url: "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids"
-      fasta:    "GCA_000001405.15_GRCh38_no_alt_plus_hs38d1_analysis_set.fna.gz"
-      md5:      "md5checksums.txt"
-      readme:   "README_analysis_sets.txt"
+      base_url:  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids"
+      base_name: "GCA_000001405.15_GRCh38_no_alt_plus_hs38d1_analysis_set" 
+      fasta:     "{%ref/base_name}.fna.gz"
+      md5:       "md5checksums.txt"
+      readme:    "README_analysis_sets.txt"
 
       #location of the final checked, recompressed FASTA
       base_dir: "references/GRCh38_noalt_withdecoys"
@@ -20,4 +21,22 @@
       #associated index files
       fasta_gzi:  "{%ref/fasta_bgz}.gzi"
       fasta_fai:  "{%ref/fasta_bgz}.fai"
-      fasta_dict: "{%ref/fasta_bgz}.dict"
+      fasta_dict: "{%ref/base_dir}/{%ref/base_name}.dict"
+
+      #ensembl annotation
+      annot_url:  "http://ftp.ensembl.org/pub/release-107/gff3/homo_sapiens"
+      annot_gff3: "Homo_sapiens.GRCh38.107.gff3.gz"
+      annot_chk:  "CHECKSUMS"
+      annot_dir:  "annotation/ensembl_107"
+
+      #dbSNP
+      dbsnp_url: "https://ftp.ncbi.nih.gov/snp/latest_release/VCF"
+      dbsnp_vcf: "GCF_000001405.39.gz"
+      dbsnp_md5: "GCF_000001405.39.gz.md5"
+      final_vcf: "GCF_000001405.39.renamed.vcf.gz"
+      dbsnp_dir: "dbsnp/build_155"
+
+      #assembly report to map chromosome names from dbSNP to assembly
+      assembly_report_url:  "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.40_GRCh38.p14"
+      assembly_report_file: "GCF_000001405.40_GRCh38.p14_assembly_report.txt"
+      assembly_name_mapping: "NCBI2UCSC_mapping"

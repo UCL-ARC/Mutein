@@ -1,0 +1,28 @@
+#generate QC stats for anything called .fastq.gz
+#this will catch pre- and post-trimming files
+- action:
+    name: "fastqc"
+    exec: "local"
+    conda: "trim-galore"
+
+    qsub:
+      time:  "1:00:00"
+      mem:   "1G"
+      tmpfs: "15G"
+      cores: "4"
+
+    input:
+      fastq: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*file}.fastq.gz"
+
+    output:
+      zip:  "processed/{%dataset_id}/{*subset_id}/{*accession}/{*file}_fastqc.zip"
+      html: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*file}_fastqc.html"
+
+    shell: |
+        #dont scan something that a symlink to something else
+        if [[ -L {%fastq} ]] ; then
+            touch {%zip}
+            touch {%html}
+        else
+            fastqc -t {%qsub/cores} {%fastq}
+        fi

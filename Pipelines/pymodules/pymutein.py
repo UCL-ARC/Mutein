@@ -85,3 +85,22 @@ def recycle(args):
 
         #move to recycle bin
         shutil.move(fname,new_name)
+
+def truncate(args):
+    'truncate to zero length without changing the mtime'
+    assert sys.argv[1] == "truncate"
+
+    for path in args.file:
+        #verify path exists
+        if args.n == False: assert os.path.exists(path)
+
+        #get mtime and atime
+        mtime = os.path.getmtime(path)
+        atime = os.path.getatime(path)
+
+        #truncate file
+        f = open(path,'w')
+        f.close()
+
+        #reset mtime and atime
+        os.utime(path, times=(atime, mtime))

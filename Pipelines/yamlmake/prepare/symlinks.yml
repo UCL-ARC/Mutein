@@ -1,0 +1,14 @@
+#create a new directory hierachy to contain the processed versions of the data
+#with symlinks to the originals
+- action:
+    name: "create_symlinks"
+    exec: "local"
+
+    input:
+        original: "datasets/{%dataset_id}/{*subset_id}/{*accession}/{*basename}.fastq.gz"
+
+    output:
+        symlink: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*basename}.fastq.gz"
+
+    shell: |
+       ln -sr {%original} {%symlink}

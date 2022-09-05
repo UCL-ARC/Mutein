@@ -14,6 +14,7 @@ def main_func():
     if args.subcommand == "recycle":      recycle(args)
     if args.subcommand == "set-password": set_password(args)
     if args.subcommand == "encrypt-json": encrypt_json(args)
+    if args.subcommand == "truncate":     truncate(args)
 
 
 def parse_args():
@@ -30,6 +31,11 @@ def parse_args():
     #recycle
     recycle = subparsers.add_parser('recycle', help='move the file into a subfolder called recycle_bin')
     recycle.add_argument('file',nargs='+',help="list of files to recycle, last one must be a list terminator END")
+
+    #truncate
+    truncate = subparsers.add_parser('truncate', help='truncate file to empty without changing mtime')
+    truncate.add_argument('file',nargs='+',help="list of files to truncate")
+    truncate.add_argument('-n',action='store_true',help="no error if a file doesn't exists")
 
     #get master password from user, store in environment variable
     set_password = subparsers.add_parser('set-password', help='read in password from keyboard to environment variable')

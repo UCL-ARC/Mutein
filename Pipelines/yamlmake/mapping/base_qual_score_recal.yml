@@ -1,0 +1,72 @@
+#https://gatk.broadinstitute.org/hc/en-us/articles/360035890531-Base-Quality-Score-Recalibration-BQSR-
+#https://hpc.nih.gov/training/gatk_tutorial/bqsr.html
+
+- action:
+    name:  "base_recalibrator"
+    exec:  "qsub"
+    conda: "gatk4"
+
+    qsub: 
+        time:  "24:00:00" 
+        mem:   "10G"
+        tmpfs: "20G"
+        cores: "2"
+
+    input:
+        ibam:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_posn_sort.bam"
+
+    output:
+        bqsr:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_posn_sort.bqsr"
+
+    shell: |
+        gatk --java-options "-Xmx8G" \
+          BaseRecalibrator \
+          -I {%ibam} \
+          -R {%ref/fasta_bgz} \
+          -O {%bqsr} \
+          --known-sites {%ref/dbsnp_dir}/{%ref/final_vcf}
+
+- action:
+    name:  "apply_bqsr"
+    exec:  "qsub"
+    conda: "gatk4"
+
+    qsub: 
+        time:  "24:00:00" 
+        mem:   "10G"
+        tmpfs: "20G"
+        cores: "2"
+
+    input:
+        ibam:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_posn_sort.bam"
+        bqsr:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_posn_sort.bqsr"
+
+    output:
+        obam:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_bqsr.bam"
+
+    shell: |
+        gatk --java-options "-Xmx8G" \
+          ApplyBQSR \
+            -I {%ibam} \
+            -R {%ref/fasta_bgz} \
+            --bqsr-recal-file {%bqsr} \
+            -O {%obam}
+
+#truncate all_sort bams
+- action:
+    name:  "truncate_all_sort_bam"
+    exec:  "local"
+    run:   "never"
+
+    input:
+        sort:   "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_all_sort.bam"
+
+    output:
+        touch:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{%name}.touch"
+
+    shell: |
+        #truncate merged bam
+        mutein truncate "{%sort}"
+
+        #signal truncation was carried out
+        touch {%touch}
