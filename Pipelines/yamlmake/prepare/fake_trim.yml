@@ -6,6 +6,7 @@
 - action:
     name:  "fake_trim"
     exec:  "local"
+    conda: "main"
 
     qsub: 
         time:  "4:00:00"
@@ -27,8 +28,8 @@
         ireadu="processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}.fastq.gz"
         oreadu="processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_trim.fastq.gz"
 
-        ln -sr "{%iread1}" "{%oread1}"
-        ln -sr "{%iread2}" "{%oread2}"
+        mutein symlink --target "{%iread1}" --link "{%oread1}"
+        mutein symlink --target "{%iread2}" --link "{%oread2}"
         if [[ -f "${ireadu}" ]] ; then
-            ln -sr "${ireadu}" "${oreadu}"
+            mutein symlink --target "${ireadu}" --link "${oreadu}"
         fi

@@ -6,6 +6,56 @@ import getpass
 import pyaes
 import base64
 import json
+import csv
+
+def symlink(args):
+    '''
+    create a relative symlink with the shortest path to the target
+    regardless of the current working directory
+    better than doing eg:
+    ln -sr datasets/set1/subset1/accession1/file datasets/set1/subset1/accession1/link
+    '''
+    target_dir = os.path.dirname(args.target)
+    target_file = os.path.basename(args.target)
+    link_dir = os.path.dirname(args.link)
+
+    #find path to target relative to symlink
+    relpath = os.path.relpath(target_dir,start=link_dir)
+
+    final_path = os.path.join(relpath,target_file)
+
+    if os.path.exists(args.link):
+        if os.path.islink(args.link):
+            #overwrite any existing link
+            os.unlink(args.link)
+        else:
+            #but refuse to overwrite any existing file
+            raise Exception(f"path exists but is not a symlink: {args.link}")
+
+    os.symlink(final_path,args.link)
+
+def cut(args):
+    '''
+    parse stdin through csv reader using pass-through options
+    output to stdout the fields requested from the -f option
+    '''
+
+    if args.csvopts != None:
+        kwargs = json.loads(args.csvopts)
+    else:
+        kwargs = {}
+
+    reader = csv.reader(sys.stdin,**kwargs)
+
+    #output field delimiter
+    if args.output_delim == None:
+        delim = reader.dialect.delimiter
+    else:
+        delim = args.output_delim
+
+    for row in reader:
+        print(delim.join([row[i-1] for i in args.field]))
+
 
 def bytes2int(bytes):
     val = 0

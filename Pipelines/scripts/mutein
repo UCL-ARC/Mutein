@@ -15,7 +15,8 @@ def main_func():
     if args.subcommand == "set-password": set_password(args)
     if args.subcommand == "encrypt-json": encrypt_json(args)
     if args.subcommand == "truncate":     truncate(args)
-
+    if args.subcommand == "cut":          cut(args)
+    if args.subcommand == "symlink":      symlink(args)
 
 def parse_args():
     '''
@@ -36,6 +37,17 @@ def parse_args():
     truncate = subparsers.add_parser('truncate', help='truncate file to empty without changing mtime')
     truncate.add_argument('file',nargs='+',help="list of files to truncate")
     truncate.add_argument('-n',action='store_true',help="no error if a file doesn't exists")
+
+    #cut
+    cut =  subparsers.add_parser('cut', help='extract requested field(s) from csv file on stdin, allows quoted fields')
+    cut.add_argument('--field','-f',type=int,nargs='+',required=True,help="field(s) to extract")
+    cut.add_argument('--output-delim','-o',help="output field delimiter, defaults to input field delimiter")
+    cut.add_argument('--csvopts',help="""csv.reader options as json eg --csvopts '{"dialect":"excel","delimiter":"|"}'""")
+
+    #symlink
+    symlink =  subparsers.add_parser('symlink', help='create relative symlink with shortest possible path')
+    symlink.add_argument('--target',required=True,help="file the symlink points to")
+    symlink.add_argument('--link',required=True,help="the symlink")
 
     #get master password from user, store in environment variable
     set_password = subparsers.add_parser('set-password', help='read in password from keyboard to environment variable')
