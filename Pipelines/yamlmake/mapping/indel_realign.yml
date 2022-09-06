@@ -29,7 +29,8 @@
         mkdir -p ${MY_TMP_DIR}
 
         gatk3 \
-            -Xmx19G
+            -Xmx19G \
+            -Djava.io.tmpdir=${MY_TMP_DIR} \
             -T RealignerTargetCreator \
             --num_threads {%qsub/cores} \
             -R {%ref/uncompressed} \
