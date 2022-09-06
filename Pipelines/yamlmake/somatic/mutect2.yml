@@ -1,7 +1,7 @@
 #create symlinks within each accession's folder to all other accessions from same individual
 - action:
-    name: "other_sample_symlinks"
-    exec: "local"
+    name:  "other_sample_symlinks"
+    exec:  "local"
     conda: "main"
 
     input:
@@ -24,9 +24,13 @@
 
 #following keogh, do all pairwise comparisons between samples from same individuals
 #treating one as tumour other as normal
+#https://gatk.broadinstitute.org/hc/en-us/articles/5358824293659--Tool-Documentation-Index
+#https://gatk.broadinstitute.org/hc/en-us/articles/360035894731-Somatic-short-variant-discovery-SNVs-Indels-
+#https://gatk.broadinstitute.org/hc/en-us/articles/5358911630107-Mutect2
+#https://github.com/broadinstitute/gatk/blob/master/docs/mutect/mutect.pdf
 - action:
-    name: "mutect2"
-    exec: "local"
+    name:  "mutect2"
+    exec:  "qsub"
     conda: "gatk4"
 
     qsub:
@@ -41,7 +45,7 @@
         nbam: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*normal}_link.bam"
 
     output:
-        vcf:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_somatic.vcf.gz"
+        vcf:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_{*normal}_somatic.vcf.gz"
 
     shell: |
         gatk --java-options "-Xmx8g" Mutect2 \

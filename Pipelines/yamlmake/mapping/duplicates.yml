@@ -1,4 +1,8 @@
 #mark duplicates on the query (ie read name) sorted reads
+#no recommended for amplicon sequencing data as this generates many reads with the same
+#start/end positions by design, but bait capture enrichment of normal fragmented DNA
+#should not and can be deduplicated as normal
+#see C. Xu / Computational and Structural Biotechnology Journal 16 (2018) 15–24
 - action:
     name:  "mark_duplicates"
     exec:  "qsub"
