@@ -75,9 +75,9 @@
     shell: |
         touch {%touch}
 
-#extract sample information from metadata
+#extract individual information from metadata for each accession
 - action:
-    name: "extract_sample_info"
+    name: "extract_indiv_info"
     exec: "local"
     conda: "main"
 
@@ -110,3 +110,34 @@
         cat {%all_acc_list} \
         | grep -wv -e '{*accession}' | cat \
         > {%other_acc_list}
+
+#create per-individual information
+- action:
+    name: "per_individual_info"
+    exec: "local"
+    conda: "main"
+
+    input:
+        metadata: "datasets/{%dataset_id}/{=subset_id}/.meta/SraRunTable.txt"
+
+    output:
+        indiv_list: "datasets/{%dataset_id}/{=subset_id}/.meta/indiv_list"
+        acc2indiv:  "datasets/{%dataset_id}/{=subset_id}/.meta/acc2indiv"
+        touch:      "datasets/{%dataset_id}/{=subset_id}/.meta/{%name}.touch"
+
+    shell: |
+        #extract list of indiv numbers (at csv column 22 as SAMPLENUMBER_XXX_XXX
+        tail -n +2 {%metadata} | mutein cut -f 22 | cut -d_ -f1 | sort -u > {%indiv_list}
+
+        #create file containing only accession and individual
+        tail -n +2 {%metadata} | mutein cut -f 1 22 | tr ',_' ' ' | cut -d' ' -f1,2 > {%acc2indiv}
+
+        #create list of accessions from each individual
+        for indiv in $(cat {%indiv_list})
+        do
+            mkdir -p datasets/{%dataset_id}/{=subset_id}/.meta/indivs/${indiv}
+            cat {%acc2indiv} | grep -w -e ${indiv} | cut -d' ' -f1 \
+                > datasets/{%dataset_id}/{=subset_id}/.meta/indivs/${indiv}/accession_list
+        done
+
+        touch {%touch}
