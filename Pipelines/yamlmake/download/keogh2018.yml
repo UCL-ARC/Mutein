@@ -77,8 +77,8 @@
 
 #extract individual information from metadata for each accession
 - action:
-    name: "extract_indiv_info"
-    exec: "local"
+    name:  "extract_indiv_info"
+    exec:  "local"
     conda: "main"
 
     input:
@@ -113,8 +113,8 @@
 
 #create per-individual information
 - action:
-    name: "per_individual_info"
-    exec: "local"
+    name:  "per_individual_info"
+    exec:  "local"
     conda: "main"
 
     input:

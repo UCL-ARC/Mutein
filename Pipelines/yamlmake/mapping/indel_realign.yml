@@ -45,7 +45,7 @@
             -o {%indels}
 
 #make the map file to tell gatk where to output the realigned files
-#otherwise they are output into working directory!
+#otherwise they are output into the working directory regardless of input file path
 - action:
     name:  "indel_realigner_mapfile"
     exec:  "local"
@@ -69,15 +69,58 @@
         done \
         > {%mapfile}
 
+# #run IndelRealigner from GATK3 so we can use somatic SNP callers that do not do their own
+# #local denovo assembly / indel realignments
+# #https://web.archive.org/web/20150419005211/https://www.broadinstitute.org/gatk/guide/tooldocs/org_broadinstitute_gatk_tools_walkers_indels_IndelRealigner.php#--nWayOut
+# # --num_threads not supported by indelrealigner
+# #the below processes all samples concurrently using the same, single core, process
+# #it may be better to split the samples by individual to allow some parallelism
+# - action:
+#     name:  "indel_realigner"
+#     exec:  "local"
+#     conda: "gatk3"
+
+#     qsub:
+#         time:  "24:00:00"
+#         mem:   "20G"
+#         tmpfs: "20G"
+#         cores: "2"
+
+#     input:
+#         ibam:    "processed/{%dataset_id}/{=subset_id}/{+accession}/{+accession}_posn_sort.bam"
+#         indels:  "processed/{%dataset_id}/{=subset_id}/.meta/realigner_indel.intervals"
+#         known1:  "{%ref/indels1}"
+#         known2:  "{%ref/indels2}"
+#         mapfile: "processed/{%dataset_id}/{=subset_id}/.meta/realigner_output.map"
+
+#     output:
+#         touch:  "processed/{%dataset_id}/{=subset_id}/.meta/{%name}.touch"
+
+#     shell: |
+#         MY_TMP_DIR=${TMPDIR}/${RANDOM}${RANDOM}
+#         mkdir -p ${MY_TMP_DIR}
+
+#         gatk3 \
+#             -Xmx19G \
+#             -Djava.io.tmpdir=${MY_TMP_DIR} \
+#             -T IndelRealigner \
+#             -R {%ref/uncompressed} \
+#             -L {%intervals} \
+#             -known {%known1} -known {%known2} \
+#             -targetIntervals {%indels} \
+#             -I {%ibam/ -I } \
+#             -nWayOut {%mapfile}
+
+#         touch {%touch}
+
 #run IndelRealigner from GATK3 so we can use somatic SNP callers that do not do their own
 #local denovo assembly / indel realignments
 #https://web.archive.org/web/20150419005211/https://www.broadinstitute.org/gatk/guide/tooldocs/org_broadinstitute_gatk_tools_walkers_indels_IndelRealigner.php#--nWayOut
 # --num_threads not supported by indelrealigner
-#the below processes all samples concurrently using the same, single core, process
-#it may be better to split the samples by individual to allow some parallelism
+#split the samples by individual to allow some parallelism
 - action:
-    name:  "indel_realigner"
-    exec:  "local"
+    name:  "indel_realigner_parallel"
+    exec:  "qsub"
     conda: "gatk3"
 
     qsub:
@@ -87,18 +130,25 @@
         cores: "2"
 
     input:
-        ibam:    "processed/{%dataset_id}/{=subset_id}/{+accession}/{+accession}_posn_sort.bam"
-        indels:  "processed/{%dataset_id}/{=subset_id}/.meta/realigner_indel.intervals"
-        known1:  "{%ref/indels1}"
-        known2:  "{%ref/indels2}"
-        mapfile: "processed/{%dataset_id}/{=subset_id}/.meta/realigner_output.map"
+        acc_list: "datasets/{%dataset_id}/{=subset_id}/.meta/indivs/{*indiv}/accession_list"
+        indels:   "processed/{%dataset_id}/{=subset_id}/.meta/realigner_indel.intervals"
+        known1:   "{%ref/indels1}"
+        known2:   "{%ref/indels2}"
+        mapfile:  "processed/{%dataset_id}/{=subset_id}/.meta/realigner_output.map"
 
     output:
-        touch:  "processed/{%dataset_id}/{=subset_id}/.meta/{%name}.touch"
+        touch:  "processed/{%dataset_id}/{=subset_id}/.meta/{%name}.{*indiv}.touch"
 
     shell: |
         MY_TMP_DIR=${TMPDIR}/${RANDOM}${RANDOM}
         mkdir -p ${MY_TMP_DIR}
+
+        #build list of accessions from current individual
+        input_list=""
+        for acc in $(cat {%acc_list})
+        do
+            input_list="${input_list} -I processed/{%dataset_id}/{=subset_id}/${acc}/${acc}_posn_sort.bam"
+        done
 
         gatk3 \
             -Xmx19G \
@@ -108,7 +158,7 @@
             -L {%intervals} \
             -known {%known1} -known {%known2} \
             -targetIntervals {%indels} \
-            -I {%ibam/ -I } \
+            ${input_list} \
             -nWayOut {%mapfile}
 
         touch {%touch}
