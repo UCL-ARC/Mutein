@@ -1,0 +1,58 @@
+#create symlinks within each accession's folder to all other accessions from same individual
+- action:
+    name:  "other_sample_symlinks"
+    exec:  "local"
+    conda: "main"
+
+    input:
+        metadata: "datasets/{%dataset_id}/{=subset_id}/{*accession}/.meta/other_sample_accessions"
+        bam:      "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_bqsr.bam"
+
+    output:
+        touch:    "processed/{%dataset_id}/{=subset_id}/{*accession}/.meta/{%name}.touch"
+
+    shell: |
+        #symlinks to bams of all accessions from the same individual
+        for acc in $(cat {%metadata})
+        do
+            mutein symlink \
+              --target processed/{%dataset_id}/{=subset_id}/${acc}/${acc}_bqsr.bam \
+              --link   processed/{%dataset_id}/{=subset_id}/{*accession}/${acc}_link.bam
+        done
+
+        touch {%touch}
+
+#following keogh, do all pairwise comparisons between samples from same individuals
+#treating one as tumour other as normal
+#https://gatk.broadinstitute.org/hc/en-us/articles/5358824293659--Tool-Documentation-Index
+#https://gatk.broadinstitute.org/hc/en-us/articles/360035894731-Somatic-short-variant-discovery-SNVs-Indels-
+#https://gatk.broadinstitute.org/hc/en-us/articles/5358911630107-Mutect2
+#https://github.com/broadinstitute/gatk/blob/master/docs/mutect/mutect.pdf
+- action:
+    name:  "mutect2"
+    exec:  "qsub"
+    conda: "gatk4"
+
+    qsub:
+        time:  "3:00:00"
+        mem:   "9G"
+        tmpfs: "1G"
+        cores: "4"
+
+    input:
+        int:  "{%intervals}"
+        tbam: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_bqsr.bam"
+        nbam: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*normal}_link.bam"
+
+    output:
+        vcf:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_{*normal}_somatic.vcf.gz"
+
+    shell: |
+        gatk --java-options "-Xmx8g" Mutect2 \
+          --native-pair-hmm-threads {%qsub/cores} \
+          -L {%int} -ip 10 \
+          -R {%ref/fasta_bgz} \
+          -I {%tbam} \
+          -I {%nbam} \
+          --normal-sample {%dataset_id}_{=subset_id}_{*normal} \
+          -O {%vcf}

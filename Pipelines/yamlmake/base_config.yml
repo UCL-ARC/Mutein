@@ -3,8 +3,8 @@
     ym:
         prefix:             "mut."
         remote_delay_secs:  "10"
-        stale_output_file:  "stale"
-        stale_output_dir:   "stale"
+        stale_output_file:  "ignore"
+        stale_output_dir:   "ignore"
         failed_output_file: "stale"
         failed_output_dir:  "stale"
         missing_parent_dir: "create"

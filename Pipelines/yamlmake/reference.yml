@@ -253,3 +253,60 @@
     shell: |
         tabix -p vcf {%final}
 
+#download google cloud gatk resource bundle
+#https://gatk.broadinstitute.org/hc/en-us/articles/360035890811-Resource-bundle
+#https://console.cloud.google.com/storage/browser/genomics-public-data/resources/broad/hg38/v0/
+- action:
+    name:  "download_gatk_bundle"
+    conda: "gsutil"
+
+    output:
+        touch: "resources/gatk_bundle/.meta/{%name}.touch"
+
+    shell: |
+        # gsutil -m cp -r \
+        #     "gs://genomics-public-data/resources/broad/hg38/v0" \
+        #     resources/gatk_bundle
+
+        touch {%touch}
+
+#decompress the reference into a plain fasta for gatk3
+- action:
+    name:  "uncompress_reference"
+    exec:  "local"
+
+    qsub:
+        time:  "1:00:00"
+        mem:   "6G"
+        tmpfs: "10G"
+        cores: "1"
+
+    input:
+        fasta_bgz: "{%ref/fasta_bgz}"     #bgzip compressed fasta
+
+    output:
+        fasta_plain: "{%ref/uncompressed}"     #plain fasta
+
+    shell: |
+        gunzip --to-stdout {%fasta_bgz} > {%fasta_plain}
+
+#create fasta file index with samtools
+- action:
+    name:  "create_fai_uncompressed"
+    exec:  "local"
+    conda: "bwa"
+    
+    qsub:
+        time:  "1:00:00"
+        mem:   "6G"
+        tmpfs: "10G"
+        cores: "1"
+
+    input:
+        fasta: "{%ref/uncompressed}"
+
+    output:
+        index: "{%ref/uncompressed_fai}"
+
+    shell: |
+        samtools faidx {%fasta}

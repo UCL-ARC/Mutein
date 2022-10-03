@@ -1768,6 +1768,17 @@ def write_jobfile(action,shell_list):
 
     return fnamebase
 
+def colorize_command(cmd,c):
+    '''
+    put colour escape sequences at the start of each line
+    to make less -SR work the same as direct output
+    '''
+
+    tmp = cmd.replace("\n",f"\n{c}")
+    tmp = f"{c}{tmp}{col['none']}"
+
+    return tmp
+
 def execute_command(config,job_numb,cmd,env):
     'execute command locally'
     fname = f'{config["ym/prefix"]}{timestamp_now()}.{config["name"]}'
@@ -1778,7 +1789,9 @@ def execute_command(config,job_numb,cmd,env):
 
     if cmd.endswith('\n'): end = ''
     else:                  end = '\n'
-    message(f'{col["cyan"]}{cmd}{col["none"]}',end=end,timestamp=False)
+
+    tmpcmd = colorize_command(cmd,col['green'])
+    message(f'{tmpcmd}',end=end,timestamp=False)
 
     if not is_active():
         #dry-run: signal job completed ok without running it
