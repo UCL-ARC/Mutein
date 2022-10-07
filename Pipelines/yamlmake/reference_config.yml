@@ -36,7 +36,7 @@
       #dbSNP
       dbsnp_url: "https://ftp.ncbi.nih.gov/snp/latest_release/VCF"
       dbsnp_vcf: "GCF_000001405.39.gz"
-      dbsnp_md5: "GCF_000001405.39.gz.md5"
+      dbsnp_idx: "GCF_000001405.39.gz.tbi"
       final_vcf: "GCF_000001405.39.renamed.vcf.gz"
       dbsnp_dir: "dbsnp/build_155"
 

@@ -165,26 +165,27 @@
     name: "download_dbsnp"
     exec: "local"
 
-    vcf_url: "{%ref/dbsnp_url}/{%ref/dbsnp_vcf}"
-    chk_url: "{%ref/dbsnp_url}/{%ref/dbsnp_md5}"
+    dl_files:
+        - "{%ref/dbsnp_vcf}"
+        - "{%ref/dbsnp_vcf}.md5"
+        - "{%ref/dbsnp_idx}"
+        - "{%ref/dbsnp_idx}.md5"
 
     #no input
 
     output:
-        vcf: "{%ref/dbsnp_dir}/{%ref/dbsnp_vcf}"
-        chk: "{%ref/dbsnp_dir}/{%ref/dbsnp_md5}"
+        outfiles: "{%ref/dbsnp_dir}/{=dl_files}"
 
     shell: |
-        wget -O - {%vcf_url} > {%vcf}
-        wget -O - {%chk_url} > {%chk}
+        wget -O - {%ref/dbsnp_url}/{=dl_files} > {%ref/dbsnp_dir}/{=dl_files}
 
 #check dbsnp md5s
 - action:
     name: "check_dbsnp"
 
     input:
-        vcf: "{%ref/dbsnp_dir}/{%ref/dbsnp_vcf}"
-        chk: "{%ref/dbsnp_dir}/{%ref/dbsnp_md5}"
+        vcf_md5: "{%ref/dbsnp_dir}/{%ref/dbsnp_vcf}.md5"
+        idx_md5: "{%ref/dbsnp_dir}/{%ref/dbsnp_idx}.md5"
 
     output:
         touch: "{%ref/dbsnp_dir}/{%name}.touch"
@@ -192,7 +193,8 @@
     #check both md5
     shell: |
         cd {%ref/dbsnp_dir}
-        md5sum --check {%ref/dbsnp_md5}
+        md5sum --check $(basename {%vcf_md5})
+        md5sum --check $(basename {%idx_md5})
         cd -
         touch {%touch}
 
@@ -225,6 +227,12 @@
 - action:
     name:  "rename_vcf_chromosomes"
     conda: "bcftools"
+    exec:  "qsub"
+    qsub:
+        time:  "1:00:00"
+        mem:   "6G"
+        tmpfs: "10G"
+        cores: "5"
 
     input:
         dbsnp:   "{%ref/dbsnp_dir}/{%ref/dbsnp_vcf}"
@@ -237,6 +245,7 @@
         bcftools annotate \
             --rename-chrs {%mapping} \
             {%dbsnp} \
+            --threads 4 \
             -Oz -o {%final}
 
 #tabix index the fixed vcf
