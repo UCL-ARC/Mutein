@@ -17,6 +17,8 @@ def main_func():
     if args.subcommand == "truncate":     truncate(args)
     if args.subcommand == "cut":          cut(args)
     if args.subcommand == "symlink":      symlink(args)
+    if args.subcommand == "aes-encrypt":  aes_encrypt(args)
+    if args.subcommand == "aes-decrypt":  aes_decrypt(args)
 
 def parse_args():
     '''
@@ -49,11 +51,16 @@ def parse_args():
     symlink.add_argument('--target',required=True,help="file the symlink points to")
     symlink.add_argument('--link',required=True,help="the symlink")
 
-    #get master password from user, store in environment variable
-    set_password = subparsers.add_parser('set-password', help='read in password from keyboard to environment variable')
+    #encrypt/decrypt file
+    aes_encrypt  = subparsers.add_parser('aes-encrypt', help='AES encrypt a file')
+    aes_encrypt.add_argument('--input-file',required=True,help="file to encrypt")
+    aes_encrypt.add_argument('--output-file',required=True,help="encrypted output file")
+    aes_encrypt.add_argument('--key-file',default="PROMPT",help="file containing the key, prompt if omitted")
 
-    #encrypt json to file
-    encrypt_json  = subparsers.add_parser('encrypt-json', help='encrypt json from keyboard, save to config/password_vault')
+    aes_decrypt  = subparsers.add_parser('aes-decrypt', help='AES decrypt a file to stdout')
+    aes_decrypt.add_argument('--input-file',required=True,help="file to decrypt")
+    aes_decrypt.add_argument('--output-file',required=True,help="decrypted output file")
+    aes_decrypt.add_argument('--key-file',default="PROMPT",help="file containing the key, prompt if omitted")
 
     args = parser.parse_args()
 

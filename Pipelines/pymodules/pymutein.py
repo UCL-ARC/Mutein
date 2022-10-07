@@ -3,10 +3,43 @@ import os
 import random
 import shutil
 import getpass
-import pyaes
-import base64
+#import pyaes
+#import base64
 import json
 import csv
+import subprocess
+
+def get_key(args):
+    if args.key_file == "PROMPT":
+        key = getpass.getpass(prompt="Enter password (blank to cancel): ").strip()
+        if key == '':
+            print("Cancelled")
+            exit(0)
+    else:
+        key = open(args.key_file).read().strip()
+
+    return key
+
+def aes_encrypt(args):
+    '''
+    AES encrypt a file
+    '''
+
+    key = get_key(args)
+    cmd = "gpg --symmetric --batch "
+    cmd += f"--passphrase {key} --cipher-algo AES128 --output {args.output_file} {args.input_file}"
+    subprocess.run(cmd,shell=False,check=True)
+
+def aes_decrypt(args):
+    '''
+    AES decrypt a file
+    '''
+
+    key = get_key(args)
+    cmd = "gpg --decrypt --batch "
+    cmd += f"--passphrase {key} --cipher-algo AES128 --output {args.output_file} {args.input_file}"
+    subprocess.run(cmd,shell=False,check=True)
+
 
 def symlink(args):
     '''
@@ -62,43 +95,6 @@ def bytes2int(bytes):
     for x in bytes:
         val = (val << 8) + int(x)
     return val
-
-def encrypt_json(args):
-    plain_text = getpass.getpass(prompt="Enter JSON as a single line (blank to cancel): ").strip()
-
-    if plain_text == '':
-        print("Cancelled")
-        return
-
-    initial_counter = os.urandom(16)
-    initial_counter_int = bytes2int(initial_counter)
-    key_256 = base64.b64decode(os.environ['MUT_PASSWORD'])
-    counter = pyaes.Counter(initial_value = initial_counter_int)
-    aes = pyaes.AESModeOfOperationCTR(key_256, counter = counter)
-    cipher_text = aes.encrypt(plain_text.encode("utf8"))
-
-    message = initial_counter + cipher_text
-    with open('./config/password_vault','wb') as f: f.write(message)
-
-def decrypt_json():
-    with open('./config/password_vault','rb') as f: message = f.read()
-
-    initial_counter_int = bytes2int(message[:16])
-    cipher_text = message[16:]
-    key_256 = base64.b64decode(os.environ['MUT_PASSWORD'])
-    counter = pyaes.Counter(initial_value = initial_counter_int)
-    aes = pyaes.AESModeOfOperationCTR(key_256, counter = counter)
-    plain_text = aes.encrypt(cipher_text).decode("utf8")
-
-    return json.loads(plain_text)
-
-def set_password(args):
-    password = getpass.getpass(prompt="Enter password (blank for none): ").strip()
-    
-    if password == '':
-        print("")
-    else:
-        print(password)
 
 def check_cwd(args):
     if os.path.realpath(os.getcwd()) != os.path.realpath(os.environ['MUT_DATA']):
