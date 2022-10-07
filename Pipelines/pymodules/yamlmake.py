@@ -686,7 +686,7 @@ def show(item,label=None,indent=2):
 
 def check_cwd(config):
     if 'working_dir' in config:
-        if os.path.realpath(os.getcwd()) != config['working_dir']:
+        if os.path.realpath(os.getcwd()) != os.path.realpath(config['working_dir']):
             print("warning: current path is not the expected working directory")
             print(f"expecting: {config['working_dir']}")
             print(f"but found {os.path.realpath(os.getcwd())}")
