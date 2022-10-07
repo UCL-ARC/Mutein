@@ -1912,11 +1912,11 @@ def submit_job_qsub(action,shell_list,job_list):
                 warning(f"job {job_numb+1} status: {status}")
                 failed = True
 
-        if failed == False:
+        if not failed:
             #job has also failed if not all required outputs were created
             failed = verify_expected_outputs(action,job_list[job_numb]["output"],job_list[job_numb]["input"])
 
-        if failed == True:
+        if failed:
             #deal with output of failed job
             handle_failed_outputs(action,job_list[job_numb]["output"])
             something_failed = True
@@ -2035,11 +2035,11 @@ def execute_jobs(action,shell_list,job_list):
             #reports only explicit job failure from exit code
             failed = execute_command(action,job_numb,cmd,env)
 
-            if failed == False:
+            if not failed:
                 #job has also failed if not all required outputs were created/updated
                 failed = verify_expected_outputs(action,job_list[job_numb]["output"],job_list[job_numb]["input"])
 
-            if failed == True:
+            if failed:
                 #carry out config controlled action on outputs of failed job
                 #ie delete, recycle, mark as stale or ignore
                 handle_failed_outputs(action,job_list[job_numb]["output"])
