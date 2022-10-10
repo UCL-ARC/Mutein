@@ -87,11 +87,19 @@ The input and/or output fields can contain one or more simple named subfields, o
 
 Above we see that, although the file path field names are nested under the input and output fields, for naming purposes they are considered to be directly under the action name space, and we refer to them directly within the shell using `{%first_input}` etc and not `{%input/first_input}` (see below for how to access nested variables within the configuration hierachy). Effectively the "input" and "output" field labels disappear from the name space and their subfields get promoted one level. This applies only to the input and output fields, and saves a lot of typing in the shell command, but also means we must avoid name collisions with other config variables due to this promotion.
 
-To operate on sets of multiple files the input and output items can also contain any combination of four special types of placeholder which expand the file paths in various ways. These four placeholder types are of the form `{*placeholder}`, `{=placeholder}`, `{+placeholder}` and `{-placeholder}` which respectively operate to: spawn separate jobs by globbing file system paths (`{*...}`), spawn separate jobs using existing variable lists (`{=...}`), expand single input/output fields into lists by globbing file system paths (`{+...}`) and expand single input/output fields into lists using existing list variables (`{-...}`). This will be explained in more detail below.
+To operate on sets of multiple files the input and output items can also contain any combination of four other special types of placeholder which expand the file paths in various ways, as shown in this table:
+
+| placeholder type       | expansion type | number of jobs |
+| ---                    | ---     | --- |
+| `{%my_var}`            | refer to the variable `my_var`, which may be a config variable or a variable defined in the action, or an input/outfile file | no effect |
+| `{*my_capture}`        | treat the overall string as a glob, insert the `*` wildcard here, writing the wildcard text into the variable `my_capture` | Spawns a separate instance of the shell command for each file matching the glob |
+| `{=my_existing_list}`  | expand using each element of `my_existing_list` list variable | Spawns a separate instance of the shell command for each list element |
+| `{+my_captures}`       | treat the overall string as a glob, insert the `*` wildcard here, writing all wildcard values as a list into the variable `my_captures`  | Spawn one instance of the shell command |
+| `{-my_existing_list}`  | expand using each element of `my_existing_list` list variable | Spawn one instance of the shell command |
 
 Once all placeholders in the input and output fields have been processed and expanded into lists and/or multiple jobs they become available within the shell command to fill out its own placeholders. Note that the shell field must always be of YAML's literal block scalar type (ie `shell: |` as shown) to ensure that commands written on separate lines are not merged together into a single line. To continue a single shell command over multiple lines use the back slash character at the end of each continuing line as you would in a normal shell script file.
 
-#### Spawning separate jobs for each matching filename
+#### `{*...}` Spawning separate jobs for each matching filename
 
 ```
   - action:
@@ -115,7 +123,7 @@ Across the multiple jobs spawned by the action the value assigned to the `{*data
 
 There is also an alternative form of globbing placeholder of the form `{+dataset}` which generates a list of items within a single job. This will be explained later.
 
-#### Spawning separate jobs for each item of an existing list
+#### `{=...}` Spawning separate jobs for each item of an existing list
 
 The special `{=...}` placeholder expands to generate a separate job for each item in an existing config list, and can appear in the input and/or output fields of an action. Lists of strings can be defined anywhere in the configuration. Additionally each action can define any temporary local configuration it needs - this does not persist after the action has ended. Therefore a short list of files can be hard coded into the action itself (although in practise it might be better kept in a separate configuration file that is included):
 
@@ -258,7 +266,7 @@ To insert environment variables from the shell used to invoke YAMLmake another t
 
 Normal shell variables of the form `${USER}`, `${HOSTNAME}` etc are simply ignored by YAMLmake as passed through to the shell command, therefore they give you the value when the command was actually executed, whereas `{$USER}` gets substituted by YAMLmake before the action's shell command is run.
 
-#### Creating lists of file paths within single jobs by matching filenames
+#### `{+...}` Creating lists of file paths within single jobs by matching filenames
 
 Similarly to the `{*dataset}` style placeholder there is an alternative expanding globbing placeholder of the form `{+dataset}` which can be used in the input and output sections of an action. These also expand by matching filenames in the filesystem but generate lists of file paths within the same job instead of generating separate jobs for each path. Unlike the `{*dataset}` style placeholder this means that the files paths are in a list which must be dealt with in the shell command. For example:
 
@@ -286,7 +294,7 @@ Assuming the metadata folder had subfolders called one, two and three which cont
                           --output_list=data/one/one.fastq.gz,data/two/two.fastq.gz,data/three/three.fastq.gz
 ```
 
-#### Creating lists of file paths within single jobs from existing lists
+#### `{-...}` Creating lists of file paths within single jobs from existing lists
 
 The final special placeholder uses the form `{-sample}`, and generates lists of file paths within a single job. For example:
 
