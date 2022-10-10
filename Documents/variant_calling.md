@@ -9,18 +9,16 @@ The recommended way to install and execute is to ssh into your HPC account, clon
 The steps to install and run the pipeline follow. Install everything where you will be running the pipeline's commands from, eg if you intend to run on an HPC install to your account on the HPC not your personal laptop/desktop computer.
 
 ## Installation
-### install conda
-If you don't already have conda installed you must install it manually as the first step. On a shared HPC environment you may already have access to some version(s) of conda through a loadable module, but this may not be the most up-to-date version. In this case you may wish to simply ignore the system-provided conda and install your own version anyway.
+### install mamba (and maybe conda)
 
-We recommend installing [Miniconda](https://docs.conda.io/en/latest/miniconda.html), follow the link to access full installation instructions. But typically to install miniconda you will download and run the installer:
+As per the docs at https://mamba.readthedocs.io/en/latest/installation.html if you already have conda you can install mamba with this command:
 
-    wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-    chmod u+x ./Miniconda3-latest-Linux-x86_64.sh
-    ./Miniconda3-latest-Linux-x86_64.sh
+```bash
+conda install mamba -n base -c conda-forge
+```
 
-If asked, let it run `conda init`, as this will modify your `~/.bashrc` to put the conda commands in your path, amongst other things.
-
-Then log out and in again after which the conda command should be available.
+If you don't already have conda or mamba you can install only mamba and it will give you the conda command as well.
+Installers are at https://github.com/conda-forge/miniforge#mambaforge - you will want the Linux x86_64 version.
 
 ### download or clone this repository
 While the repository is private (i.e. during its development stage) you can only access the code through an authorised github account. Once your account has been given access to the repository the simplest way to do a one-off download is to log into your github account, browse to the [Mutein repository](https://github.com/UCL/Mutein), click on the green Code button, then click Download zip. Then copy this zip file onto the HPC (if required).
