@@ -7,10 +7,11 @@
     conda: "bwa"
 
     qsub: 
-        time:  "24:00:00"
-        mem:   "10G"
+        time:  "3:00:00"
+        mem:   "4G"
         tmpfs: "20G"
-        cores: "2"
+        # 4x speedup is achievable, haven't tested more
+        cores: "4"
 
     input:
         read1: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_trim_1.fastq.gz"
@@ -36,10 +37,10 @@
     conda: "bwa"
 
     qsub: 
-        time:  "24:00:00"
+        time:  "02:00:00"
         mem:   "10G"
         tmpfs: "20G"
-        cores: "2"
+        cores: "4"
 
     input:
         read: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_trim.fastq.gz"
@@ -66,7 +67,7 @@
 
     qsub: 
         time:  "24:00:00"
-        mem:   "6G"
+        mem:   "4G"
         cores: "4"
 
     input:
@@ -81,7 +82,7 @@
             sing=""
         fi
 
-        samtools merge -u -n -c -p --threads $(({%qsub/cores}-1)) -o - ${sing} {%pair}
+        samtools merge -u -n -c -p --threads $(({%qsub/cores}-1)) -o - ${sing} {%pair} \
         | samtools addreplacerg -w \
           -r 'ID:{%dataset_id}_{*subset_id}_{*accession}' \
           -r 'SM:{%dataset_id}_{*subset_id}_{*accession}' \
