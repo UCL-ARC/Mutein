@@ -56,6 +56,7 @@ list2job_regx  = r'\{=.+?\}'       #{=list} ==> split into separate jobs
 list2list_regx  = r'\{-.+?\}'      #{-list} ==> become in-job list
 
 warning_prefix = 'WARNING: '
+error_prefix = 'ERROR: '
 illegal_chrs = '\\\n\r\t\'" *?:;,/#%&{}<>+`|=$!@'
 
 default_log_dir = 'yamlmake_logs'
@@ -1562,8 +1563,11 @@ def remove_item(path):
 def remove_tree(path):
     if is_active(): shutil.rmtree(path)
 
-def warning(item,end='\n',timestamp=True):
-    message(col["yellow"]+warning_prefix+item+col["none"],end=end,timestamp=timestamp)
+def warning(item, end='\n', timestamp=True):
+    message(col["yellow"] + warning_prefix + item + col["none"], end=end, timestamp=timestamp)
+
+def error(item, end='\n', timestamp=True):
+    message(col["red"] + error_prefix + item + col["none"], end=end, timestamp=timestamp)
 
 def header(item,end='\n',timestamp=True):
     line = '-'*(70-len(item))
@@ -1812,7 +1816,7 @@ def execute_command(config,job_numb,cmd,env):
     fout.close()
     ferr.close()
 
-    if failed: warning('command failed')
+    if failed: error('command failed')
     else:      message('command completed normally')
 
     flush()
