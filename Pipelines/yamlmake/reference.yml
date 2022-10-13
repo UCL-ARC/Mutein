@@ -270,12 +270,12 @@
     conda: "gsutil"
 
     output:
-        touch: "resources/gatk_bundle/.meta/{%name}.touch"
+        touch: "{%ref/bundle_dir}/.meta/{%name}.touch"
 
     shell: |
-        # gsutil -m cp -r \
-        #     "gs://genomics-public-data/resources/broad/hg38/v0" \
-        #     resources/gatk_bundle
+        gsutil -m cp -r \
+            "gs://genomics-public-data/resources/broad/hg38/{%ref/bundle_dir_version}" \
+            {%ref/bundle_dir}
 
         touch {%touch}
 
