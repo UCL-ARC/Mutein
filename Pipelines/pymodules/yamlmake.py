@@ -1569,6 +1569,9 @@ def warning(item, end='\n', timestamp=True):
 def error(item, end='\n', timestamp=True):
     message(col["red"] + error_prefix + item + col["none"], end=end, timestamp=timestamp)
 
+def failed_command_error(cmdname, foutname, ferrname, end='\n', timestamp=True):
+    error(f'{cmdname} failed.{end}STDOUT: {foutname}{end}STDERR: {ferrname}', end=end, timestamp=timestamp)
+
 def header(item,end='\n',timestamp=True):
     line = '-'*(70-len(item))
     item = f'{item}  {line}'
@@ -1816,8 +1819,10 @@ def execute_command(config,job_numb,cmd,env):
     fout.close()
     ferr.close()
 
-    if failed: error('command failed')
-    else:      message('command completed normally')
+    if failed:
+        failed_command_error('command', foutname, ferrname)
+    else:
+        message('command completed normally')
 
     flush()
     return failed
@@ -1887,8 +1892,10 @@ def submit_job_qsub(action,shell_list,job_list):
         fout.close()
         ferr.close()
 
-        if something_failed: warning(f'qsub call failed')
-        else:                message(f'qsub call succeeded')
+        if something_failed:
+            failed_command_error('qsub', foutname, ferrname)
+        else:
+            message(f'qsub call succeeded')
 
     #delay to allow for shared filesystem latency on status files
     message(f'sleeping for {action["ym/remote_delay_secs"]} seconds to allow for filesystem latency...')
@@ -1913,7 +1920,7 @@ def submit_job_qsub(action,shell_list,job_list):
             if status == "okay":
                 message(f"job {job_numb+1} status: {status}")
             else:
-                warning(f"job {job_numb+1} status: {status}")
+                error(f"job {job_numb+1} status: {status}")
                 failed = True
 
         if not failed:
@@ -2154,7 +2161,7 @@ def process(pipeline,path,config=None,args=None):
                 if activity_state() == 'dryrun':
                     warning('action failed due to dryrun mode, continuing pipeline anyway')
                 else:
-                    warning('aborting pipeline due to failed action')
+                    error('aborting pipeline due to failed action')
                     return 2
 
         elif item_type == 'config':
