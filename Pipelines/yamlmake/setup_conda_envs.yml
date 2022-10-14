@@ -9,7 +9,14 @@
         touch: "config/conda_envs/{*env_name}.touch"
     shell: |
         mamba create -y \
-                     -n {%ym/conda_prefix}{*env_name} \
+                     {%conda_channels} \
+                     -n {%ym/conda_prefix}{*env_name}
+        conda activate {%ym/conda_prefix}{*env_name}
+        config_rc_file="{%base_dir}/{*env_name}.condarc"
+        #if [ -f "$config_rc_file" ]; then
+            #cp "$config_rc_file" ${CONDA_PREFIX}/.condarc
+        #fi
+        mamba install -y \
                      {%conda_channels} \
                      --file {%env_file} 
         touch {%touch}

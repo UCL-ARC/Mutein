@@ -1,0 +1,4 @@
+subdirs:
+ - linux-noarch
+ - linux-64
+ - noarch
