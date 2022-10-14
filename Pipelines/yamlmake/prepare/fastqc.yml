@@ -20,6 +20,8 @@
 
     shell: |
         #dont scan something that a symlink to something else
+        #to avoid doing a second fastqc if we used fake_trim.yml
+        #instead of trim.yml
         if [[ -L {%fastq} ]] ; then
             touch {%zip}
             touch {%html}
