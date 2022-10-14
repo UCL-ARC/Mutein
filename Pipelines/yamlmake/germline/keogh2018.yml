@@ -2,3 +2,4 @@
 - include: "../config/keogh2018.yml"
 
 - include: "haplotype_caller.yml"    #run gatk4 HaplotypeCaller
+#still need to pool snp call from the same individual
