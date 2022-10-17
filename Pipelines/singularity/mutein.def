@@ -1,4 +1,5 @@
-#build this container on a linux machine you have root on using:
+#build this container on a linux machine you have root
+#install conda or mamba first:
 #mamba create -n mutein_singularity
 #mamba activate mutein_singularity
 #mamba install singularity==3.5.3 #to match myriad version incase that matters

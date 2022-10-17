@@ -12,13 +12,11 @@ def main_func():
 
     if args.subcommand == "check-cwd":    check_cwd(args)
     if args.subcommand == "recycle":      recycle(args)
-    if args.subcommand == "set-password": set_password(args)
-    if args.subcommand == "encrypt-json": encrypt_json(args)
+    if args.subcommand == "encrypt-key":  encrypt_key(args)
+    if args.subcommand == "decrypt-key":  decrypt_key(args)
     if args.subcommand == "truncate":     truncate(args)
     if args.subcommand == "cut":          cut(args)
     if args.subcommand == "symlink":      symlink(args)
-    if args.subcommand == "aes-encrypt":  aes_encrypt(args)
-    if args.subcommand == "aes-decrypt":  aes_decrypt(args)
 
 def parse_args():
     '''
@@ -51,16 +49,18 @@ def parse_args():
     symlink.add_argument('--target',required=True,help="file the symlink points to")
     symlink.add_argument('--link',required=True,help="the symlink")
 
-    #encrypt/decrypt file
-    aes_encrypt  = subparsers.add_parser('aes-encrypt', help='AES encrypt a file')
-    aes_encrypt.add_argument('--input-file',required=True,help="file to encrypt")
-    aes_encrypt.add_argument('--output-file',required=True,help="encrypted output file")
-    aes_encrypt.add_argument('--key-file',default="PROMPT",help="file containing the key, prompt if omitted")
+    #generate an encrypted AES256 bulk data key
+    encrypt_key = subparsers.add_parser('encrypt-key', help='generate an encrypted AES256 bulk data key')
+    encrypt_key.add_argument('--output-file',required=True,help="where to store the encrypted key")
 
-    aes_decrypt  = subparsers.add_parser('aes-decrypt', help='AES decrypt a file to stdout')
-    aes_decrypt.add_argument('--input-file',required=True,help="file to decrypt")
-    aes_decrypt.add_argument('--output-file',required=True,help="decrypted output file")
-    aes_decrypt.add_argument('--key-file',default="PROMPT",help="file containing the key, prompt if omitted")
+    decrypt_key = subparsers.add_parser('decrypt-key', help='decrypt AES256 bulk data key')
+    decrypt_key.add_argument('--input-file',required=True,help="where read the encrypted key")
+    decrypt_key.add_argument('--output-file',required=True,help="where to write the decrypted key")
+
+    # aes_decrypt  = subparsers.add_parser('aes-decrypt', help='AES decrypt a file to stdout')
+    # aes_decrypt.add_argument('--input-file',required=True,help="file to decrypt")
+    # aes_decrypt.add_argument('--output-file',required=True,help="decrypted output file")
+    # aes_decrypt.add_argument('--key-file',default="PROMPT",help="file containing the key, prompt if omitted")
 
     args = parser.parse_args()
 
