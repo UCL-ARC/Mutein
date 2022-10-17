@@ -19,8 +19,12 @@
         bqsr:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_posn_sort.bqsr"
 
     shell: |
+        MY_TMP_DIR=${TMPDIR}/${RANDOM}${RANDOM}
+        mkdir -p ${MY_TMP_DIR}
+
         gatk --java-options "-Xmx8G" \
           BaseRecalibrator \
+          --tmp-dir ${MY_TMP_DIR} \
           -I {%ibam} \
           -R {%ref/fasta_bgz} \
           -O {%bqsr} \
@@ -45,8 +49,12 @@
         obam:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_bqsr.bam"
 
     shell: |
+        MY_TMP_DIR=${TMPDIR}/${RANDOM}${RANDOM}
+        mkdir -p ${MY_TMP_DIR}
+
         gatk --java-options "-Xmx8G" \
           ApplyBQSR \
+            --tmp-dir ${MY_TMP_DIR} \
             -I {%ibam} \
             -R {%ref/fasta_bgz} \
             --bqsr-recal-file {%bqsr} \
