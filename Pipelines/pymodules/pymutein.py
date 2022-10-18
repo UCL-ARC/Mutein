@@ -12,6 +12,8 @@ import csv
 import stat
 
 #salt for password based key derivation funtion
+#to prevent reverse lookup of unsalted hash function
+#do not change otherwise the passphrase will map to a different key!
 salt = base64.b64decode(b'oHP7EUhOZJ37fbTbE/VLbprAEqzSwdHQ2R3FW6/f6xE=')
 
 def encrypt_key(args):
@@ -21,6 +23,10 @@ def encrypt_key(args):
     encrypts it with the master password
     writes to private file
     along with a random initial AES counter value
+
+    use this command once the setup a key for encfs
+    then use decrypt_key at the start of each session to unlock the key
+    then delete the plaintext key once done
     '''
 
     #user should copy-paste in from a password manager
@@ -45,9 +51,9 @@ def encrypt_key(args):
     #generate 256 bit bulk data key and encrypt it
     bulk_key = os.urandom(32)
 
-    print(base64.b64encode(bulk_key))
+    if args.debug: print('bulk key',base64.b64encode(bulk_key),file=sys.stderr)
 
-    #set to only be read by user
+    #set to only be readable by user
     f = open(args.output_file,'wb')
     f.close()
     os.chmod(args.output_file,stat.S_IRUSR|stat.S_IWUSR)
@@ -59,6 +65,8 @@ def decrypt_key(args):
     prompts for a master password/passphrase interactively from keyboard
     decrypts a bulk data key from file
     writes to a private file in plaintext
+    delete the keyfile once you want to close the session
+    set up the initial encrypted key using encrypt_key
     '''
 
     #user should copy-paste in from a password manager
@@ -82,9 +90,10 @@ def decrypt_key(args):
 
     #decrypt 256 bit bulk data key to file
     bulk_key = aes.decrypt(encrypted_key)
-    print(base64.b64encode(bulk_key))
 
-    #set to only be read by user
+    if args.debug: print('bulk key',base64.b64encode(bulk_key),file=sys.stderr)
+
+    #set to only be readable by user
     f = open(args.output_file,'wb')
     f.close()
     os.chmod(args.output_file,stat.S_IRUSR|stat.S_IWUSR)
