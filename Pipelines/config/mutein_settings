@@ -2,10 +2,12 @@
 ## ============ ONLY EDIT THIS SECTION ============
 
 #the Mutein repository folder
-export MUT_DIR=~/repos/Mutein
+#this path should avoid any symlinks to help it work inside singularity as well
+export MUT_DIR=/lustre/home/ccaervi/repos/Mutein
 
 #the Mutein data folder
-export MUT_DATA=~/549_mutein
+#this path should avoid any symlinks to help it work inside singularity as well
+export MUT_DATA=/lustre/scratch/scratch/ccaervi/549_mutein
 
 ## ================================================
 

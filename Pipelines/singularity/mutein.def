@@ -6,6 +6,8 @@
 #export SINGULARITY=/home/ccaervi/mambaforge/envs/mutein_singularity/bin/singularity
 #sudo $SINGULARITY build mutein.sif mutein.def
 
+#missing from the container: "/usr/bin/file" command
+
 #see https://docs.sylabs.io/guides/3.5/user-guide/definition_files.html#header
 #Bootstrap: library
 Bootstrap: docker
@@ -18,4 +20,5 @@ From: centos:7
     yum makecache
     yum -y install epel-release
     yum makecache
+    yum -y install file         #this command not yet baked into the image!
     yum -y install fuse-encfs

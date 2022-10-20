@@ -19,4 +19,11 @@ mkdir -p ${SINGULARITY_CACHEDIR} \
          ${SINGULARITY_LOCALCACHEDIR} \
          ${SINGULARITY_PULLFOLDER}
 
+#run a bootstrap script which ends with "bash" to give an interactive session?
+#need to set PS1 it seems?! may need to set home somehow and not map cwd??
 singularity shell --no-home --bind /lustre containers/mutein.sif
+
+# one way to run a setup script in the container but still get
+# an interactive session
+##singularity shell containers/mutein.sif \
+##  -c "bash script_singularity.sh && /bin/bash -rcfile singularity_bashrc"
