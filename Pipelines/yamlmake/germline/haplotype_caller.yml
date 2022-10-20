@@ -9,7 +9,7 @@
 
     qsub:
         time:  "3:00:00"
-        mem:   "3G"
+        mem:   "1G"
         tmpfs: "10G"
         cores: "4"
 

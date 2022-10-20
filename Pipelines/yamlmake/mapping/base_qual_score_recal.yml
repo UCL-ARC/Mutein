@@ -8,7 +8,7 @@
 
     qsub: 
         time:  "24:00:00" 
-        mem:   "10G"
+        mem:   "6G"
         tmpfs: "20G"
         cores: "2"
 
@@ -37,7 +37,7 @@
 
     qsub: 
         time:  "24:00:00" 
-        mem:   "10G"
+        mem:   "6G"
         tmpfs: "20G"
         cores: "2"
 
@@ -64,6 +64,7 @@
 - action:
     name:  "truncate_all_sort_bam"
     exec:  "local"
+    conda: "main"
     run:   "never"
 
     input:
