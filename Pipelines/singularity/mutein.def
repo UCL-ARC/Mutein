@@ -22,3 +22,5 @@ From: centos:7
     yum makecache
     yum -y install file         #this command not yet baked into the image!
     yum -y install fuse-encfs
+    mkdir -p /mutein_tmp
+    chmod a=rwx,o+t /mutein_tmp

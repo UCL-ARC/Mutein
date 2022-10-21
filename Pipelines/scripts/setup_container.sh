@@ -1,5 +1,10 @@
 #!/bin/bash -l
 
+#
+# this run inside the container upon start up
+# see the separate def file for how to container was originally created
+#
+
 echo start setup_container
 modprobe fuse
 #mkdir -p /tmp/mutein

@@ -26,7 +26,7 @@ mkdir -p ${SINGULARITY_CACHEDIR} \
 #need to prevent /tmp:/tmp mapping without losing /dev/fuse
 
 singularity exec \
-    --no-home --contain --writable-tmpfs \
+    --no-home --writable-tmpfs \
     --bind /lustre \
     containers/mutein.sif \
     ${MUT_DIR}/Pipelines/scripts/setup_container.sh \
