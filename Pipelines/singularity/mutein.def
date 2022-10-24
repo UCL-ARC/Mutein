@@ -1,10 +1,6 @@
 #build this container on a linux machine you have root
-#install conda or mamba first:
-#mamba create -n mutein_singularity
-#mamba activate mutein_singularity
-#mamba install singularity==3.5.3 #to match myriad version incase that matters
-#export SINGULARITY=/home/ccaervi/mambaforge/envs/mutein_singularity/bin/singularity
-#sudo $SINGULARITY build mutein.sif mutein.def
+#first compile singularity using build_singularity.sh
+#then use rebuild_container.sh
 
 #missing from the container: "/usr/bin/file" command
 
@@ -20,7 +16,4 @@ From: centos:7
     yum makecache
     yum -y install epel-release
     yum makecache
-    yum -y install file         #this command not yet baked into the image!
     yum -y install fuse-encfs
-    mkdir -p /mutein_tmp
-    chmod a=rwx,o+t /mutein_tmp

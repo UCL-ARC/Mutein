@@ -1,7 +1,7 @@
 #!/bin/bash -l
 
 #
-# this run inside the container upon start up
+# this runs inside the container upon start up
 # see the separate def file for how to container was originally created
 #
 
