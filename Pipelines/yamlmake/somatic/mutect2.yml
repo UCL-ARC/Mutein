@@ -35,7 +35,7 @@
 
     qsub:
         time:  "3:00:00"
-        mem:   "9G"
+        mem:   "3G"
         tmpfs: "1G"
         cores: "4"
 
@@ -48,8 +48,12 @@
         vcf:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_{*normal}_somatic.vcf.gz"
 
     shell: |
+        MY_TMP_DIR=${TMPDIR}/${RANDOM}${RANDOM}
+        mkdir -p ${MY_TMP_DIR}
+
         gatk --java-options "-Xmx8g" Mutect2 \
           --native-pair-hmm-threads {%qsub/cores} \
+          --tmp-dir ${MY_TMP_DIR} \
           -L {%int} -ip 10 \
           -R {%ref/fasta_bgz} \
           -I {%tbam} \
