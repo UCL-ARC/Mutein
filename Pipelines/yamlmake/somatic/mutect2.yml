@@ -60,3 +60,32 @@
           -I {%nbam} \
           --normal-sample {%dataset_id}_{=subset_id}_{*normal} \
           -O {%vcf}
+
+- action:
+    name:  "mutect2_filter"
+    exec:  "qsub"
+    conda: "gatk4"
+
+    qsub:
+        time:  "3:00:00"
+        mem:   "5G"
+        tmpfs: "1G"
+        cores: "2"
+
+    input:
+        vcf:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_{*normal}_somatic.vcf.gz"
+        int:  "{%intervals}"
+
+    output:
+        vcf_filtered:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_{*normal}_somatic_filtered.vcf.gz"
+
+    shell: |
+        MY_TMP_DIR=${TMPDIR}/${RANDOM}${RANDOM}
+        mkdir -p ${MY_TMP_DIR}
+
+        gatk --java-options "-Xmx8g" FilterMutectCalls \
+          --tmp-dir ${MY_TMP_DIR} \
+          -L {%int} -ip 10 \
+          -R {%ref/fasta_bgz} \
+          -V {%vcf} \
+          -O {%vcf_filtered}
