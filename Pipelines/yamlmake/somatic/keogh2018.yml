@@ -2,3 +2,9 @@
 - include: "../config/keogh2018.yml"
 
 - include: "mutect2.yml"    #run gatk4 Mutect2 pipeline
+
+- include: "varscan.yml"
+
+- include: "deepsnv.yml"
+
+# plink?
