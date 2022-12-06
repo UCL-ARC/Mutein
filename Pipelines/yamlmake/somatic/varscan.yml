@@ -1,12 +1,12 @@
 # Run varscan2, in the same pairwise pattern as mutect2.
 # See also https://varscan.sourceforge.net/using-varscan.html
 - action:
-    name:  "varscan2"
+    name:  "varscan"
     exec:  "qsub"
     conda: "varscan"
 
     qsub:
-        time:  "6:00:00"
+        time:  "2:00:00"
         mem:   "3G"
         cores: "2"
 
@@ -17,8 +17,8 @@
 
     output_base_name: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_{*normal}_somatic_varscan"
     output:
-        snpvcf:  "{%output_base_name}.snp.vcf"
-        indelvcf:  "{%output_base_name}.indel.vcf"
+        snpvcf:  "{%output_base_name}.snp.vcf.gz"
+        indelvcf:  "{%output_base_name}.indel.vcf.gz"
 
     # Varscan requires [m]pileup format as input.
     # We could have instead generated a pileup file from each _bqsr.bam file, and then passed these pairwise to varscan,
@@ -41,3 +41,13 @@
               {%output_base_name} \
               --output-vcf 1 \
               --mpileup 1
+
+        # bgzip and create index, needed for merging
+        for vcf in {%snpvcf} {%indelvcf}; do 
+            bgzip "${vcf%.gz}"
+            bcftools index \
+                --tbi \
+                "$vcf"
+        done
+
+
