@@ -629,7 +629,9 @@ class Conf:
             sub = src[key]
 
             if type(sub) != str:
-                raise Exception(f'key {key} resolves to a {type(sub)} not a string')
+                raise Exception(f'key {key} resolves to a {type(sub)} not a string - '
+                                'perhaps this is a list variable you\'re using in the '
+                                'shell section without reducing it to a string?')
 
             value = value[:m.start(0)] + sub + value[m.end(0):]
 
