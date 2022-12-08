@@ -75,13 +75,16 @@
 
     shell: |
         sing_sort_bam="processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_sing_sort.bam"
-        if [[ ! -f "${sing_sort_bam}" ]] ; then
-            sing_sort_bam=""
+        bam_array=()
+        if [[ -f "${sing_sort_bam}" ]] ; then
+            bam_array+=("${sing_sort_bam}")
         fi
+        bam_array+=("{%pair_sort_bam}")
         samtools merge -u -n -c -p \
           --threads $(({%qsub/cores}-1)) \
           --output-fmt BAM \
-          -o - "${sing_sort_bam}" {%pair_sort_bam} \
+          -o - \
+          "${bam_array[@]}" \
         | samtools addreplacerg -w \
           --input-fmt BAM --output-fmt BAM \
           -r 'ID:{%dataset_id}_{*subset_id}_{*accession}' \
