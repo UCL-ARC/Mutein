@@ -758,6 +758,12 @@ def update_activity_state(action):
     if meta['args'].run_from and action['name'] == meta['args'].run_from:
         meta['reached_run_from'] = True
 
+    #see if we're within the run-from to run-until interval
+    elif meta['reached_run_from'] and not meta['reached_run_until']:
+        meta['is_active'] = True
+    else:
+        meta['is_active'] = False
+
     #see if we've reached the run-until rule
     if meta['args'].run_until and action['name'] == meta['args'].run_until:
         meta['reached_run_until'] = True
@@ -766,11 +772,6 @@ def update_activity_state(action):
     if meta['args'].run_only and not action['name'] in meta['args'].run_only:
         meta['is_active'] = False
 
-    #see if we're within the run-from to run-until interval
-    elif meta['reached_run_from'] and not meta['reached_run_until']:
-        meta['is_active'] = True
-    else:
-        meta['is_active'] = False
 
 def init_meta(args,config):
     global meta
