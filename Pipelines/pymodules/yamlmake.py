@@ -1813,7 +1813,7 @@ def execute_command(config,job_numb,cmd,env):
     ferr = open(ferrname,'w')
 
     try:
-        subprocess.run(cmd,env=env,shell=True,check=True,stdout=fout,stderr=ferr)
+        subprocess.run(cmd, env=env, shell=True, executable='/bin/bash', check=True, stdout=fout, stderr=ferr)
     except subprocess.CalledProcessError:
         failed = True
 
@@ -1886,7 +1886,7 @@ def submit_job_qsub(action,shell_list,job_list):
         flush()
 
         try:
-            subprocess.run(cmd,env=env,shell=True,check=True,stdout=fout,stderr=ferr)
+            subprocess.run(cmd, env=env, shell=True, executable='/bin/bash', check=True, stdout=fout, stderr=ferr)
         except subprocess.CalledProcessError:
             something_failed = True
 
@@ -1961,7 +1961,7 @@ def qsub_execute_job(jobfile):
 
     failed = False
     try:
-        subprocess.run(cmd,env=env,shell=True,check=True)
+        subprocess.run(cmd, env=env, shell=True, executable='/bin/bash', check=True)
     except subprocess.CalledProcessError:
         failed = True
 

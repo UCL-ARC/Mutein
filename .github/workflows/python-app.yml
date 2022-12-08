@@ -5,27 +5,26 @@
 name: Run Python Tests
 on:
   push:
-    branches: [main, testing]
-  pull_request:
     branches: [main]
+  pull_request:
 
 jobs:
-  pytest-run:
+  pytest-yamlmake:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: Install Python 3
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v4
         with:
           python-version: 3.9
+          cache: 'pip'
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-      # Don't we also need to install the conda env?
+          pip install pytest
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - name: Run tests with pytest
         run: |
-          export MUT_DIR=$PWD
-          export MUT_DATA=~/549_mutein
-          source Pipelines/config/mutein_fixed_settings
-          pytest
+          export PATH="$(realpath Pipelines/scripts):${PATH}"
+          export PYTHONPATH="$(realpath Pipelines/pymodules):${PYTHONPATH}"
+          pytest -v Pipelines/yamlmake_testing
