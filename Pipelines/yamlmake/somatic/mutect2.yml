@@ -103,3 +103,36 @@
             {%vcf_filtered}
 
 
+- action:
+    name:  "mutect2_merge"
+    exec:  "local"
+    conda: "bcftools"
+
+    qsub:
+        time:  "0:30:00"
+        mem:   "1G"
+        cores: "2"
+
+    input:
+        vcf_filtered: "processed/{%dataset_id}/{=subset_id}/{+accession}/{+accession}_{+normal}_somatic_mutect2_annotated_filtered.vcf.gz"
+
+    output:
+        vcf_merged: "processed_variants/{%dataset_id}/{=subset_id}/all_somatic_mutect2.vcf.gz"
+
+    # Without the --force-samples option, you get:
+    #    Error: Duplicate sample names (keogh2018_SRP159015_SRR7762372), use --force-samples to proceed anyway.
+    # This produces a file with an extreme number of columns, perhaps like it's doing an NxN matrix. Is this because of the repeated samples?
+
+    # Might need to do a within-person bcftools concat, then a merge? The docs are not particularly clear on what the difference is, or at least how
+    # it applies to my situation (finding somatic variants).
+    # Are duplicates allowed depending on if they're normal or tumour?
+    shell: |
+        bcftools merge \
+            --force-samples \
+            -Oz \
+            -o {%vcf_merged} \
+            {%vcf_filtered/ }
+
+        bcftools index \
+            --tbi \
+            {%vcf_merged}

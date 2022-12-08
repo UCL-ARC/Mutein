@@ -51,3 +51,32 @@
         done
 
 
+# previous step seems to only emit variants that pass the filter
+# but I'm missing the step of only including SS=2 variants!
+# bcftools filter can probably do this step but for now use grep or something...
+- action:
+    name:  "varscan_merge"
+    exec:  "local"
+    conda: "bcftools"
+
+    qsub:
+        time:  "2:00:00"
+        mem:   "3G"
+        cores: "2"
+
+    input:
+        somatic_vars: "processed/{%dataset_id}/{=subset_id}/{+accession}/{+accession}_{+normal}_somatic_varscan.{+snpindel}.vcf.gz"
+
+    output:
+        vcf_merged:  "processed_variants/{%dataset_id}/{=subset_id}/all_somatic_varscan.vcf.gz"
+
+    shell: |
+        bcftools merge \
+            --force-samples \
+            -Oz \
+            -o {%vcf_merged} \
+            {%somatic_vars}
+
+        bcftools index \
+            --tbi \
+            {%vcf_merged}
