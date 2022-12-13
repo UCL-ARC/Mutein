@@ -759,12 +759,10 @@ def update_activity_state(action):
         meta['reached_run_from'] = True
 
     #see if we're within the run-from to run-until interval
-    elif meta['reached_run_from'] and not meta['reached_run_until']:
-        meta['is_active'] = True
-    else:
-        meta['is_active'] = False
+    meta['is_active'] = meta['reached_run_from'] and not meta['reached_run_until']
 
-    #see if we've reached the run-until rule
+    # see if we've reached the run-until rule (will only take effect next rule,
+    # because we still want the current rule to run)
     if meta['args'].run_until and action['name'] == meta['args'].run_until:
         meta['reached_run_until'] = True
 
