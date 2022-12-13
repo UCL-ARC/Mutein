@@ -37,23 +37,41 @@ def test_idempotence_from_empty(num_reps, tmpdir):
         cp = run_yamlmake('basictest.yml', tmpdir)
         # should detect failure every time
         assert cp.returncode == 2
-        assert os.path.isfile(tmpdir / 'good.txt')
+        assert os.path.isfile(tmpdir / 'good0.txt')
+        assert os.path.isfile(tmpdir / 'good1.txt')
         # file created by the failed command should still be present (might be needed for debugging) but
         # will be marked as bad by setting the special mtime value
         assert os.path.isfile(tmpdir / 'bad.txt')
         assert STALE_DATETIME == os.path.getmtime(tmpdir / 'bad.txt')
         # no unexpected files have crept in
         assert os.path.isdir(tmpdir / 'yamlmake_logs')
-        assert_count_items_dir(tmpdir, 3)
+        assert_count_items_dir(tmpdir, 4)
         assert not os.path.exists(tmpdir / 'verybad.txt')
 
 def test_run_until(tmpdir):
     assert_count_items_dir(tmpdir, 0)
-    cp = run_yamlmake('basictest.yml', tmpdir, ['--run-until', 'jeremy'])
+    cp = run_yamlmake('basictest.yml', tmpdir, ['--run-until', 'jeremy1'])
     # we instructed it to stop before the task that fails, therefore should return success
     assert cp.returncode == 0
-    assert os.path.isfile(tmpdir / 'good.txt')
+    assert os.path.isfile(tmpdir / 'good0.txt')
+    assert os.path.isfile(tmpdir / 'good1.txt')
     assert os.path.isdir(tmpdir / 'yamlmake_logs')
-    assert not os.path.isfile(tmpdir / 'bad.txt')
-    assert not os.path.exists(tmpdir / 'verybad.txt')
+    assert_count_items_dir(tmpdir, 3)
+
+def test_run_from(tmpdir):
+    assert_count_items_dir(tmpdir, 0)
+    cp = run_yamlmake('basictest.yml', tmpdir, ['--run-from', 'jeremy1'])
+    assert cp.returncode == 2
+    assert os.path.isfile(tmpdir / 'good1.txt')
+    assert os.path.isfile(tmpdir / 'bad.txt')
+    assert os.path.isdir(tmpdir / 'yamlmake_logs')
+    assert_count_items_dir(tmpdir, 3)
+
+
+def test_run_only(tmpdir):
+    assert_count_items_dir(tmpdir, 0)
+    cp = run_yamlmake('basictest.yml', tmpdir, ['--run-only', 'jeremy1'])
+    assert cp.returncode == 0
+    assert os.path.isfile(tmpdir / 'good1.txt')
+    assert os.path.isdir(tmpdir / 'yamlmake_logs')
     assert_count_items_dir(tmpdir, 2)
