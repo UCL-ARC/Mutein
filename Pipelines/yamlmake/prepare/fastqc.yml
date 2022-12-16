@@ -2,14 +2,16 @@
 #this will catch pre- and post-trimming files
 - action:
     name: "fastqc"
-    exec: "local"
+    exec: "qsub"
     conda: "trim-galore"
 
+    # fastqc uses max one thread per file, we are passing
+    # in one file at a time, so request 1 core only
     qsub:
-      time:  "1:00:00"
+      time:  "0:30:00"
       mem:   "1G"
       tmpfs: "15G"
-      cores: "4"
+      cores: "1"
 
     input:
       fastq: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*file}.fastq.gz"

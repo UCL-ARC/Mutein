@@ -29,6 +29,6 @@
         JAVA_HOME: "-"
         JAVA_LD_LIBRARY_PATH: "-"
 
-    working_dir:    "/lustre/scratch/scratch/{$USER}/549_mutein"
+    working_dir:    "{$MUT_DATA}"
     conf_dir:       "{$MUT_DIR}/Pipelines/yamlmake"
     conda_channels: "--override-channels -c conda-forge -c defaults -c bioconda"

@@ -9,8 +9,8 @@
 
     qsub:
         time:  "3:00:00"
-        mem:   "9G"
-        tmpfs: "1G"
+        mem:   "1G"
+        tmpfs: "10G"
         cores: "4"
 
     input:
@@ -21,7 +21,11 @@
         vcf:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_germ.vcf.gz"
 
     shell: |
+        MY_TMP_DIR=${TMPDIR}/${RANDOM}${RANDOM}
+        mkdir -p ${MY_TMP_DIR}
+
         gatk --java-options "-Xmx8g" HaplotypeCaller \
+          --tmp-dir ${MY_TMP_DIR} \
           --native-pair-hmm-threads {%qsub/cores} \
           -L {%int} -ip 10 \
           -R {%ref/fasta_bgz} \

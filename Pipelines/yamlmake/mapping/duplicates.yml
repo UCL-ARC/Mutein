@@ -10,7 +10,7 @@
 
     qsub: 
         time:  "24:00:00"
-        mem:   "10G"
+        mem:   "6G"
         tmpfs: "20G"
         cores: "2"
 
@@ -48,7 +48,7 @@
 
     qsub: 
         time:  "24:00:00"
-        mem:   "10G"
+        mem:   "6G"
         tmpfs: "20G"
         cores: "3"
 
@@ -70,3 +70,23 @@
         > {%obam}
 
         samtools index -@ ${EXTRA_THREADS} {%obam}
+
+#truncate _dedup bams
+- action:
+    name:  "truncate_dedup_bam"
+    exec:  "local"
+    conda: "main"
+    run:   "never"
+
+    input:
+        dedup:   "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_dedup.bam"
+
+    output:
+        touch:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{%name}.touch"
+
+    shell: |
+        #truncate deduped bam
+        mutein truncate "{%dedup}"
+
+        #signal truncation was carried out
+        touch {%touch}

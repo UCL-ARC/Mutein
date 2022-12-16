@@ -1,0 +1,46 @@
+- action:
+    name:  "deepsnv"
+    exec:  "qsub"
+    conda: "bioconductor"
+
+    qsub:
+        time:  "6:00:00"
+        mem:   "3G"
+        cores: "2"
+
+    # need inputs and outputs
+
+    shell: |
+        # R:
+        require(deepSNV)
+        # the start and end appear to be inclusive
+        # this should I think list all known somatic variant regions so we can test the likelihood of them being real
+        # Keogh only used this to exclude (ie. to improve specificity) rather than to find new variants, so this can probably be left til later
+        chrs <- c("chr1", "chr1", "chr1", "chr1", "chr1", "chr1", "chr1")
+        snps <- c(7969451, 146156528, 146156796, 148607458, 148607726, 149390817, 149463510)
+        regions <- data.frame(chr=chrs, start = snps, stop = snps)
+
+        # Given:
+        # processed/keogh2018/SRP159015/SRR7762548/SRR7762548_SRR7762377_somatic_varscan.snp.vcf:chr1     7969451 .       A       G
+        # processed/keogh2018/SRP159015/SRR7762548/SRR7762548_SRR7762378_somatic_varscan.snp.vcf:chr1     7969451 .       A       G
+
+        ex <- deepSNV(
+          # .bai files must exist too
+          # test = "processed/keogh2018/SRP159015/SRR7762418/SRR7762418_bqsr.bam",
+          # control = "processed/keogh2018/SRP159015/SRR7762417/SRR7762417_bqsr.bam",
+          test = "processed/keogh2018/SRP159015/SRR7762548/SRR7762548_bqsr.bam",
+          control = "processed/keogh2018/SRP159015/SRR7762377/SRR7762377_bqsr.bam",
+          regions=regions,
+          q=10)
+
+        # Gives:
+        #              A         T         C            G         -
+        # [1,]        NA 1.0000000 0.8465736 1.719076e-15 1.0000000
+        # [2,] 0.5965736        NA 0.5965736 5.965736e-01 0.5965736
+        # [3,] 0.8465736 0.5965736 0.8465736           NA 0.5965736
+        # [4,] 0.5965736        NA 0.5965736 5.965736e-01 0.5965736
+        # [5,] 0.5965736 0.5965736 0.5965736           NA 0.5965736
+        # [6,] 0.1072473 1.0000000        NA 8.465736e-01 0.4180277
+        # [7,] 0.8465736 0.5965736        NA 5.965736e-01 0.5965736
+
+        # Which suggests that 7969451 A->G is real!

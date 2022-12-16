@@ -56,6 +56,7 @@ list2job_regx  = r'\{=.+?\}'       #{=list} ==> split into separate jobs
 list2list_regx  = r'\{-.+?\}'      #{-list} ==> become in-job list
 
 warning_prefix = 'WARNING: '
+error_prefix = 'ERROR: '
 illegal_chrs = '\\\n\r\t\'" *?:;,/#%&{}<>+`|=$!@'
 
 default_log_dir = 'yamlmake_logs'
@@ -628,7 +629,9 @@ class Conf:
             sub = src[key]
 
             if type(sub) != str:
-                raise Exception(f'key {key} resolves to a {type(sub)} not a string')
+                raise Exception(f'key {key} resolves to a {type(sub)} not a string - '
+                                'perhaps this is a list variable you\'re using in the '
+                                'shell section without reducing it to a string?')
 
             value = value[:m.start(0)] + sub + value[m.end(0):]
 
@@ -686,7 +689,7 @@ def show(item,label=None,indent=2):
 
 def check_cwd(config):
     if 'working_dir' in config:
-        if os.path.realpath(os.getcwd()) != config['working_dir']:
+        if os.path.realpath(os.getcwd()) != os.path.realpath(config['working_dir']):
             print("warning: current path is not the expected working directory")
             print(f"expecting: {config['working_dir']}")
             print(f"but found {os.path.realpath(os.getcwd())}")
@@ -755,7 +758,11 @@ def update_activity_state(action):
     if meta['args'].run_from and action['name'] == meta['args'].run_from:
         meta['reached_run_from'] = True
 
-    #see if we've reached the run-until rule
+    #see if we're within the run-from to run-until interval
+    meta['is_active'] = meta['reached_run_from'] and not meta['reached_run_until']
+
+    # see if we've reached the run-until rule (will only take effect next rule,
+    # because we still want the current rule to run)
     if meta['args'].run_until and action['name'] == meta['args'].run_until:
         meta['reached_run_until'] = True
 
@@ -763,11 +770,6 @@ def update_activity_state(action):
     if meta['args'].run_only and not action['name'] in meta['args'].run_only:
         meta['is_active'] = False
 
-    #see if we're within the run-from to run-until interval
-    elif meta['reached_run_from'] and not meta['reached_run_until']:
-        meta['is_active'] = True
-    else:
-        meta['is_active'] = False
 
 def init_meta(args,config):
     global meta
@@ -1562,8 +1564,14 @@ def remove_item(path):
 def remove_tree(path):
     if is_active(): shutil.rmtree(path)
 
-def warning(item,end='\n',timestamp=True):
-    message(col["yellow"]+warning_prefix+item+col["none"],end=end,timestamp=timestamp)
+def warning(item, end='\n', timestamp=True):
+    message(col["yellow"] + warning_prefix + item + col["none"], end=end, timestamp=timestamp)
+
+def error(item, end='\n', timestamp=True):
+    message(col["red"] + error_prefix + item + col["none"], end=end, timestamp=timestamp)
+
+def failed_command_error(cmdname, foutname, ferrname, end='\n', timestamp=True):
+    error(f'{cmdname} failed.{end}STDOUT: {foutname}{end}STDERR: {ferrname}', end=end, timestamp=timestamp)
 
 def header(item,end='\n',timestamp=True):
     line = '-'*(70-len(item))
@@ -1812,8 +1820,10 @@ def execute_command(config,job_numb,cmd,env):
     fout.close()
     ferr.close()
 
-    if failed: warning('command failed')
-    else:      message('command completed normally')
+    if failed:
+        failed_command_error('command', foutname, ferrname)
+    else:
+        message('command completed normally')
 
     flush()
     return failed
@@ -1883,8 +1893,10 @@ def submit_job_qsub(action,shell_list,job_list):
         fout.close()
         ferr.close()
 
-        if something_failed: warning(f'qsub call failed')
-        else:                message(f'qsub call succeeded')
+        if something_failed:
+            failed_command_error('qsub', foutname, ferrname)
+        else:
+            message(f'qsub call succeeded')
 
     #delay to allow for shared filesystem latency on status files
     message(f'sleeping for {action["ym/remote_delay_secs"]} seconds to allow for filesystem latency...')
@@ -1909,14 +1921,14 @@ def submit_job_qsub(action,shell_list,job_list):
             if status == "okay":
                 message(f"job {job_numb+1} status: {status}")
             else:
-                warning(f"job {job_numb+1} status: {status}")
+                error(f"job {job_numb+1} status: {status}")
                 failed = True
 
-        if failed == False:
+        if not failed:
             #job has also failed if not all required outputs were created
             failed = verify_expected_outputs(action,job_list[job_numb]["output"],job_list[job_numb]["input"])
 
-        if failed == True:
+        if failed:
             #deal with output of failed job
             handle_failed_outputs(action,job_list[job_numb]["output"])
             something_failed = True
@@ -2035,11 +2047,11 @@ def execute_jobs(action,shell_list,job_list):
             #reports only explicit job failure from exit code
             failed = execute_command(action,job_numb,cmd,env)
 
-            if failed == False:
+            if not failed:
                 #job has also failed if not all required outputs were created/updated
                 failed = verify_expected_outputs(action,job_list[job_numb]["output"],job_list[job_numb]["input"])
 
-            if failed == True:
+            if failed:
                 #carry out config controlled action on outputs of failed job
                 #ie delete, recycle, mark as stale or ignore
                 handle_failed_outputs(action,job_list[job_numb]["output"])
@@ -2150,7 +2162,7 @@ def process(pipeline,path,config=None,args=None):
                 if activity_state() == 'dryrun':
                     warning('action failed due to dryrun mode, continuing pipeline anyway')
                 else:
-                    warning('aborting pipeline due to failed action')
+                    error('aborting pipeline due to failed action')
                     return 2
 
         elif item_type == 'config':

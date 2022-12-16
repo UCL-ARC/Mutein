@@ -7,25 +7,24 @@
     conda: "bwa"
 
     qsub: 
-        time:  "24:00:00"
-        mem:   "10G"
+        time:  "3:00:00"
+        mem:   "4G"
         tmpfs: "20G"
-        cores: "2"
+        # 4x speedup is achievable, haven't tested more
+        cores: "4"
 
     input:
         read1: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_trim_1.fastq.gz"
         read2: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_trim_2.fastq.gz"
-
     output:
-        bam:   "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_pair_sort.bam"
+        pair_sort_bam: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_pair_sort.bam"
 
     shell: |
-        SAMTOOLS_TMP=${TMPDIR}/${USER}-${RANDOM}${RANDOM}
-        mkdir -p ${SAMTOOLS_TMP}
+        SAMTOOLS_TEMPLATE_TMP=${TMPDIR}/${USER}-${RANDOM}${RANDOM}
 
         bwa mem -t {%qsub/cores} {%ref/fasta_bgz} {%read1} {%read2} \
-        | samtools sort -n -T ${SAMTOOLS_TMP} -O bam -m 2G - \
-        > {%bam}
+        | samtools sort -n -T "${SAMTOOLS_TEMPLATE_TMP}" -O bam -m 2G - \
+        > "{%pair_sort_bam}"
 
 #map single reads to reference with bwa
 #sort by read name ready for duplicate marking, output to bam
@@ -35,25 +34,24 @@
     exec:  "qsub"
     conda: "bwa"
 
-    qsub: 
-        time:  "24:00:00"
-        mem:   "10G"
+    qsub:
+        time:  "02:00:00"
+        mem:   "4G"
         tmpfs: "20G"
-        cores: "2"
+        # 4x speedup is achievable, haven't tested more
+        cores: "4"
 
     input:
-        read: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_trim.fastq.gz"
+        sing_trim: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_trim.fastq.gz"
 
     output:
-        bam:  "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_sing_sort.bam"
+        sing_sort_bam: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_sing_sort.bam"
 
     shell: |
-        SAMTOOLS_TMP=${TMPDIR}/${USER}-${RANDOM}${RANDOM}
-        mkdir -p ${SAMTOOLS_TMP}
-
-        bwa mem -t {%qsub/cores} {%ref/fasta_bgz} {%read} \
-        | samtools sort -n -T ${SAMTOOLS_TMP} -O bam -m 2G - \
-        > {%bam}
+        SAMTOOLS_TEMPLATE_TMP=${TMPDIR}/${USER}-${RANDOM}${RANDOM}
+        bwa mem -t {%qsub/cores} {%ref/fasta_bgz} {%sing_trim} \
+            | samtools sort -n -T "${SAMTOOLS_TEMPLATE_TMP}" -O bam -m 2G - \
+            > "{%sing_sort_bam}"
 
 #merge single and paired read alignments into single bam
 #if no single read bam do a redundant "merge" of the paired file alone
@@ -64,25 +62,31 @@
     exec:  "qsub"
     conda: "bwa"
 
-    qsub: 
-        time:  "24:00:00"
-        mem:   "6G"
+    qsub:
+        time:  "3:00:00"
+        mem:   "4G"
         cores: "4"
 
     input:
-        pair:  "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_pair_sort.bam"
+        pair_sort_bam: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_pair_sort.bam"
 
     output:
         all:   "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_all_sort.bam"
 
     shell: |
-        sing="processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_sing_sort.bam"
-        if [[ ! -f "${sing}" ]] ; then
-            sing=""
+        sing_sort_bam="processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_sing_sort.bam"
+        bam_array=()
+        if [[ -f "${sing_sort_bam}" ]] ; then
+            bam_array+=("${sing_sort_bam}")
         fi
-
-        samtools merge -u -n -c -p --threads $(({%qsub/cores}-1)) -o - ${sing} {%pair}
+        bam_array+=("{%pair_sort_bam}")
+        samtools merge -u -n -c -p \
+          --threads $(({%qsub/cores}-1)) \
+          --output-fmt BAM \
+          -o - \
+          "${bam_array[@]}" \
         | samtools addreplacerg -w \
+          --input-fmt BAM --output-fmt BAM \
           -r 'ID:{%dataset_id}_{*subset_id}_{*accession}' \
           -r 'SM:{%dataset_id}_{*subset_id}_{*accession}' \
           -r 'PL:{%platform}' \
@@ -96,6 +100,7 @@
     name:  "truncate_premerged_bams"
     exec:  "local"
     conda: "main"
+    run:   "never"
 
     input:
         pair:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_pair_sort.bam"

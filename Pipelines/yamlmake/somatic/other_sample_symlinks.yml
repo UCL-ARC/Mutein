@@ -1,0 +1,24 @@
+#create symlinks within each accession's folder to all other accessions from same individual
+- action:
+    name:  "other_sample_symlinks"
+    exec:  "local"
+    conda: "main"
+
+    input:
+        metadata: "datasets/{%dataset_id}/{=subset_id}/{*accession}/.meta/other_sample_accessions"
+        bam:      "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_bqsr.bam"
+
+    output:
+        touch:    "processed/{%dataset_id}/{=subset_id}/{*accession}/.meta/{%name}.touch"
+
+    shell: |
+        #symlinks to bams of all accessions from the same individual
+        for acc in $(cat {%metadata})
+        do
+            mutein symlink \
+              --target processed/{%dataset_id}/{=subset_id}/${acc}/${acc}_bqsr.bam \
+              --link   processed/{%dataset_id}/{=subset_id}/{*accession}/${acc}_link.bam
+        done
+
+        touch {%touch}
+

@@ -1,4 +1,14 @@
 #define dataset_id and subset_list
 - include: "../config/keogh2018.yml"
 
+# run preparatory step that other typing tools need
+- include: "other_sample_symlinks.yml"
+
 - include: "mutect2.yml"    #run gatk4 Mutect2 pipeline
+
+- include: "varscan.yml"
+
+# not ready yet
+#- include: "deepsnv.yml"
+
+# plink?

@@ -8,7 +8,7 @@
 
     qsub: 
         time:  "24:00:00" 
-        mem:   "10G"
+        mem:   "6G"
         tmpfs: "20G"
         cores: "2"
 
@@ -19,8 +19,12 @@
         bqsr:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_posn_sort.bqsr"
 
     shell: |
+        MY_TMP_DIR=${TMPDIR}/${RANDOM}${RANDOM}
+        mkdir -p ${MY_TMP_DIR}
+
         gatk --java-options "-Xmx8G" \
           BaseRecalibrator \
+          --tmp-dir ${MY_TMP_DIR} \
           -I {%ibam} \
           -R {%ref/fasta_bgz} \
           -O {%bqsr} \
@@ -33,7 +37,7 @@
 
     qsub: 
         time:  "24:00:00" 
-        mem:   "10G"
+        mem:   "6G"
         tmpfs: "20G"
         cores: "2"
 
@@ -45,8 +49,12 @@
         obam:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_bqsr.bam"
 
     shell: |
+        MY_TMP_DIR=${TMPDIR}/${RANDOM}${RANDOM}
+        mkdir -p ${MY_TMP_DIR}
+
         gatk --java-options "-Xmx8G" \
           ApplyBQSR \
+            --tmp-dir ${MY_TMP_DIR} \
             -I {%ibam} \
             -R {%ref/fasta_bgz} \
             --bqsr-recal-file {%bqsr} \
@@ -56,6 +64,7 @@
 - action:
     name:  "truncate_all_sort_bam"
     exec:  "local"
+    conda: "main"
     run:   "never"
 
     input:

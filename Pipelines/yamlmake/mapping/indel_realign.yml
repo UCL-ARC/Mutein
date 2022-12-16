@@ -17,9 +17,9 @@
 
     qsub: 
         time:  "24:00:00"
-        mem:   "20G"
+        mem:   "2G"
         tmpfs: "20G"
-        cores: "4"
+        cores: "16"
 
     input:
         ibam:   "processed/{%dataset_id}/{=subset_id}/{+accession}/{+accession}_posn_sort.bam"
@@ -49,12 +49,6 @@
 - action:
     name:  "indel_realigner_mapfile"
     exec:  "local"
-
-    qsub:
-        time:  "24:00:00"
-        mem:   "20G"
-        tmpfs: "20G"
-        cores: "4"
 
     input:
         ibam:   "processed/{%dataset_id}/{=subset_id}/{+accession}/{+accession}_posn_sort.bam"
@@ -125,7 +119,7 @@
 
     qsub:
         time:  "24:00:00"
-        mem:   "20G"
+        mem:   "12G"
         tmpfs: "20G"
         cores: "2"
 
