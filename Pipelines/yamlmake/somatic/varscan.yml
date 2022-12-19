@@ -75,7 +75,7 @@
             --force-samples \
             -Oz \
             -o {%vcf_merged} \
-            {%somatic_vars}
+            {%somatic_vars/ }
 
         bcftools index \
             --tbi \
