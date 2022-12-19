@@ -44,7 +44,7 @@
 
         # bgzip and create index, needed for merging
         for vcf in {%snpvcf} {%indelvcf}; do 
-            bgzip "${vcf%.gz}"
+            bgzip -f "${vcf%.gz}"
             bcftools index \
                 --tbi \
                 "$vcf"
