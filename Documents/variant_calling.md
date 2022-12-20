@@ -27,9 +27,13 @@ If you will require frequent downloading of the latest version then you need to 
 
 If you have the git command available you can clone the repository, otherwise you can download the repository as a zip file and extract it. Either way put the repository in a suitable folder, such as ~/repos, that is not your intended data folder.
 
-    mkdir -p ~/repos && cd !$
+    mkdir -p ~/repos && cd ~/repos
 
 and then either:
+
+    git clone git@github.com:UCL/Mutein.git
+    
+or:
 
     git clone https://github.com/UCL/Mutein.git
 
