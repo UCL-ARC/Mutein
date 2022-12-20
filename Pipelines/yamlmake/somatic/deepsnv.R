@@ -8,6 +8,7 @@ args = commandArgs(trailingOnly=TRUE)
 tumour_bam = args[1]
 normal_bam = args[2]
 potential_variants_file = args[3]
+out_file_name = args[4]
 rm(args)
 
 regions_of_interest <- read.table(
@@ -38,12 +39,13 @@ ds <- deepSNV(
 
 # What's a good cutoff?
 
+P_VALUE_CUTOFF = 0.001
 # what format does bcftools annotate need?
 combined_df <- cbind(regions_of_interest, ds@p.val)
 combined_df$QUAL <- apply(combined_df, 1, function(row) {'.'})
 combined_df$FILTER <- apply(combined_df, 1,
     function(row) {
-        p_value_cutoff = 0.001
+        p_value_cutoff = P_VALUE_CUTOFF
         potential_alt <- row['ALT']
         if (! is.na(row[potential_alt]) && row[potential_alt] <= p_value_cutoff) {
             # should you explicitly say PASS, or should it be NULL so it
@@ -60,17 +62,19 @@ vcf_cols = c('CHROM', 'POS', 'ID', 'REF', 'ALT', 'QUAL', 'FILTER', 'INFO')
 # do this right
 # quick and dirty vcf
 # we want no quotes and to start with a #
-write(vcf_cols, sep=)
-# Also need to have:
-#
-##fileformat=VCFv4.1
-##FILTER=<ID=PASS,Description="All filters passed">          
-##FILTER=<ID=deepSNVFail,Description="something something">  
-
-# And then it actually works!!!
-
+out_file = file(out_file_name, open = "wt")
+cat(sprintf('##fileformat=VCFv4.1
+##FILTER=<ID=PASS,Description="All filters passed">
+##FILTER=<ID=deepSNVFail,Description="DeepSNV, failed to meet p-value cutoff of %g">
+#', P_VALUE_CUTOFF), file=out_file)
+cat(vcf_cols, sep='\t', file = out_file)
+cat('\n', file = out_file)
 write.table(
     combined_df[,vcf_cols],
     sep='\t',
-    col.names=FALSE
+    file=out_file,
+    quote=FALSE,
+    col.names=FALSE,
     row.names=FALSE)
+
+close(out_file)

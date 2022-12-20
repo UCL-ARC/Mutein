@@ -15,8 +15,8 @@
 
     input:
         vcf: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_{*normal}{=file_prefixes}.vcf.gz"
-        tbam: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_bqsr.bam.vcf.gz"
-        nbam: "processed/{%dataset_id}/{=subset_id}/{*normal}/{*normal}_bqsr.bam.vcf.gz"
+        tbam: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_bqsr.bam"
+        nbam: "processed/{%dataset_id}/{=subset_id}/{*normal}/{*normal}_bqsr.bam"
  
     output:
         regions_of_interest: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_{*normal}{=file_prefixes}_regions_of_interest.tsv"
@@ -27,7 +27,11 @@
       # spit out the positions from the VCFs that we wish to verify
       bcftools query -f '%CHROM\t%POS\t%ID\t%REF\t%ALT\n' {%vcf} > {%regions_of_interest}
       # Run deepsnv on these positions
-      Rscript deepsnv.R {%tbam} {%nbam} {%regions_of_interest} > {%deepsnv_output}
+      Rscript "{$MUT_DIR}"/Pipelines/yamlmake/somatic/deepsnv.R \
+        {%tbam} \
+        {%nbam} \
+        {%regions_of_interest} \
+        {%deepsnv_output}
 
       bgzip -f {%deepsnv_output}
       bcftools index -f --tbi {%deepsnv_output}
