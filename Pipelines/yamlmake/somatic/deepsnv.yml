@@ -30,10 +30,11 @@
       deepsnv_annotations_vcf_gz="{%deepsnv_annotations_vcf_gz}"
       deepsnv_annotations_vcf="${deepsnv_annotations_vcf_gz%.*}"
       Rscript "{$MUT_DIR}"/Pipelines/yamlmake/somatic/deepsnv.R \
-        {%tbam} \
-        {%nbam} \
-        {%regions_of_interest} \
-        "$deepsnv_annotations_vcf"
+        --tumour-bam {%tbam} \
+        --normal-bam {%nbam} \
+        --potential-variants {%regions_of_interest} \
+        --one-by-one \
+        --out "$deepsnv_annotations_vcf"
 
       bgzip -f "$deepsnv_annotations_vcf"
       bcftools index -f --tbi "$deepsnv_annotations_vcf_gz"
