@@ -45,31 +45,41 @@ regions_of_interest <- read.table(
                         file=potential_variants_file,
                         header=FALSE,
                         col.names=c('CHROM', 'POS', 'ID', 'REF', 'ALT'))
+# fix the IDs in a column (row names get rewritten by semi_join)
+regions_of_interest$roi_id = rownames(regions_of_interest)
 
+# This list is dataset specific, and determined experimentally using the --one-by-one option to this script.
+# The crash logs can then be grepped as follows to identify the position(s) causing a crash.
+# Only the first crashing position per sample will be detected, therefore after adding rows
+# to bad_data, you will need to re-run everything, and you will get a (hopefully) smaller set of crashing rows to
+# add, until you've caught every one.
 # grep -h -B 2 'caught segfault'  yamlmake_logs/mut.20221221.172252.736840.deepsnv.*.err | grep Calling | sort | uniq
 
-# grep -B4 'caught segfault' yamlmake_logs/mut.20221221.154521.512993.deepsnv.*.err | view -
+# Ideally I would find out the root cause of the crashing (maybe some property of
+# the position is evident in the BAM file so bad locations could be automatically identified?)
 bad_data = rbind(
-    data.frame(CHR='chr1',  POS=20633892),
-    data.frame(CHR='chr1',  POS=20645555),
-    data.frame(CHR='chr1',  POS=20645618),
-    data.frame(CHR='chr1',  POS=226883824),
-    data.frame(CHR='chr2',  POS=201711098),
-    data.frame(CHR='chr2',  POS=29320797),
-    data.frame(CHR='chr2',  POS=74370400),
-    data.frame(CHR='chr4',  POS=95206718),
-    data.frame(CHR='chr5',  POS=70067122),
-    data.frame(CHR='chr6',  POS=117301070),
-    data.frame(CHR='chr6',  POS=117383318),
-    data.frame(CHR='chr6',  POS=151879295),
-    data.frame(CHR='chr6',  POS=152061247),
-    data.frame(CHR='chr7',  POS=154052934),
-    data.frame(CHR='chr7',  POS=154880936),
-    data.frame(CHR='chr7',  POS=154889340),
-    data.frame(CHR='chr9',  POS=136513000),
+    data.frame(CHR='chr1', POS=20633892),
+    data.frame(CHR='chr1', POS=20645555),
+    data.frame(CHR='chr1', POS=20645618),
+    data.frame(CHR='chr1', POS=226883824),
+    data.frame(CHR='chr2', POS=29320797),
+    data.frame(CHR='chr2', POS=74370400),
+    data.frame(CHR='chr2', POS=201711098),
+    data.frame(CHR='chr4', POS=95206718),
+    data.frame(CHR='chr5', POS=70067122),
+    data.frame(CHR='chr5', POS=150120109),
+    data.frame(CHR='chr6', POS=117301070),
+    data.frame(CHR='chr6', POS=117383318),
+    data.frame(CHR='chr6', POS=151879295),
+    data.frame(CHR='chr6', POS=152061247),
+    data.frame(CHR='chr7', POS=154052934),
+    data.frame(CHR='chr7', POS=154880936),
+    data.frame(CHR='chr7', POS=154889340),
+    data.frame(CHR='chr9', POS=136513000),
     data.frame(CHR='chr10', POS=13125860),
-    data.frame(CHR='chr11', POS=121605089),
+    data.frame(CHR='chr10', POS=43120057),
     data.frame(CHR='chr11', POS=32435148),
+    data.frame(CHR='chr11', POS=121605089),
     data.frame(CHR='chr11', POS=64805130),
     data.frame(CHR='chr12', POS=40309044),
     data.frame(CHR='chr12', POS=40320071),
@@ -86,56 +96,29 @@ bad_data = rbind(
     data.frame(CHR='chr19', POS=15174241),
     data.frame(CHR='chr19', POS=15184323),
     data.frame(CHR='chr21', POS=34887027),
+    data.frame(CHR='chr21', POS=38403636),
     data.frame(CHR='chr21', POS=41473456),
     data.frame(CHR='chr21', POS=41507982),
+    data.frame(CHR='chr22', POS=23766225),
+    data.frame(CHR='chr22', POS=23767587),
     data.frame(CHR='chr22', POS=32479203)
-
-# Next go:
-#  chr10 13125860
-#  chr11 32435148
-#  chr11 64805130
-#  chr1 20633892
-#  chr1 20645555
-#  chr1 20645618
-#  chr12 40309044
-#  chr12 40320071
-#  chr12 40364850
-#  chr14 36520594
-#  chr15 34348017
-#  chr15 34348177
-#  chr16 31182621
-#  chr16 46662372
-#  chr16 68737447
-#  chr17 39723335
-#  chr17 45993928
-#  chr19 15160960
-#  chr19 15174241
-#  chr19 15184323
-#  chr21 34887027
-#  chr21 38403636
-#  chr21 41473456
-#  chr21 41507982
-#  chr22 23767587
-#  chr22 32479203
-#  chr2 29320797
-#  chr2 74370400
-#  chr4 95206718
-#  chr5 70067122
 
 
 
 )
-bad_rownums = which(apply(regions_of_interest, 1,
-function(roi_row) {
-    return(any(bad_data$CHR == roi_row['CHROM'] & bad_data$POS == roi_row['POS']))
-}))
 
-# bad_rownums = which(regions_of_interest$CHR == 'chr10' & regions_of_interest$POS == '13125860')
+# use the roi_id because semi_join generates rows with new row names
+bad_rownums = semi_join(regions_of_interest, bad_data, 
+                                 by = c('CHROM' = 'CHR', 'POS' = 'POS'))$roi_id
+
 if (length(bad_rownums) > 0) {
     warning('Omitting bad data known to cause segfault in R:\n',
         paste0(capture.output(regions_of_interest[bad_rownums,]), collapse='\n'))
-    regions_of_interest = regions_of_interest[-bad_rownums,]
+    regions_of_interest = regions_of_interest[!rownames(regions_of_interest) %in% bad_rownums,]
 }
+
+# finished with this
+regions_of_interest$roi_id <- NULL
 
 # The start and end are inclusive,
 # so identical start and stop params gives us single nucleotide regions of interest
