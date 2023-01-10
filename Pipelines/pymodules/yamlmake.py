@@ -770,6 +770,9 @@ def update_activity_state(action):
     if meta['args'].run_only and not action['name'] in meta['args'].run_only:
         meta['is_active'] = False
 
+    meta['log_path_prefix'] = os.path.join(meta['log_dir'],
+                                    meta['prefix'] + meta['start_time'])
+
 
 def init_meta(args,config):
     global meta
@@ -1595,8 +1598,7 @@ def message(item,end='\n',timestamp=True):
         sys.stdout.flush()
 
     if meta['args'].no_logs != True:
-        path = os.path.join(meta['log_dir'],
-                            meta['prefix']+meta['start_time']+'.messages')
+        path = meta["log_path_prefix"] + '.messages'
 
         try:
             with open(path,'a') as f:
@@ -1766,7 +1768,7 @@ def generate_job_environment(config,job_numb,njobs):
 def write_jobfile(action,shell_list):
     'save action config and shell_list as json'
 
-    fnamebase = f'{action["ym/prefix"]}{timestamp_now()}.{action["name"]}'
+    fnamebase = f'{action["ym/prefix"]}{meta["start_time"]}.{action["name"]}'
     jobfile = os.path.join(meta['log_dir'],fnamebase+'.jobs')
     payload = {'action':action.getdict(),'shell_list':shell_list}
 
@@ -1789,9 +1791,8 @@ def colorize_command(cmd,c):
 
 def execute_command(config,job_numb,cmd,env):
     'execute command locally'
-    fname = f'{config["ym/prefix"]}{timestamp_now()}.{config["name"]}'
-    foutname = os.path.join(meta['log_dir'],fname+'.out')
-    ferrname = os.path.join(meta['log_dir'],fname+'.err')
+    foutname = f'{meta["log_path_prefix"]}.{config["name"]}.out'
+    ferrname = f'{meta["log_path_prefix"]}.{config["name"]}.err'
 
     message(f'job {job_numb+1} executing locally...')
 
@@ -2125,7 +2126,7 @@ def process_action(config,action,path):
 
     #execute jobs locally or remotely from the jobfile
     if execute_jobs(action,shell_list,job_list):
-        warning(f'action {action["name"]} had failed job(s)')
+        warning(f'action {action["name"]} had failed job(s), logs at: {meta["log_path_prefix"]}*')
         #signal action failed
         return True
 
