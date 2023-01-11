@@ -33,7 +33,6 @@
         --tumour-bam {%tbam} \
         --normal-bam {%nbam} \
         --potential-variants {%regions_of_interest} \
-        --one-by-one \
         --out "$deepsnv_annotations_vcf"
 
       bgzip -f "$deepsnv_annotations_vcf"
@@ -42,6 +41,8 @@
       # Add deepsnv scores to a new, annotated VCF
       bcftools annotate \
         -a {%deepsnv_annotations_vcf_gz} \
-        --columns CHROM,POS,FILTER \
+        --columns CHROM,POS,FILTER,INFO \
         -Oz -o {%deepsnv_vcf_gz} \
         {%vcf}
+      # and index that too
+      bcftools index -f --tbi {%deepsnv_vcf_gz}
