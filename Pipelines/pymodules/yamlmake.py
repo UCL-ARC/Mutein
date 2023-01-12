@@ -806,6 +806,9 @@ def init_meta(args,config):
     else:
         meta['log_dir'] = default_log_dir
 
+    #update with a fake action name that will not match any rule
+    update_activity_state({'name':None})
+
     #note: still creating missing log_dir in dryrun mode
     #so we can record messages and create qsub scripts
     #for inspection by the user
@@ -813,9 +816,6 @@ def init_meta(args,config):
     if not os.path.exists(meta['log_dir']):
         os.makedirs(meta['log_dir'])
         message(f"created missing log_dir {meta['log_dir']}")
-
-    #update with a fake action name that will not match any rule
-    update_activity_state({'name':None})
 
 def load_pipeline(path,parent_file):
     'path is relative to the parent path'
