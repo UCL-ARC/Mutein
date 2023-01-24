@@ -1,5 +1,9 @@
 #!/bin/bash
 
+#
+# script to start the container running on myriad
+#
+
 #ensure unique tmp folders for each container instance
 if [ -z "${TMPDIR+x}" ]; then
     #TMPDIR is not set, use a tmp under mutein working directory
