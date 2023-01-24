@@ -3,43 +3,130 @@ import os
 import random
 import shutil
 import getpass
-#import pyaes
-#import base64
+import pyaes
+import hashlib
+import base64
 import json
 import csv
-import subprocess
+#import subprocess
+import stat
 
-def get_key(args):
-    if args.key_file == "PROMPT":
-        key = getpass.getpass(prompt="Enter password (blank to cancel): ").strip()
-        if key == '':
-            print("Cancelled")
-            exit(0)
-    else:
-        key = open(args.key_file).read().strip()
+#salt for password based key derivation funtion
+#to prevent reverse lookup of unsalted hash function
+#do not change otherwise the passphrase will map to a different key!
+salt = base64.b64decode(b'oHP7EUhOZJ37fbTbE/VLbprAEqzSwdHQ2R3FW6/f6xE=')
 
-    return key
-
-def aes_encrypt(args):
+def encrypt_key(args):
     '''
-    AES encrypt a file
-    '''
+    prompts for a master password/passphrase interactively from keyboard
+    creates a random bulk data password
+    encrypts it with the master password
+    writes to private file
+    along with a random initial AES counter value
 
-    key = get_key(args)
-    cmd = "gpg --symmetric --batch "
-    cmd += f"--passphrase {key} --cipher-algo AES128 --output {args.output_file} {args.input_file}"
-    subprocess.run(cmd,shell=False,check=True)
-
-def aes_decrypt(args):
-    '''
-    AES decrypt a file
+    use this command once the setup a key for encfs
+    then use decrypt_key at the start of each session to unlock the key
+    then delete the plaintext key once done
     '''
 
-    key = get_key(args)
-    cmd = "gpg --decrypt --batch "
-    cmd += f"--passphrase {key} --cipher-algo AES128 --output {args.output_file} {args.input_file}"
-    subprocess.run(cmd,shell=False,check=True)
+    #user should copy-paste in from a password manager
+    #or use a long but memorisable passphrase
+    master_password = getpass.getpass(prompt="Enter master password: ").strip()
+    if master_password == '':
+        print("Cancelled")
+        return
 
+    #generate random initial counter value for AES counter mode
+    #https://github.com/ricmoo/pyaes/blob/master/README.md
+    iv = os.urandom(16)
+
+    #derive 256 bit key from the master password
+    #https://docs.python.org/3/library/hashlib.html
+    master_key = hashlib.pbkdf2_hmac('sha256', master_password.encode('utf8'), salt, 500000, 32)
+
+    #set up AES-256 with IV in counter mode
+    aes = pyaes.AESModeOfOperationCTR(master_key,
+            counter=pyaes.Counter(initial_value=int.from_bytes(iv, "little")))
+
+    #generate 256 bit bulk data key and encrypt it
+    bulk_key = os.urandom(32)
+
+    if args.debug: print('bulk key',base64.b64encode(bulk_key),file=sys.stderr)
+
+    #set to only be readable by user
+    f = open(args.output_file,'wb')
+    f.close()
+    os.chmod(args.output_file,stat.S_IRUSR|stat.S_IWUSR)
+
+    with open(args.output_file,'wb') as f: f.write(iv + aes.encrypt(bulk_key))
+
+def decrypt_key(args):
+    '''
+    prompts for a master password/passphrase interactively from keyboard
+    decrypts a bulk data key from file
+    writes to a private file in plaintext
+    delete the keyfile once you want to close the session
+    set up the initial encrypted key using encrypt_key
+    '''
+
+    #user should copy-paste in from a password manager
+    #or use a long but memorisable passphrase
+    master_password = getpass.getpass(prompt="Enter master password: ").strip()
+    if master_password == '':
+        print("Cancelled")
+        return
+
+    #derive 256 bit key from the master password
+    #https://docs.python.org/3/library/hashlib.html
+    master_key = hashlib.pbkdf2_hmac('sha256', master_password.encode('utf8'), salt, 500000, 32)
+
+    with open(args.input_file,'rb') as f: data = f.read()
+    iv = data[:16]
+    encrypted_key = data[16:]
+
+    #set up AES-256 with IV in counter mode
+    aes = pyaes.AESModeOfOperationCTR(master_key,
+            counter=pyaes.Counter(initial_value=int.from_bytes(iv, "little")))
+
+    #decrypt 256 bit bulk data key to file
+    bulk_key = aes.decrypt(encrypted_key)
+
+    if args.debug: print('bulk key',base64.b64encode(bulk_key),file=sys.stderr)
+
+    #set to only be readable by user
+    f = open(args.output_file,'wb')
+    f.close()
+    os.chmod(args.output_file,stat.S_IRUSR|stat.S_IWUSR)
+
+    with open(args.output_file,'wb') as f: f.write(bulk_key)
+
+# def get_key(args):
+#     if args.key_file == "PROMPT":
+#         key = getpass.getpass(prompt="Enter password (blank to cancel): ").strip()
+#         if key == '':
+#             print("Cancelled")
+#             exit(0)
+#     else:
+#         key = open(args.key_file).read().strip()
+#     return key
+
+# def aes_encrypt(args):
+#     '''
+#     AES encrypt of a bulk a file
+#     '''
+#     key = get_key(args)
+#     cmd = "gpg --symmetric --batch "
+#     cmd += f"--passphrase {key} --cipher-algo AES128 --output {args.output_file} {args.input_file}"
+#     subprocess.run(cmd,shell=False,check=True)
+
+# def aes_decrypt(args):
+#     '''
+#     AES decrypt of a bulk file
+#     '''
+#     key = get_key(args)
+#     cmd = "gpg --decrypt --batch "
+#     cmd += f"--passphrase {key} --cipher-algo AES128 --output {args.output_file} {args.input_file}"
+#     subprocess.run(cmd,shell=False,check=True)
 
 def symlink(args):
     '''
