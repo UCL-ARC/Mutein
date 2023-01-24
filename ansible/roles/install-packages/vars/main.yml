@@ -1,0 +1,21 @@
+apt_package_list:
+- python3-pymysql
+
+apt_package_list_all:
+- screen
+- sudo
+- ufw
+- xfsprogs
+- git
+- gcc
+- mdadm
+- mariadb-client
+- mariadb-server
+- python3-pymysql
+- slurm-wlm
+- slurm-wlm-doc
+- slurm-wlm-basic-plugins
+- slurm-client
+- slurmctld
+- slurmdbd
+- slurmd

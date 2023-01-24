@@ -1,0 +1,124 @@
+---
+
+- name: create slurmdbd database
+  community.mysql.mysql_db:
+    name: slurm_db
+    state: present
+    login_unix_socket: /run/mysqld/mysqld.sock
+
+- name: create slurm user
+  community.mysql.mysql_user:
+    name: slurm
+    password: slurm_user
+    priv: 'slurm_db.*:ALL'
+    state: present
+    login_unix_socket: /run/mysqld/mysqld.sock
+
+# see install-packages role instead
+# - name: install slurm packages
+#   apt:
+#     force_apt_get: yes
+#     name: '{{ item }}'
+#     state: present
+#     update_cache: yes
+#   with_items:
+#    - slurm-wlm
+#    - slurm-wlm-doc
+#    - slurm-wlm-basic-plugins
+#    - slurm-client
+#    - slurmctld
+#    - slurmdbd
+#    - slurmd
+
+# #- name: exclude slurmd package
+# #  apt:
+# #    force_apt_get: yes
+# #    name: '{{ item }}'
+# #    state: absent
+# #  with_items:
+# #   - slurmd
+
+- name: create spool folder
+  file:
+    path: /var/spool/slurm-llnl
+    state: directory
+    owner: slurm
+    group: slurm
+    mode: "u=rwx,g=rwx,o=rx"
+
+- name: create pid folder
+  file:
+    path: /var/run/slurm-llnl
+    state: directory
+    owner: slurm
+    group: slurm
+    mode: "u=rwx,g=rwx,o=rx"
+
+- name: create log folder
+  file:
+    path: /var/log/slurm-llnl
+    state: directory
+    owner: slurm
+    group: slurm
+    mode: "u=rwx,g=rwx,o=rx"
+
+- name: copy slurm.conf
+  template:
+    src: slurm.conf.j2
+    dest: /etc/slurm/slurm.conf
+    owner: slurm
+    group: slurm
+    mode: "u=rw,g=r,o=r"
+
+- name: copy grub config
+  copy:
+    src: grub
+    dest: /etc/default/grub
+    owner: root
+    group: root
+    mode: "u=rw,g=r,o=r"
+  notify:
+   - update grub
+
+- name: copy cgroup.conf
+  copy:
+    src: cgroup.conf
+    dest: /etc/slurm/cgroup.conf
+    owner: slurm
+    group: slurm
+    mode: "u=rw,g=r,o=r"
+
+- name: copy slurmdbd.conf
+  template:
+    src: slurmdbd.conf.j2
+    dest: /etc/slurm/slurmdbd.conf
+    owner: slurm
+    group: slurm
+    mode: "u=rw,g=,o="
+
+- name: force restart slurmdbd
+  systemd:
+    name: slurmdbd
+    state: restarted
+
+- name: force restart slurmctld
+  systemd:
+    name: slurmctld
+    state: restarted
+
+- name: restart slurmd
+  systemd:
+    name: slurmd
+    state: restarted
+
+- name: create slurm-account-manager cluster compute
+  shell: sacctmgr -i add cluster compute
+  register: sacctmgr_create_cluster
+  failed_when: (sacctmgr_create_cluster.rc > 0) and ('already exists' not in sacctmgr_create_cluster.stdout)
+  changed_when: (sacctmgr_create_cluster.rc == 0) and ('already exists' not in sacctmgr_create_cluster.stdout)
+
+- name: create slurm-account-manager account compute-acc
+  shell: sacctmgr -i add account compute-acc
+  register: sacctmgr_create_account
+  failed_when: (sacctmgr_create_account.rc > 0) and ('Nothing new added' not in sacctmgr_create_account.stdout)
+  changed_when: (sacctmgr_create_account.rc == 0) and ('Nothing new added' not in sacctmgr_create_account.stdout)
