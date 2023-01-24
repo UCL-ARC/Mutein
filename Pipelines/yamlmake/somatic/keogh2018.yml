@@ -8,7 +8,6 @@
 
 - include: "varscan.yml"
 
-# not ready yet
-#- include: "deepsnv.yml"
+- include: "deepsnv.yml"
 
 # plink?

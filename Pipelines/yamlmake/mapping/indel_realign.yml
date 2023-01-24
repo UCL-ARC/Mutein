@@ -16,10 +16,15 @@
     conda: "gatk3"
 
     qsub: 
-        time:  "24:00:00"
-        mem:   "2G"
+        time:  "48:00:00"
+        mem:   "3G"
         tmpfs: "20G"
-        cores: "16"
+        # Too many open files error from Java VM with cores = 16 :(
+        # Where is this limit imposed? SGE?
+        # 4 cores on Keogh+myriad completed successfully in ~8 hours
+        # 1 and 8(!) timed out after 24 hours.
+        # Trying 4 again, it finished in 23 hours. Why so variable?
+        cores: "4"
 
     input:
         ibam:   "processed/{%dataset_id}/{=subset_id}/{+accession}/{+accession}_posn_sort.bam"

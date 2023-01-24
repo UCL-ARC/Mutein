@@ -770,6 +770,9 @@ def update_activity_state(action):
     if meta['args'].run_only and not action['name'] in meta['args'].run_only:
         meta['is_active'] = False
 
+    meta['log_path_prefix'] = os.path.join(meta['log_dir'],
+                                    meta['prefix'] + meta['start_time'])
+
 
 def init_meta(args,config):
     global meta
@@ -803,6 +806,9 @@ def init_meta(args,config):
     else:
         meta['log_dir'] = default_log_dir
 
+    #update with a fake action name that will not match any rule
+    update_activity_state({'name':None})
+
     #note: still creating missing log_dir in dryrun mode
     #so we can record messages and create qsub scripts
     #for inspection by the user
@@ -810,9 +816,6 @@ def init_meta(args,config):
     if not os.path.exists(meta['log_dir']):
         os.makedirs(meta['log_dir'])
         message(f"created missing log_dir {meta['log_dir']}")
-
-    #update with a fake action name that will not match any rule
-    update_activity_state({'name':None})
 
 def load_pipeline(path,parent_file):
     'path is relative to the parent path'
@@ -1595,8 +1598,7 @@ def message(item,end='\n',timestamp=True):
         sys.stdout.flush()
 
     if meta['args'].no_logs != True:
-        path = os.path.join(meta['log_dir'],
-                            meta['prefix']+meta['start_time']+'.messages')
+        path = meta["log_path_prefix"] + '.messages'
 
         try:
             with open(path,'a') as f:
@@ -1766,7 +1768,7 @@ def generate_job_environment(config,job_numb,njobs):
 def write_jobfile(action,shell_list):
     'save action config and shell_list as json'
 
-    fnamebase = f'{action["ym/prefix"]}{timestamp_now()}.{action["name"]}'
+    fnamebase = f'{action["ym/prefix"]}{meta["start_time"]}.{action["name"]}'
     jobfile = os.path.join(meta['log_dir'],fnamebase+'.jobs')
     payload = {'action':action.getdict(),'shell_list':shell_list}
 
@@ -1789,9 +1791,8 @@ def colorize_command(cmd,c):
 
 def execute_command(config,job_numb,cmd,env):
     'execute command locally'
-    fname = f'{config["ym/prefix"]}{timestamp_now()}.{config["name"]}'
-    foutname = os.path.join(meta['log_dir'],fname+'.out')
-    ferrname = os.path.join(meta['log_dir'],fname+'.err')
+    foutname = f'{meta["log_path_prefix"]}.{config["name"]}.out'
+    ferrname = f'{meta["log_path_prefix"]}.{config["name"]}.err'
 
     message(f'job {job_numb+1} executing locally...')
 
@@ -1813,7 +1814,7 @@ def execute_command(config,job_numb,cmd,env):
     ferr = open(ferrname,'w')
 
     try:
-        subprocess.run(cmd,env=env,shell=True,check=True,stdout=fout,stderr=ferr)
+        subprocess.run(cmd, env=env, shell=True, executable='/bin/bash', check=True, stdout=fout, stderr=ferr)
     except subprocess.CalledProcessError:
         failed = True
 
@@ -1886,7 +1887,7 @@ def submit_job_qsub(action,shell_list,job_list):
         flush()
 
         try:
-            subprocess.run(cmd,env=env,shell=True,check=True,stdout=fout,stderr=ferr)
+            subprocess.run(cmd, env=env, shell=True, executable='/bin/bash', check=True, stdout=fout, stderr=ferr)
         except subprocess.CalledProcessError:
             something_failed = True
 
@@ -1961,7 +1962,7 @@ def qsub_execute_job(jobfile):
 
     failed = False
     try:
-        subprocess.run(cmd,env=env,shell=True,check=True)
+        subprocess.run(cmd, env=env, shell=True, executable='/bin/bash', check=True)
     except subprocess.CalledProcessError:
         failed = True
 
@@ -2125,7 +2126,7 @@ def process_action(config,action,path):
 
     #execute jobs locally or remotely from the jobfile
     if execute_jobs(action,shell_list,job_list):
-        warning(f'action {action["name"]} had failed job(s)')
+        warning(f'action {action["name"]} had failed job(s), logs at: {meta["log_path_prefix"]}*')
         #signal action failed
         return True
 
