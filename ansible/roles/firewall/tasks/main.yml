@@ -1,0 +1,24 @@
+---
+
+# make sure ufw firewall is installed and turned on with ssh allowed
+# note: does not block any existing explicitly enabled ports
+
+- name: install ufw
+  apt:
+    force_apt_get: yes
+    name: ufw
+    state: present
+    update_cache: yes
+  tags: ufw
+
+- name: allow ssh
+  ufw:
+    rule: allow
+    port: '22'
+    proto: tcp
+    comment: allow ssh
+
+- name: enable with deny as default outcome
+  ufw:
+    state: enabled
+    policy: deny

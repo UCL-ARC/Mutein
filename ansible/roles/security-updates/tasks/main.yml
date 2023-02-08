@@ -1,0 +1,10 @@
+---
+- name: apt upgrade
+  apt:
+    force_apt_get: yes
+    update_cache: yes
+    name: "*"
+    state: latest
+  #tags: security-updates
+  notify:
+    - reboot node

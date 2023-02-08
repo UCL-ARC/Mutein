@@ -1,0 +1,27 @@
+---
+# maybe I only needed to install munge??
+# it creates its own key and starts anyway
+
+# - name: create munge group
+#   group:
+#     name: munge
+
+# - name: create munge user
+#   user:
+#     name: munge
+#     comment: "MUNGE Uid 'N' Gid Emporium"
+#     group: munge
+#     createhome: no
+#     shell: /sbin/nologin
+
+- name: install munge
+  apt:
+    force_apt_get: yes
+    name: munge
+    state: present
+    update_cache: yes
+
+- name: start munge
+  systemd:
+    name: munge
+    state: started
