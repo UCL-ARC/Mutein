@@ -46,3 +46,15 @@ yamlmake is the tool that manages submitting jobs to the queue for mutein, and i
 cd /SAN/medic/MuteinScratch/549_mutein
 source ./config/mutein_settings
 ```
+
+`mutein_main` should now appear in front of your command prompt indicating you have the mutein_main conda environment active and are ready to run yamlmake. Test it can run by generating the help message:
+
+```
+yamlmake --help
+```
+
+To start running the pipeline proper you pass yamlmake the main pipeline file in dry run mode. There is an environment variable ${MUT_YAML} set up containing the full path to the main pipeline file therefore you can use:
+
+```
+yamlmake --dry-run --yaml ${MUT_YAML}
+```

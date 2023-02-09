@@ -1,7 +1,6 @@
 #core YAMLmake config
 - config:
     ym:
-        prefix:             "mut."
         remote_delay_secs:  "10"
         stale_output_file:  "ignore"
         stale_output_dir:   "ignore"

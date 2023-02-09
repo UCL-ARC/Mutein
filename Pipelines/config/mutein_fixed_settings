@@ -7,6 +7,9 @@ export PATH=${MUT_DIR}/Pipelines/scripts:${PATH}
 export PYTHONPATH=${MUT_DIR}/Pipelines/varcall_modules:${PYTHONPATH}
 export PYTHONPATH=${MUT_DIR}/Pipelines/pymodules:${PYTHONPATH}
 
+#convenience variable pointing to the main yamlmake pipeline file
+export MUT_YAML=${MUT_DIR}/Pipelines/yamlmake/main_pipeline.yml
+
 #conda environment names prefix to reduce chances of namespace collisions
 export MUT_PREFIX=mutein_
 

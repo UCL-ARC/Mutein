@@ -15,7 +15,6 @@ import itertools
 default_config_str =\
 '''
     ym:
-        prefix:             'ym-'           #log file/job name  prefix: qsub doesn't like numerical names
         remote_delay_secs:  '10'            #wait this long after remote jobs incase of latency
         stale_output_file:  'ignore'        #ignore,delete,recycle (also applies to symlinks)
         stale_output_dir:   'ignore'        #ignore,delete,recycle
@@ -750,10 +749,6 @@ def update_activity_state(action):
     this implements the run-only,run-from and run-until command line options
     '''
 
-    #incase the config has changed since the last action
-    if 'ym/prefix' in action:
-        meta['prefix'] = action['ym/prefix']
-
     #see if we've reached the run-from rule
     if meta['args'].run_from and action['name'] == meta['args'].run_from:
         meta['reached_run_from'] = True
@@ -772,7 +767,6 @@ def update_activity_state(action):
 
     meta['log_path_prefix'] = os.path.join(meta['log_dir'],
                                     meta['prefix'] + meta['start_time'])
-
 
 def init_meta(args,config):
     global meta
@@ -799,7 +793,9 @@ def init_meta(args,config):
     meta['start_time'] = timestamp_now()
 
     meta['is_active'] = None
-    meta['prefix'] = config['ym/prefix']
+
+    #job name and logfile prefix
+    meta['prefix'] = args.prefix #argparse defaults it to 'ym-'
 
     if args.log_dir != None:
         meta['log_dir'] = args.log_dir
@@ -1768,7 +1764,7 @@ def generate_job_environment(config,job_numb,njobs):
 def write_jobfile(action,shell_list):
     'save action config and shell_list as json'
 
-    fnamebase = f'{action["ym/prefix"]}{meta["start_time"]}.{action["name"]}'
+    fnamebase = f'{meta["prefix"]}{meta["start_time"]}.{action["name"]}'
     jobfile = os.path.join(meta['log_dir'],fnamebase+'.jobs')
     payload = {'action':action.getdict(),'shell_list':shell_list}
 
@@ -2143,7 +2139,7 @@ def process(pipeline,path,config=None,args=None):
         #set conf to defaults
         config = Conf(src="defaults")
 
-    #on first call store args and init stateful variables that
+    #on first call store command line args and initialise stateful variables that
     #implement run-only, run-from and run-until options
     init_meta(args,config)
 
