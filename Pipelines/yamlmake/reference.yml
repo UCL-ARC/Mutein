@@ -44,8 +44,8 @@
     qsub:
         time:  "1:00:00"
         mem:   "6G"
-        tmpfs: "10G"
-        cores: "1"
+        tmpfs: "1G"
+        cores: "2"
 
     input:
         orig_fasta: "{%ref/tmp_dir}/{%ref/fasta}" #gzip compressed fasta
@@ -66,8 +66,8 @@
     qsub:
         time:  "1:00:00"
         mem:   "6G"
-        tmpfs: "10G"
-        cores: "1"
+        tmpfs: "2G"
+        cores: "2"
 
     input:
         fasta_bgz: "{%ref/fasta_bgz}"
@@ -86,8 +86,8 @@
     qsub:
         time:  "2:00:00"
         mem:   "6G"
-        tmpfs: "10G"
-        cores: "1"
+        tmpfs: "2G"
+        cores: "2"
 
     #file extensions of all the index files bwa will create
     exts: [ "bwt","pac","ann","amb","sa" ]
@@ -109,8 +109,8 @@
     qsub:
         time:  "1:00:00"
         mem:   "6G"
-        tmpfs: "10G"
-        cores: "1"
+        tmpfs: "2G"
+        cores: "2"
 
     input:
         fasta_bgz: "{%ref/fasta_bgz}"

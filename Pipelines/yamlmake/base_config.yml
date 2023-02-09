@@ -15,12 +15,12 @@
         conda_prefix:       "{$MUT_PREFIX}"
 
     qsub:
-        template: "default"
+        template: "{%conf_dir}/cs_qsub_template.sh"
         time:     "02:00:00"
         mem:      "4G"
         tmpfs:    "10G"
         pe:       "smp"
-        cores:    "1"
+        cores:    "2"
 
     env:
         #provide dummy values to prevent bash strict mode causing unbound variable errors in
