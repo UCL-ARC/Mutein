@@ -2,12 +2,12 @@
 ## ============ ONLY EDIT THIS SECTION ============
 
 #the Mutein repository folder
-#this path should avoid any symlinks to help it work inside singularity as well
+#this path should avoid any symlinks to help it work with singularity, autofs etc
 export MUT_DIR=/home/rvickers/repos/Mutein
 
 #the Mutein data folder
-#this path should avoid any symlinks to help it work inside singularity as well
-export MUT_DATA=/SAN/medic/Mutein/549_mutein
+#this path should avoid any symlinks to help it work with singularity, autofs etc
+export MUT_DATA=/SAN/medic/MuteinScratch/549_mutein
 
 ## ================================================
 
