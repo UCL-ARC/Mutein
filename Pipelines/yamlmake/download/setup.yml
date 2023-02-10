@@ -1,0 +1,15 @@
+#setup the symlink to the backed up area where the raw data will live
+- action:
+    name:  "setup_rawdata_area"
+    exec:  "local"
+
+    #no input files
+
+    output:
+        touch: ".meta/{%name}.touch"
+
+    shell: |
+      mkdir -p {$MUT_RAW}/datasets/.meta
+      chmod o-wrx {$MUT_RAW} {$MUT_DATA} {$MUT_RAW}/datasets
+      ln -s {$MUT_RAW}/datasets {$MUT_DATA}
+      touch {%touch}

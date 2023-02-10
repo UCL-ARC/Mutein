@@ -21,33 +21,39 @@
         | sort \
         > {%accession_file}
 
+#download ftp link and md5 for each datafile using ena portal api
 - action:
-    name: "create_accession_folders"
+    name: "download_metadata"
     exec:  "local"
 
+    url_prefix: "https://www.ebi.ac.uk/ena/portal/api/filereport?accession="
+    url_suffix: "&result=read_run&fields=run_accession,fastq_ftp,fastq_md5"
+
     input:
-        #spawn one job per subset_id, currently there's only one
+        #spawn one job per subset_id, currently there's only one for keogh
         accession_list: "datasets/{%dataset_id}/{=subset_id}/.meta/accession_list"
 
     output:
-        touch: "datasets/{%dataset_id}/{=subset_id}/.meta/create_accession_folders.touch"
+        touch: "datasets/{%dataset_id}/{=subset_id}/.meta/{%name}.touch"
 
     shell: |
         for acc in $(cat {%accession_list})
         do
             mkdir -p datasets/{%dataset_id}/{=subset_id}/${acc}/.meta
-            touch datasets/{%dataset_id}/{=subset_id}/${acc}/.meta/download_pending
+            outfile="datasets/{%dataset_id}/{=subset_id}/${acc}/.meta/link_and_md5"
+            query='{%url_prefix}'${acc}'{%url_suffix}'
+            wget -O "${outfile}" "${query}"
         done
         touch {%touch}
 
+#wget download the actual fastq.gz files
 - action:
     name:  "download_accessions"
     exec:  "local"
-    conda: "enabrowsertools"
 
     input:
         #avoid using dir as the input as its mtime updates when any of its contents change
-        download_trigger: "datasets/{%dataset_id}/{=subset_id}/{*accession}/.meta/download_pending"
+        metadata: "datasets/{%dataset_id}/{=subset_id}/{*accession}/.meta/link_and_md5"
 
     output:
         read1: "datasets/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_1.fastq.gz"
@@ -55,13 +61,15 @@
         #note: most also have {*accession}.fastq.gz as well
 
     shell: |
-        cd datasets/{%dataset_id}/{=subset_id}/{*accession}
-        enaDataGet -f fastq {*accession}
+        for url in $(tail -n1 {%metadata} | awk '{print $2}' | tr ';' ' ')
+        do
+            wget --continue --directory-prefix=datasets/{%dataset_id}/{=subset_id}/{*accession} "ftp://${url}"
+        done
 
 #make sure user has downloaded the metadata file from:
 #https://www.ncbi.nlm.nih.gov/sra/?term=SRP159015
 # ==> "Send results to run selector"
-# ==> "Metadata"
+# ==> "Select" ==> "Total" ==> "Metadata"
 - action:
     name: "require_meta_data"
     exec: "local"
