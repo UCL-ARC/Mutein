@@ -26,6 +26,7 @@ default_config_str =\
         job_number:         'YM_JOB_NUMBER' #env variable: 1 based job numbering within the current action
         conda_setup:        ''              #run just before trying to activate the conda env the command requested
         conda_prefix:       ''              #a prefix to apply to the name of every conda environment
+        aggregate:          '1'             #how many jobs share the same shell
         #run before every shell action
         bash_setup: |
           source ~/.bashrc
@@ -1777,6 +1778,12 @@ def add_job_number_to_env(env,config,job_numb):
     env[ config['ym/job_number'] ] = f'{job_numb+1}' # convert from 0 to 1 based to match SGE_TASK_ID
     return env
 
+def add_job_numbers_to_env(env,config,first_job,last_job):
+    'add the job numbers to the env'
+
+    env[ config['ym/job_number'] ] = ' '.join( [str(i+1) for i in range(first_job,last_job+1)] )
+    return env
+
 def generate_job_environment(config,job_numb,njobs):
     'copy local environment with a few adjustments'
 
@@ -1809,12 +1816,17 @@ def colorize_command(cmd,c):
 
     return tmp
 
-def execute_command(config,job_numb,cmd,env):
-    'execute command locally'
-    foutname = f'{meta["log_path_prefix"]}.{config["name"]}.{job_numb+1}.out'
-    ferrname = f'{meta["log_path_prefix"]}.{config["name"]}.{job_numb+1}.err'
+def local_execute_command(config,first_job,last_job,cmd,env):
+    'execute command(s) locally'
 
-    message(f'job {job_numb+1} executing locally...')
+    if first_job == last_job:
+        foutname = f'{meta["log_path_prefix"]}.{config["name"]}.{first_job+1}.out'
+        ferrname = f'{meta["log_path_prefix"]}.{config["name"]}.{first_job+1}.err'
+        message(f'job {first_job+1} executing locally...')
+    else:
+        foutname = f'{meta["log_path_prefix"]}.{config["name"]}.{first_job+1}-{last_job+1}.out'
+        ferrname = f'{meta["log_path_prefix"]}.{config["name"]}.{first_job+1}-{last_job+1}.err'
+        message(f'jobs {first_job+1}-{last_job+1} executing locally...')
 
     if cmd.endswith('\n'): end = ''
     else:                  end = '\n'
@@ -2056,40 +2068,29 @@ def verify_expected_outputs(action,outputs,inputs):
 
     return False
 
-def execute_jobs(action,shell_list,job_list):
+def aggregated_local_execution(action,shell_list,job_list):
+    'execute local job(s), in batches if ym/aggregate > 1'
+    
     something_failed = False
+    njobs = len(shell_list)
+    first_job = 0
+    per_batch = int(action['ym/aggregate'])
 
-    if not 'exec' in action or action['exec'] == 'local':
-        #local serial execution
-        for job_numb,item in enumerate(shell_list):
-            cmd = generate_full_command(action,item)
-            env = generate_job_environment(action,job_numb,len(shell_list))
+    while first_job < njobs:
+        last_job = min(njobs-1,first_job+per_batch-1)
 
-            #reports only explicit job failure from exit code
-            failed = execute_command(action,job_numb,cmd,env)
-
-            if not failed:
-                #job has also failed if not all required outputs were created/updated
-                failed = verify_expected_outputs(action,job_list[job_numb]["output"],job_list[job_numb]["input"])
-
-            if failed:
-                #carry out config controlled action on outputs of failed job
-                #ie delete, recycle, mark as stale or ignore
-                handle_failed_outputs(action,job_list[job_numb]["output"])
-                something_failed = True
-
-    elif action['exec'] == 'aggregated':
-        #aggregated local execution
         cmd = generate_prefix_commands(action)
-        env = generate_common_job_env(action,len(shell_list))
+        env = generate_common_job_env(action,njobs)
+        env = add_job_numbers_to_env(env,action,first_job,last_job)
+        batch_list = shell_list[first_job:last_job+1]
 
-        for job_numb,item in enumerate(shell_list):
+        for item in batch_list:
             cmd += '\n' + generate_final_shell_command(item)
 
         #reports only explicit job failure from exit code
-        all_failed = execute_command(action,0,cmd,env)
+        all_failed = local_execute_command(action,first_job,last_job,cmd,env)
 
-        for job_numb in range(len(shell_list)):
+        for job_numb in range(first_job,last_job+1):
             #job has also failed if not all required outputs were created/updated
             job_failed = verify_expected_outputs(action,job_list[job_numb]["output"],job_list[job_numb]["input"])
 
@@ -2099,6 +2100,21 @@ def execute_jobs(action,shell_list,job_list):
                 #ie delete, recycle, mark as stale or ignore
                 handle_failed_outputs(action,job_list[job_numb]["output"])
                 something_failed = True
+
+        first_job += per_batch
+
+    return something_failed
+
+def execute_jobs(action,shell_list,job_list):
+    something_failed = False
+
+    if not 'exec' in action or action['exec'] == 'local':
+        #separate local execution (default mode)
+        something_failed = aggregated_local_execution(action,shell_list,job_list)
+
+    # elif action['exec'] == 'aggregated':
+    #     #aggregated local execution
+    #     something_failed = aggregated_execution(action,shell_list,job_list)
 
     elif action['exec'] == 'qsub':
         #qsub execution using an array job

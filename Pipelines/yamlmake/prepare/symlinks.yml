@@ -2,7 +2,8 @@
 #with symlinks to the originals
 - action:
     name: "create_symlinks"
-    exec: "aggregated"
+    exec: "local"
+    ym:   { aggregate: "50" }
 
     input:
         original: "datasets/{%dataset_id}/{*subset_id}/{*accession}/{*basename}.fastq.gz"
