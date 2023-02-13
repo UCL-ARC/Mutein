@@ -66,22 +66,57 @@
             wget --continue --directory-prefix=datasets/{%dataset_id}/{=subset_id}/{*accession} "ftp://${url}"
         done
 
-#make sure user has downloaded the metadata file from:
-#https://www.ncbi.nlm.nih.gov/sra/?term=SRP159015
-# ==> "Send results to run selector"
-# ==> "Select" ==> "Total" ==> "Metadata"
+#check fastq.gz files
 - action:
-    name: "require_meta_data"
+    name:  "verify_downloads"
+    exec:  "qsub"
+    conda: "main"
+
+    qsub:
+        time:  "1:00:00"
+        mem:   "2G"
+        tmpfs: "2G"
+        cores: "2"
+
+    input:
+        metadata: "datasets/{%dataset_id}/{=subset_id}/{*accession}/.meta/link_and_md5"
+        read1: "datasets/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_1.fastq.gz"
+
+    output:
+        touch: "datasets/{%dataset_id}/{=subset_id}/{*accession}/.meta/md5_okay"
+
+    shell: |
+        fnames=( $(tail -n1 {%metadata} | awk '{print $2}' | tr ';' ' ') )
+        md5s=( $(tail -n1 {%metadata} | awk '{print $3}' | tr ';' ' ') )
+
+        for (( i=0; i<${#fnames[*]}; ++i))
+        do
+            filename='datasets/{%dataset_id}/{=subset_id}/{*accession}/'$(basename ${fnames[$i]})
+            obs=$(md5sum ${filename} | awk '{print $1}')
+            exp=${md5s[$i]}
+            if [ ${obs} != ${exp} ]
+            then
+                echo "MD5 mismatch: ${fnames[$i]} expecting ${exp} but found ${obs}"
+                exit 1
+            fi
+        done
+
+        touch {%touch}
+
+#copy manually downloaded metadata file into working position
+#see download/setup.yml
+- action:
+    name: "move_meta_data"
     exec: "local"
 
     input:
-        metadata: "datasets/{%dataset_id}/{=subset_id}/.meta/SraRunTable.txt"
+        src:  "manual_downloads/{%dataset_id}/SraRunTable.txt"
 
     output:
-        touch:    "datasets/{%dataset_id}/{=subset_id}/.meta/{%name}.touch"
+        dst:  "datasets/{%dataset_id}/{=subset_id}/.meta/SraRunTable.txt"
 
     shell: |
-        touch {%touch}
+        cp {%src} {%dst}
 
 #extract individual information from metadata for each accession
 - action:
@@ -90,8 +125,8 @@
     conda: "main"
 
     input:
-        metadata: "datasets/{%dataset_id}/{=subset_id}/.meta/SraRunTable.txt"
-        download_trigger: "datasets/{%dataset_id}/{=subset_id}/{*accession}/.meta/download_pending"
+        metadata:        "datasets/{%dataset_id}/{=subset_id}/.meta/SraRunTable.txt"
+        glob_accessions: "datasets/{%dataset_id}/{=subset_id}/{*accession}/.meta/link_and_md5"
 
     output:
         acc_meta:  "datasets/{%dataset_id}/{=subset_id}/{*accession}/.meta/accession_metadata"

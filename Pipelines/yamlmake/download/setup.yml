@@ -13,3 +13,32 @@
       chmod o-wrx {$MUT_RAW} {$MUT_DATA} {$MUT_RAW}/datasets
       ln -s {$MUT_RAW}/datasets {$MUT_DATA}
       touch {%touch}
+
+#create manual downloads folder
+- action:
+    name:  "create_manual_downloads_folder"
+    exec:  "local"
+
+    #no input files
+
+    output:
+        keogh2018: "manual_downloads/keogh2018/.meta/{%name}.touch"
+
+    shell: |
+        touch {%keogh2018}
+
+#check for presence of the files which must be downloaded manually
+- action:
+    name:  "require_manual_downloads"
+    exec:  "local"
+
+    #no input files
+
+    output:
+        keogh_metadata: "manual_downloads/keogh2018/SraRunTable.txt"
+
+    shell: |
+        echo 'Manually download the following as {%keogh_metadata}'
+        echo 'Visit: https://www.ncbi.nlm.nih.gov/sra/?term=SRP159015'
+        echo 'Click "Send results to run selector"'
+        echo 'Click "Select ==> Total ==> Metadata"'

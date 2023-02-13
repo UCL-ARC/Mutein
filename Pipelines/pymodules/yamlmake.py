@@ -1787,8 +1787,8 @@ def colorize_command(cmd,c):
 
 def execute_command(config,job_numb,cmd,env):
     'execute command locally'
-    foutname = f'{meta["log_path_prefix"]}.{config["name"]}.out'
-    ferrname = f'{meta["log_path_prefix"]}.{config["name"]}.err'
+    foutname = f'{meta["log_path_prefix"]}.{config["name"]}.{job_numb+1}.out'
+    ferrname = f'{meta["log_path_prefix"]}.{config["name"]}.{job_numb+1}.err'
 
     message(f'job {job_numb+1} executing locally...')
 

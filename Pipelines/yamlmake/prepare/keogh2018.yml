@@ -2,6 +2,6 @@
 - include: "../config/keogh2018.yml"
 
 - include: "symlinks.yml"     #make symlinks in "processed" to raw data in "datasets"
-- include: "fastqc.yml"       #fastqc original reads
-- include: "fake_trim.yml"    #keogh is already trimmed, create symlinks instead
-- include: "fastqc.yml"       #fastqc trimmed reads - or touch outputs for keogh
+#- include: "fastqc.yml"       #fastqc original reads
+#- include: "fake_trim.yml"    #keogh is already trimmed, create symlinks instead
+#- include: "fastqc.yml"       #fastqc trimmed reads - or touch outputs for keogh
