@@ -38,6 +38,7 @@ def parse_args():
     parser.add_argument('--run-until',help="do not run beyond the named action")
     parser.add_argument('--dry-run','--dryrun',action='store_true',help="do not run anything ,just report what would have been run")
     parser.add_argument('--quiet',action='store_true',help="do not print any status messages to screen")
+    parser.add_argument('--conf',help="YAML string containing configuration overrides")
 
     parser.add_argument('--qsub',help="used internally to execute a job using qsub")
     args = parser.parse_args()

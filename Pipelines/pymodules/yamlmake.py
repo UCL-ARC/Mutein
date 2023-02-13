@@ -248,11 +248,11 @@ class Conf:
 
     def update(self,src,base=None):
         '''
-        merge in all items from another Conf object or dict
+        merge in all items from another src Conf object or dict
         values of src take priority (overwrite) any duplicate keys in self
-        in lists shared between self and src, the list in self gets emptied
-        before the items from src are added
-        place the new items at the specified base key
+        in lists shared between self and src the list in self gets emptied before the items from src are added
+        
+        places the new items at the specified base key
         default is the root key
         '''
 
@@ -777,6 +777,12 @@ def init_meta(args,config):
 
     assert args != None
 
+    #parse and store any yaml config provided on the command line
+    if args.conf:
+        meta["conf"] = yaml.safe_load(args.conf)
+    else:
+        meta["conf"] = None
+    
     #store dry_run, run_only, run_from, run_until settings
     meta['args'] = args
 
@@ -840,6 +846,7 @@ def fill_out_all(config,action,path):
     '''
 
     action.override(config)
+    if meta["conf"]: action.update(meta["conf"])
     action.includes_and_loads(path)
     action.sub_vars()
     #action.make_log_dir()
@@ -2194,16 +2201,23 @@ def process_action(config,action,path):
 def process(pipeline,path,config=None,args=None):
     '''
     process the YAML pipeline that was already loaded from path
+    note: this maybe a module or the toplevel pipeline
+    toplevel calls with config=None
+    module calls with a copy of the current config
     '''
 
-    #initially set config to default values if none provided
+    #toplevel sets the config to built in default values
     if config == None:
-        #set conf to defaults
         config = Conf(src="defaults")
 
-    #on first call store command line args and initialise stateful variables that
-    #implement run-only, run-from and run-until options
-    init_meta(args,config)
+    #toplevels passed command line args (modules have args==None)
+    if args:
+        #on first call store command line args and initialise stateful variables that
+        #implement run-only, run-from and run-until options
+        init_meta(args,config)
+
+        #apply command line config overrides
+        if meta["conf"]: config.update(meta["conf"])
 
     counter = 0
 
@@ -2228,6 +2242,8 @@ def process(pipeline,path,config=None,args=None):
             #add new config to the existing one, overriding any shared keys
             message(f'updating config')
             config.update(item[item_type])
+            #but reapply command line config overrides
+            if meta["conf"]: config.update(meta["conf"])
             config.includes_and_loads(path)
 
         elif item_type == 'include':

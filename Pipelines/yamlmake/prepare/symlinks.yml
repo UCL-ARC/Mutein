@@ -13,3 +13,17 @@
 
     shell: |
         mutein symlink --target {%original} --link {%symlink}
+
+# - action:
+#     name: "test_action"
+#     exec: "local"
+#     ym:   { aggregate: "50" }
+
+#     input:
+#         original: "datasets/{%dataset_id}/{*subset_id}/{*accession}/{*basename}.fastq.gz"
+
+#     output:
+#         testout: "testout/{%dataset_id}/{*subset_id}/{*accession}/{*basename}.fastq.gz"
+
+#     shell: |
+#         mutein symlink --target {%original} --link {%testout}
