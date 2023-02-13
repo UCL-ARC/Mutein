@@ -1721,7 +1721,7 @@ def rmnl(item):
     if item.endswith('\n'): return item[:-1]
     return item
 
-def generate_full_command(config,shell):
+def generate_prefix_commands(config):
     'generate the bash commands to run before the job commands'
 
     cmd_list = []
@@ -1734,7 +1734,19 @@ def generate_full_command(config,shell):
             cmd_list.append(rmnl(config['ym/conda_setup']))
         cmd_list.append(rmnl(f'conda activate {config["ym/conda_prefix"]}{config["conda"]}'))
 
-    cmd_list.append(rmnl(shell))
+    return '\n'.join(cmd_list)
+
+def generate_final_shell_command(shell):
+    'append the shell command to the command list'
+
+    return rmnl(shell)
+
+def generate_full_command(config,shell):
+    'generate the complete job command list'
+
+    cmd_list = generate_prefix_commands(config)
+
+    cmd_list.append( generate_final_shell_command(shell) )
 
     return '\n'.join(cmd_list)
 
@@ -1748,7 +1760,7 @@ def add_env(config,env):
         assert type(value) == str, f'non-string value found in env field {key}, all env fields must be simple strings'
         env[key] = value
 
-def generate_job_environment(config,job_numb,njobs):
+def generate_common_job_env(config,njobs):
     'copy local environment with a few adjustments'
 
     env = copy.deepcopy(os.environ)
@@ -1757,7 +1769,19 @@ def generate_job_environment(config,job_numb,njobs):
     add_env(config,env)
 
     env[ config['ym/job_count'] ] = f'{njobs}'
+
+    return env
+
+def add_job_number_to_env(env,config,job_numb):
+    'add the job number to the env'
     env[ config['ym/job_number'] ] = f'{job_numb+1}' # convert from 0 to 1 based to match SGE_TASK_ID
+    return env
+
+def generate_job_environment(config,job_numb,njobs):
+    'copy local environment with a few adjustments'
+
+    env = generate_common_job_env(config,njobs)
+    env = add_job_number_to_env(env,config,job_numb)
 
     return env
 
@@ -2049,6 +2073,28 @@ def execute_jobs(action,shell_list,job_list):
                 failed = verify_expected_outputs(action,job_list[job_numb]["output"],job_list[job_numb]["input"])
 
             if failed:
+                #carry out config controlled action on outputs of failed job
+                #ie delete, recycle, mark as stale or ignore
+                handle_failed_outputs(action,job_list[job_numb]["output"])
+                something_failed = True
+
+    elif action['exec'] == 'aggregated':
+        #aggregated local execution
+        cmd = generate_prefix_commands(action)
+        env = generate_common_job_env(action,len(shell_list))
+
+        for job_numb,item in enumerate(shell_list):
+            cmd += '\n' + generate_final_shell_command(item)
+
+        #reports only explicit job failure from exit code
+        all_failed = execute_command(action,0,cmd,env)
+
+        for job_numb in range(len(shell_list)):
+            #job has also failed if not all required outputs were created/updated
+            job_failed = verify_expected_outputs(action,job_list[job_numb]["output"],job_list[job_numb]["input"])
+
+            #note: assumes every job failed if all_failed is True
+            if all_failed or job_failed:
                 #carry out config controlled action on outputs of failed job
                 #ie delete, recycle, mark as stale or ignore
                 handle_failed_outputs(action,job_list[job_numb]["output"])
