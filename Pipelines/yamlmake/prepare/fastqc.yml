@@ -1,5 +1,4 @@
 #generate QC stats for anything called .fastq.gz
-#this will catch pre- and post-trimming files
 - action:
     name: "fastqc"
     exec: "qsub"
@@ -8,9 +7,9 @@
     # fastqc uses max one thread per file, we are passing
     # in one file at a time, so request 1 core only
     qsub:
-      time:  "0:30:00"
-      mem:   "1G"
-      tmpfs: "15G"
+      time:  "1:00:00"
+      mem:   "4G"
+      tmpfs: "2G"
       cores: "1"
 
     input:
@@ -21,12 +20,4 @@
       html: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*file}_fastqc.html"
 
     shell: |
-        #dont scan something that a symlink to something else
-        #to avoid doing a second fastqc if we used fake_trim.yml
-        #instead of trim.yml
-        if [[ -L {%fastq} ]] ; then
-            touch {%zip}
-            touch {%html}
-        else
-            fastqc -t {%qsub/cores} {%fastq}
-        fi
+        fastqc -t {%qsub/cores} {%fastq}

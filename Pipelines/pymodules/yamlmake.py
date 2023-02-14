@@ -1752,11 +1752,11 @@ def generate_final_shell_command(shell):
 def generate_full_command(config,shell):
     'generate the complete job command list'
 
-    cmd_list = generate_prefix_commands(config)
+    cmd = generate_prefix_commands(config)
 
-    cmd_list.append( generate_final_shell_command(shell) )
+    cmd += '\n' + generate_final_shell_command(shell)
 
-    return '\n'.join(cmd_list)
+    return cmd
 
 def add_env(config,env):
     'add key:value pairs from config["env"] to env'
@@ -2020,7 +2020,7 @@ def verify_expected_outputs(action,outputs,inputs):
     '''
     verify that all specified output files exist
     and are newer than the job start time
-    if any are missing or stale flag job has failed
+    if any are missing or stale flag job as failed
 
     implies jobs must use touch to update any output file that does not need altering
     or else exclude it from the list of required outputs

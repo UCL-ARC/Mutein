@@ -43,6 +43,12 @@ setup_conda_env()
 
     # Disable password setting as this feature doesn't work as expected
     # export MUT_PASSWORD=$(mutein set-password)
+
+    #yamlmake command hints
+    echo "To begin try:"
+    echo "    yamlmake --help"
+    echo "Or:"
+    echo '    yamlmake --yaml ${MUT_YAML} --dry-run'
 }
 
 # run as a function so that we can stop on errors without exiting the current shell

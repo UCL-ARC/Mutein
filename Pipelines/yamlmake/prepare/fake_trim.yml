@@ -1,14 +1,16 @@
 #create symlinks for the expected trimmed files
 #to handle datasets where the "raw" reads we got are al ready trimmed
-#to prevent double trimming
+#to prevent double trimming but still create  the expected filename
+#for subsequent pipeline steps
 
 #handles the case of no unpaired reads but requires paired reads
 - action:
     name:  "fake_trim"
     exec:  "local"
     conda: "main"
+    ym: { aggregate: "50" }
 
-    qsub: 
+    qsub:
         time:  "4:00:00"
         mem:   "1G"
         tmpfs: "1G"
@@ -24,12 +26,13 @@
         oread2: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_trim_2.fastq.gz"
 
     shell: |
-        #optional unpaired raw / trimmed file paths
-        ireadu="processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}.fastq.gz"
-        oreadu="processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_trim.fastq.gz"
-
+        #requires paired read files
         mutein symlink --target "{%iread1}" --link "{%oread1}"
         mutein symlink --target "{%iread2}" --link "{%oread2}"
+
+        #handle optional unpaired read file
+        ireadu="processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}.fastq.gz"
+        oreadu="processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_trim.fastq.gz"
         if [[ -f "${ireadu}" ]] ; then
             mutein symlink --target "${ireadu}" --link "${oreadu}"
         fi
