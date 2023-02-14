@@ -10,9 +10,22 @@
         recycle_bin:        "recycle_bin"
         job_count:          "YM_NJOBS"
         job_number:         "YM_JOB_NUMBER"
-        bash_setup:         "source ~/.bashrc\nset -euo pipefail\nset +o history{%autofs}"
+        #bash_setup:         "source ~/.bashrc\nset -euo pipefail\nset +o history{%autofs}"
         #conda_setup:        "source ~/mambaforge/etc/profile.d/conda.sh"
         conda_prefix:       "{$MUT_PREFIX}"
+        bash_setup: |
+          source ~/.bashrc
+          set -euo pipefail
+          set +o history
+          file /SAN/medic/Mutein > /dev/null
+          file /SAN/medic/MuteinScratch > /dev/null
+          export MUT_UNIQ_SUFFIX=$(date +'%Y%m%d%H%M%S%3N')${RANDOM}
+          export TMPDIR=/scratch0/${USER}/tmp${MUT_UNIQ_SUFFIX}
+          mkdir -p ${TMPDIR}
+          function finish {
+          rm -rf /scratch0/${USER}/tmp${MUT_UNIQ_SUFFIX}
+          }
+          trap finish EXIT ERR INT TERM
 
     qsub:
         template: "{%conf_dir}/cs_qsub_template.sh"
@@ -31,4 +44,3 @@
     working_dir:    "{$MUT_DATA}"
     conf_dir:       "{$MUT_DIR}/Pipelines/yamlmake"
     conda_channels: "--override-channels -c conda-forge -c defaults -c bioconda"
-    autofs:         "\nfile /SAN/medic/Mutein > /dev/null\nfile /SAN/medic/MuteinScratch > /dev/null" #ensure autofs mounts the shares

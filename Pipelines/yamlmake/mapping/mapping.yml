@@ -8,8 +8,8 @@
 
     qsub: 
         time:  "3:00:00"
-        mem:   "4G"
-        tmpfs: "20G"
+        mem:   "2G"
+        tmpfs: "10G"
         # 4x speedup is achievable, haven't tested more
         cores: "4"
 
@@ -20,10 +20,8 @@
         pair_sort_bam: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_pair_sort.bam"
 
     shell: |
-        SAMTOOLS_TEMPLATE_TMP=${TMPDIR}/${USER}-${RANDOM}${RANDOM}
-
         bwa mem -t {%qsub/cores} {%ref/fasta_bgz} {%read1} {%read2} \
-        | samtools sort -n -T "${SAMTOOLS_TEMPLATE_TMP}" -O bam -m 2G - \
+        | samtools sort -n -T "${TMPDIR}" -O bam -m 2G - \
         > "{%pair_sort_bam}"
 
 #map single reads to reference with bwa
@@ -48,9 +46,8 @@
         sing_sort_bam: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_sing_sort.bam"
 
     shell: |
-        SAMTOOLS_TEMPLATE_TMP=${TMPDIR}/${USER}-${RANDOM}${RANDOM}
         bwa mem -t {%qsub/cores} {%ref/fasta_bgz} {%sing_trim} \
-            | samtools sort -n -T "${SAMTOOLS_TEMPLATE_TMP}" -O bam -m 2G - \
+            | samtools sort -n -T "${TMPDIR}" -O bam -m 2G - \
             > "{%sing_sort_bam}"
 
 #merge single and paired read alignments into single bam

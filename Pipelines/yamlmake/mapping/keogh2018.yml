@@ -2,6 +2,6 @@
 - include: "../config/keogh2018.yml"
 
 - include: "mapping.yml"              #bwa map, sort by read name
-- include: "duplicates.yml"           #mark duplicates, sort by position
-- include: "indel_realign.yml"          #indel realignment for non-Mutect2 somatic calling
-- include: "base_qual_score_recal.yml" #recalibrate base quality scores
+#- include: "duplicates.yml"           #mark duplicates, sort by position
+#- include: "indel_realign.yml"          #indel realignment for non-Mutect2 somatic calling
+#- include: "base_qual_score_recal.yml" #recalibrate base quality scores
