@@ -36,9 +36,9 @@ def parse_args():
     parser.add_argument('--run-only',action='extend',nargs="+",type=str,help="run only the named action(s)")
     parser.add_argument('--run-from',help="only start running at the named action")
     parser.add_argument('--run-until',help="do not run beyond the named action")
-    parser.add_argument('--dry-run','--dryrun',action='store_true',help="do not run anything ,just report what would have been run")
+    parser.add_argument('--dry-run','--dryrun',action='store_true',help="do not run anything, just report what would have been run")
     parser.add_argument('--quiet',action='store_true',help="do not print any status messages to screen")
-    parser.add_argument('--conf',help="YAML string containing configuration overrides")
+    parser.add_argument('--conf',help="YAML string containing configuration overrides, eg 'exec: \"local\"' or 'ym: { aggregate: \"10\" }'")
 
     parser.add_argument('--qsub',help="used internally to execute a job using qsub")
     args = parser.parse_args()

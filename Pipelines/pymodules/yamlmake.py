@@ -1872,7 +1872,7 @@ def write_qsub_file(action,qsub_script,jobname,njobs,jobfile):
     'fill out the qsub job script template and write to file ready to pass to qsub'
 
     if action['qsub/template'] == 'default':
-        f_in = open(os.path.join(os.path.dirname(__file__),"qsub_template.sh"))
+        f_in = open("config/default_qsub_template.sh")
     else:
         f_in = open(action['qsub/template'])
 

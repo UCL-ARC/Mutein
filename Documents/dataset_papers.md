@@ -69,6 +69,7 @@ This section maps out the references to datasets found in the papers. Where the 
   - SRA Accessions:
     - SRP159015
       - [179 samples](https://www.ncbi.nlm.nih.gov/sra/?term=SRP159015)
+      - Covaris sheared, PCR 6 cycles, 102 gene SureSelect probe enrich, PCR 10 cycles, HiSeq 2500 single lane, paired-end 2 × 101 bp
 - Paper 6 (Zhang 2019)
   - dbGaP Accessions:
     - [phs001808.v1.p1](https://www.ncbi.nlm.nih.gov/projects/gap/cgi-bin/study.cgi?study_id=phs001808.v1.p1)

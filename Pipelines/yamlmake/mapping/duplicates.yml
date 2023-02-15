@@ -1,5 +1,5 @@
 #mark duplicates on the query (ie read name) sorted reads
-#no recommended for amplicon sequencing data as this generates many reads with the same
+#not recommended for amplicon sequencing data as this generates many reads with the same
 #start/end positions by design, but bait capture enrichment of normal fragmented DNA
 #should not and can be deduplicated as normal
 #see C. Xu / Computational and Structural Biotechnology Journal 16 (2018) 15–24
@@ -9,10 +9,12 @@
     conda: "gatk4"
 
     qsub: 
-        time:  "24:00:00"
-        mem:   "6G"
-        tmpfs: "20G"
+        template: "{%conf_dir}/cs_no_vmem_template.sh" #don't specify h_vmem option, only tmem
+        time:  "3:00:00"
+        mem:   "7G"
+        tmpfs: "10G"
         cores: "2"
+    java_opts: "-Xmx10g -XX:CompressedClassSpaceSize=2g" #set Xmx to about 2G smaller than mem*cores
 
     input:
         ibam:    "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_all_sort.bam"
@@ -22,10 +24,8 @@
         metrics: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_duplicate_metrics"
 
     shell: |
-        MY_GATK_TMP=${TMPDIR}/${USER}-${RANDOM}${RANDOM}
-        mkdir -p ${MY_GATK_TMP}
-        gatk --java-options "-Xmx8g" MarkDuplicates \
-            --TMP_DIR ${MY_GATK_TMP} \
+        gatk --java-options "{%java_opts}" MarkDuplicates \
+            --TMP_DIR ${TMPDIR} \
             --READ_NAME_REGEX {%read_name_regex} \
             --ASSUME_SORT_ORDER queryname \
             -I {%ibam} \
@@ -47,9 +47,9 @@
     conda: "bwa"
 
     qsub: 
-        time:  "24:00:00"
-        mem:   "6G"
-        tmpfs: "20G"
+        time:  "3:00:00"
+        mem:   "3G"
+        tmpfs: "10G"
         cores: "3"
 
     input:
@@ -61,12 +61,10 @@
 
     #sort mapped reads by mapping position, output to bam file
     shell: |
-        SAMTOOLS_TMP=${TMPDIR}/${USER}-${RANDOM}${RANDOM}
-        mkdir -p ${SAMTOOLS_TMP}
         EXTRA_THREADS=$(({%qsub/cores}-1))
 
         samtools view -uh {%ibam} \
-        | samtools sort -@ ${EXTRA_THREADS} -T ${SAMTOOLS_TMP} -O bam -m 2G - \
+        | samtools sort -@ ${EXTRA_THREADS} -T ${TMPDIR} -O bam -m 2G - \
         > {%obam}
 
         samtools index -@ ${EXTRA_THREADS} {%obam}

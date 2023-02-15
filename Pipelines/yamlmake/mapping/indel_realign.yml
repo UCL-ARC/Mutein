@@ -15,18 +15,21 @@
     exec:  "qsub"
     conda: "gatk3"
 
-    qsub: 
+    qsub:
+        template: "{%conf_dir}/cs_no_vmem_template.sh" #don't specify h_vmem option, only tmem
         time:  "48:00:00"
         mem:   "3G"
-        tmpfs: "20G"
+        tmpfs: "10G"
         # Too many open files error from Java VM with cores = 16 :(
         # Where is this limit imposed? SGE?
         # 4 cores on Keogh+myriad completed successfully in ~8 hours
         # 1 and 8(!) timed out after 24 hours.
         # Trying 4 again, it finished in 23 hours. Why so variable?
         cores: "4"
+    java_opts: "-Xmx10g"  # -XX:CompressedClassSpaceSize=2g"
 
     input:
+        int:    "{%gene_intervals_file}"
         ibam:   "processed/{%dataset_id}/{=subset_id}/{+accession}/{+accession}_posn_sort.bam"
         known1: "{%ref/indels1}"
         known2: "{%ref/indels2}"
@@ -35,16 +38,13 @@
         indels: "processed/{%dataset_id}/{=subset_id}/.meta/realigner_indel.intervals"
 
     shell: |
-        MY_TMP_DIR=${TMPDIR}/${RANDOM}${RANDOM}
-        mkdir -p ${MY_TMP_DIR}
-
         gatk3 \
-            -Xmx19G \
-            -Djava.io.tmpdir=${MY_TMP_DIR} \
+            {%java_opts} \
+            -Djava.io.tmpdir=${TMPDIR} \
             -T RealignerTargetCreator \
             --num_threads {%qsub/cores} \
             -R {%ref/uncompressed} \
-            -L {%intervals} \
+            -L {%int} \
             -I {%ibam/ -I } \
             -known {%known1} -known {%known2} \
             -o {%indels}
@@ -104,7 +104,7 @@
 #             -Djava.io.tmpdir=${MY_TMP_DIR} \
 #             -T IndelRealigner \
 #             -R {%ref/uncompressed} \
-#             -L {%intervals} \
+#             -L {%gene_intervals_file} \
 #             -known {%known1} -known {%known2} \
 #             -targetIntervals {%indels} \
 #             -I {%ibam/ -I } \
@@ -154,7 +154,7 @@
             -Djava.io.tmpdir=${MY_TMP_DIR} \
             -T IndelRealigner \
             -R {%ref/uncompressed} \
-            -L {%intervals} \
+            -L {%gene_intervals_file} \
             -known {%known1} -known {%known2} \
             -targetIntervals {%indels} \
             ${input_list} \

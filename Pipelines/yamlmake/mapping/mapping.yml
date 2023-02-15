@@ -34,8 +34,8 @@
 
     qsub:
         time:  "02:00:00"
-        mem:   "4G"
-        tmpfs: "20G"
+        mem:   "1G"
+        tmpfs: "10G"
         # 4x speedup is achievable, haven't tested more
         cores: "4"
 
@@ -61,7 +61,8 @@
 
     qsub:
         time:  "3:00:00"
-        mem:   "4G"
+        mem:   "2G"
+        tmpfs: "2G"
         cores: "4"
 
     input:

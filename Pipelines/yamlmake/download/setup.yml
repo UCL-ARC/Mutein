@@ -36,9 +36,23 @@
 
     output:
         keogh_metadata: "manual_downloads/keogh2018/SraRunTable.txt"
+        keogh_intervals: "manual_downloads/keogh2018/mart_export.txt.gz"
 
     shell: |
         echo 'Manually download the following as {%keogh_metadata}'
         echo 'Visit: https://www.ncbi.nlm.nih.gov/sra/?term=SRP159015'
         echo 'Click "Send results to run selector"'
         echo 'Click "Select ==> Total ==> Metadata"'
+        echo 
+        echo 'Manually download the following as {%keogh_intervals}'
+        echo 'Visit: https://www.ensembl.org/index.html'
+        echo 'Biomart'
+        echo 'CHOOSE DATABASE ==> Ensembl Genes 109'
+        echo 'CHOOSE DATASET ==> Human Genes (GRCh38.p13)'
+        echo 'Attributes ==> Features'
+        echo 'GENE ==> Gene stable ID, Gene Stable ID version'
+        echo '    ==> Chromosome/scaffold name, Gene start(bp), Gene end(bp)'
+        echo '    ==> Gene name, Gene synonym'
+        echo 'Results'
+        echo 'Export all results to ==> Compressed file (.gz), TSV'
+        echo 'GO'
