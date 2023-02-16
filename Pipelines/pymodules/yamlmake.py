@@ -20,6 +20,8 @@ default_config_str =\
         stale_output_dir:   'ignore'        #ignore,delete,recycle
         failed_output_file: 'stale'         #delete,recycle,stale,ignore (also applies to symlinks)
         failed_output_dir:  'stale'         #delete,recycle,stale,ignore    
+        check_input_mtime:  'target'        #target,symlink
+        check_output_mtime: 'target'        #target,symlink
         missing_parent_dir: 'create'        #ignore,create
         recycle_bin:        'recycle_bin'   #name of recycle bin folder
         job_count:          'YM_NJOBS'      #env variable: how many jobs spawned by current action
@@ -1338,7 +1340,7 @@ def find_conflicts(all_vals,values):
             return True #conflict found
     return False #no conflicts found
 
-def check_input_mtimes(input):
+def check_input_mtimes(input,action):
     '''
     return newest mtime if all inputs present
     otherwise return "missing" if any missing
@@ -1364,7 +1366,15 @@ def check_input_mtimes(input):
             missing = True
             continue
 
-        mtime = os.path.getmtime(path)
+        if action['ym/check_input_mtime'] == 'target':
+            mtime = os.path.getmtime(path)
+            
+        elif action['ym/check_input_mtime'] == 'symlink':
+            mtime = os.lstat(path).st_mtime
+
+        else:
+            raise Exception(f"unknown check_output_mtime option {action['ym/check_input_mtime']}")
+
         if newest_mtime == None or mtime > newest_mtime:
             newest_mtime = mtime
 
@@ -1373,7 +1383,7 @@ def check_input_mtimes(input):
     assert newest_mtime != None, 'invalid newest_mtime!'
     return newest_mtime
 
-def check_output_mtimes(output):
+def check_output_mtimes(output,action):
     '''
     return oldest mtime if all outputs present
     return "missing" if any missing or stale
@@ -1396,7 +1406,14 @@ def check_output_mtimes(output):
             missing = True
             continue
 
-        mtime = os.path.getmtime(path)
+        if action['ym/check_output_mtime'] == 'target':
+            mtime = os.path.getmtime(path)
+
+        elif action['ym/check_output_mtime'] == 'symlink':
+            mtime = os.lstat(path).st_mtime
+
+        else:
+            raise Exception(f"unknown check_output_mtime option {action['ym/check_output_mtime']}")
 
         if oldest_mtime == None or mtime < oldest_mtime:
             oldest_mtime = mtime
@@ -1411,10 +1428,10 @@ def generate_shell_commands(action,job_list,shell):
     for job_numb,job in enumerate(job_list):
         #check all inputs
         #returns newest mtime, "missing" or "empty"
-        newest_input = check_input_mtimes(job['input'])
+        newest_input = check_input_mtimes(job['input'],action)
 
         #returns oldest mtime, "missing" or "empty"
-        oldest_output = check_output_mtimes(job['output'])
+        oldest_output = check_output_mtimes(job['output'],action)
 
         run = False
 
@@ -2019,7 +2036,7 @@ def qsub_execute_job(jobfile):
 def verify_expected_outputs(action,outputs,inputs):
     '''
     verify that all specified output files exist
-    and are newer than the job start time
+    and are newer than the newest input file
     if any are missing or stale flag job as failed
 
     implies jobs must use touch to update any output file that does not need altering
@@ -2034,12 +2051,13 @@ def verify_expected_outputs(action,outputs,inputs):
 
     #find newest input file
     #return newest_mtime, "empty" or "missing"
-    newest_mtime = check_input_mtimes(inputs)
+    newest_mtime = check_input_mtimes(inputs,action)
 
     failed = False
     show = True
     for item in outputs.keys():
         path = outputs[item]
+
         if not os.path.exists(path):
             warning(f'missing output {path}')
             failed = True 
@@ -2059,11 +2077,22 @@ def verify_expected_outputs(action,outputs,inputs):
                 warning(f'cannot verify output freshness of {path} due to missing input(s)')
                 show = False
 
-        elif os.path.getmtime(path) < newest_mtime:
-            #expected output file exists but appears stale
-            #ie we assume it was not updated by the command
-            message(f'stale output {path}')
-            failed = True
+        else:
+            if action['ym/check_output_mtime'] == 'target':
+                #follow any symlinks
+                mtime = os.path.getmtime(path)
+
+            elif action['ym/check_output_mtime'] == 'symlink':
+                #do not follow symlinks, take mtime of path itself even if a symlink
+                mtime = os.lstat(path).st_mtime
+
+            else:
+                raise Exception(f"unknown check_output_mtime option {action['ym/check_output_mtime']}")
+            
+            if mtime < newest_mtime:
+                #expected output exists but appears stale
+                message(f'stale output {path}')
+                failed = True
 
     if failed:
         #job has failed

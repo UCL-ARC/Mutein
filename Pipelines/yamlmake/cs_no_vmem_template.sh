@@ -1,4 +1,6 @@
 #!/bin/bash -l
+# see https://hpc.cs.ucl.ac.uk/wp-content/uploads/sites/21/2022/01/SGE-Guide_12_2021.pdf p19
+# which notes that sometime h_vmem should be omitted as it causes memory errors
 #$ -N {jobname}
 #$ -cwd
 #$ -V

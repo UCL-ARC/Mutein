@@ -1,6 +1,7 @@
 #define dataset_id, subset_list, credentials
 - include: "../config/yokoyama2019.yml"
 
+#https://ega-archive.org/download/downloader-quickguide-APIv3
 #https://github.com/EGA-archive/ega-download-client
 #download list of accession names
 #not actually required since only the "subset_id" is needed to get all files

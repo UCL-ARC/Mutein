@@ -6,6 +6,8 @@
         stale_output_dir:   "ignore"
         failed_output_file: "stale"
         failed_output_dir:  "stale"
+        check_input_mtime:  "target"
+        check_output_mtime: "target"
         missing_parent_dir: "create"
         recycle_bin:        "recycle_bin"
         job_count:          "YM_NJOBS"

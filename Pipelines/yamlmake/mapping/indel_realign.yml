@@ -17,7 +17,7 @@
 
     qsub:
         template: "{%conf_dir}/cs_no_vmem_template.sh" #don't specify h_vmem option, only tmem
-        time:  "48:00:00"
+        time:  "10:00:00"
         mem:   "3G"
         tmpfs: "10G"
         # Too many open files error from Java VM with cores = 16 :(
@@ -123,12 +123,15 @@
     conda: "gatk3"
 
     qsub:
-        time:  "24:00:00"
-        mem:   "12G"
+        template: "{%conf_dir}/cs_no_vmem_template.sh" #don't specify h_vmem option, only tmem
+        time:  "4:00:00"
+        mem:   "7G"
         tmpfs: "20G"
         cores: "2"
+    java_opts: "-Xmx12g"
 
     input:
+        int:      "{%gene_intervals_file}"
         acc_list: "datasets/{%dataset_id}/{=subset_id}/.meta/indivs/{*indiv}/accession_list"
         indels:   "processed/{%dataset_id}/{=subset_id}/.meta/realigner_indel.intervals"
         known1:   "{%ref/indels1}"
@@ -139,9 +142,6 @@
         touch:  "processed/{%dataset_id}/{=subset_id}/.meta/{%name}.{*indiv}.touch"
 
     shell: |
-        MY_TMP_DIR=${TMPDIR}/${RANDOM}${RANDOM}
-        mkdir -p ${MY_TMP_DIR}
-
         #build list of accessions from current individual
         input_list=""
         for acc in $(cat {%acc_list})
@@ -150,11 +150,11 @@
         done
 
         gatk3 \
-            -Xmx19G \
-            -Djava.io.tmpdir=${MY_TMP_DIR} \
+            {%java_opts} \
+            -Djava.io.tmpdir=${TMPDIR} \
             -T IndelRealigner \
             -R {%ref/uncompressed} \
-            -L {%gene_intervals_file} \
+            -L {%int} \
             -known {%known1} -known {%known2} \
             -targetIntervals {%indels} \
             ${input_list} \
