@@ -3,6 +3,7 @@
 - action:
     name: "create_symlinks"
     exec: "local"
+    ym:   { aggregate: "50" }
 
     input:
         original: "datasets/{%dataset_id}/{*subset_id}/{*accession}/{*basename}.fastq.gz"
@@ -11,4 +12,4 @@
         symlink: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*basename}.fastq.gz"
 
     shell: |
-       ln -sr {%original} {%symlink}
+        mutein symlink --target {%original} --link {%symlink}

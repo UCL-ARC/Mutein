@@ -16,7 +16,7 @@
         cores: "4"
 
     input:
-        int:  "{%intervals}"
+        int:  "{%gene_intervals_file}"
         tbam: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_bqsr.bam"
         nbam: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*normal}_link.bam"
 
@@ -54,7 +54,7 @@
 
     input:
         vcf:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_{*normal}_somatic_mutect2.vcf.gz"
-        int:  "{%intervals}"
+        int:  "{%gene_intervals_file}"
 
     output:
         vcf_annotated:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_{*normal}_somatic_mutect2_annotated.vcf.gz"

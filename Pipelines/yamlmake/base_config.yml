@@ -1,27 +1,41 @@
 #core YAMLmake config
 - config:
     ym:
-        prefix:             "mut."
         remote_delay_secs:  "10"
         stale_output_file:  "ignore"
         stale_output_dir:   "ignore"
         failed_output_file: "stale"
         failed_output_dir:  "stale"
+        check_input_mtime:  "target"
+        check_output_mtime: "target"
         missing_parent_dir: "create"
         recycle_bin:        "recycle_bin"
         job_count:          "YM_NJOBS"
         job_number:         "YM_JOB_NUMBER"
-        bash_setup:         "source ~/.bashrc\nset -euo pipefail\nset +o history"
+        #bash_setup:         "source ~/.bashrc\nset -euo pipefail\nset +o history{%autofs}"
         #conda_setup:        "source ~/mambaforge/etc/profile.d/conda.sh"
         conda_prefix:       "{$MUT_PREFIX}"
+        bash_setup: |
+          source ~/.bashrc
+          set -euo pipefail
+          set +o history
+          file /SAN/medic/Mutein > /dev/null
+          file /SAN/medic/MuteinScratch > /dev/null
+          export MUT_UNIQ_SUFFIX=$(date +'%Y%m%d%H%M%S%3N')${RANDOM}
+          export TMPDIR=/scratch0/${USER}/tmp${MUT_UNIQ_SUFFIX}
+          mkdir -p ${TMPDIR}
+          function finish {
+          rm -rf /scratch0/${USER}/tmp${MUT_UNIQ_SUFFIX}
+          }
+          trap finish EXIT ERR INT TERM
 
     qsub:
-        template: "default"
+        template: "{%conf_dir}/cs_qsub_template.sh"
         time:     "02:00:00"
         mem:      "4G"
         tmpfs:    "10G"
         pe:       "smp"
-        cores:    "1"
+        cores:    "2"
 
     env:
         #provide dummy values to prevent bash strict mode causing unbound variable errors in

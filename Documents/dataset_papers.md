@@ -69,6 +69,7 @@ This section maps out the references to datasets found in the papers. Where the 
   - SRA Accessions:
     - SRP159015
       - [179 samples](https://www.ncbi.nlm.nih.gov/sra/?term=SRP159015)
+      - Covaris sheared, PCR 6 cycles, 102 gene SureSelect probe enrich, PCR 10 cycles, HiSeq 2500 single lane, paired-end 2 × 101 bp
 - Paper 6 (Zhang 2019)
   - dbGaP Accessions:
     - [phs001808.v1.p1](https://www.ncbi.nlm.nih.gov/projects/gap/cgi-bin/study.cgi?study_id=phs001808.v1.p1)
@@ -85,6 +86,16 @@ This section maps out the references to datasets found in the papers. Where the 
       - Dataset [EGAD00010001631](https://ega-archive.org/datasets/EGAD00010001631)
 - Paper 8 (Buscarlet 2017)
   - Not found any accession numbers, perhaps requires emailing corresponding author direct?
+- Paper 9 (Yamaguchi 2022)
+  - Would need a separate DAC data access request through EGA
+- Paper 10 (Lawson 2020)
+  - [EGAD00001006113](https://ega-archive.org/datasets/EGAD00001006113)
+  - [EGAD00001006114](https://ega-archive.org/datasets/EGAD00001006114)
+  - [EGAD00001006115](https://ega-archive.org/datasets/EGAD00001006115)
+  - [EGAD00001006116](https://ega-archive.org/datasets/EGAD00001006116)
+  - [EGAD00001006117](https://ega-archive.org/datasets/EGAD00001006117)
+- Paper 11 (Brunner 2019)
+  - [EGAD00001004578](https://ega-archive.org/datasets/EGAD00001004578)
 
 ### List of Dataset Accessions
 

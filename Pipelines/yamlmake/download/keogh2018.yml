@@ -21,33 +21,39 @@
         | sort \
         > {%accession_file}
 
+#download ftp link and md5 for each datafile using ena portal api
 - action:
-    name: "create_accession_folders"
+    name: "download_metadata"
     exec:  "local"
 
+    url_prefix: "https://www.ebi.ac.uk/ena/portal/api/filereport?accession="
+    url_suffix: "&result=read_run&fields=run_accession,fastq_ftp,fastq_md5"
+
     input:
-        #spawn one job per subset_id, currently there's only one
+        #spawn one job per subset_id, currently there's only one for keogh
         accession_list: "datasets/{%dataset_id}/{=subset_id}/.meta/accession_list"
 
     output:
-        touch: "datasets/{%dataset_id}/{=subset_id}/.meta/create_accession_folders.touch"
+        touch: "datasets/{%dataset_id}/{=subset_id}/.meta/{%name}.touch"
 
     shell: |
         for acc in $(cat {%accession_list})
         do
             mkdir -p datasets/{%dataset_id}/{=subset_id}/${acc}/.meta
-            touch datasets/{%dataset_id}/{=subset_id}/${acc}/.meta/download_pending
+            outfile="datasets/{%dataset_id}/{=subset_id}/${acc}/.meta/link_and_md5"
+            query='{%url_prefix}'${acc}'{%url_suffix}'
+            wget -O "${outfile}" "${query}"
         done
         touch {%touch}
 
+#wget download the actual fastq.gz files
 - action:
     name:  "download_accessions"
     exec:  "local"
-    conda: "enabrowsertools"
 
     input:
         #avoid using dir as the input as its mtime updates when any of its contents change
-        download_trigger: "datasets/{%dataset_id}/{=subset_id}/{*accession}/.meta/download_pending"
+        metadata: "datasets/{%dataset_id}/{=subset_id}/{*accession}/.meta/link_and_md5"
 
     output:
         read1: "datasets/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_1.fastq.gz"
@@ -55,25 +61,62 @@
         #note: most also have {*accession}.fastq.gz as well
 
     shell: |
-        cd datasets/{%dataset_id}/{=subset_id}/{*accession}
-        enaDataGet -f fastq {*accession}
+        for url in $(tail -n1 {%metadata} | awk '{print $2}' | tr ';' ' ')
+        do
+            wget --continue --directory-prefix=datasets/{%dataset_id}/{=subset_id}/{*accession} "ftp://${url}"
+        done
 
-#make sure user has downloaded the metadata file from:
-#https://www.ncbi.nlm.nih.gov/sra/?term=SRP159015
-# ==> "Send results to run selector"
-# ==> "Metadata"
+#check fastq.gz files
 - action:
-    name: "require_meta_data"
+    name:  "verify_downloads"
+    exec:  "qsub"
+    conda: "main"
+
+    qsub:
+        time:  "1:00:00"
+        mem:   "2G"
+        tmpfs: "2G"
+        cores: "2"
+
+    input:
+        metadata: "datasets/{%dataset_id}/{=subset_id}/{*accession}/.meta/link_and_md5"
+        read1: "datasets/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_1.fastq.gz"
+
+    output:
+        touch: "datasets/{%dataset_id}/{=subset_id}/{*accession}/.meta/md5_okay"
+
+    shell: |
+        fnames=( $(tail -n1 {%metadata} | awk '{print $2}' | tr ';' ' ') )
+        md5s=( $(tail -n1 {%metadata} | awk '{print $3}' | tr ';' ' ') )
+
+        for (( i=0; i<${#fnames[*]}; ++i))
+        do
+            filename='datasets/{%dataset_id}/{=subset_id}/{*accession}/'$(basename ${fnames[$i]})
+            obs=$(md5sum ${filename} | awk '{print $1}')
+            exp=${md5s[$i]}
+            if [ ${obs} != ${exp} ]
+            then
+                echo "MD5 mismatch: ${fnames[$i]} expecting ${exp} but found ${obs}"
+                exit 1
+            fi
+        done
+
+        touch {%touch}
+
+#copy manually downloaded metadata file into working position
+#see download/setup.yml
+- action:
+    name: "move_meta_data"
     exec: "local"
 
     input:
-        metadata: "datasets/{%dataset_id}/{=subset_id}/.meta/SraRunTable.txt"
+        src:  "manual_downloads/{%dataset_id}/SraRunTable.txt"
 
     output:
-        touch:    "datasets/{%dataset_id}/{=subset_id}/.meta/{%name}.touch"
+        dst:  "datasets/{%dataset_id}/{=subset_id}/.meta/SraRunTable.txt"
 
     shell: |
-        touch {%touch}
+        cp {%src} {%dst}
 
 #extract individual information from metadata for each accession
 - action:
@@ -82,8 +125,8 @@
     conda: "main"
 
     input:
-        metadata: "datasets/{%dataset_id}/{=subset_id}/.meta/SraRunTable.txt"
-        download_trigger: "datasets/{%dataset_id}/{=subset_id}/{*accession}/.meta/download_pending"
+        metadata:        "datasets/{%dataset_id}/{=subset_id}/.meta/SraRunTable.txt"
+        glob_accessions: "datasets/{%dataset_id}/{=subset_id}/{*accession}/.meta/link_and_md5"
 
     output:
         acc_meta:  "datasets/{%dataset_id}/{=subset_id}/{*accession}/.meta/accession_metadata"
@@ -141,3 +184,43 @@
         done
 
         touch {%touch}
+
+#create intervals.list file specifying the position of all the target capture genes
+#for the keogh2018 dataset
+- action:
+    name:  "create_intervals_list"
+    exec:  "local"
+
+    input:
+        mart_export_gz: "manual_downloads/keogh2018/mart_export.txt.gz"
+        gene_list:      "{$MUT_DIR}/Pipelines/fixtures/keogh2018_gene_list"
+
+    output:
+        all_genes:  "datasets/{%dataset_id}/.meta/all_genes.tsv"
+        uniq_genes: "datasets/{%dataset_id}/.meta/uniq_genes.tsv"
+        gene_posns: "datasets/{%dataset_id}/.meta/gene_positions.tsv"
+        intervals:  "{%gene_intervals_file}"
+
+    shell: |
+        #uncompress and rename
+        zcat {%mart_export_gz} > {%all_genes}
+
+        #make a version of the list lacking the synonyms column
+        cat {%all_genes} \
+            | awk -v OFS='\t' '{print $1,$2,$3,$4,$5,$6}' \
+            | sort -u \
+            > {%uniq_genes}
+
+        #extract gene positions for keogh2018 genes only
+        #where gene_list contains the 102 gene names from supplementary table 1
+        #note: NR is total lines processed, FNR is lines processed in current file
+        #therefore NR == FNR for the first file only
+        awk 'NR == FNR {genes[$0]} NR > FNR && ($6 in genes)' {%gene_list} {%uniq_genes} \
+            | grep -v CHR_ \
+            | sort -u \
+            > {%gene_posns}
+
+        #print only the position and full chromosome name in the required format
+        awk '{print "chr"$3":"$4"-"$5}' {%gene_posns} \
+            > {%gene_intervals_file}
+

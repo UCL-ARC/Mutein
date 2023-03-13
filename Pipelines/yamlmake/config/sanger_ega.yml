@@ -1,0 +1,21 @@
+- config:
+    dataset_id: "all_ega" #should really be "sanger_ega" as yokoyama is also from ega byt not sanger
+
+    subset_id:
+      - "EGAD00001000825" #martincorena2015
+      - "EGAD00001001090" #martincorena2015
+      - "EGAD00001001123" #martincorena2015
+      - "EGAD00001004158" #fowler2021,martincorena2018
+      - "EGAD00001004159" #fowler2021,martincorena2018
+      - "EGAD00001004192" #leesix2019
+      - "EGAD00001004193" #leesix2019
+      - "EGAD00001006194" #fowler2021
+      - "EGAD00001006969" #fowler2021
+      - "EGAD00001006113" #lawson2020
+      - "EGAD00001006114" #lawson2020
+      - "EGAD00001006115" #lawson2020
+      - "EGAD00001006116" #lawson2020
+      - "EGAD00001006117" #lawson2020
+      - "EGAD00001004578" #brunner2019
+
+    credentials: "config/private_config2.json"

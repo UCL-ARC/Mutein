@@ -15,18 +15,20 @@ import itertools
 default_config_str =\
 '''
     ym:
-        prefix:             'ym-'           #log file/job name  prefix: qsub doesn't like numerical names
         remote_delay_secs:  '10'            #wait this long after remote jobs incase of latency
         stale_output_file:  'ignore'        #ignore,delete,recycle (also applies to symlinks)
         stale_output_dir:   'ignore'        #ignore,delete,recycle
         failed_output_file: 'stale'         #delete,recycle,stale,ignore (also applies to symlinks)
         failed_output_dir:  'stale'         #delete,recycle,stale,ignore    
+        check_input_mtime:  'target'        #target,symlink
+        check_output_mtime: 'target'        #target,symlink
         missing_parent_dir: 'create'        #ignore,create
         recycle_bin:        'recycle_bin'   #name of recycle bin folder
         job_count:          'YM_NJOBS'      #env variable: how many jobs spawned by current action
         job_number:         'YM_JOB_NUMBER' #env variable: 1 based job numbering within the current action
         conda_setup:        ''              #run just before trying to activate the conda env the command requested
         conda_prefix:       ''              #a prefix to apply to the name of every conda environment
+        aggregate:          '1'             #how many jobs share the same shell
         #run before every shell action
         bash_setup: |
           source ~/.bashrc
@@ -248,11 +250,11 @@ class Conf:
 
     def update(self,src,base=None):
         '''
-        merge in all items from another Conf object or dict
+        merge in all items from another src Conf object or dict
         values of src take priority (overwrite) any duplicate keys in self
-        in lists shared between self and src, the list in self gets emptied
-        before the items from src are added
-        place the new items at the specified base key
+        in lists shared between self and src the list in self gets emptied before the items from src are added
+        
+        places the new items at the specified base key
         default is the root key
         '''
 
@@ -750,10 +752,6 @@ def update_activity_state(action):
     this implements the run-only,run-from and run-until command line options
     '''
 
-    #incase the config has changed since the last action
-    if 'ym/prefix' in action:
-        meta['prefix'] = action['ym/prefix']
-
     #see if we've reached the run-from rule
     if meta['args'].run_from and action['name'] == meta['args'].run_from:
         meta['reached_run_from'] = True
@@ -773,7 +771,6 @@ def update_activity_state(action):
     meta['log_path_prefix'] = os.path.join(meta['log_dir'],
                                     meta['prefix'] + meta['start_time'])
 
-
 def init_meta(args,config):
     global meta
 
@@ -782,6 +779,12 @@ def init_meta(args,config):
 
     assert args != None
 
+    #parse and store any yaml config provided on the command line
+    if args.conf:
+        meta["conf"] = yaml.safe_load(args.conf)
+    else:
+        meta["conf"] = None
+    
     #store dry_run, run_only, run_from, run_until settings
     meta['args'] = args
 
@@ -799,7 +802,9 @@ def init_meta(args,config):
     meta['start_time'] = timestamp_now()
 
     meta['is_active'] = None
-    meta['prefix'] = config['ym/prefix']
+
+    #job name and logfile prefix
+    meta['prefix'] = args.prefix #argparse defaults it to 'ym-'
 
     if args.log_dir != None:
         meta['log_dir'] = args.log_dir
@@ -843,6 +848,7 @@ def fill_out_all(config,action,path):
     '''
 
     action.override(config)
+    if meta["conf"]: action.update(meta["conf"])
     action.includes_and_loads(path)
     action.sub_vars()
     #action.make_log_dir()
@@ -1334,7 +1340,7 @@ def find_conflicts(all_vals,values):
             return True #conflict found
     return False #no conflicts found
 
-def check_input_mtimes(input):
+def check_input_mtimes(input,action):
     '''
     return newest mtime if all inputs present
     otherwise return "missing" if any missing
@@ -1360,7 +1366,15 @@ def check_input_mtimes(input):
             missing = True
             continue
 
-        mtime = os.path.getmtime(path)
+        if action['ym/check_input_mtime'] == 'target':
+            mtime = os.path.getmtime(path)
+            
+        elif action['ym/check_input_mtime'] == 'symlink':
+            mtime = os.lstat(path).st_mtime
+
+        else:
+            raise Exception(f"unknown check_output_mtime option {action['ym/check_input_mtime']}")
+
         if newest_mtime == None or mtime > newest_mtime:
             newest_mtime = mtime
 
@@ -1369,7 +1383,7 @@ def check_input_mtimes(input):
     assert newest_mtime != None, 'invalid newest_mtime!'
     return newest_mtime
 
-def check_output_mtimes(output):
+def check_output_mtimes(output,action):
     '''
     return oldest mtime if all outputs present
     return "missing" if any missing or stale
@@ -1392,7 +1406,14 @@ def check_output_mtimes(output):
             missing = True
             continue
 
-        mtime = os.path.getmtime(path)
+        if action['ym/check_output_mtime'] == 'target':
+            mtime = os.path.getmtime(path)
+
+        elif action['ym/check_output_mtime'] == 'symlink':
+            mtime = os.lstat(path).st_mtime
+
+        else:
+            raise Exception(f"unknown check_output_mtime option {action['ym/check_output_mtime']}")
 
         if oldest_mtime == None or mtime < oldest_mtime:
             oldest_mtime = mtime
@@ -1407,10 +1428,10 @@ def generate_shell_commands(action,job_list,shell):
     for job_numb,job in enumerate(job_list):
         #check all inputs
         #returns newest mtime, "missing" or "empty"
-        newest_input = check_input_mtimes(job['input'])
+        newest_input = check_input_mtimes(job['input'],action)
 
         #returns oldest mtime, "missing" or "empty"
-        oldest_output = check_output_mtimes(job['output'])
+        oldest_output = check_output_mtimes(job['output'],action)
 
         run = False
 
@@ -1725,7 +1746,7 @@ def rmnl(item):
     if item.endswith('\n'): return item[:-1]
     return item
 
-def generate_full_command(config,shell):
+def generate_prefix_commands(config):
     'generate the bash commands to run before the job commands'
 
     cmd_list = []
@@ -1738,9 +1759,21 @@ def generate_full_command(config,shell):
             cmd_list.append(rmnl(config['ym/conda_setup']))
         cmd_list.append(rmnl(f'conda activate {config["ym/conda_prefix"]}{config["conda"]}'))
 
-    cmd_list.append(rmnl(shell))
-
     return '\n'.join(cmd_list)
+
+def generate_final_shell_command(shell):
+    'append the shell command to the command list'
+
+    return rmnl(shell)
+
+def generate_full_command(config,shell):
+    'generate the complete job command list'
+
+    cmd = generate_prefix_commands(config)
+
+    cmd += '\n' + generate_final_shell_command(shell)
+
+    return cmd
 
 def add_env(config,env):
     'add key:value pairs from config["env"] to env'
@@ -1752,7 +1785,7 @@ def add_env(config,env):
         assert type(value) == str, f'non-string value found in env field {key}, all env fields must be simple strings'
         env[key] = value
 
-def generate_job_environment(config,job_numb,njobs):
+def generate_common_job_env(config,njobs):
     'copy local environment with a few adjustments'
 
     env = copy.deepcopy(os.environ)
@@ -1761,14 +1794,32 @@ def generate_job_environment(config,job_numb,njobs):
     add_env(config,env)
 
     env[ config['ym/job_count'] ] = f'{njobs}'
+
+    return env
+
+def add_job_number_to_env(env,config,job_numb):
+    'add the job number to the env'
     env[ config['ym/job_number'] ] = f'{job_numb+1}' # convert from 0 to 1 based to match SGE_TASK_ID
+    return env
+
+def add_job_numbers_to_env(env,config,first_job,last_job):
+    'add the job numbers to the env'
+
+    env[ config['ym/job_number'] ] = ' '.join( [str(i+1) for i in range(first_job,last_job+1)] )
+    return env
+
+def generate_job_environment(config,job_numb,njobs):
+    'copy local environment with a few adjustments'
+
+    env = generate_common_job_env(config,njobs)
+    env = add_job_number_to_env(env,config,job_numb)
 
     return env
 
 def write_jobfile(action,shell_list):
     'save action config and shell_list as json'
 
-    fnamebase = f'{action["ym/prefix"]}{meta["start_time"]}.{action["name"]}'
+    fnamebase = f'{meta["prefix"]}{meta["start_time"]}.{action["name"]}'
     jobfile = os.path.join(meta['log_dir'],fnamebase+'.jobs')
     payload = {'action':action.getdict(),'shell_list':shell_list}
 
@@ -1789,12 +1840,17 @@ def colorize_command(cmd,c):
 
     return tmp
 
-def execute_command(config,job_numb,cmd,env):
-    'execute command locally'
-    foutname = f'{meta["log_path_prefix"]}.{config["name"]}.out'
-    ferrname = f'{meta["log_path_prefix"]}.{config["name"]}.err'
+def local_execute_command(config,first_job,last_job,cmd,env):
+    'execute command(s) locally'
 
-    message(f'job {job_numb+1} executing locally...')
+    if first_job == last_job:
+        foutname = f'{meta["log_path_prefix"]}.{config["name"]}.{first_job+1}.out'
+        ferrname = f'{meta["log_path_prefix"]}.{config["name"]}.{first_job+1}.err'
+        message(f'job {first_job+1} executing locally...')
+    else:
+        foutname = f'{meta["log_path_prefix"]}.{config["name"]}.{first_job+1}-{last_job+1}.out'
+        ferrname = f'{meta["log_path_prefix"]}.{config["name"]}.{first_job+1}-{last_job+1}.err'
+        message(f'jobs {first_job+1}-{last_job+1} executing locally...')
 
     if cmd.endswith('\n'): end = ''
     else:                  end = '\n'
@@ -1833,7 +1889,7 @@ def write_qsub_file(action,qsub_script,jobname,njobs,jobfile):
     'fill out the qsub job script template and write to file ready to pass to qsub'
 
     if action['qsub/template'] == 'default':
-        f_in = open(os.path.join(os.path.dirname(__file__),"qsub_template.sh"))
+        f_in = open("config/default_qsub_template.sh")
     else:
         f_in = open(action['qsub/template'])
 
@@ -1980,8 +2036,8 @@ def qsub_execute_job(jobfile):
 def verify_expected_outputs(action,outputs,inputs):
     '''
     verify that all specified output files exist
-    and are newer than the job start time
-    if any are missing or stale flag job has failed
+    and are newer than the newest input file
+    if any are missing or stale flag job as failed
 
     implies jobs must use touch to update any output file that does not need altering
     or else exclude it from the list of required outputs
@@ -1995,12 +2051,13 @@ def verify_expected_outputs(action,outputs,inputs):
 
     #find newest input file
     #return newest_mtime, "empty" or "missing"
-    newest_mtime = check_input_mtimes(inputs)
+    newest_mtime = check_input_mtimes(inputs,action)
 
     failed = False
     show = True
     for item in outputs.keys():
         path = outputs[item]
+
         if not os.path.exists(path):
             warning(f'missing output {path}')
             failed = True 
@@ -2020,11 +2077,22 @@ def verify_expected_outputs(action,outputs,inputs):
                 warning(f'cannot verify output freshness of {path} due to missing input(s)')
                 show = False
 
-        elif os.path.getmtime(path) < newest_mtime:
-            #expected output file exists but appears stale
-            #ie we assume it was not updated by the command
-            message(f'stale output {path}')
-            failed = True
+        else:
+            if action['ym/check_output_mtime'] == 'target':
+                #follow any symlinks
+                mtime = os.path.getmtime(path)
+
+            elif action['ym/check_output_mtime'] == 'symlink':
+                #do not follow symlinks, take mtime of path itself even if a symlink
+                mtime = os.lstat(path).st_mtime
+
+            else:
+                raise Exception(f"unknown check_output_mtime option {action['ym/check_output_mtime']}")
+            
+            if mtime < newest_mtime:
+                #expected output exists but appears stale
+                message(f'stale output {path}')
+                failed = True
 
     if failed:
         #job has failed
@@ -2036,27 +2104,53 @@ def verify_expected_outputs(action,outputs,inputs):
 
     return False
 
-def execute_jobs(action,shell_list,job_list):
+def aggregated_local_execution(action,shell_list,job_list):
+    'execute local job(s), in batches if ym/aggregate > 1'
+    
     something_failed = False
+    njobs = len(shell_list)
+    first_job = 0
+    per_batch = int(action['ym/aggregate'])
 
-    if not 'exec' in action or action['exec'] == 'local':
-        #local serial execution
-        for job_numb,item in enumerate(shell_list):
-            cmd = generate_full_command(action,item)
-            env = generate_job_environment(action,job_numb,len(shell_list))
+    while first_job < njobs:
+        last_job = min(njobs-1,first_job+per_batch-1)
 
-            #reports only explicit job failure from exit code
-            failed = execute_command(action,job_numb,cmd,env)
+        cmd = generate_prefix_commands(action)
+        env = generate_common_job_env(action,njobs)
+        env = add_job_numbers_to_env(env,action,first_job,last_job)
+        batch_list = shell_list[first_job:last_job+1]
 
-            if not failed:
-                #job has also failed if not all required outputs were created/updated
-                failed = verify_expected_outputs(action,job_list[job_numb]["output"],job_list[job_numb]["input"])
+        for item in batch_list:
+            cmd += '\n' + generate_final_shell_command(item)
 
-            if failed:
+        #reports only explicit job failure from exit code
+        all_failed = local_execute_command(action,first_job,last_job,cmd,env)
+
+        for job_numb in range(first_job,last_job+1):
+            #job has also failed if not all required outputs were created/updated
+            job_failed = verify_expected_outputs(action,job_list[job_numb]["output"],job_list[job_numb]["input"])
+
+            #note: assumes every job failed if all_failed is True
+            if all_failed or job_failed:
                 #carry out config controlled action on outputs of failed job
                 #ie delete, recycle, mark as stale or ignore
                 handle_failed_outputs(action,job_list[job_numb]["output"])
                 something_failed = True
+
+        first_job += per_batch
+
+    return something_failed
+
+def execute_jobs(action,shell_list,job_list):
+    something_failed = False
+
+    if not 'exec' in action or action['exec'] == 'local':
+        #separate local execution (default mode)
+        something_failed = aggregated_local_execution(action,shell_list,job_list)
+
+    # elif action['exec'] == 'aggregated':
+    #     #aggregated local execution
+    #     something_failed = aggregated_execution(action,shell_list,job_list)
 
     elif action['exec'] == 'qsub':
         #qsub execution using an array job
@@ -2136,16 +2230,23 @@ def process_action(config,action,path):
 def process(pipeline,path,config=None,args=None):
     '''
     process the YAML pipeline that was already loaded from path
+    note: this maybe a module or the toplevel pipeline
+    toplevel calls with config=None
+    module calls with a copy of the current config
     '''
 
-    #initially set config to default values if none provided
+    #toplevel sets the config to built in default values
     if config == None:
-        #set conf to defaults
         config = Conf(src="defaults")
 
-    #on first call store args and init stateful variables that
-    #implement run-only, run-from and run-until options
-    init_meta(args,config)
+    #toplevels passed command line args (modules have args==None)
+    if args:
+        #on first call store command line args and initialise stateful variables that
+        #implement run-only, run-from and run-until options
+        init_meta(args,config)
+
+        #apply command line config overrides
+        if meta["conf"]: config.update(meta["conf"])
 
     counter = 0
 
@@ -2170,6 +2271,8 @@ def process(pipeline,path,config=None,args=None):
             #add new config to the existing one, overriding any shared keys
             message(f'updating config')
             config.update(item[item_type])
+            #but reapply command line config overrides
+            if meta["conf"]: config.update(meta["conf"])
             config.includes_and_loads(path)
 
         elif item_type == 'include':

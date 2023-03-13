@@ -14,7 +14,7 @@
         cores: "4"
 
     input:
-        int:  "{%intervals}"
+        int:  "{%gene_intervals_file}"
         ibam: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_bqsr.bam"
 
     output:
@@ -55,7 +55,7 @@
         gatk GenomicsDBImport \
           -V {%vcf/ -V } \
           --genomicsdb-workspace-path {%gdb} \
-          -L {%intervals} \
+          -L {%gene_intervals_file} \
           -ip 10
 
 - action:

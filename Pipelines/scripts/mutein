@@ -45,9 +45,11 @@ def parse_args():
     cut.add_argument('--csvopts',help="""csv.reader options as json eg --csvopts '{"dialect":"excel","delimiter":"|"}'""")
 
     #symlink
-    symlink =  subparsers.add_parser('symlink', help='create relative symlink with shortest possible path')
+    symlink =  subparsers.add_parser('symlink', help='create relative symlink with shortest possible path, always overwrite any existing symlink')
     symlink.add_argument('--target',required=True,help="file the symlink points to")
     symlink.add_argument('--link',required=True,help="the symlink")
+    symlink.add_argument('--overwrite',action='store_true',help="allow the link to silently overwrite any existing non-symlink file with the same name")
+    symlink.add_argument('--absolute',action='store_true',help="link to target using it' absolute path")
 
     #generate an encrypted AES256 bulk data key
     encrypt_key = subparsers.add_parser('encrypt-key', help='generate an encrypted AES256 bulk data key')

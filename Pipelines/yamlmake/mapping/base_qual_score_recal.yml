@@ -7,10 +7,12 @@
     conda: "gatk4"
 
     qsub: 
-        time:  "24:00:00" 
-        mem:   "6G"
+        template: "{%conf_dir}/cs_no_vmem_template.sh" #don't specify h_vmem option, only tmem
+        time:  "4:00:00" 
+        mem:   "5G"
         tmpfs: "20G"
         cores: "2"
+    java_opts: "-Xmx8g"
 
     input:
         ibam:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_posn_sort.bam"
@@ -19,12 +21,9 @@
         bqsr:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_posn_sort.bqsr"
 
     shell: |
-        MY_TMP_DIR=${TMPDIR}/${RANDOM}${RANDOM}
-        mkdir -p ${MY_TMP_DIR}
-
-        gatk --java-options "-Xmx8G" \
+        gatk --java-options "{%java_opts}" \
           BaseRecalibrator \
-          --tmp-dir ${MY_TMP_DIR} \
+          --tmp-dir ${TMPDIR} \
           -I {%ibam} \
           -R {%ref/fasta_bgz} \
           -O {%bqsr} \
@@ -36,10 +35,12 @@
     conda: "gatk4"
 
     qsub: 
+        template: "{%conf_dir}/cs_no_vmem_template.sh" #don't specify h_vmem option, only tmem
         time:  "24:00:00" 
-        mem:   "6G"
+        mem:   "5G"
         tmpfs: "20G"
         cores: "2"
+    java_opts: "-Xmx8g"
 
     input:
         ibam:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_posn_sort.bam"
@@ -49,12 +50,9 @@
         obam:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_bqsr.bam"
 
     shell: |
-        MY_TMP_DIR=${TMPDIR}/${RANDOM}${RANDOM}
-        mkdir -p ${MY_TMP_DIR}
-
-        gatk --java-options "-Xmx8G" \
+        gatk --java-options "{%java_opts}" \
           ApplyBQSR \
-            --tmp-dir ${MY_TMP_DIR} \
+            --tmp-dir ${TMPDIR} \
             -I {%ibam} \
             -R {%ref/fasta_bgz} \
             --bqsr-recal-file {%bqsr} \

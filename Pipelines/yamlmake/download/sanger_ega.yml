@@ -1,5 +1,5 @@
 #define dataset_id, subset_list, credentials
-- include: "../config/yokoyama2019.yml"
+- include: "../config/sanger_ega.yml"
 
 #https://ega-archive.org/download/downloader-quickguide-APIv3
 #https://github.com/EGA-archive/ega-download-client
@@ -35,8 +35,7 @@
 
     #ensure files downloaded as single chunks
     #workaround for buggy download system
-    #pyega3_options: "-ms 100000000000" 
-    pyega3_options: " " 
+    pyega3_options: "-ms 100000000000" 
     default_cred: "credential_file.json"
 
     #no input
@@ -73,20 +72,3 @@
         observed=$(cat {%accession_dir}/${filename} | md5sum | awk '{print $1}')
         [[ "${expected}" == "${observed}" ]] && touch {%touch}
 
-#not needed provided download command will create the accession folders
-# - action:
-#     name: "create_subset_folders"
-#     exec: "local"
-
-#     input:
-#         accession_list: "datasets/{%dataset_id}/{=subset_id}/.meta/file_list"
-
-#     output:
-#         touch: "datasets/{%dataset_id}/{=subset_id}/.meta/create_subset_folders.touch"
-
-#     shell: |
-#         for acc in $(cat {%accession_list})
-#         do
-#             mkdir -p datasets/{%dataset_id}/{=subset_id}/${acc}
-#         done
-#         touch {%touch}
