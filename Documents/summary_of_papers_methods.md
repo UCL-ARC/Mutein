@@ -4,7 +4,8 @@ What steps used in their variant calling pipelines, which tools, did they has ma
 
 ### Martincorena2015
 Eyelid surgery samples from 4 adults 55-73 years old. Indiv 1: 24 samples. Indiv 2: 92 samples. Indiv 3:91 samples. Indiv 4: 28 samples.
-Reference GRCh37. A supplement Excel sheet lists all the somatic mutations found.
+Reference GRCh37. A supplement Excel sheet lists all the somatic mutations found. "The R code used for variant calling (ShearwaterML) is available in
+Bioconductor (deepSNV package)"
 
 From the supplementary material pdf:
 ```
