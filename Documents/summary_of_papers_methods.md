@@ -11,7 +11,6 @@ Eyelid surgery samples from 4 adults 55-73 years old. Indiv 1: 24 samples. Indiv
 Reference GRCh37. A supplement Excel sheet lists all the somatic mutations found. "The R code used for variant calling (ShearwaterML) is available in
 Bioconductor (deepSNV package)".
 
-
 From the supplementary material pdf:
 ```
 A panel of 74 genes (see list below) was chosen to perform ultra-deep targeted
@@ -54,9 +53,11 @@ sample that are absent in a matched normal sample. The matched normal sample is 
 a sample of normal tissue sequenced to moderate coverage (typically 20-40X), often
 blood from convenience but not necessarily so. Here, instead of using a single matched
 normal sample as a reference, mutations in each sample were called against all other
-normal samples from the same patient
+normal samples from the same patient.
 ```
 
+Perhaps they combined all the other samples, so that they only get one set of calls per samples,
+rather than doing all-versus-all like we are doing!
 
 
 ### Buscarlet2017
