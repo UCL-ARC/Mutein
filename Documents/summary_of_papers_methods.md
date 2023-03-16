@@ -5,7 +5,8 @@ What steps used in their variant calling pipelines, which tools, did they has ma
 ### Martincorena2015
 Eyelid surgery samples from 4 adults 55-73 years old. Indiv 1: 24 samples. Indiv 2: 92 samples. Indiv 3:91 samples. Indiv 4: 28 samples.
 Reference GRCh37. A supplement Excel sheet lists all the somatic mutations found. "The R code used for variant calling (ShearwaterML) is available in
-Bioconductor (deepSNV package)"
+Bioconductor (deepSNV package)". https://github.com/gerstung-lab/deepSNV/blob/master/vignettes/shearwaterML.Rmd seems to be an example of using deepSNV in ShearwaterML mode rather than non ML mode.
+
 
 From the supplementary material pdf:
 ```
@@ -51,6 +52,8 @@ blood from convenience but not necessarily so. Here, instead of using a single m
 normal sample as a reference, mutations in each sample were called against all other
 normal samples from the same patient
 ```
+
+
 
 ### Buscarlet2017
 ### Martincorena2018
