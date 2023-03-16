@@ -104,4 +104,16 @@ from different donors as controls, filtering germline mutations after variant ca
 ### Lawson2020
 ### Fowler2021
 ### Yamaguchi2022
+Note: no access to this data without doing another access request.
+```
+In this work, we perform target-gene sequencing, whole-exome
+sequencing (WES), and whole-genome sequencing (WGS) for 1311
+endometrial glands from 37 women across a wide range of ages.
+```
 
+```
+ We conducted target-gene sequencing of 112 genes in 891
+normal endometrial glands from the uteri of 32 subjects ranging
+in age from 21 to 53 years old (Fig. 1a, Supplementary Table 1
+and Supplementary Data)
+```
