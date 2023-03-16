@@ -38,6 +38,8 @@ Data processing pipeline:
 - Picard MarkDuplicates
 - ShearWaterML
 
+Is that it? Not sure if the actual scripts are available or not.
+
 ```
 Typically, somatic mutations are called by detecting mismatches present in a tumor
 sample that are absent in a matched normal sample. The matched normal sample is often
