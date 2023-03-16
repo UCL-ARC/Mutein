@@ -3,7 +3,7 @@
 What steps used in their variant calling pipelines, which tools, did they has matched normal (eg blood) samples? Technical notes on the datasets, such as which panel of genes did they use for target capture.
 
 ### Martincorena2015
-Eyelid surgery samples from 4 adults 55-73 years old.
+Eyelid surgery samples from 4 adults 55-73 years old. Indiv 1: 24 samples. Indiv 2: 92 samples. Indiv 3:91 samples. Indiv 4: 28 samples.
 From the supplementary material pdf:
 ```
 A panel of 74 genes (see list below) was chosen to perform ultra-deep targeted
