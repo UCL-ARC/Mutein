@@ -123,6 +123,15 @@ of 25.2 cm2 of skin sampled across all donors, we identified
 adjacent samples (Fig. 1D; Supplementary Table S4; Methods)
 ```
 
+```
+5. Martincorena I, Fowler JC, Wabik A, Lawson ARJ, Abascal F, Hall
+MWJ, et  al. Somatic mutant clones colonize the human esophagus
+with age. Science 2018;362:911–7.
+6. Gerstung M, Papaemmanuil E, Campbell PJ. Subclonal variant calling
+with multiple samples and prior knowledge. Bioinformatics 2014;30:
+1198–204
+```
+
 ### Yamaguchi2022
 Note: no access to this data without doing another access request.
 ```
