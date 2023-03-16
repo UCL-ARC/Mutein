@@ -126,7 +126,9 @@ Tables S2 and S3; ref. 1). Mutations were called using the
 ShearwaterML algorithm, which detects mutations present in
 1% or less of nucleated cells in the sample (5, 6). In a total area
 of 25.2 cm2 of skin sampled across all donors, we identified
-47,977 single-base substitutions (SBS), 3,824 double-base substitutions (DBS), and 2,090 small (<200 bp) insertion or deletion events (indels) after merging mutations shared between
+47,977 single-base substitutions (SBS), 3,824 double-base substitutions (DBS),
+and 2,090 small (<200 bp) insertion or deletion events (indels) after merging
+mutations shared between
 adjacent samples (Fig. 1D; Supplementary Table S4; Methods)
 ```
 
@@ -134,8 +136,10 @@ p18 main pdf
 ```
 The two sequence capture bait sets used in this study have been
 described previously ( 5, 9 ). The “grid” bait set contains a set of 74
-genes recurrently mutated in SCC and BCC as well as genes commonly mutated in other epithelial cancers. The “punches + follicles”
-bait set is a broader range of genes frequently mutated in a range of cancers based on the COSMIC cancer gene census ( https://cancer.sanger.
+genes recurrently mutated in SCC and BCC as well as genes commonly mutated in
+other epithelial cancers. The “punches + follicles”
+bait set is a broader range of genes frequently mutated in a range of cancers
+based on the COSMIC cancer gene census ( https://cancer.sanger.
 ac.uk/census ). Samples were sequenced with each bait set as detailed
 below using fat/dermis from the same patient as a germline control. A
 list of all genes covered by the bait sets can be found in Supplementary
@@ -146,11 +150,14 @@ Table S3, and metrics of the bait sets are summarized below.
 BAM files were mapped to the GRCh37d5 reference genome
 using BWA-mem (version 0.7.17; ref. 21 ) and targeted sequencing
 was aligned using the GATK tool IndelRealigner (version 3.6.0;
-ref. 22 ). Duplicate reads were marked using Biobambam2 (Biobambam2 version 2.0.86. https://gitlab.com/german.tischler/biobambam2 , https://www.sanger.ac.uk/science/tools/biobambam ). Depth
+ref. 22 ). Duplicate reads were marked using Biobambam2 (Biobambam2 version
+2.0.86. https://gitlab.com/german.tischler/biobambam2 ,
+https://www.sanger.ac.uk/science/tools/biobambam ). Depth
 of coverage was calculated using Samtools (version 0.1.18) to exclude
 reads which were unmapped, not in the primary alignment, failing
 platform/vendor quality checks, or were PCR/Optical duplicates.
-BEDTools (version 2.23.0) coverage program was then used to calculate the depth of coverage per base across samples (Supplementary
+BEDTools (version 2.23.0) coverage program was then used to calculate
+the depth of coverage per base across samples (Supplementary
 Table S2).
  To determine which samples were suitable for WGS, we used the
 VAF from targeted sequencing to determine which samples were
@@ -163,13 +170,15 @@ was made using the deepSNV R package (also commonly referred to
 as ShearwaterML), version 1.21.3, available at https://github.com/
 gerstung-lab/deepSNV , used in conjunction with R version 3.3.0
 (2016-05-03; ref. 5 ).
- deepSNV makes use of statistical testing to differentiate sequencing errors from true low-frequency mutations and has been shown
+ deepSNV makes use of statistical testing to differentiate sequencing
+ errors from true low-frequency mutations and has been shown
 to be reliable down to a detection limit of 1/10,000 alleles ( 23 ). The
 statistical tests compare by position and strand between skin samples
 and a panel of control samples to estimate how likely an observed
 nucleotide is a sequencing error or a true variant. Combining the
 information for each strand generates a single value used for fi ltering
-false-positive variants. It was noted in development that the performance of deepSNV was not strongly dependent upon P, q -values,
+false-positive variants. It was noted in development that the performance
+of deepSNV was not strongly dependent upon P, q -values,
 or PCR amplifi cations, and its sensitivity can be increased through
 higher sequencing depths. A q -value of 0.01 was used to fi lter the
 variant calls.
@@ -227,7 +236,9 @@ and Supplementary Data)
 ```
 
 ```
-Code for statistical analyses on mutation burden, mutational signatures, and timing of genome events including clonal expansions and copy neutral loss-of-heterozygosity is deposited on GitHub at https://github.com/HirofumiNakaoka/endometrium_natcommun_2021.
+Code for statistical analyses on mutation burden, mutational signatures, and timing of
+genome events including clonal expansions and copy neutral loss-of-heterozygosity is
+deposited on GitHub at https://github.com/HirofumiNakaoka/endometrium_natcommun_2021.
 ```
 
 ```
