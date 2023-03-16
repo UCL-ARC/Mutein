@@ -2,10 +2,14 @@
 
 What steps used in their variant calling pipelines, which tools, did they has matched normal (eg blood) samples? Technical notes on the datasets, such as which panel of genes did they use for target capture.
 
+### deepSNV R package
+https://github.com/gerstung-lab/deepSNV seems to be the current official home of the package.
+https://github.com/gerstung-lab/deepSNV/tree/master/vignettes details three different algorithm: deepSNV, Shearwater and ShearwaterML. Martincorena2015 used ShearwaterML.
+
 ### Martincorena2015
 Eyelid surgery samples from 4 adults 55-73 years old. Indiv 1: 24 samples. Indiv 2: 92 samples. Indiv 3:91 samples. Indiv 4: 28 samples.
 Reference GRCh37. A supplement Excel sheet lists all the somatic mutations found. "The R code used for variant calling (ShearwaterML) is available in
-Bioconductor (deepSNV package)". https://github.com/gerstung-lab/deepSNV/blob/master/vignettes/shearwaterML.Rmd seems to be an example of using deepSNV in ShearwaterML mode rather than non ML mode.
+Bioconductor (deepSNV package)".
 
 
 From the supplementary material pdf:
