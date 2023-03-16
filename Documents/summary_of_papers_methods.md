@@ -61,7 +61,16 @@ rather than doing all-versus-all like we are doing!
 
 
 ### Buscarlet2017
+
 ### Martincorena2018
+esophagus harvested from nine deceased organ donors aged 20-75 while other organs were being harvested.
+```
+we used an Agilent SureSelect custom bait capture design covering 74 cancer
+genes. In addition, we targeted 610 SNPs regularly scattered across the genome for copy number
+analysis and 1,124 SNPs within or around the 74 target genes for targeted copy number analysis.
+This was the same design used in our previous study on sun-exposed skin 
+```
+
 ### Keogh2018
 ### Leesix2019
 ### Zhang2019
