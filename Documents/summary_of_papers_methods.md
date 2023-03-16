@@ -102,7 +102,27 @@ from different donors as controls, filtering germline mutations after variant ca
 ### Yokoyama2019
 ### Brunner2019
 ### Lawson2020
+
 ### Fowler2021
+
+```
+Normal skin from chronically and intermittently sunexposed sites was collected from 35 Caucasian donors whose
+ages ranged from 26 to 79 with a balance of males and
+females (Fig.  1B; Supplementary Table S1)
+```
+
+```
+A total of 1,261 2-mm2
+pieces were sequenced at an average coverage of 690× using a
+bait set of 74 cancer-associated genes (Fig. 1C; Supplementary
+Tables S2 and S3; ref. 1). Mutations were called using the
+ShearwaterML algorithm, which detects mutations present in
+1% or less of nucleated cells in the sample (5, 6). In a total area
+of 25.2 cm2 of skin sampled across all donors, we identified
+47,977 single-base substitutions (SBS), 3,824 double-base substitutions (DBS), and 2,090 small (<200 bp) insertion or deletion events (indels) after merging mutations shared between
+adjacent samples (Fig. 1D; Supplementary Table S4; Methods)
+```
+
 ### Yamaguchi2022
 Note: no access to this data without doing another access request.
 ```
