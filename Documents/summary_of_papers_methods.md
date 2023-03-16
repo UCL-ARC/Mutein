@@ -117,3 +117,17 @@ normal endometrial glands from the uteri of 32 subjects ranging
 in age from 21 to 53 years old (Fig. 1a, Supplementary Table 1
 and Supplementary Data)
 ```
+
+```
+Code for statistical analyses on mutation burden, mutational signatures, and timing of genome events including clonal expansions and copy neutral loss-of-heterozygosity is deposited on GitHub at https://github.com/HirofumiNakaoka/endometrium_natcommun_2021.
+```
+
+```
+The target-gene sequencing of single endometrial glands
+for 112 genes was performed as described in our previous studies with some
+modifications15,59,62,63. Briefly, 112 genes were selected (Supplementary Data)
+based on WES data for ovarian endometriosis and normal uterine endometrium15,
+the mutation profiles in endometriosis-related ovarian cancer64 and in endometrial
+cancer48, and genes involved in DNA repair pathways65,66.
+
+```
