@@ -1,6 +1,6 @@
 # Summary of Variant Calling Methods use in the Dataset Publications
 
-What steps used in their variant calling pipelines, which tools, did they has matched normal (eg blood) samples?
+What steps used in their variant calling pipelines, which tools, did they has matched normal (eg blood) samples? Technical notes on the datasets, such as which panel of genes did they use for target capture.
 
 ### Martincorena2015
 Eyelid surgery samples from 4 adults 55-73 years old.
@@ -31,6 +31,22 @@ Sequencing of paired-end 75bp reads was performed on Illumina HiSeq 2000 or
 duplicates, the average on-target coverage across samples was 500.2x (ranging from
 107.9x to 1163.0x; first quartile 373.7x and third quartile 598.1x).
 ```
+
+Data processing pipeline:
+
+- BWA align paired end reads
+- Picard MarkDuplicates
+- ShearWaterML
+
+```
+Typically, somatic mutations are called by detecting mismatches present in a tumor
+sample that are absent in a matched normal sample. The matched normal sample is often
+a sample of normal tissue sequenced to moderate coverage (typically 20-40X), often
+blood from convenience but not necessarily so. Here, instead of using a single matched
+normal sample as a reference, mutations in each sample were called against all other
+normal samples from the same patient
+```
+
 ### Buscarlet2017
 ### Martincorena2018
 ### Keogh2018
