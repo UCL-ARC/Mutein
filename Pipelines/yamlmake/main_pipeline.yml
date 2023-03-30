@@ -12,6 +12,6 @@
 #- module: "germline/keogh2018.yml"
 #- module: "somatic/keogh2018.yml"
 
-- module: "download/yokoyama2019.yml"
+#- module: "download/yokoyama2019.yml"
 
-#- module: "download/sanger_ega.yml"
+- module: "download/sanger_ega.yml"
