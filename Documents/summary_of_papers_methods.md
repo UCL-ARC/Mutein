@@ -97,11 +97,34 @@ from different donors as controls, filtering germline mutations after variant ca
 ```
 
 ### Keogh2018
+
+Brain samples from Parkinson's disease (PD) or Lewy body (LB) (n=20), Alzheimer's disease (AD, n=20), age matched healthy controls (n=14).
+Brain regions were: cerebellum (CB, n=54), Entorhinal cortex (EC, n=53), frontalcortex (FC, n=32), medulla (Med, n=24), Cingulate (Cin, n=10). Blood (n=6). See Sup. Tab. 4.
+
+We sequenced all exons of 56 genes known to cause, or predispose to, common neurodegenerative disorders (132,617 base pairs (bp)) (Supple-
+mentary Table 1, left), and 46 control genes expressed at low levels in the brain which are typically associated with cancer
+(152,519 bp) (Supplementary Table 1, right, subsequently referred to as ‘cancer’ genes)
+
+Bioinformatics: trim galore, bwa mem, mark duplicates, GATK indel realigner, GATK base recalibrator.
+Germline: GATK haplotypecaller, varscan2 single sample VAR>20%
+Somatic: mutect2 and varscan2, deepSNV
+
 ### Leesix2019
 ### Zhang2019
 ### Yokoyama2019
 ### Brunner2019
+
 ### Lawson2020
+2097 bladder microbiopsies from 20 individuals using targeted (n = 1914 microbiopsies), whole-exome (n = 655), and whole-genome (n = 88) sequencing.
+
+we studied 1647 microbiopsies from 15 deceased transplant organ donors and 450 microbiopsies from five patients with bladder cancer
+(table S1)
+
+targeted sequencing of 321 cancer-associated genes for 1914 microbiopsies (median coverage of 89×)
+
+we performed whole-exome sequencing of 655 microbiopsies (median coverage of 72×)
+
+and whole-genome resequencing of 88 microbiopsies dominated by large clones (median cover-age of 33×)
 
 ### Fowler2021
 
