@@ -97,6 +97,11 @@ from different donors as controls, filtering germline mutations after variant ca
 ```
 
 ### Keogh2018
+
+Brain samples from Parkinson's disease (PD) or Lewy body (LB) (n=20), Alzheimer's disease (AD, n=20), age matched healthy controls (n=14), six samples also had blood samples.
+
+Brain regions were: cerebellum (CB, n=54), Entorhinal cortex (EC, n=53), frontalcortex (FC, n=32), medulla (Med, n=24), Cingulate (Cin, n=10).
+
 ### Leesix2019
 ### Zhang2019
 ### Yokoyama2019

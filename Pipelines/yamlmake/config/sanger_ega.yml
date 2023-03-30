@@ -1,5 +1,5 @@
 - config:
-    dataset_id: "all_ega" #should really be "sanger_ega" as yokoyama is also from ega byt not sanger
+    dataset_id: "sanger_ega" #should really be "sanger_ega" as yokoyama is also from ega byt not sanger
 
     subset_id:
       - "EGAD00001000825" #martincorena2015
