@@ -238,13 +238,15 @@ with ShearwaterML in order to be as conservative as possible. This
 involved, for all samples within each follicle, calling variants against a
 
 custom normal panel consisting of all other follicle samples from all
-donors, plus the dermis/fat samples from all other donors. The corresponding dermis/fat sample for the donor of that follicle was then
+donors, plus the dermis/fat samples from all other donors. The corresponding
+dermis/fat sample for the donor of that follicle was then
 used to remove germline variants. For follicle-spanning mutations,
 only follicles where adjacent segments were successfully sequenced
 or where the same mutation is present within the same follicle, i.e.,
 base and top, are shown.
 Shearwater was run with a normal panel of >24,000, >31,000, and
->12,000× mean coverage depth for the 2-mm2 grid samples, hair follicles, and punch biopsy samples, respectively.
+>12,000× mean coverage depth for the 2-mm2 grid samples, hair follicles,
+and punch biopsy samples, respectively.
 For WGS, data variants were called using the CaVEMan and
 Pindel algorithms (24, 25). For SNVs, CaVEMan was run with the
 major copy number set to 10 and the minor copy number set to 2.
@@ -262,7 +264,8 @@ containing at least one of the SNV pair contained both SNVs. Small
 indels that passed all Pindel filters were kept. For the punch samples
 only, variants were filtered to remove a large excess of single base
 pair insertions at homopolymers of length five or more, an artifact
-likely caused by PCR amplification of low-input DNA concentrations during WGS. Indels were then classed as clonal if the VAF was
+likely caused by PCR amplification of low-input DNA concentrations during WGS.
+Indels were then classed as clonal if the VAF was
 at least 0.3.
 Variants were annotated using VAGrENT (26). Full lists of called
 variants from 2-mm2 gridded samples, 0.25 mm diameter punch
