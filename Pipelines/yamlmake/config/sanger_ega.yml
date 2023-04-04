@@ -1,5 +1,5 @@
 - config:
-    dataset_id: "sanger_ega" #should really be "sanger_ega" as yokoyama is also from ega byt not sanger
+    dataset_id: "sanger_ega"
 
     subset_id:
       - "EGAD00001000825" #martincorena2015
@@ -18,4 +18,4 @@
       - "EGAD00001006117" #lawson2020
       - "EGAD00001004578" #brunner2019
 
-    credentials: "config/private_config2.json"
+    credentials: "/SAN/medic/MuteinScratch/549_mutein/config/private_config2.json"

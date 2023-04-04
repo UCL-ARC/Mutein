@@ -6,4 +6,4 @@
       - "EGAD00001004462"
       - "EGAD00010001631"
 
-    credentials: "config/private_config1.json"
+    credentials: "/SAN/medic/MuteinScratch/549_mutein/config/private_config1.json"
