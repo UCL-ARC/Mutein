@@ -24,12 +24,9 @@
         vcf:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_{*normal}_somatic_mutect2.vcf.gz"
 
     shell: |
-        MY_TMP_DIR=${TMPDIR}/${RANDOM}${RANDOM}
-        mkdir -p ${MY_TMP_DIR}
-
         gatk --java-options "-Xmx8g" Mutect2 \
           --native-pair-hmm-threads {%qsub/cores} \
-          --tmp-dir ${MY_TMP_DIR} \
+          --tmp-dir ${TMPDIR} \
           -L {%int} -ip 10 \
           -R {%ref/fasta_bgz} \
           -I {%tbam} \
@@ -60,11 +57,8 @@
         vcf_annotated:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_{*normal}_somatic_mutect2_annotated.vcf.gz"
 
     shell: |
-        MY_TMP_DIR=${TMPDIR}/${RANDOM}${RANDOM}
-        mkdir -p ${MY_TMP_DIR}
-
         gatk --java-options "-Xmx8g" FilterMutectCalls \
-          --tmp-dir ${MY_TMP_DIR} \
+          --tmp-dir ${TMPDIR} \
           -L {%int} -ip 10 \
           -R {%ref/fasta_bgz} \
           -V {%vcf} \
