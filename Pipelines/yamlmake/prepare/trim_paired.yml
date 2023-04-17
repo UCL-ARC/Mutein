@@ -1,0 +1,35 @@
+#
+# this version of trim.yml handles only paired inputs and retains only paired reads
+#
+
+#trim paired reads with trim_galore
+- action:
+    name:  "trim_pair_reads"
+    exec:  "qsub"
+    conda: "trim-galore"
+
+    qsub: 
+        time:  "24:00:00"
+        mem:   "10G"
+        tmpfs: "20G"
+        cores: "6"
+
+    input:
+        #"raw" paired inputs
+        iread1: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_1.fastq.gz"
+        iread2: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_2.fastq.gz"
+
+    output:
+        #final valid trimmed pairs
+        oread1: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_trim_1.fastq.gz"
+        oread2: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_trim_2.fastq.gz"
+
+    shell: |
+        trim_galore --paired {%iread1} {%iread2} \
+          --illumina --phred33 -q 20 --stringency 1 \
+          -e 0.1 --gzip --length 20 \
+          --output_dir processed/{%dataset_id}/{*subset_id}/{*accession} \
+          --cores 2 --three_prime_clip_R1 3 --three_prime_clip_R2 3
+
+        mv processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_1_val_1.fq.gz {%oread1}
+        mv processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_2_val_2.fq.gz {%oread2}

@@ -34,13 +34,6 @@
 
 #following duplicate marking change sort order from read name to mapping position
 #then index the new bam
-# note: for keogh the @RG PL:ILLUMINA tags were inserted at this point using
-# | samtools addreplacerg -u -w \
-#   -r 'ID:{%dataset_id}_{=subset_id}_{*accession}' \
-#   -r 'SM:{%dataset_id}_{=subset_id}_{*accession}' \
-#   -r 'PL:{%platform}' \
-#   - \
-#but the production pipeline inserts these tags in mapping/mapping.yml:samtools_merge
 - action:
     name:  "sort_by_posn_then_index"
     exec:  "qsub"
@@ -68,23 +61,3 @@
         > {%obam}
 
         samtools index -@ ${EXTRA_THREADS} {%obam}
-
-#truncate _dedup bams
-- action:
-    name:  "truncate_dedup_bam"
-    exec:  "local"
-    conda: "main"
-    run:   "never"
-
-    input:
-        dedup:   "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_dedup.bam"
-
-    output:
-        touch:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{%name}.touch"
-
-    shell: |
-        #truncate deduped bam
-        mutein truncate "{%dedup}"
-
-        #signal truncation was carried out
-        touch {%touch}

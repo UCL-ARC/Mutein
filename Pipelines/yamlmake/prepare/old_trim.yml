@@ -1,6 +1,9 @@
+#
+# this version of trim.yml handles paired and unpaired inputs
+#
+
 #trim just the paired reads with trim_galore
 #this action ignores any unpaired read file, see trim_sing_reads for that
-
 #to handle the case where no valid pairs pass trimming we touch the expected outputs
 #likewise we touch the broken pair outputs to ensure at least an empty file exists
 #broken reads are simply concatenated together in the final action into a single file
