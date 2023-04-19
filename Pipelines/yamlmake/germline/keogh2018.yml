@@ -1,5 +1,5 @@
 #define dataset_id and subset_list
 - include: "../config/keogh2018.yml"
 
-- include: "reheader.yml"    #create version of each bam with sample (individual) as the SM tag
+#- include: "reheader.yml"    #create version of each bam with sample (individual) as the SM tag
 - include: "haplotype_caller.yml"    #run gatk4 HaplotypeCaller

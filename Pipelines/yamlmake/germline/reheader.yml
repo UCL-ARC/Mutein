@@ -17,9 +17,11 @@
 
     output:
         obam: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_bqsr_indiv.bam"
+        oidx: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_bqsr_indiv.bai"
 
     shell: |
         sample=$(cat {%sample_no})
+
         samtools view --bam --uncompressed --with-header {%ibam} \
         | samtools addreplacerg -w \
           --input-fmt BAM --output-fmt BAM \
@@ -28,3 +30,41 @@
           -r 'PL:{%platform}' \
           - \
         > "{%obam}"
+
+        samtools index {%obam} {%oidx}
+
+# #create a new version of the bam where the ID/SM tag indicates the individual not the tissue
+# #to allow grouping all samples from the same individual
+# - action:
+#     name:  "adjust_rg_header"
+#     exec:  "qsub"
+#     conda: "bwa"
+
+#     qsub:
+#         time:  "1:00:00"
+#         mem:   "1G"
+#         tmpfs: "1G"
+#         cores: "2"
+
+#     input:
+#         sample_no: "datasets/{%dataset_id}/{=subset_id}/{*accession}/.meta/sample_number"
+#         ibam: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_bqsr.bam"
+
+#     output:
+#         obam: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_bqsr_indiv.bam"
+#         oidx: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_bqsr_indiv.bai"
+
+#     shell: |
+#         sample=$(cat {%sample_no})
+
+#         samtools view --bam --uncompressed --with-header {%ibam} \
+#         | samtools addreplacerg -w \
+#           --input-fmt BAM --output-fmt BAM \
+#           -r "ID:{%dataset_id}_{=subset_id}_${sample}" \
+#           -r "SM:{%dataset_id}_{=subset_id}_${sample}" \
+#           -r 'PL:{%platform}' \
+#           - \
+#         > "{%obam}"
+
+#         samtools index {%obam} {%oidx}
+
