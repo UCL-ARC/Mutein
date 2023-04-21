@@ -10,28 +10,31 @@
     conda: "gatk4"
 
     qsub:
+        template: "{%conf_dir}/cs_no_vmem_template.sh" #don't specify h_vmem option, only tmem
         time:  "3:00:00"
-        mem:   "3G"
+        mem:   "4G"
         tmpfs: "1G"
         cores: "4"
 
     input:
+        sample_no: "datasets/{%dataset_id}/{=subset_id}/{*accession}/.meta/sample_number"
         int:  "{%gene_intervals_file}"
-        tbam: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_bqsr.bam"
-        nbam: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*normal}_link.bam"
+        tbam: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_bqsr.bam"    #SM=tissue
+        nbam: "processed/{%dataset_id}/{=subset_id}/{*accession}/{+normal}_indiv_link.bam" #SM=individual
 
     output:
-        vcf:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_{*normal}_somatic_mutect2.vcf.gz"
+        vcf:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_somatic_mutect2.vcf.gz"
 
     shell: |
+        sample=$(cat {%sample_no})
         gatk --java-options "-Xmx8g" Mutect2 \
           --native-pair-hmm-threads {%qsub/cores} \
           --tmp-dir ${TMPDIR} \
           -L {%int} -ip 10 \
           -R {%ref/fasta_bgz} \
           -I {%tbam} \
-          -I {%nbam} \
-          --normal-sample {%dataset_id}_{=subset_id}_{*normal} \
+          -I {%nbam/ -I } \
+          --normal-sample {%dataset_id}_{=subset_id}_${sample} \
           -O {%vcf}
 
 # From Mutect2's VCF output:
@@ -44,17 +47,18 @@
     conda: "gatk4"
 
     qsub:
+        template: "{%conf_dir}/cs_no_vmem_template.sh" #don't specify h_vmem option, only tmem
         time:  "1:00:00"
         mem:   "2G"
         tmpfs: "1G"
         cores: "1"
 
     input:
-        vcf:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_{*normal}_somatic_mutect2.vcf.gz"
+        vcf:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_somatic_mutect2.vcf.gz"
         int:  "{%gene_intervals_file}"
 
     output:
-        vcf_annotated:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_{*normal}_somatic_mutect2_annotated.vcf.gz"
+        vcf_annotated:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_somatic_annotated.vcf.gz"
 
     shell: |
         gatk --java-options "-Xmx8g" FilterMutectCalls \
@@ -65,10 +69,14 @@
           -O {%vcf_annotated}
 
 # Create a slimmed down VCF file that has had "bad" calls removed
+#also remove the calls from the normal sample leaving just the somatic mutations
 - action:
     name:  "mutect2_filter"
     exec:  "qsub"
     conda: "bcftools"
+    #run:   "always"
+
+    #ym:   { aggregate: "50" }
 
     qsub:
         time:  "0:30:00"
@@ -76,20 +84,25 @@
         cores: "2"
 
     input:
-        vcf_annotated:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_{*normal}_somatic_mutect2_annotated.vcf.gz"
+        vcf_annotated:     "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_somatic_annotated.vcf.gz"
+        sample_no:         "datasets/{%dataset_id}/{=subset_id}/{*accession}/.meta/sample_number"
 
-    vcf_filtered_base:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_{*normal}_somatic_mutect2_annotated_filtered.vcf.gz"
     output:
-        vcf_filtered:  "{%vcf_filtered_base}"
-        vcf_filtered_idx:  "{%vcf_filtered_base}.tbi"
+        vcf_filtered:      "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_somatic_filtered.vcf.gz"
+        vcf_filtered_idx:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_somatic_filtered.vcf.gz.tbi"
 
     # Apply simple rule for now that the filter status must be "PASS". Perhaps in future we will allow some types of warnings.
     shell: |
+        sample=$(cat {%sample_no})
         bcftools filter \
             --include 'FILTER="PASS"' \
+            -Ov \
+            {%vcf_annotated} \
+        | bcftools view \
+            --samples ^{%dataset_id}_{=subset_id}_${sample} \
             -Oz \
             -o {%vcf_filtered} \
-            {%vcf_annotated}
+            -
 
         # create index, needed for merging
         bcftools index \
@@ -108,10 +121,10 @@
         cores: "2"
 
     input:
-        vcf_filtered: "processed/{%dataset_id}/{=subset_id}/{+accession}/{+accession}_{+normal}_somatic_mutect2_annotated_filtered.vcf.gz"
+        vcf_filtered: "processed/{%dataset_id}/{=subset_id}/{+accession}/{+accession}_somatic_filtered.vcf.gz"
 
     output:
-        vcf_merged: "processed_variants/{%dataset_id}/{=subset_id}/all_somatic_mutect2.vcf.gz"
+        vcf_merged:   "processed/{%dataset_id}/{=subset_id}/.meta/all_somatic.vcf.gz"
 
     # Without the --force-samples option, you get:
     #    Error: Duplicate sample names (keogh2018_SRP159015_SRR7762372), use --force-samples to proceed anyway.
@@ -120,9 +133,13 @@
     # Might need to do a within-person bcftools concat, then a merge? The docs are not particularly clear on what the difference is, or at least how
     # it applies to my situation (finding somatic variants).
     # Are duplicates allowed depending on if they're normal or tumour?
+    # bcftools merge \
+    #     --force-samples \
+    #     -Oz \
+    #     -o {%vcf_merged} \
+    #     {%vcf_filtered/ }
     shell: |
         bcftools merge \
-            --force-samples \
             -Oz \
             -o {%vcf_merged} \
             {%vcf_filtered/ }

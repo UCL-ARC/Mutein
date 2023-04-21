@@ -8,8 +8,9 @@
     conda: "gatk4"
 
     qsub:
+        template: "{%conf_dir}/cs_no_vmem_template.sh" #don't specify h_vmem option, only tmem
         time:  "3:00:00"
-        mem:   "2500M"
+        mem:   "4G"
         tmpfs: "10G"
         cores: "4"
 
@@ -27,7 +28,7 @@
             accessions="${accessions} -I processed/{%dataset_id}/{=subset_id}/${acc}/${acc}_bqsr_indiv.bam"
         done
 
-        gatk --java-options "-Xmx8g" HaplotypeCaller \
+        gatk --java-options "-Xmx12g" HaplotypeCaller \
           --tmp-dir ${TMPDIR} \
           --native-pair-hmm-threads {%qsub/cores} \
           -L {%int} -ip 10 \
@@ -38,10 +39,11 @@
 # https://gatk.broadinstitute.org/hc/en-us/articles/360035889971
 - action:
     name:  "genomics_db_import"
-    exec:  "local"
+    exec:  "qsub"
     conda: "gatk4"
 
     qsub:
+        template: "{%conf_dir}/cs_no_vmem_template.sh" #don't specify h_vmem option, only tmem
         time:  "3:00:00"
         mem:   "9G"
         tmpfs: "1G"
@@ -63,10 +65,11 @@
 
 - action:
     name:  "genotype_gvcfs"
-    exec:  "local"
+    exec:  "qsub"
     conda: "gatk4"
 
     qsub:
+        template: "{%conf_dir}/cs_no_vmem_template.sh" #don't specify h_vmem option, only tmem
         time:  "3:00:00"
         mem:   "9G"
         tmpfs: "1G"

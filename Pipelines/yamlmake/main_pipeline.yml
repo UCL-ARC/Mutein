@@ -9,8 +9,8 @@
 #- module: "download/keogh2018.yml"
 #- module: "prepare/keogh2018.yml"
 #- module: "mapping/keogh2018.yml"
-- module: "germline/keogh2018.yml"
-#- module: "somatic/keogh2018.yml"
+#- module: "germline/keogh2018.yml"
+- module: "somatic/keogh2018.yml"
 
 #- module: "download/yokoyama2019.yml"
 
