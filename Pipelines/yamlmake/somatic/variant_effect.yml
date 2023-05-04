@@ -1,0 +1,32 @@
+- action:
+    name:  "variant_effect"
+    exec:  "local"
+    conda: "vep"
+    #run:   "always"
+
+    ym:   { aggregate: "50" }
+
+    qsub:
+        time:  "0:30:00"
+        mem:   "1G"
+        cores: "2"
+
+    input:
+        vcf_filtered: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_somatic_snponly.vcf.gz"
+
+    output:
+        vep_output:   "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_vep.txt"
+
+    shell: |
+        #skip vcfs containing zero variants
+        set +o pipefail
+        VAR_COUNT=$(zcat {%vcf_filtered} | grep -c -v -e '^#' | cat)
+        if [[ "${VAR_COUNT}" == "0" ]] ; then
+            touch {%vep_output}
+        else
+            variant_effect_predictor.pl \
+              -i {%vcf_filtered} \
+              -o {%vep_output} \
+              -offline --dir_cache ./resources/vep_cache --cache --cache_version 109 \
+              --force_overwrite
+        fi

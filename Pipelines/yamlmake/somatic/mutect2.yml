@@ -110,6 +110,36 @@
             --tbi \
             {%vcf_filtered}
 
+- action:
+    name:  "mutect2_snponly"
+    exec:  "local"
+    conda: "bcftools"
+    #run:   "always"
+
+    ym:   { aggregate: "50" }
+
+    qsub:
+        time:  "0:30:00"
+        mem:   "1G"
+        cores: "2"
+
+    input:
+        vcf_filtered:     "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_somatic_filtered.vcf.gz"
+
+    output:
+        vcf_snponly:      "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_somatic_snponly.vcf.gz"
+        vcf_snponly_idx:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_somatic_snponly.vcf.gz.tbi"
+
+    shell: |
+        bcftools view \
+            -Oz -o {%vcf_snponly} \
+            --exclude-types indels,mnps,ref,bnd,other \
+            {%vcf_filtered}
+
+        # create index, needed for merging
+        bcftools index \
+            --tbi \
+            {%vcf_snponly}
 
 - action:
     name:  "mutect2_merge"
@@ -125,7 +155,7 @@
         vcf_filtered: "processed/{%dataset_id}/{=subset_id}/{+accession}/{+accession}_somatic_filtered.vcf.gz"
 
     output:
-        vcf_merged:   "processed/{%dataset_id}/{=subset_id}/.meta/all_somatic.vcf.gz"
+        vcf_merged:   "processed/{%dataset_id}/{=subset_id}/.meta/all_somatic.tsv.gz"
 
     shell: |
         zcat {%vcf_filtered/ } \
