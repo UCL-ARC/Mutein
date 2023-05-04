@@ -69,7 +69,13 @@
           -O {%vcf_annotated}
 
 # Create a slimmed down VCF file that has had "bad" calls removed
-#also remove the calls from the normal sample leaving just the somatic mutations
+#the following can filter out the "normal" genotype if required
+#| bcftools view \
+#    --samples ^{%dataset_id}_{=subset_id}_${sample} \
+#    -Oz \
+#    -o {%vcf_filtered} \
+#    -
+
 - action:
     name:  "mutect2_filter"
     exec:  "qsub"
@@ -96,13 +102,8 @@
         sample=$(cat {%sample_no})
         bcftools filter \
             --include 'FILTER="PASS"' \
-            -Ov \
-            {%vcf_annotated} \
-        | bcftools view \
-            --samples ^{%dataset_id}_{=subset_id}_${sample} \
-            -Oz \
-            -o {%vcf_filtered} \
-            -
+            -Oz -o {%vcf_filtered} \
+            {%vcf_annotated}
 
         # create index, needed for merging
         bcftools index \
@@ -113,7 +114,7 @@
 - action:
     name:  "mutect2_merge"
     exec:  "local"
-    conda: "bcftools"
+    conda: "main"
 
     qsub:
         time:  "0:30:00"
@@ -126,24 +127,8 @@
     output:
         vcf_merged:   "processed/{%dataset_id}/{=subset_id}/.meta/all_somatic.vcf.gz"
 
-    # Without the --force-samples option, you get:
-    #    Error: Duplicate sample names (keogh2018_SRP159015_SRR7762372), use --force-samples to proceed anyway.
-    # This produces a file with an extreme number of columns, perhaps like it's doing an NxN matrix. Is this because of the repeated samples?
-
-    # Might need to do a within-person bcftools concat, then a merge? The docs are not particularly clear on what the difference is, or at least how
-    # it applies to my situation (finding somatic variants).
-    # Are duplicates allowed depending on if they're normal or tumour?
-    # bcftools merge \
-    #     --force-samples \
-    #     -Oz \
-    #     -o {%vcf_merged} \
-    #     {%vcf_filtered/ }
     shell: |
-        bcftools merge \
-            -Oz \
-            -o {%vcf_merged} \
-            {%vcf_filtered/ }
-
-        bcftools index \
-            --tbi \
-            {%vcf_merged}
+        zcat {%vcf_filtered/ } \
+        | merge_somatic.py \
+        | gzip \
+        > {%vcf_merged}
