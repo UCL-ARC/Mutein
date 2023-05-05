@@ -56,3 +56,56 @@
         echo 'Results'
         echo 'Export all results to ==> Compressed file (.gz), TSV'
         echo 'GO'
+
+#download the variant effect predictor cache
+- action:
+    name: "download_vep_cache"
+    exec: "local"
+
+    #no input files
+
+    output:
+        vep_tarball: "resources/vep_cache/homo_sapiens_vep_109_GRCh38.tar.gz"
+        vep_touch:   "resources/vep_cache/{%name}.touch"
+
+    shell: |
+        cd resources/vep_cache
+        wget -c https://ftp.ensembl.org/pub/release-109/variation/indexed_vep_cache/homo_sapiens_vep_109_GRCh38.tar.gz
+        tar xzf homo_sapiens_vep_109_GRCh38.tar.gz
+        touch {%name}.touch
+
+#download the grch37 to grch38 metadata for crossmap
+- action:
+    name: "download_37to38"
+    exec: "local"
+
+    #no input files
+
+    output:
+        crossmap_gz: "resources/crossmap/hg19ToHg38.over.chain.gz"
+
+    shell: |
+        cd resources/crossmap
+        wget -c http://hgdownload.soe.ucsc.edu/goldenPath/hg19/liftOver/hg19ToHg38.over.chain.gz
+        gunzip --test hg19ToHg38.over.chain.gz
+
+#map keogh2018 snp locations from grch37 to grch38 using crossmap
+- action:
+    name:  "crossmap_37to38"
+    conda: "crossmap"
+    exec:  "local"
+
+    input:
+        keogh_snps: "{$MUT_DIR}/Pipelines/fixtures/keogh2018_sup_table_5.csv"
+        crossmap_gz: "resources/crossmap/hg19ToHg38.over.chain.gz"
+
+    output:
+        keogh_grch37: "resources/crossmap/keogh2018_grch37.bed"
+        keogh_grch38: "resources/crossmap/keogh2018_grch38.bed"
+
+    shell: |
+        tail -n +2 {%keogh_snps} \
+            | cut -d, -f3,4 \
+            | awk -v FS=',' '{print "chr"$1,$2,$2}' \
+            > {%keogh_grch37}
+        CrossMap.py bed {%crossmap_gz} {%keogh_grch37} {%keogh_grch38}

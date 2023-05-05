@@ -1,12 +1,4 @@
-﻿"Case
-/Control
-Gene",Gene,Chr,"Base
-Position",Ref allele,Alt allel,Mutation,ExAC MAF,"ESP6500
-MAF",SIFT_Score,SIFT_Pred,LRT_Score,LRT_Pred,MUT_Score,Mut_Pred,CADD_phred,Case number,Cohort,"Mutation
-class",Cerebellum,"Entorhinal
-Cortex","Frontal
-Cortex",Medulla,"Cingulate
-gyrus",Blood
+﻿"Case/ControlGene",Gene,Chr,"BasePosition",Ref allele,Alt allel,Mutation,ExAC MAF,"ESP6500MAF",SIFT_Score,SIFT_Pred,LRT_Score,LRT_Pred,MUT_Score,Mut_Pred,CADD_phred,Case number,Cohort,"Mutationclass",Cerebellum,"EntorhinalCortex","FrontalCortex",Medulla,"Cingulategyrus",Blood
 Control,DNMT3A,2,25457242,C,T,NS,0.00050000,0.00070,0.03,D,0,D,1,D,23.1,51,LB,MRM,,,,,,
 Control,DNMT3A,2,25461999,C,G,NS,.,.,.,.,0,D,1,D,33,29,AD,MRM,,,,,,
 Control,DNMT3A,2,25462012,G,A,NS,0.00001677,.,0.01,D,0,D,1,D,25.7,37,LB,MRM,,,,,,
@@ -19,8 +11,7 @@ Case,UCHL1,4,41262768,C,T,S,0.00002471,0.00008,.,.,.,.,.,.,.,17,AD,SRM,,,,,,
 Control,KDR,4,55963895,C,T,NS,.,.,0.47,T,0,D,1,D,36,22,AD,MRM,,,,,,
 Control,TET2,4,106155806,AT,A,FSD,.,.,.,.,.,.,.,.,.,8,Cont,SRM,,,,,,
 Control,TET2,4,106158207,C,T,S,0.00003301,.,.,.,.,.,.,.,.,18,AD,SRM,,,,,,
-Control,TET2,4,106158219,A,"ATTTGA
-CCGCTC",FSI,.,.,.,.,.,.,.,.,.,18,AD,MRM,,,,,,
+Control,TET2,4,106158219,A,"ATTTGACCGCTC",FSI,.,.,.,.,.,.,.,.,.,18,AD,MRM,,,,,,
 Control,TET2,4,106158372,A,AC,FSI,.,.,.,.,.,.,.,.,.,50,LB,MRM,,,,,,
 Control,TET2,4,106158509,G,A,NS,0.00003322,.,0.27,T,0.032,N,1,D,21.7,20,AD,MRM,,,,,,
 Control,TET2,4,106164068,G,A,NS,.,.,0,D,.,.,1,D,22,20,AD,MRM,,,,,,
