@@ -5,7 +5,7 @@
 - action:
     name:  "download_accession_list"
     exec:  "local"
-    conda: "enabrowsertools"
+    conda: "entrez"
 
     #no input files
 

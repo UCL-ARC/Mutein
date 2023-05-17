@@ -35,8 +35,9 @@
 
     #ensure files downloaded as single chunks
     #workaround for buggy download system
-    pyega3_options: "-ms 100000000000" 
-    default_cred: "credential_file.json"
+    #pyega3_options: "-cf {%credentials} -ms 100000000000" 
+
+    pyega3_options: "-cf {%credentials}" 
 
     #no input
 
@@ -45,12 +46,9 @@
 
     #get list of EGAF accessions and MD5s using pyega3
     shell: |
-        mutein symlink --abs \
-          --target {%credentials} \
-          --link   datasets/{%dataset_id}/{=subset_id}/{%default_cred}
         cd datasets/{%dataset_id}/{=subset_id}
         pyega3 {%pyega3_options} fetch {=subset_id}
-        rm -f {%default_cred} pyega3_output.log
+        rm -f pyega3_output.log
         cd -
         touch {%touch}
 
