@@ -6,6 +6,21 @@ What steps used in their variant calling pipelines, which tools, did they has ma
 https://github.com/gerstung-lab/deepSNV seems to be the current official home of the package.
 https://github.com/gerstung-lab/deepSNV/tree/master/vignettes details three different algorithm: deepSNV, Shearwater and ShearwaterML. Martincorena2015 used ShearwaterML.
 
+deepsnv_ncomms1814.pdf
+
+```
+Batch-library preparation and sequencing in the
+same run ensure identical noise characteristics of test and control,
+an important prerequisite for reliable variant detection
+
+Specificity is lost if sequencing is performed in different runs
+because of dissimilar error distributions, but can partially be recovered by data normalisation
+
+P-values are corrected for the number of tests performed, controlling
+either the family-wise error rate (FWER; Bonferroni method) or
+the false discovery rate (FDR; Benjamini–Hochberg)
+```
+
 ### Martincorena2015
 Eyelid surgery samples from 4 adults 55-73 years old. Indiv 1: 24 samples. Indiv 2: 92 samples. Indiv 3:91 samples. Indiv 4: 28 samples.
 Reference GRCh37. A supplement Excel sheet lists all the somatic mutations found. "The R code used for variant calling (ShearwaterML) is available in
