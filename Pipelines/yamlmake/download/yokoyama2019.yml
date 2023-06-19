@@ -36,6 +36,7 @@
     #ensure files downloaded as single chunks
     #workaround for buggy download system
     #pyega3_options: "-ms 100000000000" 
+    #--max-retries -1 means unlimited but is not supported by this version of pyega3 it seems
     pyega3_options: "-cf {%credentials} -ms 100000000000" 
 
     #no input

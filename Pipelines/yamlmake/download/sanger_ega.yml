@@ -35,9 +35,9 @@
 
     #ensure files downloaded as single chunks
     #workaround for buggy download system
-    #pyega3_options: "-cf {%credentials} -ms 100000000000" 
+    pyega3_options: "-cf {%credentials} -ms 100000000000" 
 
-    pyega3_options: "-cf {%credentials}" 
+    #pyega3_options: "-cf {%credentials}" 
 
     #no input
 
