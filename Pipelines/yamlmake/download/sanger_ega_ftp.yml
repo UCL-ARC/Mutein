@@ -1,0 +1,38 @@
+#define dataset_id, subset_list, credentials
+- include: "../config/sanger_ega_ftp.yml"
+
+#recursive ftp download of each accession with ncftp
+- action:
+    name:  "download_accessions"
+    exec:  "local"
+
+    #no input
+
+    output:
+        touch: "datasets/{%dataset_id}/{=subset_id}/.meta/{%name}.touch"
+
+    shell: |
+        export PATH=/share/apps/ncftp-3.2.6/bin:${PATH}
+        ncftpget -f {%credentials} -RT datasets/{%dataset_id} EGAD00001000825
+        touch {%touch}
+
+# decrypt files
+
+# #explicitly test md5 of all downloaded files
+# - action:
+#     name: "verify_downloads"
+#     exec: "qsub"
+
+#     input:
+#         accession_dir: "datasets/{%dataset_id}/{=subset_id}/{*accession}"
+#         md5_list: "datasets/{%dataset_id}/{=subset_id}/.meta/md5_list"
+
+#     output:
+#         touch: "datasets/{%dataset_id}/{=subset_id}/{*accession}/.meta/{%name}.touch"
+
+#     shell: |
+#         filename=$(cat {%md5_list} | grep -w '^{*accession}' | awk '{print $3}')
+#         expected=$(cat {%md5_list} | grep -w '^{*accession}' | awk '{print $2}')
+#         observed=$(cat {%accession_dir}/${filename} | md5sum | awk '{print $1}')
+#         [[ "${expected}" == "${observed}" ]] && touch {%touch}
+

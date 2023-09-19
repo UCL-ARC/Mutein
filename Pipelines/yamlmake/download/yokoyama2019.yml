@@ -27,6 +27,25 @@
         cat {%stderr} | grep EGAF | awk '{print $4}'    > {%file_list}
         cat {%stderr} | grep EGAF | awk '{print $4,$7,$8}' > {%md5_list}
 
+#preemptively create each accession folder
+#so we have a list of expected items to verify after each dataset download
+- action:
+    name: "create_subset_folders"
+    exec: "local"
+
+    input:
+        accession_list: "datasets/{%dataset_id}/{=subset_id}/.meta/file_list"
+
+    output:
+        touch: "datasets/{%dataset_id}/{=subset_id}/.meta/{%name}.touch"
+
+    shell: |
+        for acc in $(cat {%accession_list})
+        do
+            mkdir -p datasets/{%dataset_id}/{=subset_id}/${acc}
+        done
+        touch {%touch}
+
 #one download command per subset rather than accession
 - action:
     name:  "download_accessions"
@@ -45,14 +64,17 @@
         touch: "datasets/{%dataset_id}/{=subset_id}/.meta/{%name}.touch"
 
     #get list of EGAF accessions and MD5s using pyega3
+    #verify that last line of log file ends with " Download complete"
+    #pyega3 seems not to use error codes
     shell: |
         cd datasets/{%dataset_id}/{=subset_id}
         pyega3 {%pyega3_options} fetch {=subset_id}
+        OUTCOME=$(tail -n1 pyega3_output.log | tail -n1 | cut -d']' -f2)
         rm -f pyega3_output.log
         cd -
-        touch {%touch}
+        [[ "${OUTCOME}" == " Download complete" ]] && touch {%touch}
 
-#explicitly test md5 of all downloaded files
+#explicitly test md5 of all accession folders
 - action:
     name: "verify_downloads"
     exec: "qsub"
@@ -70,20 +92,3 @@
         observed=$(cat {%accession_dir}/${filename} | md5sum | awk '{print $1}')
         [[ "${expected}" == "${observed}" ]] && touch {%touch}
 
-#not needed provided download command will create the accession folders
-# - action:
-#     name: "create_subset_folders"
-#     exec: "local"
-
-#     input:
-#         accession_list: "datasets/{%dataset_id}/{=subset_id}/.meta/file_list"
-
-#     output:
-#         touch: "datasets/{%dataset_id}/{=subset_id}/.meta/create_subset_folders.touch"
-
-#     shell: |
-#         for acc in $(cat {%accession_list})
-#         do
-#             mkdir -p datasets/{%dataset_id}/{=subset_id}/${acc}
-#         done
-#         touch {%touch}
