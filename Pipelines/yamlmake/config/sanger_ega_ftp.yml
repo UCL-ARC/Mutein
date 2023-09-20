@@ -13,10 +13,10 @@
     dataset_id: "sanger_ega_ftp"
 
     subset_id:
-      #- "EGAD00001000825" #B1 martincorena2015
-      #- "EGAD00001001090" #B1 martincorena2015
-      #- "EGAD00001001123" #B1 martincorena2015
-      - "EGAD00001004158" #B1 fowler2021,martincorena2018
+      #- "EGAD00001000825" #B1 martincorena2015 CS
+      #- "EGAD00001001090" #B1 martincorena2015 CS
+      #- "EGAD00001001123" #B1 martincorena2015 My
+      - "EGAD00001004158" #B1 fowler2021,martincorena2018 CS
       #- "EGAD00001004159" #B1 fowler2021,martincorena2018
       #- "EGAD00001004192" #B2 leesix2019
       #- "EGAD00001004193" #B1 leesix2019
@@ -29,4 +29,4 @@
       #- "EGAD00001006117" #B1 lawson2020
       #- "EGAD00001004578" #B3 brunner2019
 
-    credentials: "${MUT_DATA}/config/private_config3.txt"
+    credentials: "{$MUT_DATA}/config/private_config3.txt"

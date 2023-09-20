@@ -13,7 +13,6 @@
         touch: "datasets/{%dataset_id}/{=subset_id}/.meta/{%name}.touch"
 
     shell: |
-        #export PATH=/share/apps/ncftp-3.2.6/bin:${PATH} #cs only
         ncftpget -f {%credentials} -RT datasets/{%dataset_id} {=subset_id}
         touch {%touch}
 
