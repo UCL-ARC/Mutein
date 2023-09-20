@@ -16,6 +16,13 @@ export MUT_DATA=/SAN/medic/MuteinScratch/549_mutein
 #only this folder is backed up
 export MUT_RAW=/SAN/medic/Mutein/549_mutein
 
+#where to put temporary files on local node storage
+export MUT_LOCAL_SCRATCH=/scratch0
+
+#extra setup commands to run at the start of each job
+#ensure autofs has mounted the shares
+export MUT_AUX_SETUP='file /SAN/medic/Mutein > /dev/null ; file /SAN/medic/MuteinScratch > /dev/null'
+
 ## ================================================
 
 ## Everything else will not normally need to be edited

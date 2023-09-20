@@ -12,6 +12,12 @@ export MUT_DATA=/lustre/scratch/scratch/ccaervi/549_mutein
 #the rawdata are on a separate store on cs but not myriad
 export MUT_RAW=/lustre/scratch/scratch/ccaervi/549_mutein
 
+#where to put temporary files on local node storage
+export MUT_LOCAL_SCRATCH=/tmp
+
+#extra setup commands to run at the start of each job
+export MUT_AUX_SETUP=''
+
 ## ================================================
 
 ## Everything else will not normally need to be edited

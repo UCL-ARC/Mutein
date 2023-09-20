@@ -19,13 +19,12 @@
           source ~/.bashrc
           set -euo pipefail
           set +o history
-          file /SAN/medic/Mutein > /dev/null
-          file /SAN/medic/MuteinScratch > /dev/null
+          ${MUT_AUX_SETUP}
           export MUT_UNIQ_SUFFIX=$(date +'%Y%m%d%H%M%S%3N')${RANDOM}
-          export TMPDIR=/scratch0/${USER}/tmp${MUT_UNIQ_SUFFIX}
+          export TMPDIR=${MUT_LOCAL_SCRATCH}/${USER}/tmp${MUT_UNIQ_SUFFIX}
           mkdir -p ${TMPDIR}
           function finish {
-          rm -rf /scratch0/${USER}/tmp${MUT_UNIQ_SUFFIX}
+          rm -rf ${MUT_LOCAL_SCRATCH}/${USER}/tmp${MUT_UNIQ_SUFFIX}
           }
           trap finish EXIT ERR INT TERM
 
@@ -45,4 +44,4 @@
 
     working_dir:    "{$MUT_DATA}"
     conf_dir:       "{$MUT_DIR}/Pipelines/yamlmake"
-    conda_channels: "--override-channels -c conda-forge -c defaults -c bioconda"
+    conda_channels: "--override-channels -c conda-forge -c defaults -c bioconda -c flynn"

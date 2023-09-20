@@ -14,8 +14,8 @@
 
     subset_id:
       #- "EGAD00001000825" #B1 martincorena2015
-      - "EGAD00001001090" #B1 martincorena2015
-      #- "EGAD00001001123" #B1 martincorena2015
+      #- "EGAD00001001090" #B1 martincorena2015
+      - "EGAD00001001123" #B1 martincorena2015
       #- "EGAD00001004158" #B1 fowler2021,martincorena2018
       #- "EGAD00001004159" #B1 fowler2021,martincorena2018
       #- "EGAD00001004192" #B2 leesix2019
