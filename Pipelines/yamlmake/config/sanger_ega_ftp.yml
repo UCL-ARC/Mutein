@@ -29,4 +29,4 @@
       #- "EGAD00001006117" #B1 lawson2020
       #- "EGAD00001004578" #B3 brunner2019
 
-    credentials: "/SAN/medic/MuteinScratch/549_mutein/config/private_config3.txt"
+    credentials: "${MUT_DATA}/config/private_config3.txt"
