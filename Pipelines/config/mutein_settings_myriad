@@ -2,12 +2,15 @@
 ## ============ ONLY EDIT THIS SECTION ============
 
 #the Mutein repository folder
-#this path should avoid any symlinks to help it work inside singularity as well
+#this path should avoid any symlinks incase it needs to work inside singularity as well
 export MUT_DIR=/lustre/home/ccaervi/repos/Mutein
 
 #the Mutein data folder
 #this path should avoid any symlinks to help it work inside singularity as well
 export MUT_DATA=/lustre/scratch/scratch/ccaervi/549_mutein
+
+#the rawdata are on a separate store on cs but not myriad
+export MUT_RAW=/lustre/scratch/scratch/ccaervi/549_mutein
 
 ## ================================================
 
