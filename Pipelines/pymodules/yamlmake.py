@@ -2276,9 +2276,11 @@ def process(pipeline,path,config=None,args=None):
             config.includes_and_loads(path)
 
         elif item_type == 'include':
+            include_path = expand_path(item[item_type],config)
+
             #toplevel include: load and insert the yaml items in place of the include item
-            header(f'[{item[item_type]}] included')
-            new_pipeline,new_path = load_pipeline(item[item_type],path) #new_path ignored
+            header(f'[{include_path}] included')
+            new_pipeline,new_path = load_pipeline(include_path,path) #new_path ignored
             counter -= 1
             del pipeline[counter]
             pipeline = pipeline[:counter] + new_pipeline + pipeline[counter:]
@@ -2286,8 +2288,10 @@ def process(pipeline,path,config=None,args=None):
         elif item_type == 'module':
             #process a nested pipeline without affecting the config of any
             #following items
-            header(f'[{item[item_type]}] module')
-            new_pipeline,new_path = load_pipeline(item[item_type],path)
+            module_path = expand_path(item[item_type],config)
+
+            header(f'[{module_path}] module')
+            new_pipeline,new_path = load_pipeline(module_path,path)
             sub_config = Conf(config)
             process(new_pipeline,new_path,config=sub_config)
 
@@ -2298,3 +2302,10 @@ def process(pipeline,path,config=None,args=None):
     flush()
 
     return 0
+
+def expand_path(raw_path,config):
+    'substitute and $ or % placeholders in the path'
+    tmpconf = Conf()
+    tmpconf['path'] = raw_path
+    tmpconf.sub_vars(src=config)
+    return tmpconf['path']
