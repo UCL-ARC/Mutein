@@ -23,6 +23,8 @@ export MUT_LOCAL_SCRATCH=/scratch0
 #ensure autofs has mounted the shares
 export MUT_AUX_SETUP='file /SAN/medic/Mutein > /dev/null ; file /SAN/medic/MuteinScratch > /dev/null'
 
+export MUT_SANGER_YML='sanger_ega_ftp_cs.yml'
+
 ## ================================================
 
 ## Everything else will not normally need to be edited
