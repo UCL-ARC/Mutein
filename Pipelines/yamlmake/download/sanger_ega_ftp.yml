@@ -1,5 +1,5 @@
 #define dataset_id, subset_list, credentials
-- include: "../config/{$MUT_SANGER_YML}"
+- include: "../config/sanger_ega_ftp_{$MUT_PLATFORM}.yml"
 
 #recursive ftp download of each accession with ncftp
 - action:
