@@ -25,6 +25,7 @@ export MUT_AUX_SETUP='file /SAN/medic/Mutein > /dev/null ; file /SAN/medic/Mutei
 
 #use this config file for the sanger_ega_ftp.yml pipeline file
 export MUT_SANGER_YML='sanger_ega_ftp_cs.yml'
+export MUT_PLATFORM='cs'
 
 ## ================================================
 
