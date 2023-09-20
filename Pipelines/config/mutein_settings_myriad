@@ -18,6 +18,9 @@ export MUT_LOCAL_SCRATCH=/tmp
 #extra setup commands to run at the start of each job
 export MUT_AUX_SETUP=''
 
+#use this config file for the sanger_ega_ftp.yml pipeline file
+export MUT_SANGER_YML='sanger_ega_ftp_myriad.yml'
+
 ## ================================================
 
 ## Everything else will not normally need to be edited
