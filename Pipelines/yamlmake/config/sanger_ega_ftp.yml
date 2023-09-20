@@ -1,21 +1,32 @@
+# pyega3 not working we have been given ftp access
+# the datasets have to be grouped into batches of less than 10T
+# the batch groupings I have been told to expect are indicated in the comment following each id
+# eg B1 = first batch, B2 = second batch etc
+# some will need to be split across two batches
+
+# to deal with timeouts and dropped connections
+# I am forcing each download to complete before starting the next one
+# by only uncommenting one dataset id at a time and restarting the pipeline using:
+# $ while true ; do yamlmake --yaml ${MUT_YAML} ; sleep 60 ; done
+
 - config:
     dataset_id: "sanger_ega_ftp"
 
     subset_id:
-      - "EGAD00001000825" #B1 martincorena2015
+      #- "EGAD00001000825" #B1 martincorena2015
       - "EGAD00001001090" #B1 martincorena2015
-      - "EGAD00001001123" #B1 martincorena2015
-      - "EGAD00001004158" #B1 fowler2021,martincorena2018
-      - "EGAD00001004159" #B1 fowler2021,martincorena2018
-      - "EGAD00001004192" #B2 leesix2019
-      - "EGAD00001004193" #B1 leesix2019
-      - "EGAD00001006194" #B4? fowler2021
-      - "EGAD00001006969" #B1 fowler2021
-      - "EGAD00001006113" #B1 lawson2020
-      - "EGAD00001006114" #B1 lawson2020
-      - "EGAD00001006115" #B1 lawson2020
-      - "EGAD00001006116" #B1 lawson2020
-      - "EGAD00001006117" #B1 lawson2020
-      - "EGAD00001004578" #B3 brunner2019
+      #- "EGAD00001001123" #B1 martincorena2015
+      #- "EGAD00001004158" #B1 fowler2021,martincorena2018
+      #- "EGAD00001004159" #B1 fowler2021,martincorena2018
+      #- "EGAD00001004192" #B2 leesix2019
+      #- "EGAD00001004193" #B1 leesix2019
+      #- "EGAD00001006194" #B4? fowler2021
+      #- "EGAD00001006969" #B1 fowler2021
+      #- "EGAD00001006113" #B1 lawson2020
+      #- "EGAD00001006114" #B1 lawson2020
+      #- "EGAD00001006115" #B1 lawson2020
+      #- "EGAD00001006116" #B1 lawson2020
+      #- "EGAD00001006117" #B1 lawson2020
+      #- "EGAD00001004578" #B3 brunner2019
 
-    credentials: "/SAN/medic/MuteinScratch/549_mutein/config/private_config3.json"
+    credentials: "/SAN/medic/MuteinScratch/549_mutein/config/private_config3.txt"
