@@ -19,12 +19,12 @@
           source ~/.bashrc
           set -euo pipefail
           set +o history
-          ${MUT_AUX_SETUP}
+          {$MUT_AUX_SETUP}
           export MUT_UNIQ_SUFFIX=$(date +'%Y%m%d%H%M%S%3N')${RANDOM}
-          export TMPDIR=${MUT_LOCAL_SCRATCH}/${USER}/tmp${MUT_UNIQ_SUFFIX}
+          export TMPDIR={$MUT_LOCAL_SCRATCH}/${USER}/tmp${MUT_UNIQ_SUFFIX}
           mkdir -p ${TMPDIR}
           function finish {
-          rm -rf ${MUT_LOCAL_SCRATCH}/${USER}/tmp${MUT_UNIQ_SUFFIX}
+          rm -rf {$MUT_LOCAL_SCRATCH}/${USER}/tmp${MUT_UNIQ_SUFFIX}
           }
           trap finish EXIT ERR INT TERM
 
