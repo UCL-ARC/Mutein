@@ -16,8 +16,6 @@
         ncftpget -f {%credentials} -RT datasets/{%dataset_id} {=subset_id}
         touch {%touch}
 
-# decrypt files
-
 # #explicitly test md5 of all downloaded files
 # - action:
 #     name: "verify_downloads"
@@ -35,4 +33,7 @@
 #         expected=$(cat {%md5_list} | grep -w '^{*accession}' | awk '{print $2}')
 #         observed=$(cat {%accession_dir}/${filename} | md5sum | awk '{print $1}')
 #         [[ "${expected}" == "${observed}" ]] && touch {%touch}
+
+# decrypt files
+
 

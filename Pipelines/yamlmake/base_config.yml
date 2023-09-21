@@ -29,7 +29,7 @@
           trap finish EXIT ERR INT TERM
 
     qsub:
-        template: "{%conf_dir}/cs_qsub_template.sh"
+        template: "{%conf_dir}/{$MUT_PLATFORM}_qsub_template.sh"
         time:     "02:00:00"
         mem:      "4G"
         tmpfs:    "10G"

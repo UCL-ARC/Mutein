@@ -28,3 +28,6 @@ export MUT_PLATFORM='myriad'
 ## by the user so is sourced from a file in the repo
 
 source "$MUT_DIR"/Pipelines/config/mutein_fixed_settings
+
+#try to suppress the perl locale warning
+export LC_ALL=C.UTF-8
