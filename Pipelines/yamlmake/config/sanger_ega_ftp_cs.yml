@@ -15,11 +15,11 @@
     subset_id:
       #- "EGAD00001000825" #B1 martincorena2015 CS
       #- "EGAD00001001090" #B1 martincorena2015 CS
-      #- "EGAD00001001123" #B1 martincorena2015 My
+      #- "EGAD00001001123" #B1 martincorena2015 Myriad
       - "EGAD00001004158" #B1 fowler2021,martincorena2018 CS
-      #- "EGAD00001004159" #B1 fowler2021,martincorena2018
+      #- "EGAD00001004159" #B1 fowler2021,martincorena2018 Myriad
       #- "EGAD00001004192" #B2 leesix2019
-      #- "EGAD00001004193" #B1 leesix2019
+      #- "EGAD00001004193" #B1 leesix2019 Myriad
       #- "EGAD00001006194" #B4? fowler2021
       #- "EGAD00001006969" #B1 fowler2021
       #- "EGAD00001006113" #B1 lawson2020
