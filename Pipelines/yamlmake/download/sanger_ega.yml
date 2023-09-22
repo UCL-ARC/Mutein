@@ -1,3 +1,5 @@
+#this version tries to use pyega3 tool to download
+
 #define dataset_id, subset_list, credentials
 - include: "../config/sanger_ega.yml"
 
