@@ -33,12 +33,17 @@
         accession_file: "datasets/{%dataset_id}/{=subset_id}/{*accession}.cip"
 
     output:
-        touch: "datasets/{%dataset_id}/{=subset_id}/.meta/{%name}.{*accession}.touch"
+        touch: "datasets/{%dataset_id}/{=subset_id}/.meta/verify_ftp_downloads.{*accession}.touch"
 
     shell: |
         md5_file="{%accession_file}.md5"
         expected=$(cat "${md5_file}")
         observed=$(cat "{%accession_file}" | md5sum | awk '{print $1}')
         [[ "${expected}" == "${observed}" ]] && touch {%touch}
+
+# copy from myriad to cs - rsync?
+# I used a single manually entered command running from barker on CS cluster:
+# while true ; do rsync -av myriad:/lustre/scratch/scratch/ccaervi/549_mutein/datasets/sanger_ega_ftp . ; sleep 300 ; done
+# executed in the folder /SAN/medic/Mutein/549_mutein/datasets/sanger_ega_myriad_rsync
 
 # decrypt files
