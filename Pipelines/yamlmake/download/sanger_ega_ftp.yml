@@ -37,6 +37,7 @@
 
     shell: |
         md5_file="{%accession_file}.md5"
+        file ${md5_file}   #error if missing
         expected=$(cat "${md5_file}")
         observed=$(cat "{%accession_file}" | md5sum | awk '{print $1}')
         [[ "${expected}" == "${observed}" ]] && touch {%touch}
@@ -47,3 +48,5 @@
 # executed in the folder /SAN/medic/Mutein/549_mutein/datasets/sanger_ega_myriad_rsync
 
 # decrypt files
+
+#remove "#"" from file names and reorganised into subsets etc
