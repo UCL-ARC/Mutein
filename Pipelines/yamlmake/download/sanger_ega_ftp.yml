@@ -48,5 +48,26 @@
 # executed in the folder /SAN/medic/Mutein/549_mutein/datasets/sanger_ega_myriad_rsync
 
 # decrypt files
+- action:
+    name: "decrypt_crams"
+    exec: "qsub"
+    qsub:
+      time:  "1:00:00"
+      mem:   "4G"
+      cores: "1"
+
+    input:
+        #             eg datasets/sanger_ega_ftp/EGAD00001001123/13726_1.cram.cip
+        cip_file:     "datasets/{%dataset_id}/{=subset_id}/{*accession}.cip"
+        is_verified:  "datasets/{%dataset_id}/{=subset_id}/.meta/verify_ftp_downloads.{*accession}.touch"
+
+    output:
+        cram_file:    "datasets/{%dataset_id}/{=subset_id}/{*accession}"
+
+    shell: |
+        openssl enc -d -aes-256-cbc \
+            -in {%cip_file}   \
+            -out {%cram_file} \
+            -k $(cat /home/rvickers/549_mutein/config/private_config4.txt) -md sha256
 
 #remove "#"" from file names and reorganised into subsets etc
