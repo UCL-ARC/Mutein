@@ -64,8 +64,11 @@
         touch: "datasets/{%dataset_id}/{=subset_id}/.meta/{%name}.touch"
 
     #get list of EGAF accessions and MD5s using pyega3
+    #pyega3 seems not to emit an error code if the download failed
     #verify that last line of log file ends with " Download complete"
-    #pyega3 seems not to use error codes
+    #note: this might means that the last item downloaded correctly
+    #not that all items downloaded correctly, therefore is essentially useless
+    #a much more difficult and granular parsing of the output log would be required
     shell: |
         cd datasets/{%dataset_id}/{=subset_id}
         pyega3 {%pyega3_options} fetch {=subset_id}
