@@ -37,12 +37,11 @@ default_config_str =\
     qsub:
         template:           'default'       #template job script: "default" or path to your own
         time:               '02:00:00'      #$ -l h_rt={time}
-        memfmt:             '#$ -l mem={mem}'
         mem:                '4G'            #$ -l mem={mem}
         tmpfs:              '10G'           #$ -l tmpfs={tmpfs}
         pe:                 'smp'           #$ -pe {pe} {cores}
-        cores:              '1'             #$ -pe {pe} {cores}
-        maxrun:             '0'             #$ -tc {maxrun} 0=unlimited
+        cores:              '1'             #$ -pe {pe} {cores} cores=1 comments out the pe request altogether
+        maxrun:             '0'             #$ -tc {maxrun} 0=unlimited and comments out the tc request
 '''
 
 default_global_config = yaml.safe_load(default_config_str)
@@ -1917,7 +1916,7 @@ def write_qsub_file(action,qsub_script,jobname,njobs,jobfile):
     else:                   env["_pe"] = "#$" #activate -pe option for multiple cores
 
     for line in f_in:
-        f_out.write(line.format(**env).format(**env)) #two rounds to allow {memfmt} to expand to reveal {mem}
+        f_out.write(line.format(**env).format(**env)) #two rounds to allow nested variables
 
     f_out.close()
     f_in.close()
