@@ -52,7 +52,8 @@
     name: "decrypt_crams"
     exec: "qsub"
     qsub:
-      time:  "1:00:00"
+      template: "{%conf_dir}/{$MUT_PLATFORM}_qsub_template_tc10.sh" #dont use pe, only 10 jobs at once
+      time:  "4:00:00"
       mem:   "4G"
       cores: "1"
 
