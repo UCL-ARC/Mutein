@@ -1,0 +1,7 @@
+#CS requires a different way of requesting RAM
+#and also needs modifying to drop the h_vmem part for some jobs
+# see https://hpc.cs.ucl.ac.uk/wp-content/uploads/sites/21/2022/01/SGE-Guide_12_2021.pdf p19
+# which notes that sometimes h_vmem should be omitted as it causes memory errors
+- config:
+    qsub:
+        memfmt: "#$ -l tmem={mem},h_vmem={mem}"

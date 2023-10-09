@@ -37,10 +37,12 @@ default_config_str =\
     qsub:
         template:           'default'       #template job script: "default" or path to your own
         time:               '02:00:00'      #$ -l h_rt={time}
+        memfmt:             '#$ -l mem={mem}'
         mem:                '4G'            #$ -l mem={mem}
         tmpfs:              '10G'           #$ -l tmpfs={tmpfs}
         pe:                 'smp'           #$ -pe {pe} {cores}
         cores:              '1'             #$ -pe {pe} {cores}
+        maxrun:             '0'             #$ -tc {maxrun} 0=unlimited
 '''
 
 default_global_config = yaml.safe_load(default_config_str)
@@ -1908,7 +1910,14 @@ def write_qsub_file(action,qsub_script,jobname,njobs,jobfile):
     env["yamlmake"] = sys.argv[0]
     env["log_dir"] = meta["log_dir"]
 
-    for line in f_in: f_out.write(line.format(**env))
+    if env["maxrun"] == '0': env["_tc"] = "##" #comment out the -tc option for unlimited tasks
+    else:                    env["_tc"] = "#$" #activate -tc option to limit simultaneous tasks
+
+    if env["cores"] == '1': env["_pe"] = "##" #comment out the -pe option if only requesting one core
+    else:                   env["_pe"] = "#$" #activate -pe option for multiple cores
+
+    for line in f_in:
+        f_out.write(line.format(**env).format(**env)) #two rounds to allow {memfmt} to expand to reveal {mem}
 
     f_out.close()
     f_in.close()

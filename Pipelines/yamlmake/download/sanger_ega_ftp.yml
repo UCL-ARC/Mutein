@@ -52,10 +52,10 @@
     name: "decrypt_crams"
     exec: "qsub"
     qsub:
-      template: "{%conf_dir}/{$MUT_PLATFORM}_qsub_template_tc10.sh" #dont use pe, only 10 jobs at once
       time:  "4:00:00"
       mem:   "4G"
       cores: "1"
+      maxrun: "10"
 
     input:
         #             eg datasets/sanger_ega_ftp/EGAD00001001123/13726_1.cram.cip

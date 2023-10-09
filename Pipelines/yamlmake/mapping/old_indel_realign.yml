@@ -16,7 +16,7 @@
     conda: "gatk3"
 
     qsub:
-        template: "{%conf_dir}/cs_no_vmem_template.sh" #don't specify h_vmem option, only tmem
+        memfmt: "#$ -l tmem={mem}" #don't specify h_vmem option, only tmem
         time:  "10:00:00"
         mem:   "3G"
         tmpfs: "10G"
@@ -123,7 +123,7 @@
     conda: "gatk3"
 
     qsub:
-        template: "{%conf_dir}/cs_no_vmem_template.sh" #don't specify h_vmem option, only tmem
+        memfmt: "#$ -l tmem={mem}" #don't specify h_vmem option, only tmem
         time:  "4:00:00"
         mem:   "7G"
         tmpfs: "20G"
