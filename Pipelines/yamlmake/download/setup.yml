@@ -95,8 +95,9 @@
     conda: "crossmap"
     exec:  "local"
 
+    keogh_snps: "{$MUT_DIR}/Pipelines/fixtures/keogh2018_sup_table_5.csv"
+
     input:
-        keogh_snps: "{$MUT_DIR}/Pipelines/fixtures/keogh2018_sup_table_5.csv"
         crossmap_gz: "resources/crossmap/hg19ToHg38.over.chain.gz"
 
     output:
@@ -109,3 +110,18 @@
             | awk -v FS=',' '{print "chr"$1,$2,$2}' \
             > {%keogh_grch37}
         CrossMap.py bed {%crossmap_gz} {%keogh_grch37} {%keogh_grch38}
+
+#download grch37 needed as the reference for the CRAM files
+- action:
+    name:  "download_grch37"
+    exec:  "local"
+
+    #no input files
+
+    output:
+        grch37_fasta: "references/GRCh37/Homo_sapiens.GRCh37.dna_sm.primary_assembly.fa"
+
+    shell: |
+        wget https://ftp.ensembl.org/pub/grch37/current/fasta/homo_sapiens/dna/Homo_sapiens.GRCh37.dna_sm.primary_assembly.fa.gz \
+            -O {%grch37_fasta}.gz
+        gunzip {%grch37_fasta}.gz
