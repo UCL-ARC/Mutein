@@ -3,6 +3,7 @@
     exec: "parallel"
     ym:
         parallel: "4"
+        aggregate: "4"
 
     input:
         inpfile: "tmp/input_file.{*ext}"
@@ -14,4 +15,3 @@
         sleep 5
         echo ${YM_JOB_NUMBER} ${YM_NJOBS} > {%outfile}
         cat {%inpfile} >> {%outfile}
-

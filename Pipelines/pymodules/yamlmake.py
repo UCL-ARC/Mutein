@@ -30,6 +30,7 @@ default_config_str =\
         conda_setup:        ''              #run just before trying to activate the conda env the command requested
         conda_prefix:       ''              #a prefix to apply to the name of every conda environment
         aggregate:          '1'             #how many jobs share the same shell for local execution
+        parallel:           '4'             #how many local jobs at once in parallel execution mode
         #run before every shell action
         bash_setup: |
           source ~/.bashrc
@@ -2184,8 +2185,8 @@ def parallel_local_execution(action,shell_list,job_list):
 
     #spawn initial jobs up to pool_size
     while next_job < pool_size and next_job < njobs:
+        message(f"starting job {next_job+1} in slot {len(pool)+1}")
         pool.append(spawn_job(action,shell_list,job_list,next_job,njobs))
-        message(f"started job {next_job+1} in slot {len(pool)}")
         next_job += 1
 
     #while still jobs to run, replace finished jobs with new jobs
@@ -2227,8 +2228,8 @@ def parallel_local_execution(action,shell_list,job_list):
 
             if next_job < njobs:
                 #spawn a new job in place of the finished one
+                message(f"starting job {next_job+1} in slot {i+1}")
                 pool[i] = spawn_job(action,shell_list,job_list,next_job,njobs)
-                message(f"started job {next_job+1} in slot {i+1}")
                 next_job += 1
                 still_running = True
             else:
