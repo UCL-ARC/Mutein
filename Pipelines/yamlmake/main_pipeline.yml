@@ -1,8 +1,6 @@
 - include: "base_config.yml"
 - include: "reference_config.yml"
 
-- include: "testing/test_parallel.yml"
-
 #- include: "setup_conda_envs.yml"
 #- include: "reference.yml"
 
@@ -18,4 +16,4 @@
 
 #- module: "download/sanger_ega.yml"
 
-#- module: "download/sanger_ega_ftp.yml"
+- module: "download/sanger_ega_ftp.yml"
