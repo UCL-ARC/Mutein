@@ -1,0 +1,17 @@
+- action:
+    name: "test_parallel"
+    exec: "parallel"
+    ym:
+        parallel: "4"
+
+    input:
+        inpfile: "tmp/input_file.{*ext}"
+
+    output:
+        outfile: "tmp/output_file.{*ext}"
+
+    shell: |
+        sleep 5
+        echo ${YM_JOB_NUMBER} ${YM_NJOBS} > {%outfile}
+        cat {%inpfile} >> {%outfile}
+
