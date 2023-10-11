@@ -75,6 +75,7 @@
 - action:
     name: "truncate_cips"
     exec: "local"
+    run:  "never" #comment out to activate
     ym:
         aggregate: "20"
 

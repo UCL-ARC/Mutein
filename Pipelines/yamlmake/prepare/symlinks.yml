@@ -6,10 +6,10 @@
     ym:   { aggregate: "50" }
 
     input:
-        original: "datasets/{%dataset_id}/{*subset_id}/{*accession}/{*basename}.fastq.gz"
+        original: "datasets/{%dataset_id}/{=subset_id}/{*accession}/{*basename}.fastq.gz"
 
     output:
-        symlink: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*basename}.fastq.gz"
+        symlink: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*basename}.fastq.gz"
 
     shell: |
         mutein symlink --target {%original} --link {%symlink}
