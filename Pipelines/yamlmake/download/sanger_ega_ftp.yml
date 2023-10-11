@@ -71,4 +71,21 @@
             -out {%cram_file} \
             -k $(cat /home/rvickers/549_mutein/config/private_config4.txt) -md sha256
 
+# truncate the encrypted versions to save space
+- action:
+    name: "truncate_cips"
+    exec: "local"
+    ym:
+        aggregate: "20"
+
+    input:
+        cip_file:  "datasets/{%dataset_id}/{=subset_id}/{*accession}.cip"
+
+    output:
+        touch:     "datasets/{%dataset_id}/{=subset_id}/.meta/{%name}.{*accession}.cip.touch"
+
+    shell: |
+        mutein truncate {%cip_file}
+        touch {%touch}
+
 #remove "#"" from file names and reorganised into subsets etc

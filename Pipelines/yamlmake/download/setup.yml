@@ -115,13 +115,16 @@
 - action:
     name:  "download_grch37"
     exec:  "local"
+    conda: "bwa"
 
     #no input files
 
     output:
-        grch37_fasta: "references/GRCh37/Homo_sapiens.GRCh37.dna_sm.primary_assembly.fa"
+        grch37_fasta: "references/GRCh37/Homo_sapiens.GRCh37.dna.primary_assembly.fa"
+        grch37_faidx: "references/GRCh37/Homo_sapiens.GRCh37.dna.primary_assembly.fa.fai"
 
     shell: |
-        wget https://ftp.ensembl.org/pub/grch37/current/fasta/homo_sapiens/dna/Homo_sapiens.GRCh37.dna_sm.primary_assembly.fa.gz \
+        wget -c https://ftp.ensembl.org/pub/grch37/current/fasta/homo_sapiens/dna/Homo_sapiens.GRCh37.dna.primary_assembly.fa.gz \
             -O {%grch37_fasta}.gz
         gunzip {%grch37_fasta}.gz
+        samtools faidx {%grch37_fasta}
