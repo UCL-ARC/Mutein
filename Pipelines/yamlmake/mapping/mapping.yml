@@ -22,18 +22,18 @@
         cores: "4"
 
     input:
-        read1: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_trim_1.fastq.gz"
-        read2: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_trim_2.fastq.gz"
+        read1: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_trim_1.fastq.gz"
+        read2: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_trim_2.fastq.gz"
     output:
-        sorted_bam: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_all_sort.bam"
+        sorted_bam: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_all_sort.bam"
 
     shell: |
         bwa mem -t {%qsub/cores} {%ref/fasta_bgz} {%read1} {%read2} \
         | samtools sort -n -T "${TMPDIR}" -O bam -u -m 2G - \
         | samtools addreplacerg -w \
           --input-fmt BAM --output-fmt BAM \
-          -r 'ID:{%dataset_id}_{*subset_id}_{*accession}' \
-          -r 'SM:{%dataset_id}_{*subset_id}_{*accession}' \
+          -r 'ID:{%dataset_id}_{=subset_id}_{*accession}' \
+          -r 'SM:{%dataset_id}_{=subset_id}_{*accession}' \
           -r 'PL:{%platform}' \
           - \
         > "{%sorted_bam}"

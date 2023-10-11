@@ -20,35 +20,35 @@
 
     input:
         #"raw" paired inputs
-        iread1: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_1.fastq.gz"
-        iread2: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_2.fastq.gz"
+        iread1: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_1.fastq.gz"
+        iread2: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_2.fastq.gz"
 
     output:
         #final valid trimmed pairs
-        oread1: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_trim_1.fastq.gz"
-        oread2: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_trim_2.fastq.gz"
+        oread1: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_trim_1.fastq.gz"
+        oread2: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_trim_2.fastq.gz"
 
         #broken pairs where one was removed
-        uread1: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_1_unpaired_1.fq.gz"
-        uread2: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_2_unpaired_2.fq.gz"
+        uread1: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_1_unpaired_1.fq.gz"
+        uread2: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_2_unpaired_2.fq.gz"
 
         #signal we need to merge single reads
-        touch:   "processed/{%dataset_id}/{*subset_id}/{*accession}/concat_sing_reads.required"
+        touch:   "processed/{%dataset_id}/{=subset_id}/{*accession}/concat_sing_reads.required"
 
     shell: |
         trim_galore --paired {%iread1} {%iread2} \
           --illumina --phred33 -q 20 --stringency 1 \
           -e 0.1 --gzip --length 20 --retain_unpaired \
-          --output_dir processed/{%dataset_id}/{*subset_id}/{*accession} \
+          --output_dir processed/{%dataset_id}/{=subset_id}/{*accession} \
           --cores 2 --three_prime_clip_R1 3 --three_prime_clip_R2 3
 
         #ensure at least an empty output file is created
-        touch processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_1_val_1.fq.gz
-        touch processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_2_val_2.fq.gz
+        touch processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_1_val_1.fq.gz
+        touch processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_2_val_2.fq.gz
 
         #then rename valid outputs to something shorter
-        mv processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_1_val_1.fq.gz {%oread1}
-        mv processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_2_val_2.fq.gz {%oread2}
+        mv processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_1_val_1.fq.gz {%oread1}
+        mv processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_2_val_2.fq.gz {%oread2}
 
         #ensure at least an empty output file is created
         touch {%uread1}
@@ -72,23 +72,23 @@
 
     input:
         #unpaired "raw" inputs
-        ireadu: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}.fastq.gz"
+        ireadu: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}.fastq.gz"
 
     output:
         #trimmed reads
-        oreadu: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_trimmed.fq.gz"
+        oreadu: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_trimmed.fq.gz"
 
         #signal we need to merge single reads
-        touch:   "processed/{%dataset_id}/{*subset_id}/{*accession}/concat_sing_reads.required"
+        touch:   "processed/{%dataset_id}/{=subset_id}/{*accession}/concat_sing_reads.required"
     shell: |
         trim_galore {%ireadu} \
           --illumina --phred33 -q 20 --stringency 1 \
           -e 0.1 --gzip --length 20 \
-          --output_dir processed/{%dataset_id}/{*subset_id}/{*accession} \
+          --output_dir processed/{%dataset_id}/{=subset_id}/{*accession} \
           --cores 2 --three_prime_clip_R1 3 --three_prime_clip_R2 3
 
         #ensure at least an empty file is output even if nothing passes QC
-        touch processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_trimmed.fq.gz
+        touch processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_trimmed.fq.gz
 
         #signal that a new concat_sing_reads action is required
         touch {%touch}
@@ -111,19 +111,19 @@
     input:
         #make sure action is runnable whatever combo of inputs we have from previous two actions
         #this touch triggers this action from either trimming action above
-        touch: "processed/{%dataset_id}/{*subset_id}/{*accession}/concat_sing_reads.required"
+        touch: "processed/{%dataset_id}/{=subset_id}/{*accession}/concat_sing_reads.required"
 
     output:
         #final all unpaired trimmed reads combined
-        oreadu: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_trim.fastq.gz"
+        oreadu: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_trim.fastq.gz"
 
     shell: |
         #broken pairs where one was removed
-        iread1="processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_1_unpaired_1.fq.gz"
-        iread2="processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_2_unpaired_2.fq.gz"
+        iread1="processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_1_unpaired_1.fq.gz"
+        iread2="processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_2_unpaired_2.fq.gz"
 
         #valid trimmed unpaired reads
-        ireadu="processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_trimmed.fq.gz"
+        ireadu="processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_trimmed.fq.gz"
 
         #truncate any existing output
         echo -n > {%oreadu}

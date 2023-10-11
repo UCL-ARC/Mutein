@@ -18,10 +18,10 @@
         cores: "4"
 
     input:
-        read1: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_trim_1.fastq.gz"
-        read2: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_trim_2.fastq.gz"
+        read1: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_trim_1.fastq.gz"
+        read2: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_trim_2.fastq.gz"
     output:
-        pair_sort_bam: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_pair_sort.bam"
+        pair_sort_bam: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_pair_sort.bam"
 
     shell: |
         bwa mem -t {%qsub/cores} {%ref/fasta_bgz} {%read1} {%read2} \
@@ -44,10 +44,10 @@
         cores: "4"
 
     input:
-        sing_trim: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_trim.fastq.gz"
+        sing_trim: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_trim.fastq.gz"
 
     output:
-        sing_sort_bam: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_sing_sort.bam"
+        sing_sort_bam: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_sing_sort.bam"
 
     shell: |
         bwa mem -t {%qsub/cores} {%ref/fasta_bgz} {%sing_trim} \
@@ -70,13 +70,13 @@
         cores: "4"
 
     input:
-        pair_sort_bam: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_pair_sort.bam"
+        pair_sort_bam: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_pair_sort.bam"
 
     output:
-        all:   "processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_all_sort.bam"
+        all:   "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_all_sort.bam"
 
     shell: |
-        sing_sort_bam="processed/{%dataset_id}/{*subset_id}/{*accession}/{*accession}_sing_sort.bam"
+        sing_sort_bam="processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_sing_sort.bam"
         bam_array=()
         if [[ -f "${sing_sort_bam}" ]] ; then
             bam_array+=("${sing_sort_bam}")
@@ -89,8 +89,8 @@
           "${bam_array[@]}" \
         | samtools addreplacerg -w \
           --input-fmt BAM --output-fmt BAM \
-          -r 'ID:{%dataset_id}_{*subset_id}_{*accession}' \
-          -r 'SM:{%dataset_id}_{*subset_id}_{*accession}' \
+          -r 'ID:{%dataset_id}_{=subset_id}_{*accession}' \
+          -r 'SM:{%dataset_id}_{=subset_id}_{*accession}' \
           -r 'PL:{%platform}' \
           - \
         > {%all}
