@@ -1,0 +1,21 @@
+#create a new directory for the dataset_id with subfolders for each subset_id
+#symlink to the data files in the download location with new names that replace # with _
+- action:
+    name: "rename_crams"
+    exec: "local"
+    ym:   { aggregate: "5" }
+
+    input:
+        #eg       datasets/sanger_ega_ftp/EGAD00001000825/15884_2#21.cram (original file)
+        #becomes  datasets/martincorena2015/EGAD00001000825/15884_2_21/15884_2_21.cram (symlink to original file)
+        src_file: "datasets/sanger_ega_ftp/{=subset_id}/{*accession}.cram"
+
+    output:
+        #we don't know the new name until the sed therefore use touch instead to mark as completed
+        touch:    "datasets/{%dataset_id}/{=subset_id}/.meta/{%name}.{*accession}"
+
+    shell: |
+        new_name=$(echo '{*accession}' | sed 's/#/_/g')
+        new_path="datasets/{%dataset_id}/{=subset_id}/${new_name}/${new_name}.cram"
+        mutein symlink --target {%src_file} --link ${new_path}
+        touch {%touch}

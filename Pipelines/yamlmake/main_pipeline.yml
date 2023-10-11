@@ -14,6 +14,6 @@
 
 #- module: "download/yokoyama2019.yml"
 
-#- module: "download/sanger_ega_ftp.yml"
+- module: "download/sanger_ega_ftp.yml"
 
-- module: "reorganise/martincorena2015.yml"
+#- module: "reorganise/martincorena2015.yml"
