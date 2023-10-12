@@ -8,8 +8,8 @@
     #subset corresponds to EGAD number
     subset_id:
       - "EGAD00001000825"
-      - "EGAD00001001090"
-      - "EGAD00001001123"
+      #- "EGAD00001001090"
+      #- "EGAD00001001123"
 
     #keogh has lost its original read names therefore cannot find optical duplicates
     #because tile,x,y info is not in read names
@@ -19,3 +19,6 @@
 
     #text for the PL: tag of bam files
     platform: "ILLUMINA"
+
+    #which reference fasta for the cram files
+    cram_ref: "references/GRCh37/Homo_sapiens.GRCh37.dna.primary_assembly.fa"

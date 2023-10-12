@@ -1,9 +1,11 @@
 #create a new directory for the dataset_id with subfolders for each subset_id
-#symlink to the data files in the download location with new names that replace # with _
+#symlink to the data files in the download location with new names that replace # and _ with -
+#because # might get interpretted as a comment
+#end we need to stop accession names ending in _1 or _2 as this i used to indicate read 1 / 2 in fastqs
 - action:
     name: "rename_crams"
     exec: "local"
-    ym:   { aggregate: "5" }
+    ym:   { aggregate: "40" }
 
     input:
         #eg       datasets/sanger_ega_ftp/EGAD00001000825/15884_2#21.cram (original file)
@@ -11,11 +13,56 @@
         src_file: "datasets/sanger_ega_ftp/{=subset_id}/{*accession}.cram"
 
     output:
-        #we don't know the new name until the sed therefore use touch instead to mark as completed
+        #we don't know the new name before the shell runs therefore we use touch to create
+        #a file path based only to the original filename to mark the action as completed
         touch:    "datasets/{%dataset_id}/{=subset_id}/.meta/{%name}.{*accession}"
 
     shell: |
-        new_name=$(echo '{*accession}' | sed 's/#/_/g')
+        new_name=$(echo '{*accession}' | sed 's/#/-/g;s/_/-/g')
         new_path="datasets/{%dataset_id}/{=subset_id}/${new_name}/${new_name}.cram"
+        mkdir -p datasets/{%dataset_id}/{=subset_id}/${new_name}
         mutein symlink --target {%src_file} --link ${new_path}
         touch {%touch}
+
+#convert cram into bam to verify that cram reference sequence is correct
+- action:
+    name: "cram_to_bam"
+    exec: "parallel"
+    conda: "bwa"
+
+    ym:
+        parallel: "10"
+
+    input:
+        #eg       datasets/martincorena2015/EGAD00001000825/15884_2_21/15884_2_21.cram
+        inpfile: "datasets/{%dataset_id}/{=subset_id}/{*accession}/{*accession}.cram"
+
+    output:
+        outfile: "datasets/{%dataset_id}/{=subset_id}/{*accession}/{*accession}.bam"
+
+    shell: |
+        ## samtools view -hb --reference {%cram_ref} {%inpfile} > {%outfile} # use grch37
+        samtools view -hb {%inpfile} > {%outfile}                          #let if find the ref itself
+
+# #convert cram into bam sorted into read name order ready for conversion to paired fastq later
+# - action:
+#     name: "bam_to_fastq"
+#     exec: "parallel"
+#     conda: "bwa"
+    
+#     ym:
+#         parallel: "10"
+
+#     input:
+#         #eg       datasets/martincorena2015/EGAD00001000825/15884_2_21/15884_2_21.cram
+#         inpfile: "datasets/{%dataset_id}/{=subset_id}/{*accession}/{*accession}.cram"
+
+#     output:
+#         read1: "datasets/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_1.fastq.gz"
+#         read2: "datasets/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_2.fastq.gz"
+#         read0: "datasets/{%dataset_id}/{=subset_id}/{*accession}/{*accession}.fastq.gz"
+
+#     shell: |
+#         samtools view -h --reference {%cram_ref} {%inpfile} \
+#         | samtools sort -n -T "${TMPDIR}" -O bam -u -m 2G -@ 2 - \
+#         | samtools fastq -1 {%read1} -2 {%read2} -s {%read0} -@ 2
