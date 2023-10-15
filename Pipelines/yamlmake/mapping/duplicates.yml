@@ -5,8 +5,11 @@
 #see C. Xu / Computational and Structural Biotechnology Journal 16 (2018) 15–24
 - action:
     name:  "mark_duplicates"
-    exec:  "qsub"
+    exec:  "parallel"
     conda: "gatk4"
+
+    ym:
+        parallel: "24"
 
     qsub: 
         memfmt: "#$ -l tmem={mem}" #don't specify h_vmem option, only tmem
@@ -14,6 +17,7 @@
         mem:   "7G"
         tmpfs: "10G"
         cores: "2"
+
     java_opts: "-Xmx10g -XX:CompressedClassSpaceSize=2g" #set Xmx to about 2G smaller than mem*cores
 
     input:
@@ -36,8 +40,11 @@
 #then index the new bam
 - action:
     name:  "sort_by_posn_then_index"
-    exec:  "qsub"
+    exec:  "parallel"
     conda: "bwa"
+
+    ym:
+        parallel: "24"
 
     qsub: 
         time:  "3:00:00"

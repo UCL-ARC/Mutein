@@ -3,8 +3,11 @@
 
 - action:
     name:  "base_recalibrator"
-    exec:  "qsub"
+    exec:  "parallel"
     conda: "gatk4"
+
+    ym:
+        parallel: "24"
 
     qsub: 
         memfmt: "#$ -l tmem={mem}" #don't specify h_vmem option, only tmem
@@ -31,8 +34,11 @@
 
 - action:
     name:  "apply_bqsr"
-    exec:  "qsub"
+    exec:  "parallel"
     conda: "gatk4"
+
+    ym:
+        parallel: "24"
 
     qsub: 
         memfmt: "#$ -l tmem={mem}" #don't specify h_vmem option, only tmem

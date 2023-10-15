@@ -1,0 +1,7 @@
+#define dataset_id and subset_list
+- include: "../config/martincorena2015.yml"
+
+- include: "symlinks.yml"
+- include: "fastqc.yml"          #for raw
+- include: "trim_generic.yml"
+- include: "fastqc.yml"          #for trimmed

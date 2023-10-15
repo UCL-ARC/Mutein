@@ -1,7 +1,7 @@
 #generate QC stats for anything called .fastq.gz
 - action:
     name: "fastqc"
-    exec: "qsub"
+    exec: "parallel"
     conda: "trim-galore"
 
     # fastqc uses max one thread per file, we are passing
@@ -11,6 +11,9 @@
       mem:   "4G"
       tmpfs: "2G"
       cores: "1"
+
+    ym:
+      parallel: "40"
 
     input:
       fastq: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*file}.fastq.gz"

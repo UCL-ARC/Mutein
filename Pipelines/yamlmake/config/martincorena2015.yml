@@ -8,8 +8,8 @@
     #subset corresponds to EGAD number
     subset_id:
       - "EGAD00001000825"
-      #- "EGAD00001001090"
-      #- "EGAD00001001123"
+      - "EGAD00001001090"
+      - "EGAD00001001123"
 
     #keogh has lost its original read names therefore cannot find optical duplicates
     #because tile,x,y info is not in read names

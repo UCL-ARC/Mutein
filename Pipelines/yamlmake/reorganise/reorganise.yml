@@ -24,6 +24,49 @@
         mutein symlink --target {%src_file} --link ${new_path}
         touch {%touch}
 
+#try to download any additional reference sequences the crams refer to
+- action:
+    name: "get_cram_refs"
+    exec: "local"
+    conda: "bwa"
+
+    ym:
+        aggregate: "20"
+
+    ref_dir: "{%ref/cram_ref_dir}"
+
+    input:
+        inpfile: "datasets/{%dataset_id}/{=subset_id}/{*accession}/{*accession}.cram"
+
+    output:
+        touch: "datasets/{%dataset_id}/{=subset_id}/{*accession}/.meta/{%name}.{*accession}"
+
+    shell: |
+        for md5 in $(samtools view -H {%inpfile} | grep -e '^@SQ' | grep -o -e 'M5:[0-9a-f]*' | cut --bytes=4-)
+        do
+            len=$(samtools view -H {%inpfile} | grep -e '^@SQ' | grep -e "${md5}" | grep -o -e 'LN:[0-9]*' | cut --bytes=4- | head -n1)
+            dir1=${md5:0:2}
+            dir2=${md5:2:2}
+            filename=${md5:4}
+            if [[ -f "{%ref_dir}/${dir1}/${dir2}/${filename}" ]]; then
+                filesize=$(cat "{%ref_dir}/${dir1}/${dir2}/${filename}" | wc --bytes)
+                if [[ "${len}" == "${filesize}" ]]; then
+                    #already exists at expected size
+                    continue
+                else
+                    #remove file with incorrect size
+                    chmod u+w {%ref_dir}/${dir1}/${dir2} {%ref_dir}/${dir1}/${dir2}/${filename}
+                    rm {%ref_dir}/${dir1}/${dir2}/${filename}
+                fi
+            fi
+
+            #try to download missing reference sequence
+            mkdir -p {%ref_dir}/${dir1}/${dir2}
+            echo wget -O {%ref_dir}/${dir1}/${dir2}/${filename} https://www.ebi.ac.uk/ena/cram/md5/${md5}
+            wget -O {%ref_dir}/${dir1}/${dir2}/${filename} https://www.ebi.ac.uk/ena/cram/md5/${md5}
+        done
+        touch {%touch}
+
 #convert cram into bam to verify that cram reference sequence is correct
 - action:
     name: "cram_to_bam"
@@ -33,6 +76,8 @@
     ym:
         parallel: "10"
 
+    ref_dir: "{%ref/cram_ref_dir}"
+
     input:
         #eg       datasets/martincorena2015/EGAD00001000825/15884_2_21/15884_2_21.cram
         inpfile: "datasets/{%dataset_id}/{=subset_id}/{*accession}/{*accession}.cram"
@@ -41,28 +86,28 @@
         outfile: "datasets/{%dataset_id}/{=subset_id}/{*accession}/{*accession}.bam"
 
     shell: |
-        ## samtools view -hb --reference {%cram_ref} {%inpfile} > {%outfile} # use grch37
-        samtools view -hb {%inpfile} > {%outfile}                          #let if find the ref itself
+        export REF_PATH='{%ref_dir}/%2s/%2s/%s'
+        samtools view -hb {%inpfile} > {%outfile}
 
-# #convert cram into bam sorted into read name order ready for conversion to paired fastq later
-# - action:
-#     name: "bam_to_fastq"
-#     exec: "parallel"
-#     conda: "bwa"
+#convert bam into fastq
+- action:
+    name: "bam_to_fastq"
+    exec: "parallel"
+    conda: "bwa"
     
-#     ym:
-#         parallel: "10"
+    ym:
+        parallel: "12"
 
-#     input:
-#         #eg       datasets/martincorena2015/EGAD00001000825/15884_2_21/15884_2_21.cram
-#         inpfile: "datasets/{%dataset_id}/{=subset_id}/{*accession}/{*accession}.cram"
+    input:
+        #eg       datasets/martincorena2015/EGAD00001000825/15884_2_21/15884_2_21.cram
+        inpfile: "datasets/{%dataset_id}/{=subset_id}/{*accession}/{*accession}.bam"
 
-#     output:
-#         read1: "datasets/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_1.fastq.gz"
-#         read2: "datasets/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_2.fastq.gz"
-#         read0: "datasets/{%dataset_id}/{=subset_id}/{*accession}/{*accession}.fastq.gz"
+    output:
+        read1: "datasets/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_1.fastq.gz"
+        read2: "datasets/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_2.fastq.gz"
+        read0: "datasets/{%dataset_id}/{=subset_id}/{*accession}/{*accession}.fastq.gz"
 
-#     shell: |
-#         samtools view -h --reference {%cram_ref} {%inpfile} \
-#         | samtools sort -n -T "${TMPDIR}" -O bam -u -m 2G -@ 2 - \
-#         | samtools fastq -1 {%read1} -2 {%read2} -s {%read0} -@ 2
+    shell: |
+        samtools view -hbu {%inpfile} \
+        | samtools sort -n -T "${TMPDIR}" -O bam -u -m 2G -@ 2 - \
+        | samtools fastq -1 {%read1} -2 {%read2} -s {%read0} -@ 2

@@ -128,3 +128,23 @@
             -O {%grch37_fasta}.gz
         gunzip {%grch37_fasta}.gz
         samtools faidx {%grch37_fasta}
+
+#convert reference fastas into samtools CRAM reference cache format
+- action:
+    name:  "create_cram_cache"
+    exec:  "local"
+    conda: "bwa"
+
+    #ref_dir: "{%ref/cram_ref_dir}"
+    ref_dir: "references/test"
+
+    input:
+        grch37_fasta: "references/GRCh37/Homo_sapiens.GRCh37.dna.primary_assembly.fa"
+        grch38_fasta: "{%ref/uncompressed}"
+
+    output:
+        touch: "{%ref_dir}/.meta/{%name}.touch"
+
+    shell: |
+        seq_cache_populate.pl -root {%ref_dir} {%grch37_fasta} {%grch38_fasta}
+        touch {%touch}

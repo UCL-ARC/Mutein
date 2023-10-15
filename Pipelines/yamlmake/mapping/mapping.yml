@@ -11,15 +11,17 @@
 #also https://gatk.broadinstitute.org/hc/en-us/articles/360035532352
 - action:
     name:  "bwa_mem"
-    exec:  "qsub"
+    exec:  "parallel"
     conda: "bwa"
+
+    ym:
+        parallel: "24"
 
     qsub: 
         time:  "3:00:00"
         mem:   "2G"
         tmpfs: "10G"
-        # 4x speedup is achievable, haven't tested more
-        cores: "4"
+        cores: "2"
 
     input:
         read1: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_trim_1.fastq.gz"

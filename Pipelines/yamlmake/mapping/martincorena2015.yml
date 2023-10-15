@@ -1,0 +1,6 @@
+#define dataset_id and subset_list
+- include: "../config/martincorena2015.yml"
+
+- include: "mapping.yml"               #bwa map, sort by read name
+- include: "duplicates.yml"            #mark duplicates, sort by position
+- include: "base_qual_score_recal.yml" #recalibrate base quality scores
