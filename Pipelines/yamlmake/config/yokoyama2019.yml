@@ -2,9 +2,9 @@
     dataset_id: "yokoyama2019"
 
     subset_id:
-      - "EGAD00001004464"
-      - "EGAD00001004462"
-      - "EGAD00010001631"
+      - "EGAD00001004464" # 5944.77 GB in 523 files (~11G each)
+      - "EGAD00001004462" # 1204.46 GB in 20 files (~60G each)
+      #- "EGAD00010001631" #CEL files (ie SNP chip)
 
     #credentials: "/SAN/medic/MuteinScratch/549_mutein/config/private_config1.json"
     credentials: "/home/ccaervi/549_mutein/config/private_config1.json"

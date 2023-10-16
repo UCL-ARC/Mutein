@@ -49,7 +49,7 @@
 #download and verify each file in the same job
 #as we probably cant trust pyega3 to signal failure in its exit code
 - action:
-    name:  "download_and verify_accessions"
+    name:  "download_and_verify_accessions"
     exec:  "local"
     conda: "pyega3"
 
@@ -57,7 +57,8 @@
     #workaround for buggy download system
     #pyega3_options: "-ms 100000000000" 
     #--max-retries -1 means unlimited but is not supported by this version of pyega3 it seems
-    pyega3_options: "-cf {%credentials} -ms 100000000000" 
+    #pyega3_options: "-cf {%credentials} -ms 100000000000" 
+    pyega3_options: "-cf {%credentials} -c 4" 
 
     input:
         accession_dir: "datasets/{%dataset_id}/{=subset_id}/{*accession}"
@@ -66,12 +67,6 @@
     output:
         touch: "datasets/{%dataset_id}/{=subset_id}/{*accession}/.meta/{%name}.touch"
 
-    #get list of EGAF accessions and MD5s using pyega3
-    #pyega3 seems not to emit an error code if the download failed
-    #verify that last line of log file ends with " Download complete"
-    #note: this might means that the last item downloaded correctly
-    #not that all items downloaded correctly, therefore is essentially useless
-    #a much more difficult and granular parsing of the output log would be required
     shell: |
         cd {%accession_dir}
         pyega3 {%pyega3_options} fetch {*accession}
@@ -99,4 +94,3 @@
 #         expected=$(cat {%md5_list} | grep -w '^{*accession}' | awk '{print $2}')
 #         observed=$(cat {%accession_dir}/${filename} | md5sum | awk '{print $1}')
 #         [[ "${expected}" == "${observed}" ]] && touch {%touch}
-
