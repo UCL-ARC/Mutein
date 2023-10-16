@@ -46,10 +46,9 @@
         done
         touch {%touch}
 
-#download and verify each file in the same job
-#as we probably cant trust pyega3 to signal failure in its exit code
+#one download command per subset rather than accession
 - action:
-    name:  "download_and verify_accessions"
+    name:  "download_accessions"
     exec:  "local"
     conda: "pyega3"
 
@@ -59,12 +58,10 @@
     #--max-retries -1 means unlimited but is not supported by this version of pyega3 it seems
     pyega3_options: "-cf {%credentials} -ms 100000000000" 
 
-    input:
-        accession_dir: "datasets/{%dataset_id}/{=subset_id}/{*accession}"
-        md5_list:      "datasets/{%dataset_id}/{=subset_id}/.meta/md5_list"
+    #no input
 
     output:
-        touch: "datasets/{%dataset_id}/{=subset_id}/{*accession}/.meta/{%name}.touch"
+        touch: "datasets/{%dataset_id}/{=subset_id}/.meta/{%name}.touch"
 
     #get list of EGAF accessions and MD5s using pyega3
     #pyega3 seems not to emit an error code if the download failed
@@ -73,30 +70,28 @@
     #not that all items downloaded correctly, therefore is essentially useless
     #a much more difficult and granular parsing of the output log would be required
     shell: |
-        cd {%accession_dir}
-        pyega3 {%pyega3_options} fetch {*accession}
+        cd datasets/{%dataset_id}/{=subset_id}
+        pyega3 {%pyega3_options} fetch {=subset_id}
+        OUTCOME=$(tail -n1 pyega3_output.log | tail -n1 | cut -d']' -f2)
         rm -f pyega3_output.log
         cd -
+        [[ "${OUTCOME}" == " Download complete" ]] && touch {%touch}
+
+#explicitly test md5 of all accession folders
+- action:
+    name: "verify_downloads"
+    exec: "qsub"
+
+    input:
+        accession_dir: "datasets/{%dataset_id}/{=subset_id}/{*accession}"
+        md5_list: "datasets/{%dataset_id}/{=subset_id}/.meta/md5_list"
+
+    output:
+        touch: "datasets/{%dataset_id}/{=subset_id}/{*accession}/.meta/{%name}.touch"
+
+    shell: |
         filename=$(cat {%md5_list} | grep -w '^{*accession}' | awk '{print $3}')
         expected=$(cat {%md5_list} | grep -w '^{*accession}' | awk '{print $2}')
         observed=$(cat {%accession_dir}/${filename} | md5sum | awk '{print $1}')
         [[ "${expected}" == "${observed}" ]] && touch {%touch}
-
-# #explicitly test md5 of all accession folders
-# - action:
-#     name: "verify_downloads"
-#     exec: "qsub"
-
-#     input:
-#         accession_dir: "datasets/{%dataset_id}/{=subset_id}/{*accession}"
-#         md5_list: "datasets/{%dataset_id}/{=subset_id}/.meta/md5_list"
-
-#     output:
-#         touch: "datasets/{%dataset_id}/{=subset_id}/{*accession}/.meta/{%name}.touch"
-
-#     shell: |
-#         filename=$(cat {%md5_list} | grep -w '^{*accession}' | awk '{print $3}')
-#         expected=$(cat {%md5_list} | grep -w '^{*accession}' | awk '{print $2}')
-#         observed=$(cat {%accession_dir}/${filename} | md5sum | awk '{print $1}')
-#         [[ "${expected}" == "${observed}" ]] && touch {%touch}
 
