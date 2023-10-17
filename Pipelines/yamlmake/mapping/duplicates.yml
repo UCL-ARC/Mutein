@@ -58,6 +58,7 @@
     output:
         obam:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_posn_sort.bam"
         indx:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_posn_sort.bam.bai"
+        touch: "processed/{%dataset_id}/{=subset_id}/{*accession}/.meta/{%name}.{*accession}"
 
     #sort mapped reads by mapping position, output to bam file
     shell: |
@@ -68,3 +69,4 @@
         > {%obam}
 
         samtools index -@ ${EXTRA_THREADS} {%obam}
+        touch {%touch}

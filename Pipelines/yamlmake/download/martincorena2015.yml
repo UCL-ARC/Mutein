@@ -1,0 +1,41 @@
+#define dataset_id and subset_list
+- include: "../config/martincorena2015.yml"
+
+#create intervals.list file specifying the position of all the target capture genes
+#for the martincorena2015 dataset, see supplementary pdf section 1.2 of the paper
+- action:
+    name:  "create_intervals_list"
+    exec:  "local"
+
+    input:
+        mart_export_gz: "manual_downloads/keogh2018/mart_export.txt.gz" #contains all genes in grch38
+        gene_list:      "{$MUT_DIR}/Pipelines/fixtures/martincorena2015_gene_list"
+
+    output:
+        all_genes:  "datasets/{%dataset_id}/.meta/all_genes.tsv"
+        uniq_genes: "datasets/{%dataset_id}/.meta/uniq_genes.tsv"
+        gene_posns: "datasets/{%dataset_id}/.meta/gene_positions.tsv"
+        intervals:  "{%gene_intervals_file}"
+
+    shell: |
+        #uncompress and rename
+        zcat {%mart_export_gz} > {%all_genes}
+
+        #make a version of the list lacking the synonyms column
+        cat {%all_genes} \
+            | awk -v OFS='\t' '{print $1,$2,$3,$4,$5,$6}' \
+            | sort -u \
+            > {%uniq_genes}
+
+        #extract gene positions for martincorena2015 genes only
+        #note: NR is total lines processed, FNR is lines processed in current file
+        #therefore NR == FNR for the first file only
+        awk 'NR == FNR {genes[$0]} NR > FNR && ($6 in genes)' {%gene_list} {%uniq_genes} \
+            | grep -v CHR_ \
+            | sort -u \
+            > {%gene_posns}
+
+        #print only the position and full chromosome name in the required format
+        awk '{print "chr"$3":"$4"-"$5}' {%gene_posns} \
+            > {%gene_intervals_file}
+

@@ -4,7 +4,7 @@
 #https://gatk.broadinstitute.org/hc/en-us/articles/360035531852-Intervals-and-interval-lists
 - action:
     name:  "haplotype_caller"
-    exec:  "qsub"
+    exec:  "parallel"
     conda: "gatk4"
 
     qsub:
@@ -13,6 +13,9 @@
         mem:   "4G"
         tmpfs: "10G"
         cores: "4"
+
+    ym:
+        parallel: "24"
 
     input:
         int:      "{%gene_intervals_file}"

@@ -1863,8 +1863,11 @@ def local_execute_command(config,first_job,last_job,cmd,env,parallel):
 
     if not is_active():
         #dry-run: signal job completed ok without running it
-        if not parallel: message(f'pipeline inactive, skipping actual command execution')
-        return False
+        if not parallel:
+            message(f'pipeline inactive, skipping actual command execution')
+            return False
+        else:
+            sys.exit(1)
 
     flush()
 
@@ -2183,7 +2186,7 @@ def parallel_local_execution(action,shell_list,job_list):
 
     pool = []
 
-    #spawn initial jobs up to pool_size
+    #spawn initial jobs up to maximum of pool_size
     while next_job < pool_size and next_job < njobs:
         message(f"starting job {next_job+1} in slot {len(pool)+1}")
         pool.append(spawn_job(action,shell_list,job_list,next_job,njobs))

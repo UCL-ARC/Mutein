@@ -3,7 +3,7 @@
     dataset_id: "martincorena2015"
 
     #genomic positions covered by any capture baits used
-    gene_intervals_file: "datasets/martincorena2018/.meta/intervals.list"
+    gene_intervals_file: "datasets/{%dataset_id}/.meta/intervals.list"
 
     #subset corresponds to EGAD number
     subset_id:

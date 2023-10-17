@@ -17,5 +17,8 @@
 #- module: "download/sanger_ega_ftp.yml"
 
 #- module: "reorganise/martincorena2015.yml"
+- module: "download/martincorena2015.yml"
 #- module: "prepare/martincorena2015.yml"
 - module: "mapping/martincorena2015.yml"
+#- module: "germline/martincorena2015.yml"
+#- module: "somatic/martincorena2015.yml"
