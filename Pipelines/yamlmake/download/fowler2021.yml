@@ -68,7 +68,7 @@
         touch: "datasets/{%dataset_id}/{=subset_id}/{*accession}/.meta/{%name}.touch"
 
     shell: |
-        cd {%accession_dir}
+        cd datasets/{%dataset_id}/{=subset_id}
         pyega3 {%pyega3_options} fetch {*accession}
         rm -f pyega3_output.log
         cd -
