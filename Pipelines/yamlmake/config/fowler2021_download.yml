@@ -1,0 +1,8 @@
+- config:
+    dataset_id: "fowler2021"
+
+    subset_id:
+      - "EGAD00001006194" # 2653 GB in 1780 files (~1.5G each)
+
+    #credentials: "/SAN/medic/MuteinScratch/549_mutein/config/private_config1.json"
+    credentials: "/home/ccaervi/549_mutein/config/private_config2.json"
