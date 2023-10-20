@@ -1,6 +1,3 @@
-#define dataset_id, subset_list, credentials
-- include: "../config/yokoyama2019.yml"
-
 #https://ega-archive.org/download/downloader-quickguide-APIv3
 #https://github.com/EGA-archive/ega-download-client
 #download list of accession names
@@ -46,9 +43,10 @@
         done
         touch {%touch}
 
-#one download command per subset rather than accession
+#download and verify each file in the same job
+#as we probably cant trust pyega3 to signal failure in its exit code
 - action:
-    name:  "download_accessions"
+    name:  "download_and_verify_accessions"
     exec:  "local"
     conda: "pyega3"
 
@@ -57,39 +55,20 @@
     #pyega3_options: "-ms 100000000000" 
     #--max-retries -1 means unlimited but is not supported by this version of pyega3 it seems
     pyega3_options: "-cf {%credentials} -ms 100000000000" 
-
-    #no input
-
-    output:
-        touch: "datasets/{%dataset_id}/{=subset_id}/.meta/{%name}.touch"
-
-    #get list of EGAF accessions and MD5s using pyega3
-    #pyega3 seems not to emit an error code if the download failed
-    #verify that last line of log file ends with " Download complete"
-    #note: this might means that the last item downloaded correctly
-    #not that all items downloaded correctly, therefore is essentially useless
-    #a much more difficult and granular parsing of the output log would be required
-    shell: |
-        cd datasets/{%dataset_id}/{=subset_id}
-        pyega3 {%pyega3_options} fetch {=subset_id}
-        OUTCOME=$(tail -n1 pyega3_output.log | tail -n1 | cut -d']' -f2)
-        rm -f pyega3_output.log
-        cd -
-        [[ "${OUTCOME}" == " Download complete" ]] && touch {%touch}
-
-#explicitly test md5 of all accession folders
-- action:
-    name: "verify_downloads"
-    exec: "qsub"
+    #pyega3_options: "-cf {%credentials} -c 4" 
 
     input:
         accession_dir: "datasets/{%dataset_id}/{=subset_id}/{*accession}"
-        md5_list: "datasets/{%dataset_id}/{=subset_id}/.meta/md5_list"
+        md5_list:      "datasets/{%dataset_id}/{=subset_id}/.meta/md5_list"
 
     output:
         touch: "datasets/{%dataset_id}/{=subset_id}/{*accession}/.meta/{%name}.touch"
 
     shell: |
+        cd datasets/{%dataset_id}/{=subset_id}
+        pyega3 {%pyega3_options} fetch {*accession}
+        rm -f pyega3_output.log
+        cd -
         filename=$(cat {%md5_list} | grep -w '^{*accession}' | awk '{print $3}')
         expected=$(cat {%md5_list} | grep -w '^{*accession}' | awk '{print $2}')
         observed=$(cat {%accession_dir}/${filename} | md5sum | awk '{print $1}')
