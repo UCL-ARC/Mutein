@@ -39,3 +39,18 @@
         awk '{print "chr"$3":"$4"-"$5}' {%gene_posns} \
             > {%gene_intervals_file}
 
+#copy manually downloaded metadata file into working position
+#see download/setup.yml
+- action:
+    name: "extract_meta_data"
+    exec: "local"
+
+    input:
+        src:  "manual_downloads/{%dataset_id}/{=subset_id}-metadata.zip"
+
+    output:
+        touch:  "datasets/{%dataset_id}/{=subset_id}/.meta/{%name}.touch"
+
+    shell: |
+        unzip {%src} -d datasets/{%dataset_id}/{=subset_id}/.meta
+        touch {%touch}

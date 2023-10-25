@@ -23,9 +23,11 @@
 
     output:
         keogh2018: "manual_downloads/keogh2018/.meta/{%name}.touch"
+        martincorena2015: "manual_downloads/martincorena2015/.meta/{%name}.touch"
 
     shell: |
         touch {%keogh2018}
+        touch {%martincorean2015}
 
 #check for presence of the files which must be downloaded manually
 - action:
@@ -37,25 +39,35 @@
     output:
         keogh_metadata: "manual_downloads/keogh2018/SraRunTable.txt"
         keogh_intervals: "manual_downloads/keogh2018/mart_export.txt.gz"
+        martincorena1: "manual_downloads/martincorena2015/EGAD00001000825-metadata.zip"
+        martincorena2: "manual_downloads/martincorena2015/EGAD00001001090-metadata.zip"
+        martincorena3: "manual_downloads/martincorena2015/EGAD00001001123-metadata.zip"
 
     shell: |
         echo 'Manually download the following as {%keogh_metadata}'
-        echo 'Visit: https://www.ncbi.nlm.nih.gov/sra/?term=SRP159015'
-        echo 'Click "Send results to run selector"'
-        echo 'Click "Select ==> Total ==> Metadata"'
+        echo ' Visit: https://www.ncbi.nlm.nih.gov/sra/?term=SRP159015'
+        echo ' Click "Send results to run selector"'
+        echo ' Click "Select ==> Total ==> Metadata"'
         echo 
         echo 'Manually download the following as {%keogh_intervals}'
-        echo 'Visit: https://www.ensembl.org/index.html'
-        echo 'Biomart'
-        echo 'CHOOSE DATABASE ==> Ensembl Genes 109'
-        echo 'CHOOSE DATASET ==> Human Genes (GRCh38.p13)'
-        echo 'Attributes ==> Features'
-        echo 'GENE ==> Gene stable ID, Gene Stable ID version'
-        echo '    ==> Chromosome/scaffold name, Gene start(bp), Gene end(bp)'
-        echo '    ==> Gene name, Gene synonym'
-        echo 'Results'
-        echo 'Export all results to ==> Compressed file (.gz), TSV'
-        echo 'GO'
+        echo ' Visit: https://www.ensembl.org/index.html'
+        echo ' Biomart'
+        echo ' CHOOSE DATABASE ==> Ensembl Genes 109'
+        echo ' CHOOSE DATASET ==> Human Genes (GRCh38.p13)'
+        echo ' Attributes ==> Features'
+        echo ' GENE ==> Gene stable ID, Gene Stable ID version'
+        echo '      ==> Chromosome/scaffold name, Gene start(bp), Gene end(bp)'
+        echo '      ==> Gene name, Gene synonym'
+        echo ' Results'
+        echo ' Export all results to ==> Compressed file (.gz), TSV'
+        echo ' GO'
+        echo
+        echo 'Manually download the metadata zip files from here (login required):'
+        echo ' https://ega-archive.org/datasets/EGAD00001000825 ==> metadata ==> csv'
+        echo ' https://ega-archive.org/datasets/EGAD00001001090 ==> metadata ==> csv'
+        echo ' https://ega-archive.org/datasets/EGAD00001001123 ==> metadata ==> csv'
+        echo ' and save as {%martincorena1} {%martincorena2} {%martincorena3}'
+
 
 #download the variant effect predictor cache
 - action:
