@@ -22,7 +22,10 @@
 #test md5 of all ftp downloaded files
 - action:
     name: "verify_ftp_downloads"
-    exec: "qsub"
+    exec: "parallel"
+
+    ym:
+        parallel: "10"
     
     qsub:
       time:  "1:00:00"
@@ -44,7 +47,7 @@
         observed=$(cat "{%accession_file}" | md5sum | awk '{print $1}')
         [[ "${expected}" == "${observed}" ]] && touch {%touch}
 
-# copy from myriad to cs - rsync?
+# here copy from myriad to cs - using rsync
 # I used a single manually entered command running from barker on CS cluster:
 # while true ; do rsync -av myriad:/lustre/scratch/scratch/ccaervi/549_mutein/datasets/sanger_ega_ftp . ; sleep 300 ; done
 # executed in the folder /SAN/medic/Mutein/549_mutein/datasets/sanger_ega_myriad_rsync
@@ -52,7 +55,11 @@
 # decrypt files
 - action:
     name: "decrypt_crams"
-    exec: "qsub"
+    exec: "parallel"
+
+    ym:
+        parallel: "10"
+
     qsub:
       time:  "4:00:00"
       mem:   "4G"
