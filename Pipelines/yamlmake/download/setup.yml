@@ -68,6 +68,22 @@
         echo ' https://ega-archive.org/datasets/EGAD00001001123 ==> metadata ==> csv'
         echo ' and save as {%martincorena1} {%martincorena2} {%martincorena3}'
 
+#check for presence of the files which must be downloaded manually
+- action:
+    name:  "require_manual_downloads2"
+    exec:  "local"
+
+    #no input files
+
+    output:
+        zipfile1: "manual_downloads/leesix2019/EGAD00001004192-metadata.zip"
+        zipfile2: "manual_downloads/leesix2019/EGAD00001004193-metadata.zip"
+
+    shell: |
+        echo 'Manually download the metadata zip files from here (login required):'
+        echo ' https://ega-archive.org/datasets/EGAD00001004192 ==> metadata ==> csv'
+        echo ' https://ega-archive.org/datasets/EGAD00001004193 ==> metadata ==> csv'
+        echo ' and save as {%zipfile1} {%zipfile2}
 
 #download the variant effect predictor cache
 - action:
