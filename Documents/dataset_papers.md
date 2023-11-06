@@ -117,9 +117,9 @@ This table is a duplicate-free list of the dataset accession numbers from the ab
 | EGAD00001004464          | [EGA](https://ega-archive.org/datasets/EGAD00001004464) | yokoyama2019                | Akira Yokoyama kyototumorpatho-labo@umin.ac.jp|523 files, BAM, Illumina HiSeq 2000|5950|
 | EGAD00001004462          | [EGA](https://ega-archive.org/datasets/EGAD00001004462) | yokoyama2019                | Akira Yokoyama kyototumorpatho-labo@umin.ac.jp|20 files, BAM, Illumina NovaSeq 6000|1209|
 | EGAD00010001631          | [EGA](https://ega-archive.org/datasets/EGAD00010001631) | yokoyama2019                | Akira Yokoyama kyototumorpatho-labo@umin.ac.jp|124 files, "raw" format, GeneChip Human Mapping 250K NspI|5|
-| EGAD00001006113          | [EGA](https://ega-archive.org/datasets/EGAD00001006113) | lawson202                   |                          |                            ||
-| EGAD00001006114          | [EGA](https://ega-archive.org/datasets/EGAD00001006114) | lawson202                   |                          |                            ||
-| EGAD00001006115          | [EGA](https://ega-archive.org/datasets/EGAD00001006115) | lawson202                   |                          |                            ||
-| EGAD00001006116          | [EGA](https://ega-archive.org/datasets/EGAD00001006116) | lawson202                   |                          |                            ||
-| EGAD00001006117          | [EGA](https://ega-archive.org/datasets/EGAD00001006117) | lawson202                   |                          |                            ||
-| EGAD00001004578          | [EGA](https://ega-archive.org/datasets/EGAD00001004578) | brunner2019                 |                          |                            ||
+| EGAD00001006113          | [EGA](https://ega-archive.org/datasets/EGAD00001006113) | lawson2020                  | datasharing@sanger.ac.uk | 299 files                  |2800|
+| EGAD00001006114          | [EGA](https://ega-archive.org/datasets/EGAD00001006114) | lawson2020                  | datasharing@sanger.ac.uk | 1917 files                           |1200|
+| EGAD00001006115          | [EGA](https://ega-archive.org/datasets/EGAD00001006115) | lawson2020                  | datasharing@sanger.ac.uk | 104 files                           |198|
+| EGAD00001006116          | [EGA](https://ega-archive.org/datasets/EGAD00001006116) | lawson2020                  | datasharing@sanger.ac.uk | 25 files                     |551|
+| EGAD00001006117          | [EGA](https://ega-archive.org/datasets/EGAD00001006117) | lawson2020                  | datasharing@sanger.ac.uk | 818 files                  |2200|
+| EGAD00001004578          | [EGA](https://ega-archive.org/datasets/EGAD00001004578) | brunner2019                 | datasharing@sanger.ac.uk | 1676 files                           |25800|
