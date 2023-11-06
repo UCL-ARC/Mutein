@@ -112,8 +112,14 @@ This table is a duplicate-free list of the dataset accession numbers from the ab
 | EGAD00001000825          | [EGA](https://ega-archive.org/datasets/EGAD00001000825) | martincorena2015            | datasharing@sanger.ac.uk |700 files, CRAM, Illumina HiSeq 2000|489|
 | EGAD00001004192          | [EGA](https://ega-archive.org/datasets/EGAD00001004192) | leesix2019                  | datasharing@sanger.ac.uk |2038 files, CRAM, HiSeq X Ten|10681|
 | EGAD00001004193          | [EGA](https://ega-archive.org/datasets/EGAD00001004193) | leesix2019                  | datasharing@sanger.ac.uk |1632 files, CRAM, Illumina HiSeq 2500|195|
-| SRP159015                | [SRA](https://www.ncbi.nlm.nih.gov/sra/?term=SRP159015) | keogh2018                   | open access?                    |179 files, SRA, Illumina HiSeq 2500|203|
+| SRP159015                | [SRA](https://www.ncbi.nlm.nih.gov/sra/?term=SRP159015) | keogh2018                   | open access                    |179 files, SRA, Illumina HiSeq 2500|203|
 | SRP219003                | [phs001808.v1.p1](https://www.ncbi.nlm.nih.gov/projects/gap/cgi-bin/study.cgi?study_id=phs001808.v1.p1) [PRJNA531733](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA531733) [SRP219003](https://trace.ncbi.nlm.nih.gov/Traces/sra/?study=SRP219003)|zhang2019|JAAMH-DAC@list.nih.gov|152 files, SRA,Illumina HiSeq X Ten, HiSeq 2000|3103|
 | EGAD00001004464          | [EGA](https://ega-archive.org/datasets/EGAD00001004464) | yokoyama2019                | Akira Yokoyama kyototumorpatho-labo@umin.ac.jp|523 files, BAM, Illumina HiSeq 2000|5950|
 | EGAD00001004462          | [EGA](https://ega-archive.org/datasets/EGAD00001004462) | yokoyama2019                | Akira Yokoyama kyototumorpatho-labo@umin.ac.jp|20 files, BAM, Illumina NovaSeq 6000|1209|
 | EGAD00010001631          | [EGA](https://ega-archive.org/datasets/EGAD00010001631) | yokoyama2019                | Akira Yokoyama kyototumorpatho-labo@umin.ac.jp|124 files, "raw" format, GeneChip Human Mapping 250K NspI|5|
+| EGAD00001006113          | [EGA](https://ega-archive.org/datasets/EGAD00001006113) | lawson202                   |                          |                            ||
+| EGAD00001006114          | [EGA](https://ega-archive.org/datasets/EGAD00001006114) | lawson202                   |                          |                            ||
+| EGAD00001006115          | [EGA](https://ega-archive.org/datasets/EGAD00001006115) | lawson202                   |                          |                            ||
+| EGAD00001006116          | [EGA](https://ega-archive.org/datasets/EGAD00001006116) | lawson202                   |                          |                            ||
+| EGAD00001006117          | [EGA](https://ega-archive.org/datasets/EGAD00001006117) | lawson202                   |                          |                            ||
+| EGAD00001004578          | [EGA](https://ega-archive.org/datasets/EGAD00001004578) | brunner2019                 |                          |                            ||
