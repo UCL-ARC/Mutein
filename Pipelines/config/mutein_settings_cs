@@ -9,7 +9,8 @@ export MUT_DIR=/home/rvickers/repos/Mutein
 #the main Mutein data folder, this storage area is not backed up
 #this allows conda environments to be stored here without impacting the backup process
 #this path should avoid any symlinks to help it work with singularity, autofs etc
-export MUT_DATA=/SAN/medic/MuteinScratch/549_mutein
+#export MUT_DATA=/SAN/medic/MuteinScratch/549_mutein
+export MUT_DATA=/home/rvickers/549_mutein_scratcha
 
 #the rawdata are on a separate store, should be not larger than about 30TB
 #to avoid overloading the backup system

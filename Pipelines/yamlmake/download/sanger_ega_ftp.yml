@@ -22,10 +22,10 @@
 #test md5 of all ftp downloaded files
 - action:
     name: "verify_ftp_downloads"
-    exec: "parallel"
+    exec: "qsub"
 
     ym:
-        parallel: "10"
+        parallel: "8"
     
     qsub:
       time:  "1:00:00"
@@ -58,7 +58,7 @@
     exec: "parallel"
 
     ym:
-        parallel: "10"
+        parallel: "8"
 
     qsub:
       time:  "4:00:00"
@@ -78,13 +78,14 @@
         openssl enc -d -aes-256-cbc \
             -in {%cip_file}   \
             -out {%cram_file} \
-            -k $(cat /home/rvickers/549_mutein/config/private_config4.txt) -md sha256
+            -k $(cat {%decryption_password}) -md sha256
 
 # truncate the encrypted versions to save space
 - action:
     name: "truncate_cips"
     exec: "local"
     run:  "never" #comment out to activate
+    
     ym:
         aggregate: "20"
 

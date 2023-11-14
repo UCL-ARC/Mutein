@@ -30,3 +30,4 @@
       #- "EGAD00001004578" #B3 brunner2019
 
     credentials: "{$MUT_DATA}/config/private_config3.txt"
+    decryption_password: "{$MUT_DATA}/config/private_config4.txt"
