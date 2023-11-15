@@ -1,7 +1,7 @@
 #this version uses the ftp download account setup by the ega helpdesk for me
 #due to pyega3 not working
 
-#define dataset_id, subset_list, credentials
+#define dataset_id, subset_id list, login credentials
 - include: "../config/sanger_ega_ftp_{$MUT_PLATFORM}.yml"
 
 #recursive ftp download of each accession with ncftp
