@@ -3,11 +3,14 @@
 
 - action:
     name:  "base_recalibrator"
-    exec:  "qsub"
+    exec:  "parallel"
     conda: "gatk4"
 
+    ym:
+        parallel: "24"
+
     qsub: 
-        template: "{%conf_dir}/cs_no_vmem_template.sh" #don't specify h_vmem option, only tmem
+        memfmt: "#$ -l tmem={mem}" #don't specify h_vmem option, only tmem
         time:  "4:00:00" 
         mem:   "5G"
         tmpfs: "20G"
@@ -19,6 +22,7 @@
 
     output:
         bqsr:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_posn_sort.bqsr"
+        touch: "processed/{%dataset_id}/{=subset_id}/{*accession}/.meta/{%name}.{*accession}"
 
     shell: |
         gatk --java-options "{%java_opts}" \
@@ -28,14 +32,18 @@
           -R {%ref/fasta_bgz} \
           -O {%bqsr} \
           --known-sites {%ref/dbsnp_dir}/{%ref/final_vcf}
+        touch {%touch}
 
 - action:
     name:  "apply_bqsr"
-    exec:  "qsub"
+    exec:  "parallel"
     conda: "gatk4"
 
+    ym:
+        parallel: "24"
+
     qsub: 
-        template: "{%conf_dir}/cs_no_vmem_template.sh" #don't specify h_vmem option, only tmem
+        memfmt: "#$ -l tmem={mem}" #don't specify h_vmem option, only tmem
         time:  "24:00:00" 
         mem:   "5G"
         tmpfs: "20G"
@@ -48,6 +56,7 @@
 
     output:
         obam:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_bqsr.bam"
+        touch: "processed/{%dataset_id}/{=subset_id}/{*accession}/{%name}.{*accession}"
 
     shell: |
         gatk --java-options "{%java_opts}" \
@@ -57,23 +66,4 @@
             -R {%ref/fasta_bgz} \
             --bqsr-recal-file {%bqsr} \
             -O {%obam}
-
-#truncate all_sort bams
-- action:
-    name:  "truncate_all_sort_bam"
-    exec:  "local"
-    conda: "main"
-    run:   "never"
-
-    input:
-        sort:   "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_all_sort.bam"
-
-    output:
-        touch:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{%name}.touch"
-
-    shell: |
-        #truncate merged bam
-        mutein truncate "{%sort}"
-
-        #signal truncation was carried out
         touch {%touch}

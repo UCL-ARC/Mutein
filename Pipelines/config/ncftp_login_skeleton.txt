@@ -1,0 +1,3 @@
+host ftp.ega.ebi.ac.uk
+user ega-dbox-xxx
+pass PASSWORD

@@ -6,14 +6,14 @@
 #     exec: "local"
 
 #     input:
-#       izip:   "datasets/{%dataset_id}/{*subset_id}/{*accession}/{*file}_fastqc.zip"
-#       ihtml:  "datasets/{%dataset_id}/{*subset_id}/{*accession}/{*file}_fastqc.html"
-#       ibam:   "datasets/{%dataset_id}/{*subset_id}/{*accession}/{*file}_aln_sort.bam"
+#       izip:   "datasets/{%dataset_id}/{=subset_id}/{*accession}/{*file}_fastqc.zip"
+#       ihtml:  "datasets/{%dataset_id}/{=subset_id}/{*accession}/{*file}_fastqc.html"
+#       ibam:   "datasets/{%dataset_id}/{=subset_id}/{*accession}/{*file}_aln_sort.bam"
 
 #     output:
-#       ozip:   "processed/{%dataset_id}/{*subset_id}/{*accession}/{*file}_fastqc.zip"
-#       ohtml:  "processed/{%dataset_id}/{*subset_id}/{*accession}/{*file}_fastqc.html"
-#       obam:   "processed/{%dataset_id}/{*subset_id}/{*accession}/{*file}_aln_sort.bam"
+#       ozip:   "processed/{%dataset_id}/{=subset_id}/{*accession}/{*file}_fastqc.zip"
+#       ohtml:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*file}_fastqc.html"
+#       obam:   "processed/{%dataset_id}/{=subset_id}/{*accession}/{*file}_aln_sort.bam"
 
 #     #this will generate a warning that the inputs are missing after job completes
 #     shell: |
@@ -28,7 +28,7 @@
 #     exec: "local"
 
 #     input:
-#       folder:   "datasets/{%dataset_id}/{*subset_id}/{*accession}"
+#       folder:   "datasets/{%dataset_id}/{=subset_id}/{*accession}"
 
 #     #no output
 
@@ -47,8 +47,8 @@
 #       cores: "4"
 
 #     input:
-#       zip:  "processed/{%dataset_id}/{*subset_id}/{*accession}/{*file}_fastqc.zip"
-#       html: "processed/{%dataset_id}/{*subset_id}/{*accession}/{*file}_fastqc.html"
+#       zip:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*file}_fastqc.zip"
+#       html: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*file}_fastqc.html"
 
 #     shell: |
 #       touch -t 202208181200 {%zip}

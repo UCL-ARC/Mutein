@@ -1,4 +1,4 @@
 #define dataset_id, subset_list, credentials
-- include: "../config/yokoyama2019.yml"
+- include: "../config/fowler2021_download.yml"
 
 - include: "download_and_verify.yml"

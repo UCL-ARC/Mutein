@@ -1,6 +1,6 @@
 #create symlinks for the expected trimmed files
-#to handle datasets where the "raw" reads we got are al ready trimmed
-#to prevent double trimming but still create  the expected filename
+#to handle datasets where the "raw" reads we got are already trimmed
+#to prevent double trimming but still create the expected filename
 #for subsequent pipeline steps
 #also create symlinks to the fastqc reports
 - action:
@@ -65,34 +65,3 @@
         mutein symlink --target "{%iread2}" --link "{%oread2}"
         mutein symlink --target "{%izip2}"  --link "{%ozip2}"
         mutein symlink --target "{%ihtml2}" --link "{%ohtml2}"
-
-- action:
-    name:  "fake_trim_single"
-    exec:  "qsub"
-    conda: "main"
-
-    #check the mtimes of the created symlinks not their target files
-    ym: { check_output_mtime: "symlink" }
-
-    qsub:
-        time:  "1:00:00"
-        mem:   "1G"
-        tmpfs: "1M"
-        cores: "1"
-
-    input:
-        #requires paired reads
-        iread: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}.fastq.gz"
-        izip:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_fastqc.zip"
-        ihtml: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_fastqc.html"
-
-    output:
-        oread: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_trim.fastq.gz"
-        ozip:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_trim_fastqc.zip"
-        ohtml: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_trim_fastqc.html"
-
-    shell: |
-        #linked back to corresponding raw files
-        mutein symlink --target "{%iread}" --link "{%oread}"
-        mutein symlink --target "{%izip}"  --link "{%ozip}"
-        mutein symlink --target "{%ihtml}" --link "{%ohtml}"

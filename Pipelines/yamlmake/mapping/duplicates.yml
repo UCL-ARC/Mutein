@@ -5,15 +5,19 @@
 #see C. Xu / Computational and Structural Biotechnology Journal 16 (2018) 15–24
 - action:
     name:  "mark_duplicates"
-    exec:  "qsub"
+    exec:  "parallel"
     conda: "gatk4"
 
+    ym:
+        parallel: "24"
+
     qsub: 
-        template: "{%conf_dir}/cs_no_vmem_template.sh" #don't specify h_vmem option, only tmem
+        memfmt: "#$ -l tmem={mem}" #don't specify h_vmem option, only tmem
         time:  "3:00:00"
         mem:   "7G"
         tmpfs: "10G"
         cores: "2"
+
     java_opts: "-Xmx10g -XX:CompressedClassSpaceSize=2g" #set Xmx to about 2G smaller than mem*cores
 
     input:
@@ -34,17 +38,13 @@
 
 #following duplicate marking change sort order from read name to mapping position
 #then index the new bam
-# note: for keogh the @RG PL:ILLUMINA tags were inserted at this point using
-# | samtools addreplacerg -u -w \
-#   -r 'ID:{%dataset_id}_{=subset_id}_{*accession}' \
-#   -r 'SM:{%dataset_id}_{=subset_id}_{*accession}' \
-#   -r 'PL:{%platform}' \
-#   - \
-#but the production pipeline inserts these tags in mapping/mapping.yml:samtools_merge
 - action:
     name:  "sort_by_posn_then_index"
-    exec:  "qsub"
+    exec:  "parallel"
     conda: "bwa"
+
+    ym:
+        parallel: "24"
 
     qsub: 
         time:  "3:00:00"
@@ -58,6 +58,7 @@
     output:
         obam:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_posn_sort.bam"
         indx:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_posn_sort.bam.bai"
+        touch: "processed/{%dataset_id}/{=subset_id}/{*accession}/.meta/{%name}.{*accession}"
 
     #sort mapped reads by mapping position, output to bam file
     shell: |
@@ -68,23 +69,4 @@
         > {%obam}
 
         samtools index -@ ${EXTRA_THREADS} {%obam}
-
-#truncate _dedup bams
-- action:
-    name:  "truncate_dedup_bam"
-    exec:  "local"
-    conda: "main"
-    run:   "never"
-
-    input:
-        dedup:   "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_dedup.bam"
-
-    output:
-        touch:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{%name}.touch"
-
-    shell: |
-        #truncate deduped bam
-        mutein truncate "{%dedup}"
-
-        #signal truncation was carried out
         touch {%touch}

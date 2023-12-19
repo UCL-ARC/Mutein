@@ -1,51 +1,59 @@
-#initial per sample variant calling
+#initial per individual variant calling using the bams where SM=<individual> not tissue sample
 #https://gatk.broadinstitute.org/hc/en-us/articles/360037225632-HaplotypeCaller
 #use -L to specify target regions, eg for exome/bait capture
 #https://gatk.broadinstitute.org/hc/en-us/articles/360035531852-Intervals-and-interval-lists
 - action:
     name:  "haplotype_caller"
-    exec:  "qsub"
+    exec:  "parallel"
     conda: "gatk4"
 
     qsub:
+        memfmt: "#$ -l tmem={mem}" #don't specify h_vmem option, only tmem
         time:  "3:00:00"
-        mem:   "1G"
+        mem:   "4G"
         tmpfs: "10G"
         cores: "4"
 
+    ym:
+        parallel: "24"
+
     input:
-        int:  "{%gene_intervals_file}"
-        ibam: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_bqsr.bam"
+        int:      "{%gene_intervals_file}"
+        acc_list: "datasets/{%dataset_id}/{=subset_id}/.meta/indivs/{*indiv}/accession_list"
 
     output:
-        vcf:  "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_germ.vcf.gz"
+        vcf:  "processed/{%dataset_id}/{=subset_id}/.germline/{*indiv}/germline.g.vcf.gz"
 
     shell: |
-        MY_TMP_DIR=${TMPDIR}/${RANDOM}${RANDOM}
-        mkdir -p ${MY_TMP_DIR}
+        accessions=" "
+        for acc in $(cat {%acc_list})
+        do
+            accessions="${accessions} -I processed/{%dataset_id}/{=subset_id}/${acc}/${acc}_bqsr_indiv.bam"
+        done
 
-        gatk --java-options "-Xmx8g" HaplotypeCaller \
-          --tmp-dir ${MY_TMP_DIR} \
+        gatk --java-options "-Xmx12g" HaplotypeCaller \
+          --tmp-dir ${TMPDIR} \
           --native-pair-hmm-threads {%qsub/cores} \
           -L {%int} -ip 10 \
           -R {%ref/fasta_bgz} \
-          -I {%ibam} \
+          ${accessions} \
           -O {%vcf} -ERC GVCF
 
 # https://gatk.broadinstitute.org/hc/en-us/articles/360035889971
 - action:
     name:  "genomics_db_import"
-    exec:  "local"
+    exec:  "qsub"
     conda: "gatk4"
 
     qsub:
+        memfmt: "#$ -l tmem={mem}" #don't specify h_vmem option, only tmem
         time:  "3:00:00"
         mem:   "9G"
         tmpfs: "1G"
         cores: "2"
 
     input:
-        vcf: "processed/{%dataset_id}/{=subset_id}/{+accession}/{+accession}_germ.vcf.gz"
+        vcf: "processed/{%dataset_id}/{=subset_id}/.germline/{+indiv}/germline.g.vcf.gz"
 
     output:
        gdb:  "processed/{%dataset_id}/{=subset_id}/.meta/gatk_db"
@@ -60,10 +68,11 @@
 
 - action:
     name:  "genotype_gvcfs"
-    exec:  "local"
+    exec:  "qsub"
     conda: "gatk4"
 
     qsub:
+        memfmt: "#$ -l tmem={mem}" #don't specify h_vmem option, only tmem
         time:  "3:00:00"
         mem:   "9G"
         tmpfs: "1G"
@@ -73,7 +82,7 @@
         gdb:  "processed/{%dataset_id}/{=subset_id}/.meta/gatk_db"
 
     output:
-        ovcf: "processed/{%dataset_id}/{=subset_id}/.meta/{%dataset_id}_{=subset_id}.vcf"
+        ovcf: "processed/{%dataset_id}/{=subset_id}/.meta/all_germline.vcf"
 
     shell: |
         gatk GenotypeGVCFs -R {%ref/fasta_bgz} -V gendb://{%gdb} -O {%ovcf}

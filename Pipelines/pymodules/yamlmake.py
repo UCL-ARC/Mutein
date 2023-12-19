@@ -11,6 +11,7 @@ import subprocess
 import sys
 import random
 import itertools
+from multiprocessing import Process
 
 default_config_str =\
 '''
@@ -28,7 +29,8 @@ default_config_str =\
         job_number:         'YM_JOB_NUMBER' #env variable: 1 based job numbering within the current action
         conda_setup:        ''              #run just before trying to activate the conda env the command requested
         conda_prefix:       ''              #a prefix to apply to the name of every conda environment
-        aggregate:          '1'             #how many jobs share the same shell
+        aggregate:          '1'             #how many jobs share the same shell for local execution
+        parallel:           '4'             #how many local jobs at once in parallel execution mode
         #run before every shell action
         bash_setup: |
           source ~/.bashrc
@@ -40,7 +42,8 @@ default_config_str =\
         mem:                '4G'            #$ -l mem={mem}
         tmpfs:              '10G'           #$ -l tmpfs={tmpfs}
         pe:                 'smp'           #$ -pe {pe} {cores}
-        cores:              '1'             #$ -pe {pe} {cores}
+        cores:              '1'             #$ -pe {pe} {cores} cores=1 comments out the pe request altogether
+        maxrun:             '0'             #$ -tc {maxrun} 0=unlimited and comments out the tc request
 '''
 
 default_global_config = yaml.safe_load(default_config_str)
@@ -1840,28 +1843,31 @@ def colorize_command(cmd,c):
 
     return tmp
 
-def local_execute_command(config,first_job,last_job,cmd,env):
+def local_execute_command(config,first_job,last_job,cmd,env,parallel):
     'execute command(s) locally'
 
     if first_job == last_job:
         foutname = f'{meta["log_path_prefix"]}.{config["name"]}.{first_job+1}.out'
         ferrname = f'{meta["log_path_prefix"]}.{config["name"]}.{first_job+1}.err'
-        message(f'job {first_job+1} executing locally...')
+        if not parallel: message(f'job {first_job+1} executing locally...')
     else:
         foutname = f'{meta["log_path_prefix"]}.{config["name"]}.{first_job+1}-{last_job+1}.out'
         ferrname = f'{meta["log_path_prefix"]}.{config["name"]}.{first_job+1}-{last_job+1}.err'
-        message(f'jobs {first_job+1}-{last_job+1} executing locally...')
+        if not parallel: message(f'jobs {first_job+1}-{last_job+1} executing locally...')
 
     if cmd.endswith('\n'): end = ''
     else:                  end = '\n'
 
     tmpcmd = colorize_command(cmd,col['green'])
-    message(f'{tmpcmd}',end=end,timestamp=False)
+    if not parallel: message(f'{tmpcmd}',end=end,timestamp=False)
 
     if not is_active():
         #dry-run: signal job completed ok without running it
-        message(f'pipeline inactive, skipping actual command execution')
-        return False
+        if not parallel:
+            message(f'pipeline inactive, skipping actual command execution')
+            return False
+        else:
+            sys.exit(1)
 
     flush()
 
@@ -1878,12 +1884,17 @@ def local_execute_command(config,first_job,last_job,cmd,env):
     ferr.close()
 
     if failed:
-        failed_command_error('command', foutname, ferrname)
+        if not parallel: failed_command_error('command', foutname, ferrname)
     else:
-        message('command completed normally')
+        if not parallel: message('command completed normally')
 
     flush()
-    return failed
+
+    if parallel:
+        if failed: sys.exit(1)
+        else:      sys.exit(0)
+    else: 
+        return failed
 
 def write_qsub_file(action,qsub_script,jobname,njobs,jobfile):
     'fill out the qsub job script template and write to file ready to pass to qsub'
@@ -1908,7 +1919,14 @@ def write_qsub_file(action,qsub_script,jobname,njobs,jobfile):
     env["yamlmake"] = sys.argv[0]
     env["log_dir"] = meta["log_dir"]
 
-    for line in f_in: f_out.write(line.format(**env))
+    if env["maxrun"] == '0': env["_tc"] = "##" #comment out the -tc option for unlimited tasks
+    else:                    env["_tc"] = "#$" #activate -tc option to limit simultaneous tasks
+
+    if env["cores"] == '1': env["_pe"] = "##" #comment out the -pe option if only requesting one core
+    else:                   env["_pe"] = "#$" #activate -pe option for multiple cores
+
+    for line in f_in:
+        f_out.write(line.format(**env).format(**env)) #two rounds to allow nested variables
 
     f_out.close()
     f_in.close()
@@ -2124,7 +2142,7 @@ def aggregated_local_execution(action,shell_list,job_list):
             cmd += '\n' + generate_final_shell_command(item)
 
         #reports only explicit job failure from exit code
-        all_failed = local_execute_command(action,first_job,last_job,cmd,env)
+        all_failed = local_execute_command(action,first_job,last_job,cmd,env,False)
 
         for job_numb in range(first_job,last_job+1):
             #job has also failed if not all required outputs were created/updated
@@ -2141,16 +2159,101 @@ def aggregated_local_execution(action,shell_list,job_list):
 
     return something_failed
 
+def spawn_job(action,shell_list,job_list,next_job,njobs):
+    cmd = generate_prefix_commands(action)
+    env = generate_common_job_env(action,njobs)
+    env = add_job_number_to_env(env,action,next_job)
+    cmd += '\n' + generate_final_shell_command(shell_list[next_job])
+
+    if cmd.endswith('\n'): end = ''
+    else:                  end = '\n'
+
+    tmpcmd = colorize_command(cmd,col['green'])
+    message(f'{tmpcmd}',end=end,timestamp=False)
+    flush()
+
+    p = Process(target=local_execute_command,args=(action,next_job,next_job,cmd,env,True))
+    p.start()
+    return (p,next_job)
+
+def parallel_local_execution(action,shell_list,job_list):
+    'execute local jobs in parallel using separate processes'
+    
+    something_failed = False
+    njobs = len(shell_list)
+    next_job = 0
+    pool_size = int(action['ym/parallel'])
+
+    pool = []
+
+    #spawn initial jobs up to maximum of pool_size
+    while next_job < pool_size and next_job < njobs:
+        message(f"starting job {next_job+1} in slot {len(pool)+1}")
+        pool.append(spawn_job(action,shell_list,job_list,next_job,njobs))
+        next_job += 1
+
+    #while still jobs to run, replace finished jobs with new jobs
+    #exit when all jobs finished
+    still_running = True
+    while still_running:
+        still_running = False
+
+        for i in range(len(pool)):
+            if pool[i] == None:
+                continue #worker slot is unused
+
+            result = pool[i][0].exitcode
+
+            if result == None:
+                #job still running
+                still_running = True
+                continue
+
+            #job finished, work out if it failed
+            job_failed = False
+            job_numb = pool[i][1]
+
+            if result != 0:
+                #exit code indicates job failure
+                job_failed = True
+            else:
+                #job has also failed if not all required outputs were created/updated
+                job_failed = verify_expected_outputs(action,job_list[job_numb]["output"],job_list[job_numb]["input"])
+
+            if job_failed:
+                message(f"job {pool[i][1]+1} failed")
+                #carry out config controlled action on outputs of failed job
+                #ie delete, recycle, mark as stale or ignore
+                handle_failed_outputs(action,job_list[job_numb]["output"])
+                something_failed = True
+            else:
+                message(f"job {pool[i][1]+1} okay")
+
+            if next_job < njobs:
+                #spawn a new job in place of the finished one
+                message(f"starting job {next_job+1} in slot {i+1}")
+                pool[i] = spawn_job(action,shell_list,job_list,next_job,njobs)
+                next_job += 1
+                still_running = True
+            else:
+                #leave worker slot unused
+                pool[i] = None
+            
+        #limit polling rate
+        time.sleep(1)
+
+    return something_failed
+
 def execute_jobs(action,shell_list,job_list):
     something_failed = False
 
     if not 'exec' in action or action['exec'] == 'local':
-        #separate local execution (default mode)
+        #local execution (default mode) with optional aggregation
         something_failed = aggregated_local_execution(action,shell_list,job_list)
 
-    # elif action['exec'] == 'aggregated':
-    #     #aggregated local execution
-    #     something_failed = aggregated_execution(action,shell_list,job_list)
+    elif action['exec'] == 'parallel':
+        #parallel local execution
+        something_failed = parallel_local_execution(action,shell_list,job_list)
 
     elif action['exec'] == 'qsub':
         #qsub execution using an array job
@@ -2214,6 +2317,7 @@ def process_action(config,action,path):
         return False
 
     message(f'==> {col["cyan"]}{len(shell_list)} runnable job(s){col["none"]} <==')
+    flush()
 
     #check current working directory agrees with configured value
     check_cwd(action)
@@ -2276,9 +2380,11 @@ def process(pipeline,path,config=None,args=None):
             config.includes_and_loads(path)
 
         elif item_type == 'include':
+            include_path = expand_path(item[item_type],config)
+
             #toplevel include: load and insert the yaml items in place of the include item
-            header(f'[{item[item_type]}] included')
-            new_pipeline,new_path = load_pipeline(item[item_type],path) #new_path ignored
+            header(f'[{include_path}] included')
+            new_pipeline,new_path = load_pipeline(include_path,path) #new_path ignored
             counter -= 1
             del pipeline[counter]
             pipeline = pipeline[:counter] + new_pipeline + pipeline[counter:]
@@ -2286,8 +2392,10 @@ def process(pipeline,path,config=None,args=None):
         elif item_type == 'module':
             #process a nested pipeline without affecting the config of any
             #following items
-            header(f'[{item[item_type]}] module')
-            new_pipeline,new_path = load_pipeline(item[item_type],path)
+            module_path = expand_path(item[item_type],config)
+
+            header(f'[{module_path}] module')
+            new_pipeline,new_path = load_pipeline(module_path,path)
             sub_config = Conf(config)
             process(new_pipeline,new_path,config=sub_config)
 
@@ -2298,3 +2406,10 @@ def process(pipeline,path,config=None,args=None):
     flush()
 
     return 0
+
+def expand_path(raw_path,config):
+    'substitute and $ or % placeholders in the path'
+    tmpconf = Conf()
+    tmpconf['path'] = raw_path
+    tmpconf.sub_vars(src=config)
+    return tmpconf['path']

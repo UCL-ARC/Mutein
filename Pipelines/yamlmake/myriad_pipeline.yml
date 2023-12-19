@@ -1,4 +1,7 @@
 #
+# this pipeline file is for myriad as opposed to skinner
+# and is to allow simultaneous running of tasks on both systems from the same repo state
+#
 # commented include and module lines below are still part of the pipeline
 # they are just being temporarily excluded from execution
 # all these steps should still be run in the order they appear
@@ -20,19 +23,10 @@
 #- module: "somatic/keogh2018.yml"
 
 #- module: "download/yokoyama2019.yml"
+#- module: "download/fowler2021.yml"
 
 - module: "download/sanger_ega_ftp.yml"
 
 #- module: "reorganise/martincorena2015.yml"
-#- module: "download/martincorena2015.yml"
 #- module: "prepare/martincorena2015.yml"
 #- module: "mapping/martincorena2015.yml"
-#- module: "germline/martincorena2015.yml"
-#- module: "somatic/martincorena2015.yml"
-
-#- module: "reorganise/leesix2019.yml"
-#- module: "download/leesix2019.yml"
-#- module: "prepare/leesix2019.yml"
-#- module: "mapping/leesix2019.yml"
-#- module: "germline/leesix2019.yml"
-#- module: "somatic/leesix2019.yml"

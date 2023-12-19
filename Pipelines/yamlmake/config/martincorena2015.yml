@@ -1,0 +1,24 @@
+#define dataset_id and subset_list
+- config:
+    dataset_id: "martincorena2015"
+
+    #genomic positions covered by any capture baits used
+    gene_intervals_file: "datasets/{%dataset_id}/.meta/intervals.list"
+
+    #subset corresponds to EGAD number
+    subset_id:
+      - "EGAD00001000825"
+      - "EGAD00001001090"
+      - "EGAD00001001123"
+
+    #keogh has lost its original read names therefore cannot find optical duplicates
+    #because tile,x,y info is not in read names
+    #https://gatk.broadinstitute.org/hc/en-us/articles/360037052812-MarkDuplicates-Picard-#--READ_NAME_REGEX
+    #see action yamlmake/mapping/duplicates.yml:mark_duplicates
+    read_name_regex: "null"
+
+    #text for the PL: tag of bam files
+    platform: "ILLUMINA"
+
+    #which reference fasta for the cram files
+    cram_ref: "references/GRCh37/Homo_sapiens.GRCh37.dna.primary_assembly.fa"
