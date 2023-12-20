@@ -358,6 +358,8 @@ Sometimes you have a large number of trivial operations to perform, such as rena
     ...
 ```
 
+Naturally you could just as well write your job to process multiple files within a single job from the beginning by using a list based placeholder in conjunction with a bash for loop in the shell command, but then if you need to refactor your pipeline to go back to having one file processed per job so any reason then you'd need to change the shell code, whereas with the `aggregate` method all you have to do is disable to option.
+
 #### Parallel Local Execution
 
 If you have direct access to a multicore machine, such as the `skinner` node on CS cluster, the you will want to run multiple jobs at the same time on the local machine, which is possible using the `parallel` execution mode. This mode takes one additional parameter nested under the `ym` key, also called `parallel`, which tells YAMLmake how many *jobs* to run at once. As with `local` mode, this execution mode ignores all the resource settings under `qsub`, so it is again up to you to make sure the machine has enough resources to run the number of jobs you requested in parallel:
