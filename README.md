@@ -4,7 +4,8 @@ RSDG project for [Ben Hall](https://iris.ucl.ac.uk/iris/browse/profile?upi=BHALL
 
 This is a research project to reanalyse multiple existing [datasets](https://github.com/UCL/Mutein/issues?q=is%3Aissue+label%3Adataset) from publications, aiming to understand the effects of mutations on protein structure, and through that to ultimately understand the proteins' functions and interactions. The datasets are DNA sequence data, including target capture of specific gene sets, whole exome capture and whole genome capture, from studies looking at diseased and normal tissue from various tissue types.
 
-The project will essentially scale up and improve upon what has already been done in individual papers on single datasets by Ben and/or other lab members or collaborators (such as in [Fowler et al 2021](https://github.com/UCL/Mutein/issues/54), and produce a well documented, maintainable pipeline that Hall lab members can reuse or build on in the future.
+The project will essentially scale up and improve upon what has already been done in individual papers on single datasets by Ben and/or other lab members or collaborators (such as in [Fowler et al 2021](https://github.com/UCL/Mutein/issues/54)), and produce a well documented, maintainable pipeline that Hall lab members can reuse or build on in the future.
 
 #### Preparation
-In order to use an HPC to accelerate the pipelines you will need to be setup with an account on the appropriate system(s). In the UCL context this currently means [Myriad](https://www.rc.ucl.ac.uk/docs/Clusters/Myriad/) for non-sensitive, non-GDPR data, and [CS](https://hpc.cs.ucl.ac.uk/) ([contact](https://hpc.cs.ucl.ac.uk/contact-us/)) otherwise.
+In order to use an HPC to accelerate the pipelines you will need to be setup with an account on the appropriate system(s). In the UCL context this currently means [Myriad](https://www.rc.ucl.ac.uk/docs/Clusters/Myriad/) for non-sensitive, non-GDPR data, and [CS](https://hpc.cs.ucl.ac.uk/) ([contact](https://hpc.cs.ucl.ac.uk/contact-us/)) for sensitive data.
+
