@@ -1,6 +1,6 @@
 # YAMLmake Workflow Tool
 
-This markdown documents YAMLmake, a new workflow tool developed during the Mutein project. This is similar to Snakemake in that a config file documents each step in the pipeline in terms of input and output files, the shell command(s) to be run and also allows local or HPC execution. However YAMLmake config files are written in pure YAML rather than a mixture of YAML and Snakemake exhanced Python. YAMLmake also does not create a dependency graph working backwards from a target output file, rather the actions are carried out sequentially in the order they appear in the file. This makes it much simpler to deal with lists of input files that are not known in advance, the action simply globs then before it runs, whereas Snakemake requires a special checkpoint concept to handle this common situation. YAMLmake allows easy changing between local and qsub execution, whereas Snakemake requires a separate directive for each rule to make it run remotely, and these can break when a module is imported. YAMLmake tries to specify all input and output files using special placeholders which insert filenames from predefined lists or from filesystem globs executed just prior to running the action. It therefore does not use embedded Python functions to generate the file lists.
+This markdown documents YAMLmake, a new workflow tool developed during the Mutein project. This is similar to Snakemake in that a config file documents each step in the pipeline in terms of input and output files, the shell command(s) to be run and also allows local or HPC execution. However YAMLmake config files are written in pure YAML rather than a mixture of YAML and Snakemake exhanced Python. YAMLmake also does not create a dependency graph working backwards from a target output file, rather the actions are carried out sequentially in the order they appear in the file. This makes it much simpler to deal with lists of input files that are not known in advance, the action simply globs them before it runs, whereas Snakemake requires a special checkpoint concept to handle this common situation. YAMLmake allows easy changing between local and qsub execution, whereas Snakemake requires a separate directive for each rule to make it run remotely, and these can break when a module is imported. YAMLmake tries to specify all input and output files using special placeholders which insert filenames from predefined lists or from filesystem globs executed just prior to running the action. It therefore does not use embedded Python functions to generate the file lists.
 
 ## Key aims
 
@@ -332,18 +332,46 @@ The built-in default YAMLmake config includes a set of subfields under a `qsub` 
     qsub:
         template: 'default'        #template job script: "default" or path to your own
         log_dir:  '{%ym/log_dir}'  #log dir for qsub stdout and stderr files
-        time:     '02:00:00'       #$ -l h_rt={time}
-        mem:      '4G'             #$ -l mem={mem}
-        tmpfs:    '10G'            #$ -l tmpfs={tmpfs}
-        pe:       'smp'            #$ -pe {pe} {cores}
-        cores:    '1'              #$ -pe {pe} {cores}
+        time:     '02:00:00'       #$ -l h_rt={time} maximum run time
+        mem:      '4G'             #$ -l mem={mem}   maximum memory per core
+        tmpfs:    '10G'            #$ -l tmpfs={tmpfs}   require tmpfs file space
+        pe:       'smp'            #$ -pe {pe} {cores}   parallel execution environment
+        cores:    '1'              #$ -pe {pe} {cores}   how many cores
 ```
 
-As indicated in the comments above the values of time,mem,tmpfs,pe and cores are copied into the qsub job script, whereas the log_dir field can be used to set a different log directory from the global YAMLmake log directory if desired (the default, as can be seen, is to use the same). Finally, the template file used to generate the qsub job script can be overridden if you need to customise it for you local system. The default is called qsub_template.sh within Pipelines/pymodules.
+As indicated in the comments above the values of time,mem,tmpfs,pe and cores are copied into the qsub job script, whereas the log_dir field can be used to set a different log directory from the global YAMLmake log directory if desired (the default, as can be seen, is to use the same). Finally, the template file used to generate the qsub job script can be overridden if you need to customise it for you local system. The default is called qsub_template.sh within Pipelines/pymodules. You can leave all of these `qsub` settings in the action to document the job's resource requirement even if you then decide to run it locally by setting `exec` to `local` or `parallel` (see below), and YAMLmake will just ignore them.
 
-#### Local Execution
+#### Sequential Local Execution
 
-The default execution mode is local execution, which simply runs one job at a time without anykind of parallelism on the machine used to invoke YAMLmake.
+The default execution mode is local execution, which simply runs one job at a time without any kind of parallelism on the machine used to invoke YAMLmake. This is good for doing simple file operations that are allowed to run on the HPC login node without requiring a compute node. Select this execution mode using the `action` key `exec: "local"`. Note this execution mode does not pay any attention to the memory or CPU core settings under the `qsub` key, so it is up to you to make sure the local environment has sufficient cores, memory etc, and that you are permitted to run this type of job there.
+
+#### Aggregated Local Execution
+
+Sometimes you have a large number of trivial operations to perform, such as renaming a single file each time, and it would be a waste of time to wait for compute nodes to be allocated for each one, therefore you want to use local execution, but the setup time for YAMLmake to spawn each local job is making the process very slow. To speed this up it is possible to tell YAMLmake to run multiple local sequential jobs within each shell. This has the advantage of speeding things up, at the cost of forcing multiple jobs to share the same bash session, which can cause problems in some situations. It is up to you to make sure the `shell` command part of the `action` can be run multiple time in the same shell without problems (such as ending up in the wrong working directory at the end of the first job). To enable this mode use the `local` setting of the `exec` option, add the `aggregate` option under the `ym` key, and set the value to the number of jobs you want to run in each bash subshell:
+
+```
+- action:
+    name: "rename_files"
+    exec: "local"
+    ym:
+        aggregate: "40"
+    ...
+```
+
+#### Parallel Local Execution
+
+If you have direct access to a multicore machine, such as the `skinner` node on CS cluster, the you will want to run multiple jobs at the same time on the local machine, which is possible using the `parallel` execution mode. This mode takes one additional parameter nested under the `ym` key, also called `parallel`, which tells YAMLmake how many *jobs* to run at once. As with `local` mode, this execution mode ignores all the resource settings under `qsub`, so it is again up to you to make sure the machine has enough resources to run the number of jobs you requested in parallel:
+
+```
+- action:
+    name:  "mark_duplicates"
+    exec:  "parallel"
+    conda: "gatk4"
+
+    ym:
+        parallel: "24"
+    ...
+```
 
 #### Loading Simple Lists
 

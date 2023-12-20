@@ -9,5 +9,4 @@ The project will essentially scale up and improve upon what has already been don
 #### Preparation
 In order to use an HPC to accelerate the pipelines you will need to be setup with an account on the appropriate system(s). In the UCL context this currently means [Myriad](https://www.rc.ucl.ac.uk/docs/Clusters/Myriad/) for non-sensitive, non-GDPR data, and [CS](https://hpc.cs.ucl.ac.uk/) ([contact](https://hpc.cs.ucl.ac.uk/contact-us/)) for sensitive data.
 
-See [working_on_cs.md](variant_calling/working_on_cs.md) for how to get started working on the CS HPC system with Mutein.
-
+See [working_on_cs.md](working_on_cs.md) for how to get started working on the CS HPC system with Mutein.
