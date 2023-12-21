@@ -123,7 +123,7 @@
     conda: "crossmap"
     exec:  "local"
 
-    keogh_snps: "{$MUT_DIR}/Pipelines/fixtures/keogh2018_sup_table_5.csv"
+    keogh_snps: "{$MUT_DIR}/mutein/fixtures/keogh2018_sup_table_5.csv"
 
     input:
         crossmap_gz: "resources/crossmap/hg19ToHg38.over.chain.gz"

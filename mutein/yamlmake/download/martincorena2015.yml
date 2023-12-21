@@ -9,7 +9,7 @@
 
     input:
         mart_export_gz: "manual_downloads/keogh2018/mart_export.txt.gz" #contains all genes in grch38
-        gene_list:      "{$MUT_DIR}/Pipelines/fixtures/martincorena2015_gene_list"
+        gene_list:      "{$MUT_DIR}/mutein/fixtures/martincorena2015_gene_list"
 
     output:
         all_genes:  "datasets/{%dataset_id}/.meta/all_genes.tsv"

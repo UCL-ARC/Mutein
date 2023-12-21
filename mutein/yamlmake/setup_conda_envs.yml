@@ -2,7 +2,7 @@
 #touch an output file to flag that env has been created
 - action:
     name: "setup_conda_envs"
-    base_dir: "{$MUT_DIR}/Pipelines/conda_envs"
+    base_dir: "{$MUT_DIR}/mutein/conda_envs"
     input:
         env_file: "{%base_dir}/{*env_name}.env"
     output:

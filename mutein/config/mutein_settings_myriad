@@ -27,7 +27,7 @@ export MUT_PLATFORM='myriad'
 ## Everything else will not normally need to be edited
 ## by the user so is sourced from a file in the repo
 
-source "$MUT_DIR"/Pipelines/config/mutein_fixed_settings
+source "$MUT_DIR"/mutein/config/mutein_fixed_settings
 
 #try to suppress the perl locale warning
 export LC_ALL=C.UTF-8

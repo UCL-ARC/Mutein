@@ -29,7 +29,7 @@
       # Run deepsnv on these positions
       deepsnv_annotations_vcf_gz="{%deepsnv_annotations_vcf_gz}"
       deepsnv_annotations_vcf="${deepsnv_annotations_vcf_gz%.*}"
-      Rscript "{$MUT_DIR}"/Pipelines/yamlmake/somatic/deepsnv.R \
+      Rscript "{$MUT_DIR}"/mutein/yamlmake/somatic/deepsnv.R \
         --tumour-bam {%tbam} \
         --normal-bam {%nbam} \
         --potential-variants {%regions_of_interest} \

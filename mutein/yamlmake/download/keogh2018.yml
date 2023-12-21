@@ -193,7 +193,7 @@
 
     input:
         mart_export_gz: "manual_downloads/keogh2018/mart_export.txt.gz"
-        gene_list:      "{$MUT_DIR}/Pipelines/fixtures/keogh2018_gene_list"
+        gene_list:      "{$MUT_DIR}/mutein/fixtures/keogh2018_gene_list"
 
     output:
         all_genes:  "datasets/{%dataset_id}/.meta/all_genes.tsv"

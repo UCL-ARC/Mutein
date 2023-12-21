@@ -1,13 +1,9 @@
 # Getting Started
-
-#### Preparation
-In order to use an HPC to accelerate the pipelines you will need to be setup with an account on the appropriate system(s). In the UCL context this currently means [Myriad](https://www.rc.ucl.ac.uk/docs/Clusters/Myriad/) for non-sensitive, non-GDPR data, and [CS](https://hpc.cs.ucl.ac.uk/) ([contact](https://hpc.cs.ucl.ac.uk/contact-us/)) for sensitive data.
-
-See [docs/working_on_cs.md](docs/working_on_cs.md) for how to get started working on the CS HPC system with Mutein.
+In order to use an HPC to accelerate the pipelines you will need to be setup with an account on the appropriate system(s). In the UCL context this currently means [Myriad](https://www.rc.ucl.ac.uk/docs/Clusters/Myriad/) for non-sensitive, non-GDPR data, and [CS](https://hpc.cs.ucl.ac.uk/) ([contact](https://hpc.cs.ucl.ac.uk/contact-us/)) for sensitive data. This document assumes you will be using the CS system.
 
 
 #### Setup access to the github repository
-Mutein repository is currently private, therefore you need to have a github account with permission to access the repository in order to clone it. Then you'll need to create an ssh key (link)[https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent] on the login node of the CS cluster and upload the public key from that to your github account (link)[https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account].
+This Mutein repository is currently private, therefore you need to have a github account with permission to access the repository in order to clone it. Then you'll need to create an ssh key [link](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent) on the login node of the CS cluster and upload the public key from that to your github account [link](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account).
 
 #### Clone the repository into your home folder
 On the CS cluster you should now have an ssh key stored in your ~/.ssh folder and the public key part should be added to your github account. On the CS cluster login node:
@@ -17,13 +13,13 @@ mkdir -p repos && cd repos
 git clone git@github.com:UCL/Mutein.git
 ```
 
-#### Setup you working space on scratch, link to the CS settings file
+#### Setup your working space on scratch, link to the CS settings file
 Here /SAN/medic/MuteinScratch is the non-backed up working space allocated to the project on the CS cluster's shared filesystem:
 ```
 cd /SAN/medic/MuteinScratch
 mkdir 549_mutein && cd 549_mutein
 mkdir config && cd config
-ln -s ~/repos/Mutein/Pipelines/config/mutein_settings_cs mutein_settings
+ln -s ~/repos/Mutein/mutein/config/mutein_settings_cs mutein_settings
 ```
 The mutein_settings_cs file contains environment variables defining which directories the mutein pipeline is using. Modify these if required.
 

@@ -339,7 +339,7 @@ The built-in default YAMLmake config includes a set of subfields under a `qsub` 
         cores:    '1'              #$ -pe {pe} {cores}   how many cores
 ```
 
-As indicated in the comments above the values of time,mem,tmpfs,pe and cores are copied into the qsub job script, whereas the log_dir field can be used to set a different log directory from the global YAMLmake log directory if desired (the default, as can be seen, is to use the same). Finally, the template file used to generate the qsub job script can be overridden if you need to customise it for you local system. The default is called qsub_template.sh within Pipelines/pymodules. You can leave all of these `qsub` settings in the action to document the job's resource requirement even if you then decide to run it locally by setting `exec` to `local` or `parallel` (see below), and YAMLmake will just ignore them.
+As indicated in the comments above the values of time,mem,tmpfs,pe and cores are copied into the qsub job script, whereas the log_dir field can be used to set a different log directory from the global YAMLmake log directory if desired (the default, as can be seen, is to use the same). Finally, the template file used to generate the qsub job script can be overridden if you need to customise it for you local system. The default is called qsub_template.sh within mutein/pymodules. You can leave all of these `qsub` settings in the action to document the job's resource requirement even if you then decide to run it locally by setting `exec` to `local` or `parallel` (see below), and YAMLmake will just ignore them.
 
 #### Sequential Local Execution
 

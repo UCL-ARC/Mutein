@@ -57,7 +57,7 @@ We also create a subfolder called config:
 Now we need to create the boot strap script that will setup your environment ready to run the pipeline:
 
     cd ~/mutein_data/config
-    cp ~/repos/Mutein/Pipelines/config/mutein_settings .
+    cp ~/repos/Mutein/mutein/config/mutein_settings .
 
 ### customise the bootstrap script
 Finally edit the mutein_settings script you just copied to set the correct paths for your repository and data folders:
