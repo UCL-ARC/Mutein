@@ -7,7 +7,7 @@ cd Mutein
 git pull
 git checkout rachel/foldxv1
 ```
-#### 2) Navigate to the Pipelines directory and run the script, first installing python mods
+#### 2) Navigate to the Pipelines directory and run the script, first loading the python module
 ```
 module load python3/recommended
 ```
