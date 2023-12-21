@@ -130,15 +130,15 @@ dmypy.json
 
 .vscode/*
 
-# Don't include results directories in the github sync
-Pipelines/foldx/interim/*
-Pipelines/foldx/thruputs/*
-Pipelines/foldx/outputs/*
-# New structure for all pipelines, we only want to sync the inputs
-Pipelines/shared/data/outputs/genes/shearwater*
-Pipelines/shared/data/outputs/pdbs/*
-Pipelines/shared/data/thruputs*
-Pipelines/shared/data/inputs/pdbs/*
+# # Don't include results directories in the github sync
+# Pipelines/foldx/interim/*
+# Pipelines/foldx/thruputs/*
+# Pipelines/foldx/outputs/*
+# # New structure for all pipelines, we only want to sync the inputs
+# Pipelines/shared/data/outputs/genes/shearwater*
+# Pipelines/shared/data/outputs/pdbs/*
+# Pipelines/shared/data/thruputs*
+# Pipelines/shared/data/inputs/pdbs/*
 
 
-Results/*
+# Results/*
