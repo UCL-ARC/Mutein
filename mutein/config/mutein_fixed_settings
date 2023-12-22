@@ -4,11 +4,7 @@
 export PATH=${MUT_DIR}/mutein/scripts:${PATH}
 
 #add Mutein python modules to PYTHONPATH
-export PYTHONPATH=${MUT_DIR}/mutein/varcall_modules:${PYTHONPATH}
 export PYTHONPATH=${MUT_DIR}/mutein/pymodules:${PYTHONPATH}
-
-#convenience variable pointing to the main yamlmake pipeline file
-export MUT_YAML=${MUT_DIR}/mutein/yamlmake/main_pipeline.yml
 
 #conda environment names prefix to reduce chances of namespace collisions
 export MUT_PREFIX=mutein_
@@ -48,7 +44,7 @@ setup_conda_env()
     echo "To begin try:"
     echo "    yamlmake --help"
     echo "Or:"
-    echo '    yamlmake --yaml ${MUT_YAML} --dry-run'
+    echo '    yamlmake --yaml <pipeline> --dry-run'
 }
 
 # run as a function so that we can stop on errors without exiting the current shell

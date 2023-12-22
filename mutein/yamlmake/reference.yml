@@ -39,7 +39,7 @@
 #convert gzip into an indexed bgzip format
 - action:
     name:  "create_bgzip"
-    exec:  "qsub"
+    exec:  "local"
     conda: "bwa"
     qsub:
         time:  "1:00:00"
@@ -61,7 +61,7 @@
 #create fasta file index with samtools
 - action:
     name:  "create_fai"
-    exec:  "qsub"
+    exec:  "local"
     conda: "bwa"
     qsub:
         time:  "1:00:00"
@@ -81,7 +81,7 @@
 #create bwa index
 - action:
     name: "create_bwtsw"
-    exec:  "qsub"
+    exec:  "local"
     conda: "bwa"
     qsub:
         time:  "2:00:00"
@@ -104,7 +104,7 @@
 #create gatk index
 - action:
     name: "create_gatk_dict"
-    exec:  "qsub"
+    exec:  "local"
     conda: "gatk4"
     qsub:
         time:  "1:00:00"
@@ -227,7 +227,7 @@
 - action:
     name:  "rename_vcf_chromosomes"
     conda: "bcftools"
-    exec:  "qsub"
+    exec:  "local"
     qsub:
         time:  "1:00:00"
         mem:   "6G"

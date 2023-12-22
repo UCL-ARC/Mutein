@@ -1,0 +1,18 @@
+#
+# pipeline dealing only with the keogh2018 dataset
+# this is a public, non-GDPR dataset
+#
+
+- include: "base_config.yml"
+- include: "reference_config.yml"
+
+- include: "setup_conda_envs.yml"
+#- include: "reference.yml"
+
+#- module: "download/setup.yml"
+
+#- module: "download/keogh2018.yml"
+#- module: "prepare/keogh2018.yml"
+#- module: "mapping/keogh2018.yml"
+#- module: "germline/keogh2018.yml"
+#- module: "somatic/keogh2018.yml"
