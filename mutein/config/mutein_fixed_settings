@@ -1,0 +1,55 @@
+# This file is intended to be sourced, not executed, so that you keep the env vars
+
+#add Mutein scripts to the path
+export PATH=${MUT_DIR}/mutein/scripts:${PATH}
+
+#add Mutein python modules to PYTHONPATH
+export PYTHONPATH=${MUT_DIR}/mutein/varcall_modules:${PYTHONPATH}
+export PYTHONPATH=${MUT_DIR}/mutein/pymodules:${PYTHONPATH}
+
+#convenience variable pointing to the main yamlmake pipeline file
+export MUT_YAML=${MUT_DIR}/mutein/yamlmake/main_pipeline.yml
+
+#conda environment names prefix to reduce chances of namespace collisions
+export MUT_PREFIX=mutein_
+
+## ========== END OF CONFIG =======================
+
+setup_conda_env()
+{
+    # setup conda snakemake environment if not already available (also provides python3)
+    if ! conda env list | grep -qe "${MUT_PREFIX}main" ; then
+        echo -n "Creating the ${MUT_PREFIX}main conda environment... "
+        conda create -y -n ${MUT_PREFIX}main \
+            $(cat ${MUT_DIR}/mutein/conda_envs/channels) \
+            --file ${MUT_DIR}/mutein/conda_envs/main.env \
+        || { echo "FAILED with error $?"; return 1; }
+        echo OK
+    else
+        echo "Conda environment ${MUT_PREFIX}main already exists"
+    fi
+
+    # activate snakemake conda environment, also provides python3
+    echo -n "Activating the ${MUT_PREFIX}main conda environment... "
+    conda activate "${MUT_PREFIX}main" \
+    || { echo "FAILED with error $?"; return 1; }
+    echo OK
+
+    echo -n "Running the mutein script... "
+    # verify mutein is in the PATH and print warning if not in MUT_DATA directory
+    mutein check-cwd \
+    || { echo "FAILED with error $?"; return 1; }
+    echo OK
+
+    # Disable password setting as this feature doesn't work as expected
+    # export MUT_PASSWORD=$(mutein set-password)
+
+    #yamlmake command hints
+    echo "To begin try:"
+    echo "    yamlmake --help"
+    echo "Or:"
+    echo '    yamlmake --yaml ${MUT_YAML} --dry-run'
+}
+
+# run as a function so that we can stop on errors without exiting the current shell
+setup_conda_env

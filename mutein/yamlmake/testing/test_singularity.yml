@@ -1,0 +1,47 @@
+#core YAMLmake config
+- config:
+    ym:
+        prefix:             "sing."
+        remote_delay_secs:  "10"
+        stale_output_file:  "ignore"
+        stale_output_dir:   "ignore"
+        failed_output_file: "stale"
+        failed_output_dir:  "stale"
+        missing_parent_dir: "create"
+        recycle_bin:        "recycle_bin"
+        job_count:          "YM_NJOBS"
+        job_number:         "YM_JOB_NUMBER"
+        bash_setup:         "source ~/.bashrc\nset -euo pipefail\nset +o history"
+        #conda_setup:        "source ~/mambaforge/etc/profile.d/conda.sh"
+        conda_prefix:       "sing_"
+
+    qsub:
+        template: "default"
+        time:     "02:00:00"
+        mem:      "4G"
+        tmpfs:    "10G"
+        pe:       "smp"
+        cores:    "1"
+
+    env:
+        #provide dummy values to prevent bash strict mode causing unbound variable errors in
+        #~/mambaforge/envs/mutein_gatk4/etc/conda/activate.d/openjdk_activate.sh
+        JAVA_HOME: "-"
+        JAVA_LD_LIBRARY_PATH: "-"
+
+    working_dir:    "/lustre/scratch/scratch/{$USER}/549_mutein"
+    conf_dir:       "{$MUT_DIR}/mutein/yamlmake"
+    conda_channels: "--override-channels -c conda-forge -c defaults -c bioconda"
+
+- action:
+    name: "test_singularity"
+    input:
+        env_file: "{%base_dir}/{*env_name}.env"
+    output:
+        touch: "config/conda_envs/{*env_name}.touch"
+    shell: |
+        mamba create -y \
+                     -n {%ym/conda_prefix}{*env_name} \
+                     {%conda_channels} \
+                     --file {%env_file} 
+        touch {%touch}

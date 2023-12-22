@@ -1,0 +1,48 @@
+- action:
+    name:  "deepsnv"
+    exec:  "qsub"
+    conda: "bioconductor"
+
+    qsub:
+        time:  "1:00:00"
+        mem:   "3G"
+        cores: "1"
+
+    # filter VCFs from both mutect2 and varscan
+    file_prefixes:
+        - "_somatic_varscan.snp"
+        - "_somatic_mutect2_annotated_filtered"
+
+    input:
+        vcf: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_{*normal}{=file_prefixes}.vcf.gz"
+        tbam: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_bqsr.bam"
+        nbam: "processed/{%dataset_id}/{=subset_id}/{*normal}/{*normal}_bqsr.bam"
+ 
+    output:
+        regions_of_interest: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_{*normal}{=file_prefixes}_regions_of_interest.tsv"
+        deepsnv_annotations_vcf_gz: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_{*normal}{=file_prefixes}_deepsnv_annotations.vcf.gz"
+        deepsnv_vcf_gz: "processed/{%dataset_id}/{=subset_id}/{*accession}/{*accession}_{*normal}{=file_prefixes}_deepsnv_annotated.vcf.gz"
+
+    shell: |
+      # spit out the positions from the VCFs that we wish to verify
+      bcftools query -f '%CHROM\t%POS\t%ID\t%REF\t%ALT\n' {%vcf} > {%regions_of_interest}
+      # Run deepsnv on these positions
+      deepsnv_annotations_vcf_gz="{%deepsnv_annotations_vcf_gz}"
+      deepsnv_annotations_vcf="${deepsnv_annotations_vcf_gz%.*}"
+      Rscript "{$MUT_DIR}"/mutein/yamlmake/somatic/deepsnv.R \
+        --tumour-bam {%tbam} \
+        --normal-bam {%nbam} \
+        --potential-variants {%regions_of_interest} \
+        --out "$deepsnv_annotations_vcf"
+
+      bgzip -f "$deepsnv_annotations_vcf"
+      bcftools index -f --tbi "$deepsnv_annotations_vcf_gz"
+
+      # Add deepsnv scores to a new, annotated VCF
+      bcftools annotate \
+        -a {%deepsnv_annotations_vcf_gz} \
+        --columns CHROM,POS,FILTER,INFO \
+        -Oz -o {%deepsnv_vcf_gz} \
+        {%vcf}
+      # and index that too
+      bcftools index -f --tbi {%deepsnv_vcf_gz}

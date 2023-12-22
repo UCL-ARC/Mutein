@@ -1,0 +1,178 @@
+#setup the symlink to the backed up area where the raw data will live
+- action:
+    name:  "setup_rawdata_area"
+    exec:  "local"
+
+    #no input files
+
+    output:
+        touch: ".meta/{%name}.touch"
+
+    shell: |
+      mkdir -p {$MUT_RAW}/datasets/.meta
+      chmod o-wrx {$MUT_RAW} {$MUT_DATA} {$MUT_RAW}/datasets
+      ln -s {$MUT_RAW}/datasets {$MUT_DATA}
+      touch {%touch}
+
+#create manual downloads folder
+- action:
+    name:  "create_manual_downloads_folder"
+    exec:  "local"
+
+    #no input files
+
+    output:
+        keogh2018: "manual_downloads/keogh2018/.meta/{%name}.touch"
+        martincorena2015: "manual_downloads/martincorena2015/.meta/{%name}.touch"
+
+    shell: |
+        touch {%keogh2018}
+        touch {%martincorean2015}
+
+#check for presence of the files which must be downloaded manually
+- action:
+    name:  "require_manual_downloads"
+    exec:  "local"
+
+    #no input files
+
+    output:
+        keogh_metadata: "manual_downloads/keogh2018/SraRunTable.txt"
+        keogh_intervals: "manual_downloads/keogh2018/mart_export.txt.gz"
+        martincorena1: "manual_downloads/martincorena2015/EGAD00001000825-metadata.zip"
+        martincorena2: "manual_downloads/martincorena2015/EGAD00001001090-metadata.zip"
+        martincorena3: "manual_downloads/martincorena2015/EGAD00001001123-metadata.zip"
+
+    shell: |
+        echo 'Manually download the following as {%keogh_metadata}'
+        echo ' Visit: https://www.ncbi.nlm.nih.gov/sra/?term=SRP159015'
+        echo ' Click "Send results to run selector"'
+        echo ' Click "Select ==> Total ==> Metadata"'
+        echo 
+        echo 'Manually download the following as {%keogh_intervals}'
+        echo ' Visit: https://www.ensembl.org/index.html'
+        echo ' Biomart'
+        echo ' CHOOSE DATABASE ==> Ensembl Genes 109'
+        echo ' CHOOSE DATASET ==> Human Genes (GRCh38.p13)'
+        echo ' Attributes ==> Features'
+        echo ' GENE ==> Gene stable ID, Gene Stable ID version'
+        echo '      ==> Chromosome/scaffold name, Gene start(bp), Gene end(bp)'
+        echo '      ==> Gene name, Gene synonym'
+        echo ' Results'
+        echo ' Export all results to ==> Compressed file (.gz), TSV'
+        echo ' GO'
+        echo
+        echo 'Manually download the metadata zip files from here (login required):'
+        echo ' https://ega-archive.org/datasets/EGAD00001000825 ==> metadata ==> csv'
+        echo ' https://ega-archive.org/datasets/EGAD00001001090 ==> metadata ==> csv'
+        echo ' https://ega-archive.org/datasets/EGAD00001001123 ==> metadata ==> csv'
+        echo ' and save as {%martincorena1} {%martincorena2} {%martincorena3}'
+
+#check for presence of the files which must be downloaded manually
+- action:
+    name:  "require_manual_downloads2"
+    exec:  "local"
+
+    #no input files
+
+    output:
+        zipfile1: "manual_downloads/leesix2019/EGAD00001004192-metadata.zip"
+        zipfile2: "manual_downloads/leesix2019/EGAD00001004193-metadata.zip"
+
+    shell: |
+        echo 'Manually download the metadata zip files from here (login required):'
+        echo ' https://ega-archive.org/datasets/EGAD00001004192 ==> metadata ==> csv'
+        echo ' https://ega-archive.org/datasets/EGAD00001004193 ==> metadata ==> csv'
+        echo ' and save as {%zipfile1} {%zipfile2}
+
+#download the variant effect predictor cache
+- action:
+    name: "download_vep_cache"
+    exec: "local"
+
+    #no input files
+
+    output:
+        vep_tarball: "resources/vep_cache/homo_sapiens_vep_109_GRCh38.tar.gz"
+        vep_touch:   "resources/vep_cache/{%name}.touch"
+
+    shell: |
+        cd resources/vep_cache
+        wget -c https://ftp.ensembl.org/pub/release-109/variation/indexed_vep_cache/homo_sapiens_vep_109_GRCh38.tar.gz
+        tar xzf homo_sapiens_vep_109_GRCh38.tar.gz
+        touch {%name}.touch
+
+#download the grch37 to grch38 metadata for crossmap
+- action:
+    name: "download_37to38"
+    exec: "local"
+
+    #no input files
+
+    output:
+        crossmap_gz: "resources/crossmap/hg19ToHg38.over.chain.gz"
+
+    shell: |
+        cd resources/crossmap
+        wget -c http://hgdownload.soe.ucsc.edu/goldenPath/hg19/liftOver/hg19ToHg38.over.chain.gz
+        gunzip --test hg19ToHg38.over.chain.gz
+
+#map keogh2018 snp locations from grch37 to grch38 using crossmap
+- action:
+    name:  "crossmap_37to38"
+    conda: "crossmap"
+    exec:  "local"
+
+    keogh_snps: "{$MUT_DIR}/mutein/fixtures/keogh2018_sup_table_5.csv"
+
+    input:
+        crossmap_gz: "resources/crossmap/hg19ToHg38.over.chain.gz"
+
+    output:
+        keogh_grch37: "resources/crossmap/keogh2018_grch37.bed"
+        keogh_grch38: "resources/crossmap/keogh2018_grch38.bed"
+
+    shell: |
+        tail -n +2 {%keogh_snps} \
+            | cut -d, -f3,4 \
+            | awk -v FS=',' '{print "chr"$1,$2,$2}' \
+            > {%keogh_grch37}
+        CrossMap.py bed {%crossmap_gz} {%keogh_grch37} {%keogh_grch38}
+
+#download grch37 needed as the reference for the CRAM files
+- action:
+    name:  "download_grch37"
+    exec:  "local"
+    conda: "bwa"
+
+    #no input files
+
+    output:
+        grch37_fasta: "references/GRCh37/Homo_sapiens.GRCh37.dna.primary_assembly.fa"
+        grch37_faidx: "references/GRCh37/Homo_sapiens.GRCh37.dna.primary_assembly.fa.fai"
+
+    shell: |
+        wget -c https://ftp.ensembl.org/pub/grch37/current/fasta/homo_sapiens/dna/Homo_sapiens.GRCh37.dna.primary_assembly.fa.gz \
+            -O {%grch37_fasta}.gz
+        gunzip {%grch37_fasta}.gz
+        samtools faidx {%grch37_fasta}
+
+#convert reference fastas into samtools CRAM reference cache format
+- action:
+    name:  "create_cram_cache"
+    exec:  "local"
+    conda: "bwa"
+
+    #ref_dir: "{%ref/cram_ref_dir}"
+    ref_dir: "references/test"
+
+    input:
+        grch37_fasta: "references/GRCh37/Homo_sapiens.GRCh37.dna.primary_assembly.fa"
+        grch38_fasta: "{%ref/uncompressed}"
+
+    output:
+        touch: "{%ref_dir}/.meta/{%name}.touch"
+
+    shell: |
+        seq_cache_populate.pl -root {%ref_dir} {%grch37_fasta} {%grch38_fasta}
+        touch {%touch}
