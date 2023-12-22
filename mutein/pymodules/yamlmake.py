@@ -16,14 +16,23 @@ from multiprocessing import Process
 default_config_str =\
 '''
     ym:
-        remote_delay_secs:  '10'            #wait this long after remote jobs incase of latency
+        remote_delay_secs:  '10'            #wait this long after remote jobs finish before checking output files in case of latency
+
+        #if stale output files are present before the job runs:
         stale_output_file:  'ignore'        #ignore,delete,recycle (also applies to symlinks)
         stale_output_dir:   'ignore'        #ignore,delete,recycle
+
+        #if output files are present after a job fails:
         failed_output_file: 'stale'         #delete,recycle,stale,ignore (also applies to symlinks)
         failed_output_dir:  'stale'         #delete,recycle,stale,ignore    
+
+        #whether to check the modification time of a symlink itself or the file it points to
         check_input_mtime:  'target'        #target,symlink
         check_output_mtime: 'target'        #target,symlink
+
+        #when a parent directory of an expected output file is missing before the job runs
         missing_parent_dir: 'create'        #ignore,create
+        
         recycle_bin:        'recycle_bin'   #name of recycle bin folder
         job_count:          'YM_NJOBS'      #env variable: how many jobs spawned by current action
         job_number:         'YM_JOB_NUMBER' #env variable: 1 based job numbering within the current action
@@ -31,19 +40,24 @@ default_config_str =\
         conda_prefix:       ''              #a prefix to apply to the name of every conda environment
         aggregate:          '1'             #how many jobs share the same shell for local execution
         parallel:           '4'             #how many local jobs at once in parallel execution mode
+
         #run before every shell action
         bash_setup: |
           source ~/.bashrc
           set -euo pipefail
           set +o history 
+
     qsub:
-        template:           'default'       #template job script: "default" or path to your own
-        time:               '02:00:00'      #$ -l h_rt={time}
-        mem:                '4G'            #$ -l mem={mem}
-        tmpfs:              '10G'           #$ -l tmpfs={tmpfs}
-        pe:                 'smp'           #$ -pe {pe} {cores}
-        cores:              '1'             #$ -pe {pe} {cores} cores=1 comments out the pe request altogether
-        maxrun:             '0'             #$ -tc {maxrun} 0=unlimited and comments out the tc request
+        #qsub job submission template that gets filled out for each qsub job
+        template:           'config/default_qsub_template.sh'       #path from working directory to template job script
+
+        #default job resources for grid engine jobs
+        time:               '02:00:00'      #the hard limit on job runtime hours:mins:seconds
+        mem:                '4G'            #the maximum memory *per core*
+        tmpfs:              '10G'           #the required space available in local temporary storage
+        pe:                 'smp'           #which parallel environment to request
+        cores:              '1'             #how many cpu cores to request, setting cores=1 removed the pe request altogether
+        maxrun:             '0'             #maximum simultaneous jobs to have running, 0 means unlimited and removes tc from the request
 '''
 
 default_global_config = yaml.safe_load(default_config_str)
@@ -1899,10 +1913,7 @@ def local_execute_command(config,first_job,last_job,cmd,env,parallel):
 def write_qsub_file(action,qsub_script,jobname,njobs,jobfile):
     'fill out the qsub job script template and write to file ready to pass to qsub'
 
-    if action['qsub/template'] == 'default':
-        f_in = open("config/default_qsub_template.sh")
-    else:
-        f_in = open(action['qsub/template'])
+    f_in = open(action['qsub/template'])
 
     if is_active():
         message(f'creating qsub jobscript {qsub_script}')
