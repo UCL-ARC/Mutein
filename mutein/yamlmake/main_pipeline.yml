@@ -1,8 +1,6 @@
 #
-# commented include and module lines below are still part of the pipeline
-# they are just being temporarily excluded from execution
-# all these steps should still be run in the order they appear
-# to fully replicate the pipeline
+# main variant calling pipeline
+#
 #
 
 - include: "base_config.yml"
