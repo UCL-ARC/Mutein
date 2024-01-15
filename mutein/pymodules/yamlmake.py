@@ -802,7 +802,7 @@ def init_meta(args,config):
     else:
         meta["conf"] = None
     
-    #store dry_run, run_only, run_from, run_until settings
+    #store dry_run, run_only, run_from, run_until, module settings
     meta['args'] = args
 
     #store changeable states
@@ -2401,6 +2401,11 @@ def process(pipeline,path,config=None,args=None):
             pipeline = pipeline[:counter] + new_pipeline + pipeline[counter:]
 
         elif item_type == 'module':
+            #ignore any module that doesn't match the --module option if specified
+            if meta['args'].module and item[item_type] != meta['args'].module:
+                header(f'[{module_path}] module skipped')
+                continue
+
             #process a nested pipeline without affecting the config of any
             #following items
             module_path = expand_path(item[item_type],config)

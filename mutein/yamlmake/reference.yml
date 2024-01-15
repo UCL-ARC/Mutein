@@ -1,6 +1,7 @@
 #download the reference files into a temporary location
 - action:
     name: "download_reference"
+    exec:  "local"
 
     readme_url: "{%ref/base_url}/{%ref/readme}"
     md5_url:    "{%ref/base_url}/{%ref/md5}"
@@ -22,6 +23,7 @@
 #do the md5 check of the reference file
 - action:
     name: "check_reference"
+    exec:  "local"
 
     input:
       readme: "{%ref/tmp_dir}/{%ref/readme}"
@@ -124,6 +126,7 @@
 #download the GFF3 annotation file
 - action:
     name: "download_annotation"
+    exec:  "local"
 
     gff3_url: "{%ref/annot_url}/{%ref/annot_gff3}"
     chk_url:  "{%ref/annot_url}/{%ref/annot_chk}"
@@ -141,6 +144,7 @@
 #verify the GFF3 annotation file
 - action:
     name: "verify_annotation"
+    exec:  "local"
 
     input:
         gff3: "{%ref/annot_dir}/{%ref/annot_gff3}"
@@ -182,6 +186,7 @@
 #check dbsnp md5s
 - action:
     name: "check_dbsnp"
+    exec:  "local"
 
     input:
         vcf_md5: "{%ref/dbsnp_dir}/{%ref/dbsnp_vcf}.md5"
@@ -201,6 +206,7 @@
 #download assembly report to enable conversion from dbsnp to ucsc naming
 - action:
     name: "download_assembly_report"
+    exec:  "local"
 
     report_url: "{%ref/assembly_report_url}/{%ref/assembly_report_file}"
 
@@ -213,6 +219,7 @@
 #generate ncbi to ucsc name mapping file
 - action:
     name: "generate_name_mapping"
+    exec:  "local"
 
     input:
         report: "{%ref/dbsnp_dir}/{%ref/assembly_report_file}"
@@ -251,6 +258,7 @@
 #tabix index the fixed vcf
 - action:
     name:  "index_vcf"
+    exec:  "local"
     conda: "bwa"
 
     input:
@@ -267,6 +275,7 @@
 #https://console.cloud.google.com/storage/browser/genomics-public-data/resources/broad/hg38/v0/
 - action:
     name:  "download_gatk_bundle"
+    exec:  "local"
     conda: "gsutil"
 
     output:
