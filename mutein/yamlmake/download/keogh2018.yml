@@ -69,8 +69,11 @@
 #check fastq.gz files
 - action:
     name:  "verify_downloads"
-    exec:  "qsub"
+    exec:  "{%exec_qsub}"
     conda: "main"
+
+    ym:
+        parallel: "8"
 
     qsub:
         time:  "1:00:00"

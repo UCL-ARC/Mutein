@@ -42,7 +42,7 @@
 # https://gatk.broadinstitute.org/hc/en-us/articles/360035889971
 - action:
     name:  "genomics_db_import"
-    exec:  "qsub"
+    exec:  "{%exec_qsub}"
     conda: "gatk4"
 
     qsub:
@@ -68,7 +68,7 @@
 
 - action:
     name:  "genotype_gvcfs"
-    exec:  "qsub"
+    exec:  "{%exec_qsub}"
     conda: "gatk4"
 
     qsub:

@@ -6,7 +6,7 @@
 #https://github.com/broadinstitute/gatk/blob/master/docs/mutect/mutect.pdf
 - action:
     name:  "mutect2"
-    exec:  "qsub"
+    exec:  "{%exec_qsub}"
     conda: "gatk4"
 
     qsub:
@@ -43,7 +43,7 @@
 # It actually only annotates existing calls with quality information, a further command is needed to remove them.
 - action:
     name:  "mutect2_annotate"
-    exec:  "qsub"
+    exec:  "{%exec_qsub}"
     conda: "gatk4"
 
     qsub:
@@ -78,7 +78,7 @@
 
 - action:
     name:  "mutect2_filter"
-    exec:  "qsub"
+    exec:  "{%exec_qsub}"
     conda: "bcftools"
     #run:   "always"
 

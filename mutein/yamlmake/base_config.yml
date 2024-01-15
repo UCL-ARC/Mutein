@@ -12,6 +12,7 @@
         recycle_bin:        "recycle_bin"
         job_count:          "YM_NJOBS"
         job_number:         "YM_JOB_NUMBER"
+        parallel:           "8"
         #bash_setup:         "source ~/.bashrc\nset -euo pipefail\nset +o history{%autofs}"
         #conda_setup:        "source ~/mambaforge/etc/profile.d/conda.sh"
         conda_prefix:       "{$MUT_PREFIX}"

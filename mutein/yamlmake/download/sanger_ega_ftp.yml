@@ -22,7 +22,7 @@
 #test md5 of all ftp downloaded files
 - action:
     name: "verify_ftp_downloads"
-    exec: "qsub"
+    exec: "{%exec_qsub}"
 
     ym:
         parallel: "8"

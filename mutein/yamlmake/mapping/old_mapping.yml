@@ -7,7 +7,7 @@
 #output to bam
 - action:
     name:  "bwa_mem_pair"
-    exec:  "qsub"
+    exec:  "{%exec_qsub}"
     conda: "bwa"
 
     qsub: 
@@ -33,7 +33,7 @@
 #note not all samples have a single reads fastq.gz
 - action:
     name:  "bwa_mem_sing"
-    exec:  "qsub"
+    exec:  "{%exec_qsub}"
     conda: "bwa"
 
     qsub:
@@ -60,7 +60,7 @@
 # add readgroup tag to say "these are all from the same sample", include platform info
 - action:
     name:  "samtools_merge"
-    exec:  "qsub"
+    exec:  "{%exec_qsub}"
     conda: "bwa"
 
     qsub:

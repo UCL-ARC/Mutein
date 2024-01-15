@@ -2,7 +2,7 @@
 # See also https://varscan.sourceforge.net/using-varscan.html
 - action:
     name:  "varscan"
-    exec:  "qsub"
+    exec:  "{%exec_qsub}"
     conda: "varscan"
 
     qsub:

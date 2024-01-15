@@ -5,7 +5,7 @@
 #also create symlinks to the fastqc reports
 - action:
     name:  "fake_trim_paired1"
-    exec:  "qsub"
+    exec:  "{%exec_qsub}"
     conda: "main"
 
     #check the mtimes of the created symlinks not their target files
@@ -40,7 +40,7 @@
 #also create symlinks to the fastqc reports
 - action:
     name:  "fake_trim_paired2"
-    exec:  "qsub"
+    exec:  "{%exec_qsub}"
     conda: "main"
 
     #check the mtimes of the created symlinks not their target files
