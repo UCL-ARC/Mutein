@@ -7,7 +7,7 @@
 # to deal with timeouts and dropped connections
 # I am forcing each download to complete before starting the next one
 # by only uncommenting one dataset id at a time and restarting the pipeline using:
-# $ while true ; do yamlmake --yaml ${MUT_YAML} ; sleep 60 ; done
+# $ while true ; do yamlmake --yaml <pipeline> ; sleep 60 ; done
 
 - config:
     dataset_id: "sanger_ega_ftp"
