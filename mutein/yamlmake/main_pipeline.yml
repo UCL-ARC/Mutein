@@ -8,31 +8,25 @@
 - include: "base_config.yml"
 - include: "reference_config.yml"
 
-#- module: "setup_conda_envs.yml"
-#- module: "reference.yml"
+- module: "setup_conda_envs.yml"
+- module: "reference.yml"
 
-#- module: "download/setup.yml"
+- module: "download/setup.yml"
 
-#- module: "download/keogh2018.yml"
-#- module: "prepare/keogh2018.yml"
-#- module: "mapping/keogh2018.yml"
-#- module: "germline/keogh2018.yml"
-#- module: "somatic/keogh2018.yml"
+- module: "download/keogh2018.yml"
+- module: "prepare/keogh2018.yml"
+- module: "mapping/keogh2018.yml"
+- module: "germline/keogh2018.yml"
+- module: "somatic/keogh2018.yml"
 
-#- module: "download/yokoyama2019.yml"
+- module: "download/yokoyama2019.yml"
 
-- module: "download/sanger_ega_ftp.yml"
+- module: "download/sanger_ega_ftp.yml" #active
 
-#- module: "reorganise/martincorena2015.yml"
-#- module: "download/martincorena2015.yml"
-#- module: "prepare/martincorena2015.yml"
-#- module: "mapping/martincorena2015.yml"
-#- module: "germline/martincorena2015.yml"
-#- module: "somatic/martincorena2015.yml"
+- module: "reorganise/martincorena2015.yml"
+- module: "download/martincorena2015.yml"
+- module: "prepare/martincorena2015.yml"
+- module: "mapping/martincorena2015.yml"
+- module: "germline/martincorena2015.yml"
+- module: "somatic/martincorena2015.yml" #stub
 
-#- module: "reorganise/leesix2019.yml"
-#- module: "download/leesix2019.yml"
-#- module: "prepare/leesix2019.yml"
-#- module: "mapping/leesix2019.yml"
-#- module: "germline/leesix2019.yml"
-#- module: "somatic/leesix2019.yml"

@@ -82,7 +82,8 @@ Which should run through the pipeline in dry run mode, ie without actually issui
 To disconnect from the `screen` session use `CTRL-A CTRL-D`. To list available screen sessions use `screen -list`. To reconnect to the session you just created used `screen -R pipeline`.
 
 #### Notes
-- use comments to disable includes/modules in the top-level pipeline file
-- or else use the --run-until option to stop execution
+- use --module to enable selected modules
+- use the --run-only to run selected actions within a module
 - need to go through and convert exec: "qsub" to local or parallel
 - perhaps use 'exec: "parallel" #qsub or parallel' so we can do a search and replace back and forth between qsub and parallel (or local)
+

@@ -27,7 +27,7 @@
 
     shell: |
         touch {%keogh2018}
-        touch {%martincorean2015}
+        touch {%martincorena2015}
 
 #check for presence of the files which must be downloaded manually
 - action:
