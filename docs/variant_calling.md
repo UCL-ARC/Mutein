@@ -12,7 +12,7 @@ The main pipeline is laid out in the `mutein/yamlmake/main_pipeline.yml` yamlmak
 - `reference.yml` downloads and prepares the reference genome
 - `download/setup.yml` sets up some download folders and blocks until the user has manually downloaded some required metadata
 
-Instructions on how to perform the manual downloads are in the `download/setup.yml` file. You can either wait until the pipeline has created the `manual_downloads` folder for you, or else preemptively create this folder yourself.
+Instructions on how to perform the manual downloads are in the `download/setup.yml` file. You can either wait until the pipeline has created the `manual_downloads` folder for you, or else preemptively create this folder yourself. The pipeline will keep quiting with an error until it finds all the required manual downloads in the expected locations.
 
 Then the pipeline is broken into one group of modules per dataset, of which only Keogh2018 is fully implemented:
 
@@ -142,7 +142,38 @@ yamlmake will not needlessly rerun actions that have already been completed unle
 
 yamlmake keeps no explicit record of job history recording what has been run (except the logs in the yamlmake_logs folder), everything is based on what files are present and their modification timestamps. This explains why some jobs create files using the `touch` command which don't seem to do anything - they create a record that a job was completed at a certain time. This is also why intermediate files are never simply deleted once finished with, as this will trigger the action that created them to rerun, outputting new files, incorrectly making all downstream files seem out of date. Instead, to save space, a special truncation operation is used which replaces the file with an empty placeholder without changing the name or modification time. Files output from an action that exited with an error are flagged by setting their timestamp to a special value (1980/01/01) rather than being deleted so that yamlmake recognises them as stale, but also allowing you to examine the file contents to help trouble shoot.
 
+To run the whole of the Keogh2018 pipeline you can run through each of the separate modules listed above using the following commands one at a time:
+
+```
+yamlmake --yaml ./ym/main_pipeline.yml --module setup_conda_envs.yml
+yamlmake --yaml ./ym/main_pipeline.yml --module reference.yml
+
+#this step requires the manual metadata downloads mentioned above
+yamlmake --yaml ./ym/main_pipeline.yml --module download/setup.yml 
+
+yamlmake --yaml ./ym/main_pipeline.yml --module download/keogh2018.yml
+yamlmake --yaml ./ym/main_pipeline.yml --module prepare/keogh2018.yml
+yamlmake --yaml ./ym/main_pipeline.yml --module mapping/keogh2018.yml
+yamlmake --yaml ./ym/main_pipeline.yml --module germline/keogh2018.yml
+yamlmake --yaml ./ym/main_pipeline.yml --module somatic/keogh2018.yml
+```
+
+Each of these commands will block until completed, even if they involve submitting qsub jobs to the queue and output log messages to the screen and to log files under the `yamlmake_logs` folder. For long running steps you will likely want to disconnect the screen session and monitor progress by periodically looking at the most recent log files, eg:
+
+```
+cd yamlmake_logs
+ls -lhtr | tail
+tail -f <most_recent_log_file>
+```
+
+Log messages contain colour highlighting information which may not display correctly on your terminal depending on how you view the file. For example if using `less` to scroll through a long log file use the following to increase readability:
+
+```
+less -SR <log_file>
+```
+
+Log files are named `ym` followed by the timestamp of when yamlmake was first invoked, followed by a suffix. The top level log file suffix is `messages`. Per action log files end with the action's name, and qsub job log files also contain the array task number and the suffix `out` or `err` denote standard out and standard error. 
 
 #### Notes
-- explain which datasets have pipeline implemented
 - output and use with muteinfold
+

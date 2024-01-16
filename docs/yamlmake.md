@@ -406,6 +406,23 @@ If you have direct access to a multicore machine, such as the `skinner` node on 
     ...
 ```
 
+To facilitate easy relocation from a single server supporting parallel local execution to an HPC requiring qsub it is recommended to use a variable such as `exec_mode` in place of an explicit "parallel" or "qsub" and to provide settings for the action to run in either mode, ie to provide both `parallel:` and `qsub:` settings in the action. In this way a single config option can be set to either `parallel` or `qsub`:
+
+```
+- config:
+    exec_mode: "parallel" #change to "qsub" for gridengine
+
+- action:
+    name: "relocateable_compute_step"
+    exec: "{%exec_mode}"
+    ym:
+        parallel: "16"
+    qsub:
+        mem: "4G"
+        cores: "2"
+        #etc
+```
+
 #### Loading Simple Lists
 
 A special type of placeholder can be used to extract data from an external, non-YAML text file. For example to load a list of values from the first column of a csv file:
@@ -529,6 +546,8 @@ These settings affect the internal working of yamlmake and are stored in the glo
   --run-from RUN_FROM   only start running at the named action
   --run-until RUN_UNTIL
                         do not run beyond the named action
+ --module MODULE [MODULE ...]
+                        only run the named module(s)
   --dry-run, --dryrun   do not run anything, just report what would have been run
   --quiet               do not print any status messages to screen
   --conf CONF           YAML string containing configuration overrides, eg 'exec: "local"' or 'ym: { aggregate: "10" }'

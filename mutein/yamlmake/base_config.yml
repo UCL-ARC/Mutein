@@ -43,6 +43,7 @@
         tmpfs:    "10G"
         pe:       "smp"
         cores:    "2"
+        maxrun:   "0"
 
     #default bash environment variables
     env:
