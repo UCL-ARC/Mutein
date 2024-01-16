@@ -11,7 +11,7 @@
 #also https://gatk.broadinstitute.org/hc/en-us/articles/360035532352
 - action:
     name:  "bwa_mem"
-    exec:  "parallel"
+    exec: ""{%exec_mode}""
     conda: "bwa"
 
     ym:

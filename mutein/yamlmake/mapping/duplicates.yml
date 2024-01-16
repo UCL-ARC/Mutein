@@ -5,7 +5,7 @@
 #see C. Xu / Computational and Structural Biotechnology Journal 16 (2018) 15–24
 - action:
     name:  "mark_duplicates"
-    exec:  "parallel"
+    exec: ""{%exec_mode}""
     conda: "gatk4"
 
     ym:
@@ -40,7 +40,7 @@
 #then index the new bam
 - action:
     name:  "sort_by_posn_then_index"
-    exec:  "parallel"
+    exec: ""{%exec_mode}""
     conda: "bwa"
 
     ym:

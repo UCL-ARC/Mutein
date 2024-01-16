@@ -1,4 +1,4 @@
-#define dataset_id, subset_list, credentials
+#define dataset_id, subset_id list, credentials
 - include: "../config/yokoyama2019.yml"
 
 - include: "download_and_verify.yml"

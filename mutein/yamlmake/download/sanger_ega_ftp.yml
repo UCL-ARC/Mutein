@@ -1,5 +1,6 @@
-#this version uses the ftp download account setup by the ega helpdesk for me
-#due to pyega3 not working
+# this version uses the temporary ftp download account setup by the ega helpdesk for me
+# due to pyega3 not working
+# files are preencrypted therefore download to myriad is okay
 
 #define dataset_id, subset_id list, login credentials
 - include: "../config/sanger_ega_ftp_{$MUT_PLATFORM}.yml"
@@ -22,7 +23,7 @@
 #test md5 of all ftp downloaded files
 - action:
     name: "verify_ftp_downloads"
-    exec: "{%exec_qsub}"
+    exec: ""{%exec_mode}""
 
     ym:
         parallel: "8"
@@ -55,7 +56,7 @@
 # decrypt files
 - action:
     name: "decrypt_crams"
-    exec: "parallel"
+    exec: ""{%exec_mode}""
 
     ym:
         parallel: "8"

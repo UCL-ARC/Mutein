@@ -30,7 +30,7 @@
 
 - action:
     name:     "test1"
-    exec:     "{%exec_qsub}"
+    exec:     ""{%exec_mode}""
     conda:    "{%mut_prefix}main"
     sample_subset:
       - "subset1"

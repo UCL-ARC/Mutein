@@ -1,6 +1,6 @@
 - action:
     name: "test_parallel"
-    exec: "parallel"
+    exec: ""{%exec_mode}""
     ym:
         parallel: "4"
         aggregate: "4"

@@ -1,3 +1,11 @@
+#
+# setup some folder
+# block with error until user has manually downloaded some datasets into required position
+# (done manually due to being hard to automate)
+# see comments in the actions for what to download
+# also automatically downloads grch37 reference and associated metadata
+#
+
 #setup the symlink to the backed up area where the raw data will live
 - action:
     name:  "setup_rawdata_area"

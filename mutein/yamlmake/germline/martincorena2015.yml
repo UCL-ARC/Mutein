@@ -1,4 +1,4 @@
-#define dataset_id and subset_list
+#define dataset_id and subset_id list
 - include: "../config/martincorena2015.yml"
 
 - include: "reheader.yml"    #create version of each bam with sample (individual) as the SM tag

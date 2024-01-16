@@ -1,30 +1,38 @@
 #
 # main variant calling pipeline
-#
+# see within each yml file for further detailed comments
 #
 
+# include general and reference related config
 - include: "base_config.yml"
 - include: "reference_config.yml"
 
+#set up all the required conda environments
 - module: "setup_conda_envs.yml"
+
+#download and process the GRCh38 reference sequence and related metadata
 - module: "reference.yml"
 
+#setup directories, blocks until user has manually download some data
 - module: "download/setup.yml"
 
+# download and process keogh2018 dataset
 - module: "download/keogh2018.yml"
 - module: "prepare/keogh2018.yml"
 - module: "mapping/keogh2018.yml"
 - module: "germline/keogh2018.yml"
 - module: "somatic/keogh2018.yml"
 
+# download yokoyama2019 dataset
 - module: "download/yokoyama2019.yml"
 
-- module: "download/sanger_ega_ftp.yml" #active
+# download all sanger ega datasets
+- module: "download/sanger_ega_ftp.yml"
 
+# process martincorena2015 dataset
 - module: "reorganise/martincorena2015.yml"
 - module: "download/martincorena2015.yml"
 - module: "prepare/martincorena2015.yml"
 - module: "mapping/martincorena2015.yml"
 - module: "germline/martincorena2015.yml"
-- module: "somatic/martincorena2015.yml" #stub
-
+- module: "somatic/martincorena2015.yml" #not implemented

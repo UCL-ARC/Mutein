@@ -1,12 +1,16 @@
-#following keogh, do all pairwise comparisons between samples from same individuals
-#treating one as tumour other as normal
+# call somatic variants using Mutect2
+# call somatic mutations in each accession using it as the "tumour" sample
+# and all other accessions from the same individual as the aggregated "normal" sample
+# for the tumour sample use the version of the file where SM (sample tag) is set to the accession
+# for the normal samples use the version of the files where SM is set to the individual
+# so that they are aggregated into one during calling
 #https://gatk.broadinstitute.org/hc/en-us/articles/5358824293659--Tool-Documentation-Index
 #https://gatk.broadinstitute.org/hc/en-us/articles/360035894731-Somatic-short-variant-discovery-SNVs-Indels-
 #https://gatk.broadinstitute.org/hc/en-us/articles/5358911630107-Mutect2
 #https://github.com/broadinstitute/gatk/blob/master/docs/mutect/mutect.pdf
 - action:
     name:  "mutect2"
-    exec:  "{%exec_qsub}"
+    exec:  ""{%exec_mode}""
     conda: "gatk4"
 
     qsub:
@@ -43,7 +47,7 @@
 # It actually only annotates existing calls with quality information, a further command is needed to remove them.
 - action:
     name:  "mutect2_annotate"
-    exec:  "{%exec_qsub}"
+    exec:  ""{%exec_mode}""
     conda: "gatk4"
 
     qsub:
@@ -78,7 +82,7 @@
 
 - action:
     name:  "mutect2_filter"
-    exec:  "{%exec_qsub}"
+    exec:  ""{%exec_mode}""
     conda: "bcftools"
     #run:   "always"
 
@@ -110,6 +114,7 @@
             --tbi \
             {%vcf_filtered}
 
+# filter retaining only SNP variants
 - action:
     name:  "mutect2_snponly"
     exec:  "local"
@@ -141,6 +146,7 @@
             --tbi \
             {%vcf_snponly}
 
+# merge variants across all samples in the dataset
 - action:
     name:  "mutect2_merge"
     exec:  "local"
