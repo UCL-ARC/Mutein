@@ -23,7 +23,7 @@
 #test md5 of all ftp downloaded files
 - action:
     name: "verify_ftp_downloads"
-    exec: ""{%exec_mode}""
+    exec: "{%exec_mode}"
 
     ym:
         parallel: "8"
@@ -56,7 +56,7 @@
 # decrypt files
 - action:
     name: "decrypt_crams"
-    exec: ""{%exec_mode}""
+    exec: "{%exec_mode}"
 
     ym:
         parallel: "8"

@@ -1,7 +1,7 @@
 #generate QC stats for anything called .fastq.gz
 - action:
     name: "fastqc"
-    exec: ""{%exec_mode}""
+    exec: "{%exec_mode}"
     conda: "trim-galore"
 
     # fastqc uses max one thread per file, we are passing

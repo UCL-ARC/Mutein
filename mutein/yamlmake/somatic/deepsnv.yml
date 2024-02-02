@@ -1,6 +1,6 @@
 - action:
     name:  "deepsnv"
-    exec:  ""{%exec_mode}""
+    exec:  "{%exec_mode}"
     conda: "bioconductor"
 
     qsub:

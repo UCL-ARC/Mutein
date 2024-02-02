@@ -70,7 +70,7 @@
 #convert cram into bam to verify that cram reference sequence is correct
 - action:
     name: "cram_to_bam"
-    exec: ""{%exec_mode}""
+    exec: "{%exec_mode}"
     conda: "bwa"
 
     ym:
@@ -92,7 +92,7 @@
 #convert bam into fastq
 - action:
     name: "bam_to_fastq"
-    exec: ""{%exec_mode}""
+    exec: "{%exec_mode}"
     conda: "bwa"
     
     ym:

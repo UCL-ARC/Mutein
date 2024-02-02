@@ -69,7 +69,7 @@
 #check fastq.gz files
 - action:
     name:  "verify_downloads"
-    exec:  ""{%exec_mode}""
+    exec:  "{%exec_mode}"
     conda: "main"
 
     ym:

@@ -59,7 +59,7 @@
 #explicitly test md5 of all downloaded files
 - action:
     name: "verify_downloads"
-    exec: ""{%exec_mode}""
+    exec: "{%exec_mode}"
 
     input:
         accession_dir: "datasets/{%dataset_id}/{=subset_id}/{*accession}"
