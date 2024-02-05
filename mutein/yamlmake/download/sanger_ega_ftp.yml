@@ -17,6 +17,8 @@
         touch: "datasets/{%dataset_id}/{=subset_id}/.meta/{%name}.touch"
 
     shell: |
+        # -R = recursively download folder
+        # -T = disable tar mode (which would prevent resuming partial files after interruptions)
         ncftpget -f {%credentials} -RT datasets/{%dataset_id} {=subset_id}
         touch {%touch}
 
