@@ -5,7 +5,7 @@
 #define dataset_id, subset_id list, login credentials
 - include: "../config/sanger_ega_ftp_{$MUT_PLATFORM}.yml"
 
-#recursive ftp download of each accession with ncftp
+#recursive ftp download of each accession with ncftp on myriad
 - action:
     name:  "download_accessions"
     exec:  "local"
@@ -22,7 +22,7 @@
         ncftpget -f {%credentials} -RT datasets/{%dataset_id} {=subset_id}
         touch {%touch}
 
-#test md5 of all ftp downloaded files
+#test md5 of all ftp downloaded files on myriad
 - action:
     name: "verify_ftp_downloads"
     exec: "{%exec_mode}"
@@ -55,7 +55,7 @@
 # while true ; do rsync -av myriad:/lustre/scratch/scratch/ccaervi/549_mutein/datasets/sanger_ega_ftp . ; sleep 300 ; done
 # executed in the folder /SAN/medic/Mutein/549_mutein/datasets/sanger_ega_myriad_rsync
 
-# decrypt files
+# decrypt files on CS
 - action:
     name: "decrypt_crams"
     exec: "{%exec_mode}"
@@ -83,7 +83,7 @@
             -out {%cram_file} \
             -k $(cat {%decryption_password}) -md sha256
 
-# truncate the encrypted versions to save space
+# truncate the encrypted versions to save space on CS
 - action:
     name: "truncate_cips"
     exec: "local"
@@ -102,4 +102,6 @@
         mutein truncate {%cip_file}
         touch {%touch}
 
-#remove "#"" from file names and reorganised into subsets etc
+#from now on we deal with each dataset using its own pipeline files
+#ie the next module is "reorganise/martincorena2015.yml"
+# not "reorganise/sanger_ega_ftp.yml"
