@@ -15,7 +15,6 @@ timestamp=$(date +%Y%m%d-%H%M%S)
 sftp -ra -F ./ssh_config ega-outbox 2> ${timestamp}.err > ${timestamp}.out <<EOF
 get EGAD00001004462
 get EGAD00001004464
-get EGAD00001001631
 bye
 EOF
 
