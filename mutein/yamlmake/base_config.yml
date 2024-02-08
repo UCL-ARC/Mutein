@@ -56,7 +56,6 @@
     working_dir:    "{$MUT_DATA}"
     conf_dir:       "{$MUT_DIR}/mutein/yamlmake"
     conda_channels: "--override-channels -c conda-forge -c defaults -c bioconda -c flynn"
-    exec_mode:      "parallel"
 
 #platform specific config
 - include: "{$MUT_PLATFORM}_config.yml"
