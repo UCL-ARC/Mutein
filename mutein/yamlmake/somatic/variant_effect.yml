@@ -1,5 +1,5 @@
+#predict effect of the SNPs, also include uniprot ids and indicate if transcript is canonical
 - action:
-    #predict effect of the SNPs, also include uniprot ids and indicate if transcript is canonical
     name:  "variant_effect"
     exec:  "local"
     conda: "vep"
@@ -33,9 +33,9 @@
               --force_overwrite --uniprot --canonical
         fi
 
+#retain only canonical transcripts with missense mutations
+#sort and filter out duplicated mutations (ie those found in more than one sample)
 - action:
-    #retain only canonical transcripts with missense mutations
-    #sort and filter out duplicated mutations (ie those found in more than one sample)
     name:  "aggregate_variant_effects"
     exec:  "local"
     conda: "vep"
