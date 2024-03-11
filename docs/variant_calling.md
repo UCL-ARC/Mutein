@@ -17,14 +17,14 @@ Instructions on how to perform the manual downloads are in the `download/setup.y
 Then the pipeline is broken into one group of modules per dataset, of which only Keogh2018 is fully implemented:
 
 - `download/keogh2018.yml` downloads and verifies the data and creates metadata files defining individuals and samples
-- `prepare/keogh2018.yml` runs fastqc, the data are already trimmed so symlinks are created making fake "trimmed" files pointing to the originals
-- `mapping/keogh2018.yml` maps against the reference using bwa mem, and marks duplicates and applies base quality score recalibration using GATK
+- `prepare/keogh2018.yml` runs fastqc, the data are already trimmed so symlinks are created making fake "trimmed" files pointing to the originals, (this facilitates using the same filename conventions for other datasets which do require trimming)
+- `mapping/keogh2018.yml` maps against the reference using bwa mem, marks duplicates and applies base quality score recalibration using GATK
 - `germline/keogh2018.yml` calls germline variants using GATK's HaplotypeCaller
 - `somatic/keogh2018.yml` calls somatic variants using GATK's Mutect2
 
 In the main workspace folder the `datasets` subfolder contains the raw data, `processed` contains the modified, processed data. Under both of these folders there is a subfolder for each dataset named after the original paper's first author and year of publication. Under that there are subfolders for data subsets (Keogh2018 has only one) and under that one subfolder for each data accession. All these folders have no normal files or other subfolders so that every folder in them represents either a data subset or accession. All other content are stored under hidden folders called `.meta` to prevent yamlmake from seeing them when it performs glob operations looking for datasets.
 
-Final output is a single TSV file `processed/keogh2018/SRP159015/.meta/all_somatic.tsv.gz`.
+Final output is a single text file `processed/keogh2018/SRP159015/.meta/all_vep.txt` produced by Variant Effect Predictor, listing the somatic mutations found. Column 4 gives the Ensembl ID of the affected gene, Columns 10 and 11 give the protein residue affect and the single letter amino acid codes of the unmutated and mutated residue. The Swissprot ID of the protein is given in the final column. For a full description of the output see [here](https://grch37.ensembl.org/info/docs/tools/vep/vep_formats.html#output).
 
 The same pipeline is mostly implemented for the Martincorena2015 dataset except that somatic variant calling is missing, due to lack of ability to work out which accessions are from which samples / individuals mentioned in the paper.
 
@@ -173,7 +173,3 @@ less -SR <log_file>
 ```
 
 Log files are named `ym` followed by the timestamp of when yamlmake was first invoked, followed by a suffix. The top level log file suffix is `messages`. Per action log files end with the action's name, and qsub job log files also contain the array task number and the suffix `out` or `err` denote standard out and standard error. 
-
-#### Notes
-- output and use with muteinfold
-
