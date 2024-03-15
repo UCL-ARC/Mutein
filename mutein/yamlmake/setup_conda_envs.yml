@@ -2,11 +2,15 @@
 #touch an output file to flag that env has been created
 - action:
     name: "setup_conda_envs"
+    exec: "local"
+
     base_dir: "{$MUT_DIR}/mutein/conda_envs"
+
     input:
         env_file: "{%base_dir}/{*env_name}.env"
     output:
         touch: "config/conda_envs/{*env_name}.touch"
+        
     shell: |
         mamba create -y \
                      -n {%ym/conda_prefix}{*env_name} \

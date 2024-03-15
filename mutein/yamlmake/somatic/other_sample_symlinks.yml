@@ -1,4 +1,6 @@
 #create symlinks within each accession's folder to all other accessions from same individual
+#this allows mutect2 to pool multiple samples to act as the "normal" sample
+#against which to compare the "tumour" sample (ie the one we want to call somatic mutations on)
 - action:
     name:  "other_sample_symlinks"
     exec:  "local"

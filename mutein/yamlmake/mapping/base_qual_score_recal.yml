@@ -3,7 +3,7 @@
 
 - action:
     name:  "base_recalibrator"
-    exec:  "parallel"
+    exec: "{%exec_mode}"
     conda: "gatk4"
 
     ym:
@@ -36,7 +36,7 @@
 
 - action:
     name:  "apply_bqsr"
-    exec:  "parallel"
+    exec: "{%exec_mode}"
     conda: "gatk4"
 
     ym:

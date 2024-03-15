@@ -1,6 +1,11 @@
+#
+# this action is not used in the final pipeline
+# but was setup to call somatic mutations using the deepsnv R package
+#
+
 - action:
     name:  "deepsnv"
-    exec:  "qsub"
+    exec:  "{%exec_mode}"
     conda: "bioconductor"
 
     qsub:

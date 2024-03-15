@@ -1,6 +1,10 @@
-#this version tries to use pyega3 tool to download
+# this version tried to use pyega3 tool to download
+# but has never worked reliably, especially with the larger files
+# due to long standing unresolved bugs, probably on the EGA server side
+# it was abandoned in favour of sanger_ega_ftp.yml
+# which became available after EGA set up an ftp download account for us
 
-#define dataset_id, subset_list, credentials
+#define dataset_id, subset_id list, credentials
 - include: "../config/sanger_ega.yml"
 
 #https://ega-archive.org/download/downloader-quickguide-APIv3
@@ -57,7 +61,7 @@
 #explicitly test md5 of all downloaded files
 - action:
     name: "verify_downloads"
-    exec: "qsub"
+    exec: "{%exec_mode}"
 
     input:
         accession_dir: "datasets/{%dataset_id}/{=subset_id}/{*accession}"

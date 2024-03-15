@@ -1,1 +1,3 @@
-#nothing special required for myriad
+#we run jobs via qsub on myriad
+- config:
+    exec_mode:      "qsub"

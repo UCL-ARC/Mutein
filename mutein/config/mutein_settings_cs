@@ -9,7 +9,6 @@ export MUT_DIR=/home/rvickers/repos/Mutein
 #the main Mutein data folder, this storage area is not backed up
 #this allows conda environments to be stored here without impacting the backup process
 #this path should avoid any symlinks to help it work with singularity, autofs etc
-#export MUT_DATA=/SAN/medic/MuteinScratch/549_mutein
 export MUT_DATA=/home/rvickers/549_mutein_scratcha
 
 #the rawdata are on a separate store, should be not larger than about 30TB
@@ -24,8 +23,7 @@ export MUT_LOCAL_SCRATCH=/scratch0
 #ensure autofs has mounted the shares
 export MUT_AUX_SETUP='file /SAN/medic/Mutein > /dev/null ; file /SAN/medic/MuteinScratch > /dev/null'
 
-#use this config file for the sanger_ega_ftp.yml pipeline file
-export MUT_SANGER_YML='sanger_ega_ftp_cs.yml'
+#specify which platform we are using
 export MUT_PLATFORM='cs'
 
 ## ================================================

@@ -1,4 +1,4 @@
-#define dataset_id and subset_list
+#define dataset_id and subset_id list
 - include: "../config/keogh2018.yml"
 
 #download list of accession names
@@ -69,8 +69,11 @@
 #check fastq.gz files
 - action:
     name:  "verify_downloads"
-    exec:  "qsub"
+    exec:  "{%exec_mode}"
     conda: "main"
+
+    ym:
+        parallel: "8"
 
     qsub:
         time:  "1:00:00"

@@ -1,38 +1,38 @@
 #
-# commented include and module lines below are still part of the pipeline
-# they are just being temporarily excluded from execution
-# all these steps should still be run in the order they appear
-# to fully replicate the pipeline
+# main variant calling pipeline
+# see within each yml file for further detailed comments
 #
 
+# include general and reference related config
 - include: "base_config.yml"
 - include: "reference_config.yml"
 
-#- include: "setup_conda_envs.yml"
-#- include: "reference.yml"
+#set up all the required conda environments
+- module: "setup_conda_envs.yml"
 
-#- module: "download/setup.yml"
+#download and process the GRCh38 reference sequence and related metadata
+- module: "reference.yml"
 
-#- module: "download/keogh2018.yml"
-#- module: "prepare/keogh2018.yml"
-#- module: "mapping/keogh2018.yml"
-#- module: "germline/keogh2018.yml"
-#- module: "somatic/keogh2018.yml"
+#setup directories, blocks until user has manually download some data
+- module: "download/setup.yml"
 
-#- module: "download/yokoyama2019.yml"
+# download and process keogh2018 dataset
+- module: "download/keogh2018.yml"
+- module: "prepare/keogh2018.yml"
+- module: "mapping/keogh2018.yml"
+- module: "germline/keogh2018.yml"
+- module: "somatic/keogh2018.yml"
 
+# download yokoyama2019 dataset
+- module: "download/yokoyama2019.yml"
+
+# download all sanger ega datasets
 - module: "download/sanger_ega_ftp.yml"
 
-#- module: "reorganise/martincorena2015.yml"
-#- module: "download/martincorena2015.yml"
-#- module: "prepare/martincorena2015.yml"
-#- module: "mapping/martincorena2015.yml"
-#- module: "germline/martincorena2015.yml"
-#- module: "somatic/martincorena2015.yml"
-
-#- module: "reorganise/leesix2019.yml"
-#- module: "download/leesix2019.yml"
-#- module: "prepare/leesix2019.yml"
-#- module: "mapping/leesix2019.yml"
-#- module: "germline/leesix2019.yml"
-#- module: "somatic/leesix2019.yml"
+# process martincorena2015 dataset
+- module: "reorganise/martincorena2015.yml"
+- module: "download/martincorena2015.yml"
+- module: "prepare/martincorena2015.yml"
+- module: "mapping/martincorena2015.yml"
+- module: "germline/martincorena2015.yml"
+- module: "somatic/martincorena2015.yml" #not implemented

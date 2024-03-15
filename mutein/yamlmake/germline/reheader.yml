@@ -2,7 +2,7 @@
 #to allow grouping all samples from the same individual
 - action:
     name:  "adjust_rg_header"
-    exec:  "parallel"
+    exec: "{%exec_mode}"
     conda: "bwa"
 
     qsub:

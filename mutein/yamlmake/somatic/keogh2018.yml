@@ -1,8 +1,8 @@
-#define dataset_id and subset_list
+#define dataset_id and subset_id list
 - include: "../config/keogh2018.yml"
 
-#- include: "other_sample_symlinks.yml"
+- include: "other_sample_symlinks.yml"
 
-#- include: "mutect2.yml"
+- include: "mutect2.yml"
 
 - include: "variant_effect.yml"

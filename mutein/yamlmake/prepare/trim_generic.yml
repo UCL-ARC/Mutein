@@ -5,7 +5,7 @@
 #trim paired reads with trim_galore, no fixed cropping incase it's already been done
 - action:
     name:  "trim_pair_reads"
-    exec:  "parallel"
+    exec: "{%exec_mode}"
     conda: "trim-galore"
 
     qsub: 

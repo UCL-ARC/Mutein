@@ -5,7 +5,7 @@
 #trim paired reads with trim_galore
 - action:
     name:  "trim_pair_reads"
-    exec:  "qsub"
+    exec:  "{%exec_mode}"
     conda: "trim-galore"
 
     qsub: 

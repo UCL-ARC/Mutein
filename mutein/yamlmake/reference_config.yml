@@ -1,3 +1,11 @@
+#
+# config related to the human genome reference sequence reads will be mapped against (GRCh38)
+# also:
+#  ensembl annotation (GRCh38.107)
+#  dbsnp
+#  GATK resource bundle
+#
+
 - config:
     ref:
       #temporary download location of initial FASTA

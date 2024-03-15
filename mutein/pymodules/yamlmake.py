@@ -802,7 +802,7 @@ def init_meta(args,config):
     else:
         meta["conf"] = None
     
-    #store dry_run, run_only, run_from, run_until settings
+    #store dry_run, run_only, run_from, run_until, module settings
     meta['args'] = args
 
     #store changeable states
@@ -882,7 +882,7 @@ def validate_action(action):
     if not 'input' in action: action['input'] = {}   #allow empty input field
     if not 'output' in action: action['output'] = {} #allow empty output field
 
-    #name is used to general file and job names
+    #name is used to generate file and job names
     #therefore prevent any characters that cause problems for filenames
     for ch in illegal_chrs:
         assert not ch in action['name'], f'cannot use "{ch}" in action name, consider a description field for longer text'
@@ -2401,6 +2401,11 @@ def process(pipeline,path,config=None,args=None):
             pipeline = pipeline[:counter] + new_pipeline + pipeline[counter:]
 
         elif item_type == 'module':
+            #ignore any module(s) that doesn't match the --module option if specified
+            if meta['args'].module and not item[item_type] in meta['args'].module:
+                header(f'[{item[item_type]}] module skipped')
+                continue
+
             #process a nested pipeline without affecting the config of any
             #following items
             module_path = expand_path(item[item_type],config)

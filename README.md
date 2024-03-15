@@ -5,6 +5,6 @@ This is a research project to reanalyse multiple existing [datasets](docs/datase
 
 The project will essentially scale up and improve upon what has already been done in individual papers on single datasets by Ben and/or other lab members or collaborators, and produce a well documented, maintainable pipeline that Hall lab members can reuse or build on in the future.
 
-The variant calling pipeline in this repository is intended to be used in conjunction with the [MuteinFold](https://github.com/UCL-ARC/MuteinFold) pipeline. Variant calling identifies which somatic mutations are present in the samples, then MuteinFold can used to estimate the effect of those mutations on protein folding. For documentation on MuteinFold see the [MuteinFold wiki](https://github.com/UCL-ARC/MuteinFold-Issues/wiki). These repositories are currently private so you will need to request access if you don't already have it.
+The variant calling pipeline in this repository is intended to be used in conjunction with the [MuteinFold](https://github.com/UCL-ARC/MuteinFold) pipeline. Variant calling identifies which somatic mutations are present in the samples, then MuteinFold can be used to estimate the effect of those mutations on protein folding. For documentation on MuteinFold see the [MuteinFold wiki](https://github.com/UCL-ARC/MuteinFold-Issues/wiki). These repositories are currently private so you will need to request access if you don't already have it.
 
-For documentation of how to install and use the Mutein s variant calling pipeline see the [getting started](docs/getting_started.md) page.
+For documentation of how to install and use the Mutein's variant calling pipeline see the [getting started](docs/getting_started.md) page.

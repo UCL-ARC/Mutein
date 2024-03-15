@@ -1,0 +1,5 @@
+Host outbox.ega-archive.org ega-outbox
+    hostname outbox.ega-archive.org
+    User <EGA_USERNAME>
+    IdentityFile <PRIVATE_KEY_FILE>
+
