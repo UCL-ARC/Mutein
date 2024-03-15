@@ -41,6 +41,6 @@ RUN mkdir -p $repo_path
 WORKDIR /home/$username/$repo_path
 RUN git clone https://github.com/UCL-ARC/Mutein.git
 WORKDIR /home/$username/$repo_path/Mutein
-RUN git checkout robertvi_tre_docker
+RUN git checkout docker4tre
 
 CMD ["bash"]
