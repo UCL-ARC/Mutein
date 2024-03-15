@@ -8,3 +8,5 @@ The project will essentially scale up and improve upon what has already been don
 The variant calling pipeline in this repository is intended to be used in conjunction with the [MuteinFold](https://github.com/UCL-ARC/MuteinFold) pipeline. Variant calling identifies which somatic mutations are present in the samples, then MuteinFold can be used to estimate the effect of those mutations on protein folding. For documentation on MuteinFold see the [MuteinFold wiki](https://github.com/UCL-ARC/MuteinFold-Issues/wiki). These repositories are currently private so you will need to request access if you don't already have it.
 
 For documentation of how to install and use the Mutein's variant calling pipeline see the [getting started](docs/getting_started.md) page.
+
+The [docker](docker/readme.md) folder contains scripts used to setup a docker container to run the pipeline in a TRE environment.
