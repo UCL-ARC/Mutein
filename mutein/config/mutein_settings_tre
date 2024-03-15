@@ -1,0 +1,32 @@
+## this script is sourced by the user to setup their working environment
+## ============ ONLY EDIT THIS SECTION ============
+
+#the Mutein repository folder
+#this path should avoid any symlinks to help it work with singularity, autofs etc
+#the repo should be in the home folders so it is accessible easily through sshfs to allow remote editing
+export MUT_DIR=MUT_DIR_PLACEHOLDER
+
+#the main Mutein data folder
+export MUT_DATA=MUT_DATA_PLACEHOLDER
+
+#the rawdata are on a separate store, should be not larger than about 30TB
+#to avoid overloading the backup system
+#only this folder is backed up
+export MUT_RAW=MUT_RAW_PLACEHOLDER
+
+#where to put temporary files on local node storage
+export MUT_LOCAL_SCRATCH=/tmp
+
+#extra setup commands to run at the start of each job
+#ensure autofs has mounted the shares
+export MUT_AUX_SETUP=''
+
+#specify which platform we are using
+export MUT_PLATFORM='cs'
+
+## ================================================
+
+## Everything else will not normally need to be edited
+## by the user so is sourced from a file in the repo
+
+source "$MUT_DIR"/mutein/config/mutein_fixed_settings

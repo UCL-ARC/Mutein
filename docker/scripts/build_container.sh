@@ -9,24 +9,20 @@ set -eu
 
 source settings
 
-usage="usage: ./scripts/build_container.sh [--no-cache]  #run from the 'docker' folder"
-
-nocache=""
+usage="usage: ./scripts/build_container.sh [--help|build-options]  #run from the 'docker' folder"
 
 if [[ "$#" != "0" ]] ; then
-    if [[ "$1" == "--no-cache" ]] ; then
-        nocache="$1"
-    else
+    if [[ "$1" == "--help" || "$1" == "-h" ]] ; then
         echo "$usage"
         exit
     fi
 fi
 
-docker build "${nocache}" -t mutein_tre \
-    --build-arg username="${CONTAINER_USER}" \
-    --build-arg data_path="${GUEST_DATA_FOLDER}" \
-    --build-arg mamba_url="${MAMBA_URL}" \
-    --build-arg mamba_sh="${MAMBA_SH}" \
+docker build $@ -t mutein_tre \
+    --build-arg "username=${CONTAINER_USER}" \
+    --build-arg "data_path=${GUEST_DATA_FOLDER}" \
+    --build-arg "mamba_url=${MAMBA_URL}" \
+    --build-arg "mamba_sh=${MAMBA_SH}" \
     .
 
-docker image list
+#docker image list

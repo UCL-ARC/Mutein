@@ -1,6 +1,9 @@
 #using the current Ubuntu LTS
 FROM ubuntu:22.04
 
+#use bash not sh
+SHELL ["/bin/bash", "-c"]
+
 #name of the limited user within the container
 ARG username
 
@@ -28,7 +31,7 @@ RUN chmod go-rwx /home/$username/.ssh
 #install git
 RUN apt-get update
 RUN apt-get -y upgrade
-RUN apt-get install -y git
+RUN apt-get install -y git wget
 RUN rm -rf /var/lib/apt/lists/*
 
 #switch to operating as the limited user
@@ -53,7 +56,18 @@ RUN mkdir -p mamba
 WORKDIR /home/$username/mamba
 RUN wget $mamba_url/$mamba_sh
 RUN chmod u+x $mamba_sh
-RUN ./$mamba_sh
+RUN ./$mamba_sh -b -p /home/$username/mambaforge
+ENV PATH=/home/treuser/mambaforge/condabin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+RUN conda init
+RUN conda config --set auto_activate_base false
+
+#set up the workspace folder
+WORKDIR $data_path
+RUN mkdir -p mutein_workspace/config
+RUN mkdir -p mutein_raw
+#RUN cp /home/$username/$repo_path/Mutein/mutein/config/mutein_settings_tre mutein_workspace/config/mutein_settings
+#WORKDIR $data_path/mutein_workspace/config
+#RUN export NEWVAL=/home/$username/$repo_path/Mutein ; sed -i "s|MUT_DIR_PLACEHOLDER|$NEWVAL|" mutein_settings
 
 #set default command to bash
 CMD ["bash"]

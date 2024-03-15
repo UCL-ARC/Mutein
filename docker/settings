@@ -1,7 +1,7 @@
 # settings used by the scripts
 
 export CONTAINER_USER=treuser
-export HOST_DATA_FOLDER=/home/${USER}/data
-export GUEST_DATA_FOLDER=/home/${CONTAINER_USER}/data
+export HOST_DATA_FOLDER="/home/${USER}/data"
+export GUEST_DATA_FOLDER="/home/${CONTAINER_USER}/data"
 export MAMBA_URL="https://github.com/conda-forge/miniforge/releases/latest/download"
 export MAMBA_SH="Mambaforge-Linux-x86_64.sh"
