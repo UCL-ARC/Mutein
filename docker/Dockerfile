@@ -2,13 +2,17 @@
 FROM ubuntu:22.04
 
 #name of the limited user within the container
-ARG username=treuser
+ARG username
 
 #where under the users home folder to clone the pipeline repository to
 ARG repo_path=repos
 
 #where within the container will the external data folder of the TRE be mounted
-ARG data_path=/shared/mutein_data
+ARG data_path
+
+#url to download mamba install script from and name of script itself
+ARG mamba_url
+ARG mamba_sh
 
 #github host keys
 ARG github_ed25519="github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl"
@@ -43,4 +47,13 @@ RUN git clone https://github.com/UCL-ARC/Mutein.git
 WORKDIR /home/$username/$repo_path/Mutein
 RUN git checkout docker4tre
 
+#install mamba
+WORKDIR /home/$username
+RUN mkdir -p mamba
+WORKDIR /home/$username/mamba
+RUN wget $mamba_url/$mamba_sh
+RUN chmod u+x $mamba_sh
+RUN ./$mamba_sh
+
+#set default command to bash
 CMD ["bash"]

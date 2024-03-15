@@ -8,3 +8,6 @@ The folder contains scripts used to setup a docker container to run the Mutein p
 
 ## Instructions
 - [install_docker.sh](scripts/install_docker.sh) used to install docker on the Ubuntu VM
+- [build_container.sh](scripts/build_container.sh) builds the container
+  - most of the work is done in the Dockerfile
+- [run_container.sh](scripts/run_container.sh) contains the command needed to run the container
