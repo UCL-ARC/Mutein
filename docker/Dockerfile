@@ -61,13 +61,5 @@ ENV PATH=/home/treuser/mambaforge/condabin:/usr/local/sbin:/usr/local/bin:/usr/s
 RUN conda init
 RUN conda config --set auto_activate_base false
 
-#set up the workspace folder
-WORKDIR $data_path
-RUN mkdir -p mutein_workspace/config
-RUN mkdir -p mutein_raw
-#RUN cp /home/$username/$repo_path/Mutein/mutein/config/mutein_settings_tre mutein_workspace/config/mutein_settings
-#WORKDIR $data_path/mutein_workspace/config
-#RUN export NEWVAL=/home/$username/$repo_path/Mutein ; sed -i "s|MUT_DIR_PLACEHOLDER|$NEWVAL|" mutein_settings
-
 #set default command to bash
 CMD ["bash"]
