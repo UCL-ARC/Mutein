@@ -8,7 +8,6 @@ It assumes the processing is taking place on the CS cluster using the `skinner` 
 
 The main pipeline is laid out in the `mutein/yamlmake/main_pipeline.yml` yamlmake file. See comments in this file and the module and include files for details. In summary:
 
-- `setup_conda_envs.yml` module creates all the required conda environments
 - `reference.yml` downloads and prepares the reference genome
 - `download/setup.yml` sets up some download folders and blocks until the user has manually downloaded some required metadata
 
@@ -101,21 +100,23 @@ In order to allow long running jobs to continue without interruption should you 
 screen -S pipeline
 ```
 
-Now we can bootstrap the Mutein conda environment to give access to the `yamlmake` command etc:
+Now we can setup all the conda environments required by the pipeline, also required before you can run yamlmake itself. This only needs to run once:
+
+```
+/home/USERNAME/repos/Mutein/mutein/scripts/setup_conda_envs.sh
+```
+
+Once completed, you can setup the neccessary environment variables to run the pipeline each session:
 
 ```
 source ./config/mutein_settings
 ```
 
-You should see a message like:
+You should see the yamlmake help message beginning:
 
 ```
-Activating the mutein_main conda environment... OK
-Running the mutein script... OK
-To begin try:
-    yamlmake --help
-Or:
-    yamlmake --yaml <pipeline> --dry-run
+usage: yamlmake [-h] [--yaml YAML] [--log-dir LOG_DIR] [--no-logs] [--prefix PREFIX] [--run-only RUN_ONLY [RUN_ONLY ...]] [--run-from RUN_FROM] [--run-until RUN_UNTIL] [--module MODULE [MODULE ...]]
+                [--dry-run] [--quiet] [--conf CONF] [--qsub QSUB]
 ```
 
 For convenience we will make a symlink to the repository folder containing the yamlmake pipeline file:
