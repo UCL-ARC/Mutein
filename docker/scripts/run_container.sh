@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #
-# run the container using the default "bash" command
+# test run the container on the build machine and activate the default "bash" interactive command prompt
 #
 
 set -eu

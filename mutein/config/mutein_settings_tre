@@ -6,12 +6,10 @@
 #the repo should be in the home folders so it is accessible easily through sshfs to allow remote editing
 export MUT_DIR=MUT_DIR_PLACEHOLDER
 
-#the main Mutein data folder
+#the main Mutein data folder, for processed data
 export MUT_DATA=MUT_DATA_PLACEHOLDER
 
-#the rawdata are on a separate store, should be not larger than about 30TB
-#to avoid overloading the backup system
-#only this folder is backed up
+#the raw data folder, for the unmodified original data, incase this needs to be a separate file share etc
 export MUT_RAW=MUT_RAW_PLACEHOLDER
 
 #where to put temporary files on local node storage

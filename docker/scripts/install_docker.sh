@@ -20,4 +20,4 @@ sudo systemctl status docker
 
 #allow sudoless access to docker commands
 sudo adduser ${USER} docker
-#now log out and in again
+echo now log out and in again

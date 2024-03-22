@@ -21,10 +21,11 @@ if [[ "$#" != "0" ]] ; then
 fi
 
 docker build $@ -t mutein_tre \
-    --build-arg "username=${CONTAINER_USER}" \
-    --build-arg "data_path=${GUEST_DATA_FOLDER}" \
-    --build-arg "mamba_url=${MAMBA_URL}" \
-    --build-arg "mamba_sh=${MAMBA_SH}" \
+    --build-arg "REPO_FOLDER=${REPO_FOLDER}" \
+    --build-arg "CONTAINER_USER=${CONTAINER_USER}" \
+    --build-arg "GUEST_DATA_FOLDER=${GUEST_DATA_FOLDER}" \
+    --build-arg "MAMBA_URL=${MAMBA_URL}" \
+    --build-arg "MAMBA_SH=${MAMBA_SH}" \
     .
 
 #docker image list
