@@ -1,7 +1,7 @@
-#setup one conda environment given an "env" file listing the packages
-#touch an output file to flag that env has been created
+#generate the environment.yml files for each environment instead
+#the .env files must have a newline at end or the last line will be missed
 - action:
-    name: "setup_conda_envs"
+    name: "generate_env_files"
     exec: "local"
 
     base_dir: "{$MUT_DIR}/mutein/conda_envs"
@@ -9,11 +9,36 @@
     input:
         env_file: "{%base_dir}/{*env_name}.env"
     output:
-        touch: "config/conda_envs/{*env_name}.touch"
+        yml_file: "config/conda_envs/{*env_name}.yml"
         
     shell: |
-        mamba create -y \
-                     -n {%ym/conda_prefix}{*env_name} \
-                     {%conda_channels} \
-                     --file {%env_file} 
+        echo 'name: {%ym/conda_prefix}{*env_name}' >  {%yml_file}
+        echo 'channels:'                           >> {%yml_file}
+        CHANNELS=$(echo '{%conda_channels}'|sed 's/--override-channels //'|sed 's/-c //g')
+        for CHAN in ${CHANNELS}
+        do
+            echo "  - ${CHAN}"                     >> {%yml_file}
+        done
+        echo 'dependencies:'                       >> {%yml_file}
+        cat {%env_file} | \
+        while read line
+        do
+            echo "  - ${line}"                     >> {%yml_file}
+        done
+
+#setup conda environments given an environment file listing the packages
+#touch an output file to flag that env has been created
+- action:
+    name: "setup_conda_envs"
+    exec: "local"
+
+    input:
+        yml_file: "config/conda_envs/{*env_name}.yml"
+    output:
+        touch:    "config/conda_envs/{%name}.{*env_name}.touch"
+        
+    shell: |
+        conda env create -f ./config/conda_envs/bcftools.yml \
+        || conda env update -f ./config/conda_envs/bcftools.yml --prune
         touch {%touch}
+

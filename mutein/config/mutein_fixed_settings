@@ -13,7 +13,7 @@ export MUT_PREFIX=mutein_
 
 setup_conda_env()
 {
-    # setup conda snakemake environment if not already available (also provides python3)
+    # setup conda yamlmake environment if not already available (also provides python3)
     if ! conda env list | grep -qe "${MUT_PREFIX}main" ; then
         echo -n "Creating the ${MUT_PREFIX}main conda environment... "
         conda create -y -n ${MUT_PREFIX}main \

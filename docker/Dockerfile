@@ -13,7 +13,7 @@ ARG repo_path=repos
 #where within the container will the external data folder of the TRE be mounted
 ARG data_path
 
-#url to download mamba install script from and name of script itself
+#url to download mamba install script from and name of the install script itself
 ARG mamba_url
 ARG mamba_sh
 
@@ -38,12 +38,12 @@ RUN rm -rf /var/lib/apt/lists/*
 USER $username
 WORKDIR /home/$username
 
-#add github's host keys
+#add github's host keys (is this needed for an https clone?)
 RUN echo "$github_ed25519" >> ~/.ssh/known_hosts
 RUN echo "$github_ecdsa" >> ~/.ssh/known_hosts
 RUN echo "$github_rsa" >> ~/.ssh/known_hosts
 
-#clone the public pipeline repo into the container
+#clone the public pipeline repo
 RUN mkdir -p $repo_path
 WORKDIR /home/$username/$repo_path
 RUN git clone https://github.com/UCL-ARC/Mutein.git
@@ -60,6 +60,10 @@ RUN ./$mamba_sh -b -p /home/$username/mambaforge
 ENV PATH=/home/treuser/mambaforge/condabin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 RUN conda init
 RUN conda config --set auto_activate_base false
+
+#install packages
+#WORKDIR /home/$username/$repo_path/Mutein
+#RUN
 
 #set default command to bash
 CMD ["bash"]
