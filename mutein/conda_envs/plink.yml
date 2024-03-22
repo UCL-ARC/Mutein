@@ -1,0 +1,8 @@
+name: mutein_plink
+channels:
+  - conda-forge
+  - defaults
+  - bioconda
+  - flynn
+dependencies:
+  - plink==1.90b6.*

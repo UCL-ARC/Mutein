@@ -1,0 +1,10 @@
+name: mutein_main
+channels:
+  - conda-forge
+  - defaults
+  - bioconda
+  - flynn
+dependencies:
+  - snakemake
+  - pyaes
+  - pyyaml

@@ -1,0 +1,8 @@
+name: mutein_crossmap
+channels:
+  - conda-forge
+  - defaults
+  - bioconda
+  - flynn
+dependencies:
+  - crossmap

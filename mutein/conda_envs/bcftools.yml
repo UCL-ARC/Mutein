@@ -1,0 +1,8 @@
+name: mutein_bcftools
+channels:
+  - conda-forge
+  - defaults
+  - bioconda
+  - flynn
+dependencies:
+  - bcftools

@@ -1,0 +1,8 @@
+name: mutein_pyega3
+channels:
+  - conda-forge
+  - defaults
+  - bioconda
+  - flynn
+dependencies:
+  - pyega3==5.0.2

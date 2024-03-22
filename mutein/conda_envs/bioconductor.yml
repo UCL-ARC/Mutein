@@ -1,0 +1,11 @@
+name: mutein_bioconductor
+channels:
+  - conda-forge
+  - defaults
+  - bioconda
+  - flynn
+dependencies:
+  - bioconductor-deepsnv==1.44.*
+  - bcftools
+  - r-optparse
+  - r-tidyverse

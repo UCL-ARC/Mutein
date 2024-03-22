@@ -1,0 +1,8 @@
+name: mutein_seqtk
+channels:
+  - conda-forge
+  - defaults
+  - bioconda
+  - flynn
+dependencies:
+  - seqtk>=1.3

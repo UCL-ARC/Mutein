@@ -1,0 +1,8 @@
+name: mutein_ncftp
+channels:
+  - conda-forge
+  - defaults
+  - bioconda
+  - flynn
+dependencies:
+  - ncftp

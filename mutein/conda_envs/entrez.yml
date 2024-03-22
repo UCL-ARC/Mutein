@@ -1,0 +1,9 @@
+name: mutein_entrez
+channels:
+  - conda-forge
+  - defaults
+  - bioconda
+  - flynn
+dependencies:
+  - python==3.8.*
+  - entrez-direct>=16.2

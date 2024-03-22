@@ -1,0 +1,9 @@
+name: mutein_gpg
+channels:
+  - conda-forge
+  - defaults
+  - bioconda
+  - flynn
+dependencies:
+  - gnupg
+  - python>=3.8.13

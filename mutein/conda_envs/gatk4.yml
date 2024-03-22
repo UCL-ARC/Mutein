@@ -1,0 +1,8 @@
+name: mutein_gatk4
+channels:
+  - conda-forge
+  - defaults
+  - bioconda
+  - flynn
+dependencies:
+  - gatk4>=4.2.6.1

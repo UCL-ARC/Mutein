@@ -1,0 +1,9 @@
+name: mutein_bwa
+channels:
+  - conda-forge
+  - defaults
+  - bioconda
+  - flynn
+dependencies:
+  - bwa
+  - samtools

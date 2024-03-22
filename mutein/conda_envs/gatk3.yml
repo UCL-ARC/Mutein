@@ -1,0 +1,8 @@
+name: mutein_gatk3
+channels:
+  - conda-forge
+  - defaults
+  - bioconda
+  - flynn
+dependencies:
+  - gatk==3.8=hdfd78af_11
