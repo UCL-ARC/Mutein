@@ -14,4 +14,3 @@ export MUT_PREFIX=mutein_
 conda activate "${MUT_PREFIX}main"
 
 yamlmake --help
-

@@ -4,6 +4,8 @@
 # script used to build the docker container image on the docker build VM
 # run from the directory containing the Dockerfile
 #
+# useful build options:
+# --no-cache #to force full rebuild
 
 set -eu
 

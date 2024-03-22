@@ -62,8 +62,8 @@ RUN conda init
 RUN conda config --set auto_activate_base false
 
 #install packages
-#WORKDIR /home/$username/$repo_path/Mutein
-#RUN
+WORKDIR /home/$username/$repo_path/Mutein
+RUN ./mutein/scripts/setup_conda_envs.sh mutein/conda_envs/*.yml
 
 #set default command to bash
 CMD ["bash"]
