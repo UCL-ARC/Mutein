@@ -39,9 +39,9 @@ USER $CONTAINER_USER
 WORKDIR /home/$CONTAINER_USER
 
 #add github's host keys (is this needed for an https clone?)
-RUN echo "$github_ed25519" >> ~/.ssh/known_hosts
-RUN echo "$github_ecdsa" >> ~/.ssh/known_hosts
-RUN echo "$github_rsa" >> ~/.ssh/known_hosts
+# RUN echo "$github_ed25519" >> ~/.ssh/known_hosts
+# RUN echo "$github_ecdsa" >> ~/.ssh/known_hosts
+# RUN echo "$github_rsa" >> ~/.ssh/known_hosts
 
 #clone the public pipeline repo
 RUN mkdir -p $REPO_FOLDER
