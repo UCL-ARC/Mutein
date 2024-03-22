@@ -1,3 +1,5 @@
+#now done using mutein/scripts/setup_conda_envs.sh
+
 #generate the environment.yml files for each environment instead
 #the .env files must have a newline at end or the last line will be missed
 - action:
@@ -33,12 +35,12 @@
     exec: "local"
 
     input:
-        yml_file: "config/conda_envs/{*env_name}.yml"
+        yml_file: "{$MUT_DIR}/mutein/conda_envs/{*env_name}.yml"
     output:
         touch:    "config/conda_envs/{%name}.{*env_name}.touch"
         
     shell: |
-        conda env create -f ./config/conda_envs/bcftools.yml \
-        || conda env update -f ./config/conda_envs/bcftools.yml --prune
+        conda env create -f {%yml_file} \
+        || conda env update -f {%yml_file} --prune
         touch {%touch}
 

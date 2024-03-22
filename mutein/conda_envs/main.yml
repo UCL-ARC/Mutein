@@ -5,6 +5,5 @@ channels:
   - bioconda
   - flynn
 dependencies:
-  - snakemake
   - pyaes
   - pyyaml
