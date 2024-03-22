@@ -65,5 +65,9 @@ RUN conda config --set auto_activate_base false
 WORKDIR /home/$CONTAINER_USER/$REPO_FOLDER/Mutein
 RUN ./mutein/scripts/setup_conda_envs.sh mutein/conda_envs/*.yml
 
+#change into same folder that run_container.sh launches from
+#for convenience
+WORKDIR /home/$CONTAINER_USER/$REPO_FOLDER/Mutein/docker
+
 #set default command to bash
 CMD ["bash"]
